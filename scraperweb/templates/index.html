@@ -1,3 +1,12 @@
+{% extends "layout.html" %}
+{% block body %}
+
 <div>
     hello jav-scraper!
 </div>
+<button id="start">开始</button>
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}
