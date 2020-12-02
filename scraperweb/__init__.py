@@ -21,7 +21,13 @@ def create_app():
     handler.setFormatter(formatter)
     app.logger.addHandler(handler)
 
+    db.app = app
+    db.init_app(app)
     from .controller import register
     register(app)
+    from .model import load_models
+    load_models()
+    db.create_all()
+
 
     return app
