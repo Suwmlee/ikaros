@@ -2,7 +2,7 @@ name: Push Latest
 on:
   workflow_dispatch:
 jobs:
-  buildDocker::
+  buildDocker:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
