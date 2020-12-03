@@ -1,8 +1,6 @@
 import logging
 import os
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-
 
 class Config:
     DEBUG = False
@@ -12,5 +10,5 @@ class Config:
     LOGGING_LOCATION = 'error.log'
     LOGGING_LEVEL = logging.ERROR
     VERSION = '0.0.1'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'scraper.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///../database/scraper.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
