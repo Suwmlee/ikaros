@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from .SettingService import settingService
+from .setting import settingService
 from .scraper import *
 from ..utils.number_parser import get_number
 
@@ -65,7 +65,7 @@ def CEF(path):
         a = ''
 
 
-def create_data_and_move(file_path: str, c: config._Settings,debug):
+def create_data_and_move(file_path: str, c ,debug):
     # Normalized number, eg: 111xxx-222.mp4 -> xxx-222.mp4
     n_number = get_number(debug,file_path)
 
@@ -83,22 +83,22 @@ def create_data_and_move(file_path: str, c: config._Settings,debug):
             print('[-]', err)
 
             # 3.7.2 New: Move or not move to failed folder.
-            if c.failed_move() == False:
-                if c.soft_link():
+            if not c.failed_move:
+                if c.soft_link:
                     print("[-]Link {} to failed folder".format(file_path))
-                    os.symlink(file_path, str(os.getcwd()) + "/" + conf.failed_folder() + "/")
-            elif c.failed_move() == True:
-                if c.soft_link():
+                    os.symlink(file_path, str(os.getcwd()) + "/" + c.failed_folder + "/")
+            elif c.failed_move == True:
+                if c.soft_link:
                     print("[-]Link {} to failed folder".format(file_path))
-                    os.symlink(file_path, str(os.getcwd()) + "/" + conf.failed_folder() + "/")
+                    os.symlink(file_path, str(os.getcwd()) + "/" + c.failed_folder + "/")
                 else:
                     try:
                         print("[-]Move [{}] to failed folder".format(file_path))
-                        shutil.move(file_path, str(os.getcwd()) + "/" + conf.failed_folder() + "/")
+                        shutil.move(file_path, str(os.getcwd()) + "/" + c.failed_folder + "/")
                     except Exception as err:
                         print('[!]', err)
 
-def create_data_and_move_with_custom_number(file_path: str, c: config._Settings, custom_number=None):
+def create_data_and_move_with_custom_number(file_path: str, c, custom_number=None):
     try:
         print("[!]Making Data for [{}], the number is [{}]".format(file_path, custom_number))
         core_main(file_path, custom_number, c)
@@ -127,6 +127,10 @@ def start():
     # Read config.ini
     # conf = config._Settings(path=config_file)
     conf = settingService.getSetting()
+    conf.soft_link = False
+    conf.failed_move = False
+    conf.proxy_enable = True
+    conf.proxy_type = "socks5"
 
     version_print = 'Version ' + version
     print('[*]================== AV Data Capture ===================')
@@ -136,38 +140,38 @@ def start():
     if conf.update_check:
         check_update(version)
 
-    create_failed_folder(conf.failed_output_folder)
-    os.chdir(os.getcwd())
+    create_failed_folder(conf.failed_folder)
+    os.chdir(conf.scrape_folder)
 
-    # ========== Single File ==========
-    if not single_file_path == '':
-        print('[+]==================== Single File =====================')
-        create_data_and_move_with_custom_number(single_file_path, conf,custom_number)
-        CEF(conf.success_folder)
-        CEF(conf.failed_folder)
-        print("[+]All finished!!!")
-        input("[+][+]Press enter key exit, you can check the error messge before you exit.")
-        exit()
+    # # ========== Single File ==========
+    # if not single_file_path == '':
+    #     print('[+]==================== Single File =====================')
+    #     create_data_and_move_with_custom_number(single_file_path, conf,custom_number)
+    #     CEF(conf.success_folder)
+    #     CEF(conf.failed_folder)
+    #     print("[+]All finished!!!")
+    #     input("[+][+]Press enter key exit, you can check the error messge before you exit.")
+    #     exit()
     # ========== Single File ==========
 
-    movie_list = movie_lists(".", re.split("[,，]", conf.escape_folder))
+    movie_list = movie_lists(conf.scrape_folder, re.split("[,，]", conf.escape_folders))
 
     count = 0
     count_all = str(len(movie_list))
     print('[+]Find', count_all, 'movies')
-    if conf.debug() == True:
+    if conf.debug_info == True:
         print('[+]'+' DEBUG MODE ON '.center(54, '-'))
-    if conf.soft_link():
+    if conf.soft_link:
         print('[!] --- Soft link mode is ENABLE! ----')
     for movie_path in movie_list:  # 遍历电影列表 交给core处理
         count = count + 1
         percentage = str(count / int(count_all) * 100)[:4] + '%'
         print('[!] - ' + percentage + ' [' + str(count) + '/' + count_all + '] -')
-        create_data_and_move(movie_path, conf, conf.debug())
+        create_data_and_move(movie_path, conf, conf.debug_info)
 
-    CEF(conf.success_folder())
-    CEF(conf.failed_folder())
+    CEF(conf.success_folder)
+    CEF(conf.failed_folder)
     print("[+]All finished!!!")
-    if conf.auto_exit():
-        os._exit(0)
-    input("[+][+]Press enter key exit, you can check the error message before you exit.")
+    # if conf.auto_exit:
+    #     os._exit(0)
+    # input("[+][+]Press enter key exit, you can check the error message before you exit.")

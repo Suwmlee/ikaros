@@ -2,10 +2,12 @@
 
 $("#start").click(function() {
     console.log("start")
-
+    let folderpath = $("#folderpath").val();
     $.ajax({
-        type: 'GET',
+        type: 'POST',
         url: '/start',
+        data: JSON.stringify(folderpath),
+        contentType: 'application/json',
         success: function (result) {
             console.log("success")
         },

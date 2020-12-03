@@ -1,9 +1,10 @@
 import requests
 from lxml import etree
 
-from ..model import setting as config
+from ..bizlogic.setting import settingService
 
 SUPPORT_PROXY_TYPE = ("http", "socks5", "socks5h")
+
 
 def get_data_state(data: dict) -> bool:  # 元数据获取失败检测
     if "title" not in data or "number" not in data:
@@ -18,7 +19,7 @@ def get_data_state(data: dict) -> bool:  # 元数据获取失败检测
     return True
 
 
-def getXpathSingle(htmlcode,xpath):
+def getXpathSingle(htmlcode, xpath):
     html = etree.fromstring(htmlcode, etree.HTMLParser())
     result1 = str(html.xpath(xpath)).strip(" ['']")
     return result1
@@ -40,11 +41,11 @@ def get_proxy(proxy: str, proxytype: str = None) -> dict:
 
 # 网页请求核心
 def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None):
-    switch, proxy, timeout, retry_count, proxytype = config.Config().proxy()
+    switch, proxy, timeout, retry_count, proxytype = settingService.getProxySetting()
     proxies = get_proxy(proxy, proxytype)
 
     if ua is None:
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3100.0 Safari/537.36"} # noqa
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3100.0 Safari/537.36"}  # noqa
     else:
         headers = {"User-Agent": ua}
 
@@ -69,7 +70,7 @@ def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None)
 
 
 def post_html(url: str, query: dict) -> requests.Response:
-    switch, proxy, timeout, retry_count, proxytype = config.Config().proxy()
+    switch, proxy, timeout, retry_count, proxytype = settingService.getProxySetting()
     proxies = get_proxy(proxy, proxytype)
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3100.0 Safari/537.36"}
@@ -77,7 +78,7 @@ def post_html(url: str, query: dict) -> requests.Response:
     for i in range(retry_count):
         try:
             if switch == 1 or switch == '1':
-                result = requests.post(url, data=query, proxies=proxies,headers=headers, timeout=timeout)
+                result = requests.post(url, data=query, proxies=proxies, headers=headers, timeout=timeout)
             else:
                 result = requests.post(url, data=query, headers=headers, timeout=timeout)
             return result
@@ -88,7 +89,7 @@ def post_html(url: str, query: dict) -> requests.Response:
 
 def get_javlib_cookie() -> [dict, str]:
     import cloudscraper
-    switch, proxy, timeout, retry_count, proxytype = config.Config().proxy()
+    switch, proxy, timeout, retry_count, proxytype = settingService.getProxySetting()
     proxies = get_proxy(proxy, proxytype)
 
     raw_cookie = {}
@@ -113,8 +114,9 @@ def get_javlib_cookie() -> [dict, str]:
 
     return raw_cookie, user_agent
 
+
 def translateTag_to_sc(tag):
-    tranlate_to_sc = config.Config().transalte_to_sc()
+    tranlate_to_sc = settingService.setting.transalte_to_sc
     if tranlate_to_sc:
         dict_gen = {'中文字幕': '中文字幕',
                     '高清': 'XXXX', '字幕': 'XXXX', '推薦作品': '推荐作品', '通姦': '通奸', '淋浴': '淋浴', '舌頭': '舌头',
@@ -447,7 +449,7 @@ def translateTag_to_sc(tag):
                         '個人撮影', '不修改': '無修正', '角色扮演': 'コスプレ', '内衣': '下着', '美乳': '美乳', '游泳衣': '水着', '流出':
                         '流出', '制服': '制服', '小册子': 'パンチラ', '口交': 'フェラ', '模型': 'モデル', '中出': '中出し', '可爱':
                         '可愛い', '人妻': '人妻', '美少女': '美少女', '原始': 'オリジナル', '贫奶': '貧乳', '自慰': 'オナニー', '菠萝':
-                        'パイパン','ロリ':'萝莉','生ハメ':'第一人称',
+                        'パイパン', 'ロリ': '萝莉', '生ハメ': '第一人称',
                     }
         try:
             return dict_gen[tag]
@@ -456,9 +458,10 @@ def translateTag_to_sc(tag):
     else:
         return tag
 
-def translate(src:str,target_language:str="zh_cn"):
+
+def translate(src: str, target_language: str = "zh_cn"):
     url = "https://translate.google.cn/translate_a/single?client=gtx&dt=t&dj=1&ie=UTF-8&sl=auto&tl=" + target_language + "&q=" + src
-    result = get_html(url=url,return_type="object")
+    result = get_html(url=url, return_type="object")
 
     translate_list = [i["trans"] for i in result.json()["sentences"]]
 

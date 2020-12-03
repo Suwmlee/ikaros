@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''
-'''
+"""
+    init app
+"""
 import logging
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -8,10 +9,9 @@ from .config import Config
 
 db = SQLAlchemy()
 
-
 def create_app():
-    ''' create application
-    '''
+    """ create application
+    """
     app = Flask(__name__, static_url_path='')
     app.config.from_object(Config)
     # Configure logging
@@ -28,6 +28,5 @@ def create_app():
     from .model import load_models
     load_models()
     db.create_all()
-
 
     return app

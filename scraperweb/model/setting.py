@@ -12,6 +12,7 @@ class _Settings(db.Model):
     debug_info = Column(Boolean, default=False)
     auto_exit = Column(Boolean, default=True)
 
+    scrape_folder = Column(String, default='')
     failed_folder = Column(String, default='failed')
     success_folder = Column(String, default='JAV_output')
     soft_link = Column(Boolean, default=True)
@@ -31,6 +32,6 @@ class _Settings(db.Model):
 
     escape_folders = Column(String, default="failed,JAV_output")
 
-    transalte_to_sc = Column(Boolean, default=False)
     transalte_enable = Column(Boolean, default=False)
+    transalte_to_sc = Column(Boolean, default=False)
     transalte_values = Column(String, default="title,outline")
