@@ -12,10 +12,10 @@ class _Settings(db.Model):
     debug_info = Column(Boolean, default=False)
     auto_exit = Column(Boolean, default=True)
 
-    scrape_folder = Column(String, default='')
+    scrape_folder = Column(String, default='/jav')
     failed_folder = Column(String, default='failed')
-    success_folder = Column(String, default='JAV_output')
-    soft_link = Column(Boolean, default=True)
+    success_folder = Column(String, default='output')
+    soft_link = Column(Boolean, default=False)
     failed_move = Column(Boolean, default=False)
 
     proxy_enable = Column(Boolean, default=False)

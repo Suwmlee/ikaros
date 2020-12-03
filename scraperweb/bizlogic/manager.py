@@ -127,10 +127,6 @@ def start():
     # Read config.ini
     # conf = config._Settings(path=config_file)
     conf = settingService.getSetting()
-    conf.soft_link = False
-    conf.failed_move = False
-    conf.proxy_enable = True
-    conf.proxy_type = "socks5"
 
     version_print = 'Version ' + version
     print('[*]================== AV Data Capture ===================')
