@@ -8,8 +8,16 @@ from PIL import Image
 from ..utils.ADC_function import *
 
 # =========website========
+from ..scraperlib import avsox
 from ..scraperlib import fanza
+from ..scraperlib import fc2
+from ..scraperlib import jav321
 from ..scraperlib import javbus
+from ..scraperlib import javdb
+from ..scraperlib import mgstage
+from ..scraperlib import xcity
+from ..scraperlib import javlib
+from ..scraperlib import dlsite
 
 
 def escape_path(path, escape_literals: str):  # Remove escape literals
@@ -40,8 +48,16 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
     """
 
     func_mapping = {
+        "avsox": avsox.main,
+        "fc2": fc2.main,
         "fanza": fanza.main,
-        "javbus": javbus.main
+        "javdb": javdb.main,
+        "javbus": javbus.main,
+        "mgstage": mgstage.main,
+        "jav321": jav321.main,
+        "xcity": xcity.main,
+        "javlib": javlib.main,
+        "dlsite": dlsite.main,
     }
 
     # default fetch order list, from the beginning to the end
