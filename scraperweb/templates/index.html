@@ -1,21 +1,53 @@
 {% extends "layout.html" %}
 {% block body %}
 
+<div class="container">
 
+    <div class="top-menu">
 
-<div style="text-align: center;">
-    <!-- <h1>hello jav-scraper!</h1> -->
+        <input id="folderpath" type="text" value="/jav" />
 
-    <!-- <input type="file" id="flup" onchange="getfolder(event)" webkitdirectory mozdirectory msdirectory odirectory directory multiple /> -->
-    <!-- <input type="file" webkitdirectory /> -->
+        <button id="start" type="button" class="btn btn-primary">开始</button>
+    </div>
 
-    <input id="folderpath" type="text" value="/jav" />
-
-    <button id="start" type="button" class="btn btn-primary">开始</button>
+    <div id="log-container" class="log-container">
+        <pre id="log-detail"></pre>
+        <!-- <textarea id="logdetail" class="form-control" readonly aria-label="With textarea"></textarea> -->
+    </div>
 </div>
 
 {% endblock %}
 
 {% block js %}
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+    $(document).ready(function(){
+        window.lastlognum = 0
+        setInterval(function() {
+          getlog()
+        }, 3000);
+    });
+    function getlog(){
+        
+        if(window.lastlognum === undefined){
+            window.lastlognum = 1
+        }
+
+        $.ajax({
+            type: 'GET',
+            url: '/log/'+ window.lastlognum,
+            success: function (result) {
+                newlog = JSON.parse(result);
+                window.lastlognum = newlog.lastnum;
+                if (newlog.content != '') {
+                    $('#log-detail').append(newlog.content);
+                }
+            },
+            error: function (xml, info, obj) {
+                // logdetail.textContent = xhr.responseText;
+                console.log("err")
+            }
+        });
+    }
+</script>
 {% endblock %}

@@ -1,5 +1,6 @@
 import requests
 from lxml import etree
+from flask import current_app as app
 
 from ..bizlogic.setting import settingService
 
@@ -64,9 +65,9 @@ def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None)
                 return result.text
 
         except Exception as e:
-            print("[-]Connect retry {}/{}".format(i + 1, retry_count))
-            print("[-]" + str(e))
-    print('[-]Connect Failed! Please check your Proxy or Network!')
+            app.logger.info("[-]Connect retry {}/{}".format(i + 1, retry_count))
+            app.logger.info("[-]" + str(e))
+    app.logger.info('[-]Connect Failed! Please check your Proxy or Network!')
 
 
 def post_html(url: str, query: dict) -> requests.Response:
@@ -83,8 +84,8 @@ def post_html(url: str, query: dict) -> requests.Response:
                 result = requests.post(url, data=query, headers=headers, timeout=timeout)
             return result
         except requests.exceptions.ProxyError:
-            print("[-]Connect retry {}/{}".format(i+1, retry_count))
-    print("[-]Connect Failed! Please check your Proxy or Network!")
+            app.logger.info("[-]Connect retry {}/{}".format(i+1, retry_count))
+    app.logger.info("[-]Connect Failed! Please check your Proxy or Network!")
 
 
 def get_javlib_cookie() -> [dict, str]:
@@ -108,9 +109,9 @@ def get_javlib_cookie() -> [dict, str]:
                     "http://www.m45e.com/"
                 )
         except requests.exceptions.ProxyError:
-            print("[-] ProxyError, retry {}/{}".format(i+1, retry_count))
+            app.logger.info("[-] ProxyError, retry {}/{}".format(i+1, retry_count))
         except cloudscraper.exceptions.CloudflareIUAMError:
-            print("[-] IUAMError, retry {}/{}".format(i+1, retry_count))
+            app.logger.info("[-] IUAMError, retry {}/{}".format(i+1, retry_count))
 
     return raw_cookie, user_agent
 
