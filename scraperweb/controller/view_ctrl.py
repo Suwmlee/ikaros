@@ -7,6 +7,6 @@ from ..bizlogic.setting import settingService
 @web.route("/")
 def index():
 
-    folderpath = settingService.getSetting().scrape_folder
+    settings = settingService.getSetting()
 
-    return render_template('index.html', folderpath = folderpath)
+    return render_template('index.html', settings = settings)
