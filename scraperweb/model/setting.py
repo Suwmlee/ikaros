@@ -30,7 +30,7 @@ class _Settings(db.Model):
     update_check = Column(Boolean, default=False)
     website_priority = Column(String, default="javbus,javdb,fanza,xcity,mgstage,fc2,avsox,jav321,javlib,dlsite")
 
-    escape_folders = Column(String, default="failed,JAV_output")
+    escape_folders = Column(String, default="failed,output")
 
     transalte_enable = Column(Boolean, default=False)
     transalte_to_sc = Column(Boolean, default=False)

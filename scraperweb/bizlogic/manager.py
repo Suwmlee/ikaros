@@ -84,7 +84,7 @@ def create_data_and_move(file_path: str, c, debug):
             app.logger.info("[*]======================================================")
         except Exception as err:
             app.logger.info("[-] [{}] ERROR:".format(file_path))
-            app.logger.info('[-]', err)
+            app.logger.info(err)
 
             # 3.7.2 New: Move or not move to failed folder.
             if not c.failed_move:

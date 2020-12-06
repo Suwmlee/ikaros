@@ -11,8 +11,6 @@ class SettingService():
     setting = None
 
     def getSetting(self):
-        if self.setting:
-            return self.setting
         self.setting = _Settings.query.filter_by(id=1).first()
         if not self.setting:
             self.setting = _Settings()

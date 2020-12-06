@@ -342,7 +342,7 @@ def image_download(cover, number, c_word, path, conf, filepath, failed_folder):
             break
     if os.path.getsize(path + '/' + number + c_word + '-fanart.jpg') == 0:
         return
-    app.logger.info('[+]Image Downloaded!', path + '/' + number + c_word + '-fanart.jpg')
+    app.logger.info('[+]Image Downloaded!' + path + '/' + number + c_word + '-fanart.jpg')
     shutil.copyfile(path + '/' + number + c_word + '-fanart.jpg',path + '/' + number + c_word + '-thumb.jpg')
 
 
@@ -353,51 +353,51 @@ def print_files(path, c_word, naming_rule, part, cn_sub, json_data, filepath, fa
         if not os.path.exists(path):
             os.makedirs(path)
         with open(path + "/" + number + part + c_word + ".nfo", "wt", encoding='UTF-8') as code:
-            app.logger.info('<?xml version="1.0" encoding="UTF-8" ?>', file=code)
-            app.logger.info("<movie>", file=code)
-            app.logger.info(" <title>" + naming_rule + "</title>", file=code)
-            app.logger.info("  <set>", file=code)
-            app.logger.info("  </set>", file=code)
-            app.logger.info("  <studio>" + studio + "+</studio>", file=code)
-            app.logger.info("  <year>" + year + "</year>", file=code)
-            app.logger.info("  <outline>" + outline + "</outline>", file=code)
-            app.logger.info("  <plot>" + outline + "</plot>", file=code)
-            app.logger.info("  <runtime>" + str(runtime).replace(" ", "") + "</runtime>", file=code)
-            app.logger.info("  <director>" + director + "</director>", file=code)
-            app.logger.info("  <poster>" + number + c_word + "-poster.jpg</poster>", file=code)
-            app.logger.info("  <thumb>" + number + c_word + "-thumb.jpg</thumb>", file=code)
-            app.logger.info("  <fanart>" + number + c_word + '-fanart.jpg' + "</fanart>", file=code)
+            print('<?xml version="1.0" encoding="UTF-8" ?>', file=code)
+            print("<movie>", file=code)
+            print(" <title>" + naming_rule + "</title>", file=code)
+            print("  <set>", file=code)
+            print("  </set>", file=code)
+            print("  <studio>" + studio + "+</studio>", file=code)
+            print("  <year>" + year + "</year>", file=code)
+            print("  <outline>" + outline + "</outline>", file=code)
+            print("  <plot>" + outline + "</plot>", file=code)
+            print("  <runtime>" + str(runtime).replace(" ", "") + "</runtime>", file=code)
+            print("  <director>" + director + "</director>", file=code)
+            print("  <poster>" + number + c_word + "-poster.jpg</poster>", file=code)
+            print("  <thumb>" + number + c_word + "-thumb.jpg</thumb>", file=code)
+            print("  <fanart>" + number + c_word + '-fanart.jpg' + "</fanart>", file=code)
             try:
                 for key in actor_list:
-                    app.logger.info("  <actor>", file=code)
-                    app.logger.info("   <name>" + key + "</name>", file=code)
-                    app.logger.info("  </actor>", file=code)
+                    print("  <actor>", file=code)
+                    print("   <name>" + key + "</name>", file=code)
+                    print("  </actor>", file=code)
             except:
                 aaaa = ''
-            app.logger.info("  <maker>" + studio + "</maker>", file=code)
-            app.logger.info("  <label>" + label + "</label>", file=code)
+            print("  <maker>" + studio + "</maker>", file=code)
+            print("  <label>" + label + "</label>", file=code)
             if cn_sub == '1':
-                app.logger.info("  <tag>中文字幕</tag>", file=code)
+                print("  <tag>中文字幕</tag>", file=code)
             if liuchu == '流出':
-                app.logger.info("  <tag>流出</tag>", file=code)
+                print("  <tag>流出</tag>", file=code)
             try:
                 for i in tag:
-                    app.logger.info("  <tag>" + i + "</tag>", file=code)
-                app.logger.info("  <tag>" + series + "</tag>", file=code)
+                    print("  <tag>" + i + "</tag>", file=code)
+                print("  <tag>" + series + "</tag>", file=code)
             except:
                 aaaaa = ''
             try:
                 for i in tag:
-                    app.logger.info("  <genre>" + i + "</genre>", file=code)
+                    print("  <genre>" + i + "</genre>", file=code)
             except:
                 aaaaaaaa = ''
             if cn_sub == '1':
-                app.logger.info("  <genre>中文字幕</genre>", file=code)
-            app.logger.info("  <num>" + number + "</num>", file=code)
-            app.logger.info("  <premiered>" + release + "</premiered>", file=code)
-            app.logger.info("  <cover>" + cover + "</cover>", file=code)
-            app.logger.info("  <website>" + website + "</website>", file=code)
-            app.logger.info("</movie>", file=code)
+                print("  <genre>中文字幕</genre>", file=code)
+            print("  <num>" + number + "</num>", file=code)
+            print("  <premiered>" + release + "</premiered>", file=code)
+            print("  <cover>" + cover + "</cover>", file=code)
+            print("  <website>" + website + "</website>", file=code)
+            print("</movie>", file=code)
             app.logger.info("[+]Wrote!            " + path + "/" + number + part + c_word + ".nfo")
     except IOError as e:
         app.logger.info("[-]Write Failed!")
