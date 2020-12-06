@@ -342,7 +342,7 @@ def image_download(cover, number, c_word, path, conf, filepath, failed_folder):
             break
     if os.path.getsize(path + '/' + number + c_word + '-fanart.jpg') == 0:
         return
-    app.logger.info('[+]Image Downloaded!' + path + '/' + number + c_word + '-fanart.jpg')
+    app.logger.info('[+]Image Downloaded! ' + path + '/' + number + c_word + '-fanart.jpg')
     shutil.copyfile(path + '/' + number + c_word + '-fanart.jpg',path + '/' + number + c_word + '-thumb.jpg')
 
 

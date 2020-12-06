@@ -24,8 +24,8 @@ class _Settings(db.Model):
     proxy_timeout = Column(Integer, default=5)
     proxy_retry = Column(Integer, default=3)
 
-    location_rule = Column(String, default="actor+'/'+number")
-    naming_rule = Column(String, default="number+'-'+title")
+    location_rule = Column(String, default="actor+'/'+number+' '+title")
+    naming_rule = Column(String, default="number+' '+title")
     max_title_len = Column(Integer, default=50)
     update_check = Column(Boolean, default=False)
     website_priority = Column(String, default="javbus,javdb,fanza,xcity,mgstage,fc2,avsox,jav321,javlib,dlsite")

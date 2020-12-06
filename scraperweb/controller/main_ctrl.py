@@ -19,7 +19,7 @@ def start():
     try:
         content = request.get_json()
 
-        settingService.updateScrapeFolder(content)
+        settingService.updateSetting(content)
 
         manager.start()
         return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
