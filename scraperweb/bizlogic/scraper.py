@@ -32,7 +32,7 @@ def escape_path(path, escape_literals: str):  # Remove escape literals
 def moveFailedFolder(filepath, failed_folder):
     app.logger.info('[-]Move to Failed output folder')
     shutil.move(filepath, str(os.getcwd()) + '/' + failed_folder + '/')
-    return 
+    return
 
 
 def CreatFailedFolder(failed_folder):
@@ -41,7 +41,7 @@ def CreatFailedFolder(failed_folder):
             os.makedirs(failed_folder + '/')
         except:
             app.logger.info("[-]failed!can not be make Failed output folder\n[-](Please run as Administrator)")
-            return 
+            return
 
 
 def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
@@ -68,19 +68,19 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
     # if the input file name matches certain rules,
     # move some web service to the beginning of the list
     if "avsox" in sources and (re.match(r"^\d{5,}", file_number) or
-        "HEYZO" in file_number or "heyzo" in file_number or "Heyzo" in file_number
-    ):
+                               "HEYZO" in file_number or "heyzo" in file_number or "Heyzo" in file_number
+                               ):
         # if conf.debug() == True:
         #     app.logger.info('[+]select avsox')
         sources.insert(0, sources.pop(sources.index("avsox")))
     elif "mgstage" in sources and (re.match(r"\d+\D+", file_number) or
-        "siro" in file_number or "SIRO" in file_number or "Siro" in file_number
-    ):
+                                   "siro" in file_number or "SIRO" in file_number or "Siro" in file_number
+                                   ):
         # if conf.debug() == True:
             # app.logger.info('[+]select fanza')
         sources.insert(0, sources.pop(sources.index("mgstage")))
     elif "fc2" in sources and ("fc2" in file_number or "FC2" in file_number
-    ):
+                               ):
         # if conf.debug() == True:
         #     app.logger.info('[+]select fc2')
         sources.insert(0, sources.pop(sources.index("fc2")))
@@ -95,7 +95,7 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
     for source in sources:
         try:
             if conf.debug_info == True:
-                app.logger.info('[+]select',source)
+                app.logger.info('[+]select', source)
             json_data = json.loads(func_mapping[source](file_number))
             # if any service return a valid return, break
             if get_data_state(json_data):
@@ -155,49 +155,49 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
     # ====================处理异常字符 END================== #\/:*?"<>|
 
     # ===  替换Studio片假名
-    studio = studio.replace('アイエナジー','Energy')
-    studio = studio.replace('アイデアポケット','Idea Pocket')
-    studio = studio.replace('アキノリ','AKNR')
-    studio = studio.replace('アタッカーズ','Attackers')
-    studio = re.sub('アパッチ.*','Apache',studio)
-    studio = studio.replace('アマチュアインディーズ','SOD')
-    studio = studio.replace('アリスJAPAN','Alice Japan')
-    studio = studio.replace('オーロラプロジェクト・アネックス','Aurora Project Annex')
-    studio = studio.replace('クリスタル映像','Crystal 映像')
-    studio = studio.replace('グローリークエスト','Glory Quest')
-    studio = studio.replace('ダスッ！','DAS！')
-    studio = studio.replace('ディープス','DEEP’s')
-    studio = studio.replace('ドグマ','Dogma')
-    studio = studio.replace('プレステージ','PRESTIGE')
-    studio = studio.replace('ムーディーズ','MOODYZ')
-    studio = studio.replace('メディアステーション','宇宙企画')
-    studio = studio.replace('ワンズファクトリー','WANZ FACTORY')
-    studio = studio.replace('エスワン ナンバーワンスタイル','S1')
-    studio = studio.replace('エスワンナンバーワンスタイル','S1')
-    studio = studio.replace('SODクリエイト','SOD')
-    studio = studio.replace('サディスティックヴィレッジ','SOD')
-    studio = studio.replace('V＆Rプロダクツ','V＆R PRODUCE')
-    studio = studio.replace('V＆RPRODUCE','V＆R PRODUCE')
-    studio = studio.replace('レアルワークス','Real Works')
-    studio = studio.replace('マックスエー','MAX-A')
-    studio = studio.replace('ピーターズMAX','PETERS MAX')
-    studio = studio.replace('プレミアム','PREMIUM')
-    studio = studio.replace('ナチュラルハイ','NATURAL HIGH')
-    studio = studio.replace('マキシング','MAXING')
-    studio = studio.replace('エムズビデオグループ','M’s Video Group')
-    studio = studio.replace('ミニマム','Minimum')
-    studio = studio.replace('ワープエンタテインメント','WAAP Entertainment')
-    studio = re.sub('.*/妄想族','妄想族',studio)
-    studio = studio.replace('/',' ')
+    studio = studio.replace('アイエナジー', 'Energy')
+    studio = studio.replace('アイデアポケット', 'Idea Pocket')
+    studio = studio.replace('アキノリ', 'AKNR')
+    studio = studio.replace('アタッカーズ', 'Attackers')
+    studio = re.sub('アパッチ.*', 'Apache', studio)
+    studio = studio.replace('アマチュアインディーズ', 'SOD')
+    studio = studio.replace('アリスJAPAN', 'Alice Japan')
+    studio = studio.replace('オーロラプロジェクト・アネックス', 'Aurora Project Annex')
+    studio = studio.replace('クリスタル映像', 'Crystal 映像')
+    studio = studio.replace('グローリークエスト', 'Glory Quest')
+    studio = studio.replace('ダスッ！', 'DAS！')
+    studio = studio.replace('ディープス', 'DEEP’s')
+    studio = studio.replace('ドグマ', 'Dogma')
+    studio = studio.replace('プレステージ', 'PRESTIGE')
+    studio = studio.replace('ムーディーズ', 'MOODYZ')
+    studio = studio.replace('メディアステーション', '宇宙企画')
+    studio = studio.replace('ワンズファクトリー', 'WANZ FACTORY')
+    studio = studio.replace('エスワン ナンバーワンスタイル', 'S1')
+    studio = studio.replace('エスワンナンバーワンスタイル', 'S1')
+    studio = studio.replace('SODクリエイト', 'SOD')
+    studio = studio.replace('サディスティックヴィレッジ', 'SOD')
+    studio = studio.replace('V＆Rプロダクツ', 'V＆R PRODUCE')
+    studio = studio.replace('V＆RPRODUCE', 'V＆R PRODUCE')
+    studio = studio.replace('レアルワークス', 'Real Works')
+    studio = studio.replace('マックスエー', 'MAX-A')
+    studio = studio.replace('ピーターズMAX', 'PETERS MAX')
+    studio = studio.replace('プレミアム', 'PREMIUM')
+    studio = studio.replace('ナチュラルハイ', 'NATURAL HIGH')
+    studio = studio.replace('マキシング', 'MAXING')
+    studio = studio.replace('エムズビデオグループ', 'M’s Video Group')
+    studio = studio.replace('ミニマム', 'Minimum')
+    studio = studio.replace('ワープエンタテインメント', 'WAAP Entertainment')
+    studio = re.sub('.*/妄想族', '妄想族', studio)
+    studio = studio.replace('/', ' ')
     # ===  替换Studio片假名 END
-    
+
     location_rule = eval(conf.location_rule)
 
     # Process only Windows.
     if platform.system() == "Windows":
         if 'actor' in conf.location_rule and len(actor) > 100:
             app.logger.info(conf.location_rule)
-            location_rule = eval(conf.location_rule.replace("actor","'多人作品'"))
+            location_rule = eval(conf.location_rule.replace("actor", "'多人作品'"))
         maxlen = conf.max_title_len
         if 'title' in conf.location_rule and len(title) > maxlen:
             shorttitle = title[0:maxlen]
@@ -216,12 +216,12 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
         translate_values = conf.transalte_values.split(",")
         for translate_value in translate_values:
             json_data[translate_value] = translate(json_data[translate_value])
-    naming_rule=""
+    naming_rule = ""
     for i in conf.naming_rule.split("+"):
         if i not in json_data:
-            naming_rule+=i.strip("'").strip('"')
+            naming_rule += i.strip("'").strip('"')
         else:
-            naming_rule+=json_data[i]
+            naming_rule += json_data[i]
     json_data['naming_rule'] = naming_rule
     return json_data
 
@@ -251,7 +251,7 @@ def small_cover_check(path, number, cover_small, c_word, conf, filepath, failed_
 def create_folder(success_folder, location_rule, json_data, conf):  # 创建文件夹
     title, studio, year, outline, runtime, director, actor_photo, release, number, cover, website, series, label = get_info(json_data)
     if len(location_rule) > 240:  # 新建成功输出文件夹
-        path = success_folder + '/' + location_rule.replace("'actor'", "'manypeople'", 3).replace("actor","'manypeople'",3)  # path为影片+元数据所在目录
+        path = success_folder + '/' + location_rule.replace("'actor'", "'manypeople'", 3).replace("actor", "'manypeople'", 3)  # path为影片+元数据所在目录
     else:
         path = success_folder + '/' + location_rule
     path = trimblank(path)
@@ -279,6 +279,8 @@ def trimblank(s: str):
 # =====================资源下载部分===========================
 
 # path = examle:photo , video.in the Project Folder!
+
+
 def download_file_with_filename(url, filename, path, conf, filepath, failed_folder):
     switch, proxy, timeout, retry_count, proxytype = settingService.getProxySetting()
 
@@ -293,7 +295,7 @@ def download_file_with_filename(url, filename, path, conf, filepath, failed_fold
                 r = requests.get(url, headers=headers, timeout=timeout, proxies=proxies)
                 if r == '':
                     app.logger.info('[-]Movie Data not found!')
-                    return 
+                    return
                 with open(str(path) + "/" + filename, "wb") as code:
                     code.write(r.content)
                 return
@@ -305,7 +307,7 @@ def download_file_with_filename(url, filename, path, conf, filepath, failed_fold
                 r = requests.get(url, timeout=timeout, headers=headers)
                 if r == '':
                     app.logger.info('[-]Movie Data not found!')
-                    return 
+                    return
                 with open(str(path) + "/" + filename, "wb") as code:
                     code.write(r.content)
                 return
@@ -343,7 +345,7 @@ def image_download(cover, number, c_word, path, conf, filepath, failed_folder):
     if os.path.getsize(path + '/' + number + c_word + '-fanart.jpg') == 0:
         return
     app.logger.info('[+]Image Downloaded! ' + path + '/' + number + c_word + '-fanart.jpg')
-    shutil.copyfile(path + '/' + number + c_word + '-fanart.jpg',path + '/' + number + c_word + '-thumb.jpg')
+    shutil.copyfile(path + '/' + number + c_word + '-fanart.jpg', path + '/' + number + c_word + '-thumb.jpg')
 
 
 def print_files(path, c_word, naming_rule, part, cn_sub, json_data, filepath, failed_folder, tag, actor_list, liuchu):
@@ -412,20 +414,43 @@ def print_files(path, c_word, naming_rule, part, cn_sub, json_data, filepath, fa
 
 
 def cutImage(imagecut, path, number, c_word):
-    if imagecut == 1: # 剪裁大封面
+    if imagecut == 1:  # 剪裁大封面
         try:
             img = Image.open(path + '/' + number + c_word + '-fanart.jpg')
             imgSize = img.size
             w = img.width
             h = img.height
             img2 = img.crop((w - h / 1.5, 0, w, h))
-            img2.save(path + '/' + number + c_word + '-poster.jpg')
-            app.logger.info('[+]Image Cutted!     ' + path + '/' + number + c_word + '-poster.jpg')
+            if c_word == '-C':
+                app.logger.info('[+]Add Chinese subtitle mark!')
+                add_to_pic(path + '/' + number + c_word + '-poster.jpg', img2)
+            else:
+                img2.save(path + '/' + number + c_word + '-poster.jpg')
+                app.logger.info('[+]Image Cutted!     ' + path + '/' + number + c_word + '-poster.jpg')
         except:
             app.logger.info('[-]Cover cut failed!')
-    elif imagecut == 0: # 复制封面
-        shutil.copyfile(path + '/' + number + c_word + '-fanart.jpg',path + '/' + number + c_word + '-poster.jpg')
+    elif imagecut == 0:  # 复制封面
+        if c_word == '-C':
+            img3 = Image.open(path + '/' + number + c_word + '-fanart.jpg')
+            add_to_pic(path + '/' + number + c_word + '-poster.jpg', img3)
+        else:
+            shutil.copyfile(path + '/' + number + c_word + '-fanart.jpg', path + '/' + number + c_word + '-poster.jpg')
         app.logger.info('[+]Image Copyed!     ' + path + '/' + number + c_word + '-poster.jpg')
+
+
+def add_to_pic(pic_path, img_pic):
+    size = 10
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    mark_pic_path = basedir +'/../images/ch.png'
+    img_subt = Image.open(mark_pic_path)
+    scroll_high = int(img_pic.height / size)
+    scroll_wide = int(scroll_high * img_subt.width / img_subt.height)
+    img_subt = img_subt.resize((scroll_wide, scroll_high), Image.ANTIALIAS)
+    r, g, b, a = img_subt.split()  # 获取颜色通道，保持png的透明性
+    # 封面四个角的位置
+    pos = {'x': 0, 'y': img_pic.height - scroll_high}
+    img_pic.paste(img_subt, (pos['x'], pos['y']), mask=a)
+    img_pic.save(pic_path, quality=95)
 
 
 def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径，番号，后缀，要移动至的位置
@@ -449,10 +474,10 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
     except FileExistsError:
         app.logger.info('[-]File Exists! Please check your movie!')
         app.logger.info('[-]move to the root folder of the program.')
-        return 
+        return
     except PermissionError:
         app.logger.info('[-]Error! Please run as administrator!')
-        return 
+        return
 
 
 def paste_file_to_folder_mode2(filepath, path, multi_part, number, part, c_word, conf):  # 文件路径，番号，后缀，要移动至的位置
@@ -478,10 +503,11 @@ def paste_file_to_folder_mode2(filepath, path, multi_part, number, part, c_word,
     except FileExistsError:
         app.logger.info('[-]File Exists! Please check your movie!')
         app.logger.info('[-]move to the root folder of the program.')
-        return 
+        return
     except PermissionError:
         app.logger.info('[-]Error! Please run as administrator!')
         return
+
 
 def get_part(filepath, failed_folder):
     try:

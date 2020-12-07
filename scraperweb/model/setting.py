@@ -6,7 +6,7 @@ from .. import db
 
 class _Settings(db.Model):
     __tablename__ = 'settings'
-    
+
     id = Column(Integer, primary_key=True)
     main_mode = Column(Integer, default=1)
     debug_info = Column(Boolean, default=False)
@@ -31,6 +31,7 @@ class _Settings(db.Model):
     website_priority = Column(String, default="javbus,javdb,fanza,xcity,mgstage,fc2,avsox,jav321,javlib,dlsite")
 
     escape_folders = Column(String, default="failed,output")
+    escape_literals = Column(String, default="\()/")
 
     transalte_enable = Column(Boolean, default=False)
     transalte_to_sc = Column(Boolean, default=False)
