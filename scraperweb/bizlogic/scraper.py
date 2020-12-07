@@ -194,14 +194,14 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
     location_rule = eval(conf.location_rule)
 
     # Process only Windows.
-    if platform.system() == "Windows":
-        if 'actor' in conf.location_rule and len(actor) > 100:
-            app.logger.info(conf.location_rule)
-            location_rule = eval(conf.location_rule.replace("actor", "'多人作品'"))
-        maxlen = conf.max_title_len
-        if 'title' in conf.location_rule and len(title) > maxlen:
-            shorttitle = title[0:maxlen]
-            location_rule = location_rule.replace(title, shorttitle)
+    # if platform.system() == "Windows":
+    if 'actor' in conf.location_rule and len(actor) > 100:
+        app.logger.info(conf.location_rule)
+        location_rule = eval(conf.location_rule.replace("actor", "'多人作品'"))
+    maxlen = conf.max_title_len
+    if 'title' in conf.location_rule and len(title) > maxlen:
+        shorttitle = title[0:maxlen]
+        location_rule = location_rule.replace(title, shorttitle)
 
     # 返回处理后的json_data
     json_data['title'] = title
