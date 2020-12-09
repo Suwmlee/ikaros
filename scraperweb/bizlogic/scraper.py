@@ -422,7 +422,7 @@ def cutImage(imagecut, path, number, c_word):
             h = img.height
             img2 = img.crop((w - h / 1.5, 0, w, h))
             if c_word == '-C':
-                app.logger.info('[+]Add Chinese subtitle mark!')
+                app.logger.info('[+]Add mark!         Chinese subtitle ')
                 add_to_pic(path + '/' + number + c_word + '-poster.jpg', img2)
             else:
                 img2.save(path + '/' + number + c_word + '-poster.jpg')

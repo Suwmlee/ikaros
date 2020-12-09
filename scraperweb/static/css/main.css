@@ -25,4 +25,7 @@
 #log-detail{
     /* background-color: gray; */
     height: 100%;
+    width: 100%;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
