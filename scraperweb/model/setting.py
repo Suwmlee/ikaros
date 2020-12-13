@@ -15,7 +15,8 @@ class _Settings(db.Model):
     scrape_folder = Column(String, default='/jav')
     failed_folder = Column(String, default='failed')
     success_folder = Column(String, default='output')
-    soft_link = Column(Boolean, default=False)
+    soft_link = Column(Boolean, default=True)
+    soft_prefix = Column(String, default='/jav')
     failed_move = Column(Boolean, default=False)
 
     proxy_enable = Column(Boolean, default=False)

@@ -46,6 +46,12 @@
           </div>
     </div>
     <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label offset-sm-2">软链接前缀</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="soft_prefix" value="{{ settings['soft_prefix'] }}">
+        </div>
+    </div>
+    <div class="mb-3 row">
         <label class="col-sm-2 col-form-label offset-sm-2">刮削目录</label>
         <div class="col-sm-4">
             <input type="text" class="form-control" id="scrape_folder" value="{{ settings['scrape_folder'] }}">

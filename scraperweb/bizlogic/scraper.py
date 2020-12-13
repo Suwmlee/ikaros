@@ -7,6 +7,7 @@ import platform
 from PIL import Image
 from flask import current_app as app
 
+from .setting import settingService
 from ..utils.ADC_function import *
 
 # =========website========
@@ -459,7 +460,10 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
     try:
         # 如果soft_link=1 使用软链接
         if conf.soft_link:
-            os.symlink(filepath, path + '/' + number + c_word + houzhui)
+            (filefolder, name) = os.path.split(filepath)
+            soft_prefix = settingService.getSetting().soft_prefix
+            soft_path = os.path.join(soft_prefix, name)
+            os.symlink(soft_path, path + '/' + number + c_word + houzhui)
         else:
             os.rename(filepath, path + '/' + number + c_word + houzhui)
         if os.path.exists(os.getcwd() + '/' + number + c_word + '.srt'):  # 字幕移动
