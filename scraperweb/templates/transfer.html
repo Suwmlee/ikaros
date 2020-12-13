@@ -30,11 +30,64 @@
             </div>
         </div>
     </nav>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label offset-sm-2">需要软链接目录</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="source_folder" >
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label offset-sm-2">软链接前缀</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="soft_prefix" >
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label offset-sm-2">输出目录</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="output_folder" >
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label offset-sm-2">过滤目录</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="escape_folder" >
+        </div>
+    </div>
 
+    <button id="start" type="button" class="btn btn-primary offset-sm-5">开始</button>
 
 </div>
 
 {% endblock %}
 
 {% block js %}
+<script>
+
+    $("#start").click(function () {
+        console.log("start")
+        let source_folder = $("#source_folder").val();
+        let soft_prefix = $("#soft_prefix").val();
+        let output_folder = $("#output_folder").val();
+        let escape_folder = $("#escape_folder").val();
+        const settings = {
+            'source_folder': source_folder,
+            'soft_prefix': soft_prefix,
+            'output_folder': output_folder,
+            'escape_folder': escape_folder
+        };
+        $.ajax({
+            type: 'POST',
+            url: '/api/transfer',
+            data: JSON.stringify(settings),
+            contentType: 'application/json',
+            success: function (result) {
+                console.log("success")
+            },
+            error: function () {
+                console.log("error")
+            }
+        });
+    })
+</script>
 {% endblock %}

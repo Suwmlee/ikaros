@@ -3,7 +3,7 @@
 '''
 import os
 import datetime
-from ..model.info import _Info
+from ..model.info import _Info, _TransferLog
 from .. import db
 
 
@@ -33,4 +33,34 @@ class InfoService():
             info.updatetime = datetime.datetime.now()
             db.session.commit()
 
+
+class TransferService():
+
+    def addTransferLog(self, path):
+        info = self.getTransferLogByPath(path)
+        if not info:
+            (filefolder, name) = os.path.split(path)
+            info = _TransferLog(name, path)
+            db.session.add(info)
+            db.session.commit()
+            return info
+        return info
+
+    def getTransferLogByPath(self, value):
+        info = _TransferLog.query.filter_by(basepath=value).first()
+        if not info:
+            return None
+        return info
+
+    def updateTransferLog(self, path, softpath, destpath):
+        info = self.getTransferLogByPath(path)
+        if info:
+            info.success = True
+            info.softpath = softpath
+            info.destpath = destpath
+            info.updatetime = datetime.datetime.now()
+            db.session.commit()
+
+
 infoService = InfoService()
+transferService = TransferService()
