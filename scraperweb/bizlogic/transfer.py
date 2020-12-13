@@ -31,7 +31,7 @@ def transfer(src_folder, dest_folder, prefix, escape_folders):
             (filefolder, name) = os.path.split(movie_path)
             midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
             newpath = os.path.join(dest_folder, midfolder, name)
-            soft_path = os.path.join(prefix, name)
+            soft_path = os.path.join(prefix, midfolder, name)
 
             (newfolder, tname) = os.path.split(newpath)
             if not os.path.exists(newfolder):
