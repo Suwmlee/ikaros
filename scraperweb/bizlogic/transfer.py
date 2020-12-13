@@ -15,6 +15,7 @@ def copysub(src_folder, destfolder):
         (path, ext) = os.path.splitext(item)
         if ext.lower() in file_type:
             src_file = os.path.join(src_folder, item)
+            print("copy sub" + src_file)
             shutil.copy(src_file, destfolder)
 
 
@@ -35,8 +36,10 @@ def transfer(src_folder, dest_folder, prefix, escape_folders):
             (newfolder, tname) = os.path.split(newpath)
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
-            # os.symlink(soft_path, newpath)
+            os.symlink(soft_path, newpath)
             copysub(filefolder, newfolder)
+            print("[!]transfer Data for [{}], the number is [{}]".format(movie_path, newpath))
             transferService.updateTransferLog(movie_path, soft_path, newpath)
 
+    print("transfer finished")
     return True
