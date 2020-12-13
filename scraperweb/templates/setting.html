@@ -58,6 +58,12 @@
         </div>
     </div>
     <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label offset-sm-2">输出目录</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="success_folder" value="{{ settings['success_folder'] }}">
+        </div>
+    </div>
+    <div class="mb-3 row">
         <label class="col-sm-2 col-form-label offset-sm-2">目录规则</label>
         <div class="col-sm-4">
             <input type="text" class="form-control" id="location_rule" value="{{ settings['location_rule'] }}">
@@ -80,16 +86,18 @@
 
     $("#apply").click(function () {
         console.log("start")
-        let folderpath = $("#scrape_folder").val();
-        let location = $("#location_rule").val();
-        let name = $("#naming_rule").val();
+        let scrape_folder = $("#scrape_folder").val();
+        let success_folder = $("#success_folder").val();
+        let location_rule = $("#location_rule").val();
+        let naming_rule = $("#naming_rule").val();
         let softlink = $("input[name=soft_link]:checked").val();
         var issoftlink = (softlink === 'true');
         let soft_prefix = $("#soft_prefix").val();
         const settings = {
-            'scrape_folder': folderpath,
-            'location_rule': location,
-            'naming_rule': name,
+            'scrape_folder': scrape_folder,
+            'success_folder': success_folder,
+            'location_rule': location_rule,
+            'naming_rule': naming_rule,
             'soft_link':issoftlink,
             'soft_prefix': soft_prefix
         };

@@ -22,6 +22,9 @@ class SettingService():
         if setting.scrape_folder != content['scrape_folder']:
             setting.scrape_folder = content['scrape_folder']
             changed = True
+        if setting.success_folder != content['success_folder']:
+            setting.success_folder = content['success_folder']
+            changed = True
         if setting.location_rule != content['location_rule']:
             setting.location_rule = content['location_rule']
             changed = True
