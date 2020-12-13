@@ -85,11 +85,13 @@
         let name = $("#naming_rule").val();
         let softlink = $("input[name=soft_link]:checked").val();
         var issoftlink = (softlink === 'true');
+        let soft_prefix = $("#soft_prefix").val();
         const settings = {
             'scrape_folder': folderpath,
             'location_rule': location,
             'naming_rule': name,
-            'soft_link':issoftlink
+            'soft_link':issoftlink,
+            'soft_prefix': soft_prefix
         };
         $.ajax({
             type: 'POST',

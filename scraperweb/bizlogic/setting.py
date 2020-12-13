@@ -31,6 +31,9 @@ class SettingService():
         if setting.soft_link != content['soft_link']:
             setting.soft_link = content['soft_link']
             changed = True
+        if setting.soft_prefix != content['soft_prefix']:
+            setting.soft_prefix = content['soft_prefix']
+            changed = True
         if changed:
             db.session.commit()
         return True
