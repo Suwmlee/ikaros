@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /media /jav-scraper/database \
     && chmod 777 /media /jav-scraper/database
-RUN useradd -ms /bin/bash master \
+RUN useradd -ms /bin/bash master
 USER master
 WORKDIR /jav-scraper
 COPY . .
