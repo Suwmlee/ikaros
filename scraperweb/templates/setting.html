@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01"
+                aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                <a class="navbar-brand" href="#">JAV-Scraper</a>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="/">快速开始</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/setting">配置</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/scraper">刮削</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/history">历史</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/transfer">转移</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div id="mode_soft" class="mb-3 row">
+        <label class="col-sm-2 col-form-label offset-sm-2">输出模式</label>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="soft_link" 
+                    {% if settings['soft_link'] == true %}checked{% endif %}
+                    id="soft_link" value="true">
+            <label class="form-check-label" for="inlineCheckbox1">PT模式(软链接)</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="soft_link" 
+                    {% if settings['soft_link'] == false %}checked{% endif %}
+                    id="inlineRadio2" value="false">
+            <label class="form-check-label" for="inlineCheckbox2">正常模式(移动文件)</label>
+          </div>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label offset-sm-2">刮削目录</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="scrape_folder" value="{{ settings['scrape_folder'] }}">
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label offset-sm-2">目录规则</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="location_rule" value="{{ settings['location_rule'] }}">
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label offset-sm-2">命名规则</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="naming_rule" value="{{ settings['naming_rule'] }}">
+        </div>
+    </div>
+    
+    <button id="apply" type="button" class="btn btn-primary offset-sm-5">应用</button>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+
+    $("#apply").click(function () {
+        console.log("start")
+        let folderpath = $("#scrape_folder").val();
+        let location = $("#location_rule").val();
+        let name = $("#naming_rule").val();
+        let softlink = $("input[name=soft_link]:checked").val();
+        var issoftlink = (softlink === 'true');
+        const settings = {
+            'scrape_folder': folderpath,
+            'location_rule': location,
+            'naming_rule': name,
+            'soft_link':issoftlink
+        };
+        $.ajax({
+            type: 'POST',
+            url: '/api/setting',
+            data: JSON.stringify(settings),
+            contentType: 'application/json',
+            success: function (result) {
+                console.log("success")
+            },
+            error: function () {
+                console.log("error")
+            }
+        });
+    })
+</script>
+{% endblock %}

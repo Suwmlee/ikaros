@@ -8,33 +8,28 @@ from .. import db
 
 class SettingService():
 
-    setting = None
-
-    def getSetting(self):        
-        if self.setting:
-            return self.setting
-        self.setting = _Settings.query.filter_by(id=1).first()
-        if not self.setting:
-            self.setting = _Settings()
-            db.session.add(self.setting)
+    def getSetting(self):
+        setting = _Settings.query.filter_by(id=1).first()
+        if not setting:
+            setting = _Settings()
+            db.session.add(setting)
             db.session.commit()
-        return self.setting
+        return setting
 
     def updateSetting(self, content):
         changed = False
-        self.setting = _Settings.query.filter_by(id=1).first()
-        if not self.setting:
-            self.setting = _Settings()
-            db.session.add(self.setting)
+        setting = self.getSetting()
+        if setting.scrape_folder != content['scrape_folder']:
+            setting.scrape_folder = content['scrape_folder']
             changed = True
-        if self.setting.scrape_folder != content['scrape_folder']:
-            self.setting.scrape_folder = content['scrape_folder']
+        if setting.location_rule != content['location_rule']:
+            setting.location_rule = content['location_rule']
             changed = True
-        if self.setting.location_rule != content['location_rule']:
-            self.setting.location_rule = content['location_rule']
+        if setting.naming_rule != content['naming_rule']:
+            setting.naming_rule = content['naming_rule']
             changed = True
-        if self.setting.naming_rule != content['naming_rule']:
-            self.setting.naming_rule = content['naming_rule']
+        if setting.soft_link != content['soft_link']:
+            setting.soft_link = content['soft_link']
             changed = True
         if changed:
             db.session.commit()

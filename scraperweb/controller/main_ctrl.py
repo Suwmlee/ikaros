@@ -14,13 +14,9 @@ start_point = 0
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
-@web.route("/start", methods=['POST'])
+@web.route("/api/start", methods=['POST'])
 def start():
     try:
-        content = request.get_json()
-
-        settingService.updateSetting(content)
-
         manager.start()
         return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
     except Exception as err:
