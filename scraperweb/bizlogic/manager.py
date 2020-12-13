@@ -4,6 +4,7 @@ import os
 from flask import current_app as app
 
 from .setting import settingService
+from .info import infoService
 from .scraper import *
 from ..utils.number_parser import get_number
 
@@ -80,7 +81,16 @@ def create_data_and_move(file_path: str, c, debug):
     else:
         try:
             app.logger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
-            core_main(file_path, n_number, c)
+            movie_info = infoService.getInfoByPath(file_path)
+            if not movie_info or not movie_info.success:
+                infoService.addInfo(file_path)
+                (flag, new_path) = core_main(file_path, n_number, c)
+                if flag:
+                    (filefolder, newname) = os.path.split(new_path)
+                    infoService.updateInfo(file_path, newname)
+                    app.logger.info("[!]Add record, the newname is [{}]".format(newname))
+            else:
+                app.logger.info("[!]Already done, the newname is [{}]".format(movie_info.newname))
             app.logger.info("[*]======================================================")
         except Exception as err:
             app.logger.info("[-] [{}] ERROR:".format(file_path))

@@ -459,13 +459,14 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
 
     try:
         # 如果soft_link=1 使用软链接
+        newpath = path + '/' + number + c_word + houzhui
         if conf.soft_link:
             (filefolder, name) = os.path.split(filepath)
             soft_prefix = settingService.getSetting().soft_prefix
             soft_path = os.path.join(soft_prefix, name)
-            os.symlink(soft_path, path + '/' + number + c_word + houzhui)
+            os.symlink(soft_path, newpath)
         else:
-            os.rename(filepath, path + '/' + number + c_word + houzhui)
+            os.rename(filepath, newpath)
         if os.path.exists(os.getcwd() + '/' + number + c_word + '.srt'):  # 字幕移动
             os.rename(os.getcwd() + '/' + number + c_word + '.srt', path + '/' + number + c_word + '.srt')
             app.logger.info('[+]Sub moved!')
@@ -475,13 +476,14 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
         elif os.path.exists(os.getcwd() + '/' + number + c_word + '.sub'):
             os.rename(os.getcwd() + '/' + number + c_word + '.sub', path + '/' + number + c_word + '.sub')
             app.logger.info('[+]Sub moved!')
+        return True, newpath
     except FileExistsError:
         app.logger.info('[-]File Exists! Please check your movie!')
         app.logger.info('[-]move to the root folder of the program.')
-        return
+        return False, ''
     except PermissionError:
         app.logger.info('[-]Error! Please run as administrator!')
-        return
+        return False, ''
 
 
 def paste_file_to_folder_mode2(filepath, path, multi_part, number, part, c_word, conf):  # 文件路径，番号，后缀，要移动至的位置
@@ -607,7 +609,9 @@ def core_main(file_path, number_th, conf):
         print_files(path, c_word, json_data['naming_rule'], part, cn_sub, json_data, filepath, conf.failed_folder, tag, json_data['actor_list'], liuchu)
 
         # 移动文件
-        paste_file_to_folder(filepath, path, number, c_word, conf)
+        (flag, path) = paste_file_to_folder(filepath, path, number, c_word, conf)
+        return flag, path
     elif conf.main_mode == 2:
         # 移动文件
         paste_file_to_folder_mode2(filepath, path, multi_part, number, part, c_word, conf)
+    return False, ''
