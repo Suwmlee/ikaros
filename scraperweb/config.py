@@ -7,7 +7,7 @@ class Config:
     SECRET_KEY = 'secret!'
     SCHEDULER_API_ENABLED = True
     LOGGING_FORMAT = '%(asctime)s - %(name)s - %(message)s'
-    LOGGING_LOCATION = 'web.log'
+    LOGGING_LOCATION = 'database/web.log'
     LOGGING_LEVEL = logging.INFO
     VERSION = '0.0.1'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///../database/scraper.db'

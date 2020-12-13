@@ -47,7 +47,7 @@ def stream(lastnum):
 def read_logs():
     """ 读取web.log日志内容
     """
-    fo = open(basedir + "/../../web.log", "rb")
+    fo = open(basedir + "/../../database/web.log", "rb")
     global start_point
     fo.seek(start_point, 1)
     logs = ""
