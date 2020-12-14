@@ -33,6 +33,13 @@ def transfer(src_folder, dest_folder, prefix, escape_folders):
             newpath = os.path.join(dest_folder, midfolder, name)
             soft_path = os.path.join(prefix, midfolder, name)
 
+            if os.path.exists(newpath):
+                realpath = os.readlink(newpath)
+                if realpath == soft_path:
+                    print("already exists")
+                    transferService.updateTransferLog(movie_path, soft_path, newpath)
+                else:
+                    os.remove(newpath)
             (newfolder, tname) = os.path.split(newpath)
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
