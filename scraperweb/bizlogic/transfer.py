@@ -38,6 +38,7 @@ def transfer(src_folder, dest_folder, prefix, escape_folders):
                 if realpath == soft_path:
                     print("already exists")
                     transferService.updateTransferLog(movie_path, soft_path, newpath)
+                    continue
                 else:
                     os.remove(newpath)
             (newfolder, tname) = os.path.split(newpath)
