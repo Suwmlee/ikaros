@@ -45,6 +45,7 @@ def transfer(src_folder, dest_folder, prefix, escape_folders):
         (newfolder, tname) = os.path.split(newpath)
         if not os.path.exists(newfolder):
             os.makedirs(newfolder)
+        print("[!]create soft link from [{}] to [{}]".format(movie_path, newpath))
         os.symlink(soft_path, newpath)
         copysub(filefolder, newfolder)
         print("[!]transfer Data for [{}], the number is [{}]".format(movie_path, newpath))
