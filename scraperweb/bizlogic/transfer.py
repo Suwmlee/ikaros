@@ -25,29 +25,30 @@ def transfer(src_folder, dest_folder, prefix, escape_folders):
 
     for movie_path in movie_list:
         movie_info = transferService.getTransferLogByPath(movie_path)
-        if not movie_info or not movie_info.success:
-            transferService.addTransferLog(movie_path)
+        if not movie_info:
+            movie_info = transferService.addTransferLog(movie_path)
+        
+        (filefolder, name) = os.path.split(movie_path)
+        midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
+        newpath = os.path.join(dest_folder, midfolder, name)
+        soft_path = os.path.join(prefix, midfolder, name)
 
-            (filefolder, name) = os.path.split(movie_path)
-            midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
-            newpath = os.path.join(dest_folder, midfolder, name)
-            soft_path = os.path.join(prefix, midfolder, name)
-
-            if os.path.exists(newpath):
-                realpath = os.readlink(newpath)
-                if realpath == soft_path:
-                    print("already exists")
-                    transferService.updateTransferLog(movie_path, soft_path, newpath)
-                    continue
-                else:
-                    os.remove(newpath)
-            (newfolder, tname) = os.path.split(newpath)
-            if not os.path.exists(newfolder):
-                os.makedirs(newfolder)
-            os.symlink(soft_path, newpath)
-            copysub(filefolder, newfolder)
-            print("[!]transfer Data for [{}], the number is [{}]".format(movie_path, newpath))
-            transferService.updateTransferLog(movie_path, soft_path, newpath)
+        if os.path.exists(newpath):
+            realpath = os.readlink(newpath)
+            if realpath == soft_path:
+                print("already exists")
+                transferService.updateTransferLog(movie_path, soft_path, newpath)
+                continue
+            else:
+                print("clean soft link")
+                os.remove(newpath)
+        (newfolder, tname) = os.path.split(newpath)
+        if not os.path.exists(newfolder):
+            os.makedirs(newfolder)
+        os.symlink(soft_path, newpath)
+        copysub(filefolder, newfolder)
+        print("[!]transfer Data for [{}], the number is [{}]".format(movie_path, newpath))
+        transferService.updateTransferLog(movie_path, soft_path, newpath)
 
     print("transfer finished")
     return True
