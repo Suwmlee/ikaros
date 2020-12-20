@@ -13,11 +13,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt \
     && apt-get clean autoclean -y \
     && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /media /jav-scraper/database \
-    && chmod 777 /media /jav-scraper/database
-RUN useradd -ms /bin/bash master
-USER master
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /jav-scraper
 COPY . .
 VOLUME /media
