@@ -1,6 +1,11 @@
 name: Push Latest
 on:
   workflow_dispatch:
+    inputs:
+      publish_tag:
+        description: 'Publish Tag'
+        required: false
+        default: 'latest'
 jobs:
   buildDocker:
     runs-on: ubuntu-latest
@@ -28,5 +33,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            suwmlee/jav-scraper:latest     
-    
+            suwmlee/jav-scraper:${{ github.event.inputs.publish_tag }}     
