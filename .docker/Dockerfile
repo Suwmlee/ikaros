@@ -14,6 +14,10 @@ RUN pip install --no-cache-dir -r requirements.txt \
     && apt-get clean autoclean -y \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p scraperweb/templates scraperweb/static \
+    && wget -O - https://github.com/Suwmlee/Spike/archive/release.tar.gz | tar xz \
+    && mv Spike-release/index.html scraperweb/templates/ \ 
+    && mv Spike-release/* scraperweb/static/
 WORKDIR /jav-scraper
 COPY . .
 VOLUME /media
