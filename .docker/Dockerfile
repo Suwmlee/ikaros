@@ -4,22 +4,23 @@ LABEL git="https://github.com/Suwmlee/JAV-Scraper"
 ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 EXPOSE 12346
+WORKDIR /jav-scraper
+COPY . .
 
 RUN sed -i 's/deb.debian.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list \
     && sed -i 's/security.debian.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list
+RUN apt-get update \
+    && apt-get install -y wget ca-certificates \
+    && wget -O - https://github.com/Suwmlee/Spike/archive/release.tar.gz | tar xvz \
+    && mv ./Spike-release/index.html /jav-scraper/scraperweb/templates/ \ 
+    && mv ./Spike-release/* /jav-scraper/scraperweb/static/
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pip -U \
-    && pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt \
-    && apt-get clean autoclean -y \
+    && pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
+    && pip install --no-cache-dir -r requirements.txt
+RUN apt-get clean autoclean -y \
+    && apt-get purge -y wget \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
-RUN mkdir -p scraperweb/templates scraperweb/static \
-    && wget -O - https://github.com/Suwmlee/Spike/archive/release.tar.gz | tar xz \
-    && mv Spike-release/index.html scraperweb/templates/ \ 
-    && mv Spike-release/* scraperweb/static/
-WORKDIR /jav-scraper
-COPY . .
 VOLUME /media
 VOLUME /jav-scraper/database
 
