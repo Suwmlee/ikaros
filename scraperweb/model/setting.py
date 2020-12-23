@@ -37,3 +37,15 @@ class _Settings(db.Model):
     transalte_enable = Column(Boolean, default=False)
     transalte_to_sc = Column(Boolean, default=False)
     transalte_values = Column(String, default="title,outline")
+
+
+    def serialize(self):
+        return {
+            'soft_link': self.soft_link,
+            'soft_prefix': self.soft_prefix,
+            'scrape_folder': self.scrape_folder,
+            'success_folder': self.success_folder,
+            'failed_folder': self.failed_folder,
+            'location_rule': self.location_rule,
+            'naming_rule': self.naming_rule
+        }

@@ -18,22 +18,22 @@ class SettingService():
     def updateSetting(self, content):
         changed = False
         setting = self.getSetting()
-        if setting.scrape_folder != content['scrape_folder']:
+        if 'scrape_folder' in content and setting.scrape_folder != content['scrape_folder']:
             setting.scrape_folder = content['scrape_folder']
             changed = True
-        if setting.success_folder != content['success_folder']:
+        if 'success_folder' in content and setting.success_folder != content['success_folder']:
             setting.success_folder = content['success_folder']
             changed = True
-        if setting.location_rule != content['location_rule']:
+        if 'location_rule' in content and setting.location_rule != content['location_rule']:
             setting.location_rule = content['location_rule']
             changed = True
-        if setting.naming_rule != content['naming_rule']:
+        if 'naming_rule' in content and setting.naming_rule != content['naming_rule']:
             setting.naming_rule = content['naming_rule']
             changed = True
-        if setting.soft_link != content['soft_link']:
+        if 'soft_link' in content and setting.soft_link != content['soft_link']:
             setting.soft_link = content['soft_link']
             changed = True
-        if setting.soft_prefix != content['soft_prefix']:
+        if 'soft_prefix' in content and setting.soft_prefix != content['soft_prefix']:
             setting.soft_prefix = content['soft_prefix']
             changed = True
         if changed:

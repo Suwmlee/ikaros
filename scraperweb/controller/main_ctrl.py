@@ -29,7 +29,7 @@ def start_scraper():
 def start_transfer():
     try:
         content = request.get_json()
-        transfer.transfer(content['source_folder'], content['output_folder'], content['soft_prefix'], '')
+        transfer.transfer(content['source_folder'], content['output_folder'], content['soft_prefix'], content['escape_folder'])
         return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
     except Exception as err:
         current_app.logger.error(err)
