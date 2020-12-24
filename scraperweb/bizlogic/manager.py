@@ -58,7 +58,7 @@ def create_data_and_move(file_path: str, c, debug):
         if not movie_info or movie_info.status != 1:
             movie_info = infoService.addInfo(file_path)
             (flag, new_path) = core_main(file_path, n_number, c)
-            movie_info = infoService.updateInfo(file_path, new_path, flag)
+            movie_info = infoService.updateInfo(file_path, n_number, new_path, flag)
         else:
             wlogger.info("[!]Already done, the newname is [{}]".format(movie_info.newname))
         wlogger.info("[*]======================================================")

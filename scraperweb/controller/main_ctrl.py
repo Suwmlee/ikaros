@@ -10,6 +10,7 @@ from . import web
 from ..bizlogic import manager
 from ..bizlogic import transfer
 from ..bizlogic.setting import settingService
+from ..bizlogic.info import infoService
 from ..utils.wlogger import wlogger
 from concurrent.futures import ThreadPoolExecutor
 
@@ -43,6 +44,22 @@ def start_transfer():
         content = request.get_json()
         transfer.transfer(content['source_folder'], content['output_folder'], content['soft_prefix'], content['escape_folder'])
         return Response(status=200)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
+
+@web.route("/api/scrapedata", methods=['GET'])
+def get_scrape():
+    try:
+        page = 1
+        size = 10
+        sort = 0
+        infos = infoService.getInfoPage(page, size, sort)
+        ret = []
+        for i in infos.items:
+            ret.append(i.serialize())
+        return json.dumps(ret)
     except Exception as err:
         wlogger.info(err)
         return Response(status=500)

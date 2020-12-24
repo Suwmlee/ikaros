@@ -16,6 +16,7 @@ class _Info(db.Model):
     status = Column(Integer, default=0)
     newname = Column(String, default='', comment='final name')
     newpath = Column(String, default='', comment='final path')
+    updatetime = Column(DateTime, default=datetime.datetime.now)
 
     def __init__(self, basename, basepath):
         self.basename = basename
@@ -30,7 +31,8 @@ class _Info(db.Model):
             'scrapingname': self.scrapingname,
             'status': self.status,
             'newname': self.newname,
-            'newpath': self.newpath
+            'newpath': self.newpath,
+            'updatetime': self.updatetime.strftime("%H:%M:%S %m/%d/%Y")
         }
 
 

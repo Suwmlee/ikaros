@@ -13,16 +13,17 @@ class InfoService():
         info = self.getInfoByPath(path)
         if not info:
             (filefolder, name) = os.path.split(path)
+            size = os.path.getsize(path) >> 20
             info = _Info(name, path)
+            info.filesize = size
             db.session.add(info)
             db.session.commit()
-            return info
         return info
 
     def getInfoByPath(self, value) -> _Info:
         return _Info.query.filter_by(basepath=value).first()
 
-    def updateInfo(self, path, newpath, flag):
+    def updateInfo(self, path, sname, newpath, flag):
         info = self.getInfoByPath(path)
         if info:
             if flag:
@@ -32,9 +33,14 @@ class InfoService():
                 info.newpath = newpath
             else:
                 info.status = 2
+            info.scrapingname = sname
             info.updatetime = datetime.datetime.now()
             db.session.commit()
         return info
+
+    def getInfoPage(self, pagenum, pagesize, sort):
+        infos = _Info.query.order_by(_Info.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+        return infos
 
 class TransferService():
 
