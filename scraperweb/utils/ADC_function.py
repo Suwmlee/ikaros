@@ -1,7 +1,7 @@
 import requests
 from lxml import etree
-from flask import current_app as app
 
+from ..utils.wlogger import wlogger
 from ..bizlogic.setting import settingService
 
 SUPPORT_PROXY_TYPE = ("http", "socks5", "socks5h")
@@ -65,9 +65,9 @@ def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None)
                 return result.text
 
         except Exception as e:
-            app.logger.info("[-]Connect retry {}/{}".format(i + 1, retry_count))
-            app.logger.info("[-]" + str(e))
-    app.logger.info('[-]Connect Failed! Please check your Proxy or Network!')
+            wlogger.info("[-]Connect retry {}/{}".format(i + 1, retrycount))
+            wlogger.info("[-]" + str(e))
+    wlogger.info('[-]Connect Failed! Please check your Proxy or Network!')
 
 
 def post_html(url: str, query: dict) -> requests.Response:
@@ -84,8 +84,8 @@ def post_html(url: str, query: dict) -> requests.Response:
                 result = requests.post(url, data=query, headers=headers, timeout=timeout)
             return result
         except requests.exceptions.ProxyError:
-            app.logger.info("[-]Connect retry {}/{}".format(i+1, retry_count))
-    app.logger.info("[-]Connect Failed! Please check your Proxy or Network!")
+            wlogger.info("[-]Connect retry {}/{}".format(i+1, retrycount))
+    wlogger.info("[-]Connect Failed! Please check your Proxy or Network!")
 
 
 def get_javlib_cookie() -> [dict, str]:
@@ -109,9 +109,9 @@ def get_javlib_cookie() -> [dict, str]:
                     "http://www.m45e.com/"
                 )
         except requests.exceptions.ProxyError:
-            app.logger.info("[-] ProxyError, retry {}/{}".format(i+1, retry_count))
+            wlogger.info("[-] ProxyError, retry {}/{}".format(i+1, retrycount))
         except cloudscraper.exceptions.CloudflareIUAMError:
-            app.logger.info("[-] IUAMError, retry {}/{}".format(i+1, retry_count))
+            wlogger.info("[-] IUAMError, retry {}/{}".format(i+1, retrycount))
 
     return raw_cookie, user_agent
 

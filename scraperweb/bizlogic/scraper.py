@@ -5,9 +5,9 @@ import shutil
 import platform
 
 from PIL import Image
-from flask import current_app as app
 
 from .setting import settingService
+from ..utils.wlogger import wlogger
 from ..utils.ADC_function import *
 
 # =========website========
@@ -31,7 +31,7 @@ def escape_path(path, escape_literals: str):  # Remove escape literals
 
 
 def moveFailedFolder(filepath, failed_folder):
-    app.logger.info('[-]Move to Failed output folder')
+    wlogger.info('[-]Move to Failed output folder')
     shutil.move(filepath, str(os.getcwd()) + '/' + failed_folder + '/')
     return
 
@@ -41,7 +41,7 @@ def CreatFailedFolder(failed_folder):
         try:
             os.makedirs(failed_folder + '/')
         except:
-            app.logger.info("[-]failed!can not be make Failed output folder\n[-](Please run as Administrator)")
+            wlogger.info("[-]failed!can not be make Failed output folder\n[-](Please run as Administrator)")
             return
 
 
@@ -72,31 +72,31 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
                                "HEYZO" in file_number or "heyzo" in file_number or "Heyzo" in file_number
                                ):
         # if conf.debug() == True:
-        #     app.logger.info('[+]select avsox')
+        #     wlogger.info('[+]select avsox')
         sources.insert(0, sources.pop(sources.index("avsox")))
     elif "mgstage" in sources and (re.match(r"\d+\D+", file_number) or
                                    "siro" in file_number or "SIRO" in file_number or "Siro" in file_number
                                    ):
         # if conf.debug() == True:
-            # app.logger.info('[+]select fanza')
+            # wlogger.info('[+]select fanza')
         sources.insert(0, sources.pop(sources.index("mgstage")))
     elif "fc2" in sources and ("fc2" in file_number or "FC2" in file_number
                                ):
         # if conf.debug() == True:
-        #     app.logger.info('[+]select fc2')
+        #     wlogger.info('[+]select fc2')
         sources.insert(0, sources.pop(sources.index("fc2")))
     elif "dlsite" in sources and (
         "RJ" in file_number or "rj" in file_number or "VJ" in file_number or "vj" in file_number
     ):
         # if conf.debug() == True:
-        #     app.logger.info('[+]select dlsite')
+        #     wlogger.info('[+]select dlsite')
         sources.insert(0, sources.pop(sources.index("dlsite")))
 
     json_data = {}
     for source in sources:
         try:
             if conf.debug_info == True:
-                app.logger.info('[+]select', source)
+                wlogger.info('[+]select', source)
             json_data = json.loads(func_mapping[source](file_number))
             # if any service return a valid return, break
             if get_data_state(json_data):
@@ -106,7 +106,7 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
 
     # Return if data not found in all sources
     if not json_data:
-        app.logger.info('[-]Movie Data not found!')
+        wlogger.info('[-]Movie Data not found!')
         # moveFailedFolder(filepath, conf.failed_folder)
         return
 
@@ -132,7 +132,7 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
     actor = str(actor_list).strip("[ ]").replace("'", '').replace(" ", '')
 
     if title == '' or number == '':
-        app.logger.info('[-]Movie Data not found!')
+        wlogger.info('[-]Movie Data not found!')
         moveFailedFolder(filepath, conf.failed_folder)
         return
 
@@ -197,7 +197,7 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
     # Process only Windows.
     # if platform.system() == "Windows":
     if 'actor' in conf.location_rule and len(actor) > 100:
-        app.logger.info(conf.location_rule)
+        wlogger.info(conf.location_rule)
         location_rule = eval(conf.location_rule.replace("actor", "'多人作品'"))
     maxlen = conf.max_title_len
     if 'title' in conf.location_rule and len(title) > maxlen:
@@ -246,7 +246,7 @@ def get_info(json_data):  # 返回json里的数据
 
 def small_cover_check(path, number, cover_small, c_word, conf, filepath, failed_folder):
     download_file_with_filename(cover_small, number + c_word + '-poster.jpg', path, conf, filepath, failed_folder)
-    app.logger.info('[+]Image Downloaded! ' + path + '/' + number + c_word + '-poster.jpg')
+    wlogger.info('[+]Image Downloaded! ' + path + '/' + number + c_word + '-poster.jpg')
 
 
 def create_folder(success_folder, location_rule, json_data, conf):  # 创建文件夹
@@ -295,7 +295,7 @@ def download_file_with_filename(url, filename, path, conf, filepath, failed_fold
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'}
                 r = requests.get(url, headers=headers, timeout=timeout, proxies=proxies)
                 if r == '':
-                    app.logger.info('[-]Movie Data not found!')
+                    wlogger.info('[-]Movie Data not found!')
                     return
                 with open(str(path) + "/" + filename, "wb") as code:
                     code.write(r.content)
@@ -307,24 +307,24 @@ def download_file_with_filename(url, filename, path, conf, filepath, failed_fold
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'}
                 r = requests.get(url, timeout=timeout, headers=headers)
                 if r == '':
-                    app.logger.info('[-]Movie Data not found!')
+                    wlogger.info('[-]Movie Data not found!')
                     return
                 with open(str(path) + "/" + filename, "wb") as code:
                     code.write(r.content)
                 return
         except requests.exceptions.RequestException:
             i += 1
-            app.logger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retry_count))
+            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retrycount))
         except requests.exceptions.ConnectionError:
             i += 1
-            app.logger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retry_count))
+            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retrycount))
         except requests.exceptions.ProxyError:
             i += 1
-            app.logger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retry_count))
+            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retrycount))
         except requests.exceptions.ConnectTimeout:
             i += 1
-            app.logger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retry_count))
-    app.logger.info('[-]Connect Failed! Please check your Proxy or Network!')
+            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retrycount))
+    wlogger.info('[-]Connect Failed! Please check your Proxy or Network!')
     moveFailedFolder(filepath, failed_folder)
     return
 
@@ -335,17 +335,17 @@ def image_download(cover, number, c_word, path, conf, filepath, failed_folder):
         moveFailedFolder(filepath, failed_folder)
         return
 
-    switch, _proxy, _timeout, retry, _proxytype = settingService.getProxySetting()
+    proxyenable, _proxy, _timeout, retry, _proxytype = settingService.getProxySetting()
     for i in range(retry):
         if os.path.getsize(path + '/' + number + c_word + '-fanart.jpg') == 0:
-            app.logger.info('[!]Image Download Failed! Trying again. [{}/3]', i + 1)
+            wlogger.info('[!]Image Download Failed! Trying again. [{}/3]', i + 1)
             download_file_with_filename(cover, number + c_word + '-fanart.jpg', path, conf, filepath, failed_folder)
             continue
         else:
             break
     if os.path.getsize(path + '/' + number + c_word + '-fanart.jpg') == 0:
         return
-    app.logger.info('[+]Image Downloaded! ' + path + '/' + number + c_word + '-fanart.jpg')
+    wlogger.info('[+]Image Downloaded! ' + path + '/' + number + c_word + '-fanart.jpg')
     shutil.copyfile(path + '/' + number + c_word + '-fanart.jpg', path + '/' + number + c_word + '-thumb.jpg')
 
 
@@ -401,15 +401,15 @@ def print_files(path, c_word, naming_rule, part, cn_sub, json_data, filepath, fa
             print("  <cover>" + cover + "</cover>", file=code)
             print("  <website>" + website + "</website>", file=code)
             print("</movie>", file=code)
-            app.logger.info("[+]Wrote!            " + path + "/" + number + part + c_word + ".nfo")
+            wlogger.info("[+]Wrote!            " + path + "/" + number + part + c_word + ".nfo")
     except IOError as e:
-        app.logger.info("[-]Write Failed!")
-        app.logger.error(e)
+        wlogger.info("[-]Write Failed!")
+        wlogger.error(e)
         moveFailedFolder(filepath, failed_folder)
         return
     except Exception as e1:
-        app.logger.error(e1)
-        app.logger.info("[-]Write Failed!")
+        wlogger.error(e1)
+        wlogger.info("[-]Write Failed!")
         moveFailedFolder(filepath, failed_folder)
         return
 
@@ -423,20 +423,20 @@ def cutImage(imagecut, path, number, c_word):
             h = img.height
             img2 = img.crop((w - h / 1.5, 0, w, h))
             if c_word == '-C':
-                app.logger.info('[+]Add mark!         Chinese subtitle ')
+                wlogger.info('[+]Add mark!         Chinese subtitle ')
                 add_to_pic(path + '/' + number + c_word + '-poster.jpg', img2)
             else:
                 img2.save(path + '/' + number + c_word + '-poster.jpg')
-                app.logger.info('[+]Image Cutted!     ' + path + '/' + number + c_word + '-poster.jpg')
+                wlogger.info('[+]Image Cutted!     ' + path + '/' + number + c_word + '-poster.jpg')
         except:
-            app.logger.info('[-]Cover cut failed!')
+            wlogger.info('[-]Cover cut failed!')
     elif imagecut == 0:  # 复制封面
         if c_word == '-C':
             img3 = Image.open(path + '/' + number + c_word + '-fanart.jpg')
             add_to_pic(path + '/' + number + c_word + '-poster.jpg', img3)
         else:
             shutil.copyfile(path + '/' + number + c_word + '-fanart.jpg', path + '/' + number + c_word + '-poster.jpg')
-        app.logger.info('[+]Image Copyed!     ' + path + '/' + number + c_word + '-poster.jpg')
+        wlogger.info('[+]Image Copyed!     ' + path + '/' + number + c_word + '-poster.jpg')
 
 
 def add_to_pic(pic_path, img_pic):
@@ -469,20 +469,20 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
             os.rename(filepath, newpath)
         if os.path.exists(os.getcwd() + '/' + number + c_word + '.srt'):  # 字幕移动
             os.rename(os.getcwd() + '/' + number + c_word + '.srt', path + '/' + number + c_word + '.srt')
-            app.logger.info('[+]Sub moved!')
+            wlogger.info('[+]Sub moved!')
         elif os.path.exists(os.getcwd() + '/' + number + c_word + '.ssa'):
             os.rename(os.getcwd() + '/' + number + c_word + '.ssa', path + '/' + number + c_word + '.ssa')
-            app.logger.info('[+]Sub moved!')
+            wlogger.info('[+]Sub moved!')
         elif os.path.exists(os.getcwd() + '/' + number + c_word + '.sub'):
             os.rename(os.getcwd() + '/' + number + c_word + '.sub', path + '/' + number + c_word + '.sub')
-            app.logger.info('[+]Sub moved!')
+            wlogger.info('[+]Sub moved!')
         return True, newpath
     except FileExistsError:
-        app.logger.info('[-]File Exists! Please check your movie!')
-        app.logger.info('[-]move to the root folder of the program.')
+        wlogger.info('[-]File Exists! Please check your movie!')
+        wlogger.info('[-]move to the root folder of the program.')
         return False, ''
     except PermissionError:
-        app.logger.info('[-]Error! Please run as administrator!')
+        wlogger.info('[-]Error! Please run as administrator!')
         return False, ''
 
 
@@ -498,20 +498,20 @@ def paste_file_to_folder_mode2(filepath, path, multi_part, number, part, c_word,
             os.rename(filepath, path + '/' + number + part + c_word + houzhui)
         if os.path.exists(number + '.srt'):  # 字幕移动
             os.rename(number + part + c_word + '.srt', path + '/' + number + part + c_word + '.srt')
-            app.logger.info('[+]Sub moved!')
+            wlogger.info('[+]Sub moved!')
         elif os.path.exists(number + part + c_word + '.ass'):
             os.rename(number + part + c_word + '.ass', path + '/' + number + part + c_word + '.ass')
-            app.logger.info('[+]Sub moved!')
+            wlogger.info('[+]Sub moved!')
         elif os.path.exists(number + part + c_word + '.sub'):
             os.rename(number + part + c_word + '.sub', path + '/' + number + part + c_word + '.sub')
-            app.logger.info('[+]Sub moved!')
-        app.logger.info('[!]Success')
+            wlogger.info('[+]Sub moved!')
+        wlogger.info('[!]Success')
     except FileExistsError:
-        app.logger.info('[-]File Exists! Please check your movie!')
-        app.logger.info('[-]move to the root folder of the program.')
+        wlogger.info('[-]File Exists! Please check your movie!')
+        wlogger.info('[-]move to the root folder of the program.')
         return
     except PermissionError:
-        app.logger.info('[-]Error! Please run as administrator!')
+        wlogger.info('[-]Error! Please run as administrator!')
         return
 
 
@@ -522,23 +522,23 @@ def get_part(filepath, failed_folder):
         if re.search('-cd\d+', filepath):
             return re.findall('-cd\d+', filepath)[0]
     except:
-        app.logger.info("[-]failed!Please rename the filename again!")
+        wlogger.info("[-]failed!Please rename the filename again!")
         moveFailedFolder(filepath, failed_folder)
         return
 
 
 def debug_print(data: json):
     try:
-        app.logger.info("[+] ---Debug info---")
+        wlogger.info("[+] ---Debug info---")
         for i, v in data.items():
             if i == 'outline':
-                app.logger.info('[+]  -', i, '    :', len(v), 'characters')
+                wlogger.info('[+]  -', i, '    :', len(v), 'characters')
                 continue
             if i == 'actor_photo' or i == 'year':
                 continue
-            app.logger.info('[+]  -', "%-11s" % i, ':', v)
+            wlogger.info('[+]  -', "%-11s" % i, ':', v)
 
-        app.logger.info("[+] ---Debug info---")
+        wlogger.info("[+] ---Debug info---")
     except:
         pass
 

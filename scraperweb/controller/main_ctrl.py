@@ -1,28 +1,40 @@
 
 import json
 import os
-from time import sleep
 import datetime
-from flask import render_template, request, Response, current_app
+from time import sleep
+from threading import Lock
+from flask import render_template, request, Response
 
 from . import web
 from ..bizlogic import manager
 from ..bizlogic import transfer
 from ..bizlogic.setting import settingService
+from ..utils.wlogger import wlogger
+from concurrent.futures import ThreadPoolExecutor
 
-# 记录日志读取位置
-start_point = 0
-basedir = os.path.abspath(os.path.dirname(__file__))
+# DOCS https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor
+executor = ThreadPoolExecutor(2)
 
 
 @web.route("/api/start", methods=['POST'])
 def start_scraper():
     try:
+        # executor.submit(manager.start)
         manager.start()
-        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+        return Response(status=200)
     except Exception as err:
-        current_app.logger.error(err)
-        return json.dumps({'success': False}), 200, {'ContentType': 'application/json'}
+        wlogger.info(err)
+        return Response(status=500)
+
+
+@web.route("/api/startscan", methods=['POST'])
+def start_scan():
+    try:
+        return Response(status=200)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
 
 
 @web.route("/api/transfer", methods=['POST'])
@@ -30,29 +42,7 @@ def start_transfer():
     try:
         content = request.get_json()
         transfer.transfer(content['source_folder'], content['output_folder'], content['soft_prefix'], content['escape_folder'])
-        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+        return Response(status=200)
     except Exception as err:
-        current_app.logger.error(err)
-        return json.dumps({'success': False}), 200, {'ContentType': 'application/json'}
-
-
-
-@web.route("/log/<int:lastnum>", methods=["GET"])
-def stream(lastnum):
-    loginfo = read_logs()
-    """returns logging information"""
-    return json.dumps({'lastnum': lastnum + 1, 'content': loginfo})
-
-
-def read_logs():
-    """ 读取web.log日志内容
-    """
-    fo = open(basedir + "/../../database/web.log", "rb")
-    global start_point
-    fo.seek(start_point, 1)
-    logs = ""
-    for line in fo.readlines():
-        logs = logs + str(line.decode())
-    start_point = fo.tell()
-    fo.close()
-    return logs
+        wlogger.info(err)
+        return Response(status=500)
