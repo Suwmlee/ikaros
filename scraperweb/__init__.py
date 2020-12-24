@@ -8,11 +8,12 @@ from flask_sqlalchemy import SQLAlchemy
 from .config import Config
 
 db = SQLAlchemy()
-
+app = None
 
 def create_app():
     """ create application
     """
+    global app
     app = Flask(__name__, static_url_path='')
     app.config.from_object(Config)
     # Configure logging

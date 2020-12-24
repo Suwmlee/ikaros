@@ -1,7 +1,6 @@
 
-from . import web
 from flask import render_template
-from ..bizlogic.setting import settingService
+from . import web
 
 
 @web.route("/")

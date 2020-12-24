@@ -19,20 +19,22 @@ class InfoService():
             return info
         return info
 
-    def getInfoByPath(self, value):
-        info = _Info.query.filter_by(basepath=value).first()
-        if not info:
-            return None
-        return info
+    def getInfoByPath(self, value) -> _Info:
+        return _Info.query.filter_by(basepath=value).first()
 
-    def updateInfo(self, path, newname):
+    def updateInfo(self, path, newpath, flag):
         info = self.getInfoByPath(path)
         if info:
-            info.newname = newname
-            info.success = True
+            if flag:
+                (filefolder, newname) = os.path.split(newpath)
+                info.status = 1
+                info.newname = newname
+                info.newpath = newpath
+            else:
+                info.status = 2
             info.updatetime = datetime.datetime.now()
             db.session.commit()
-
+        return info
 
 class TransferService():
 

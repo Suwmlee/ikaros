@@ -1,5 +1,5 @@
 
-from scraperweb import create_app, db
+from scraperweb import create_app
 
 application = create_app()
 

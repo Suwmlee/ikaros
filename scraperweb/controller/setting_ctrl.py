@@ -14,10 +14,10 @@ from ..utils.wlogger import wlogger
 def getSetting():
     try:
         content = settingService.getSetting().serialize()
-        return json.dumps(content), 200, {'ContentType': 'application/json'}
+        return json.dumps(content)
     except Exception as err:
-        current_app.logger.error(err)
-        return json.dumps({'success': False}), 200, {'ContentType': 'application/json'}
+        wlogger.info(err)
+        return Response(status=500)
 
 
 @web.route("/api/setting", methods=['POST'])
@@ -25,7 +25,7 @@ def updateSetting():
     try:
         content = request.get_json()
         settingService.updateSetting(content)
-        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+        return Response(status=200)
     except Exception as err:
-        return json.dumps({'success': False}), 200, {'ContentType': 'application/json'}
         wlogger.info(err)
+        return Response(status=500)

@@ -12,14 +12,27 @@ class _Info(db.Model):
     basename = Column(String, default='')
     basepath = Column(String, default='')
     filesize = Column(BigInteger, default=0)
-    scrapername = Column(String, default='', comment='used for scraper')
-    success = Column(Boolean, default=False)
+    scrapingname = Column(String, default='', comment='used for scraper')
+    status = Column(Integer, default=0)
     newname = Column(String, default='', comment='final name')
-    updatetime = Column(DateTime, default=datetime.datetime.utcnow)
+    newpath = Column(String, default='', comment='final path')
 
     def __init__(self, basename, basepath):
         self.basename = basename
         self.basepath = basepath
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'basename': self.basename,
+            'basepath': self.basepath,
+            'filesize': self.filesize,
+            'scrapingname': self.scrapingname,
+            'status': self.status,
+            'newname': self.newname,
+            'newpath': self.newpath
+        }
+
 
 
 class _TransferLog(db.Model):

@@ -283,11 +283,11 @@ def trimblank(s: str):
 
 
 def download_file_with_filename(url, filename, path, conf, filepath, failed_folder):
-    switch, proxy, timeout, retry_count, proxytype = settingService.getProxySetting()
+    proxyenable, proxy, timeout, retrycount, proxytype = settingService.getProxySetting()
 
-    for i in range(retry_count):
+    for i in range(retrycount):
         try:
-            if switch == 1:
+            if proxyenable:
                 if not os.path.exists(path):
                     os.makedirs(path)
                 proxies = get_proxy(proxy, proxytype)
@@ -557,7 +557,7 @@ def core_main(file_path, number_th, conf):
 
     # Return if blank dict returned (data not found)
     if not json_data:
-        return
+        return False, ''
 
     if json_data["number"] != number:
         # fix issue #119

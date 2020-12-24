@@ -42,7 +42,7 @@ def get_proxy(proxy: str, proxytype: str = None) -> dict:
 
 # 网页请求核心
 def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None):
-    switch, proxy, timeout, retry_count, proxytype = settingService.getProxySetting()
+    proxyenable, proxy, timeout, retrycount, proxytype = settingService.getProxySetting()
     proxies = get_proxy(proxy, proxytype)
 
     if ua is None:
@@ -50,9 +50,9 @@ def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None)
     else:
         headers = {"User-Agent": ua}
 
-    for i in range(retry_count):
+    for i in range(retrycount):
         try:
-            if switch == '1' or switch == 1:
+            if proxyenable:
                 result = requests.get(str(url), headers=headers, timeout=timeout, proxies=proxies, cookies=cookies)
             else:
                 result = requests.get(str(url), headers=headers, timeout=timeout, cookies=cookies)
@@ -71,14 +71,14 @@ def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None)
 
 
 def post_html(url: str, query: dict) -> requests.Response:
-    switch, proxy, timeout, retry_count, proxytype = settingService.getProxySetting()
+    proxyenable, proxy, timeout, retrycount, proxytype = settingService.getProxySetting()
     proxies = get_proxy(proxy, proxytype)
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3100.0 Safari/537.36"}
 
-    for i in range(retry_count):
+    for i in range(retrycount):
         try:
-            if switch == 1 or switch == '1':
+            if proxyenable:
                 result = requests.post(url, data=query, proxies=proxies, headers=headers, timeout=timeout)
             else:
                 result = requests.post(url, data=query, headers=headers, timeout=timeout)
@@ -90,16 +90,16 @@ def post_html(url: str, query: dict) -> requests.Response:
 
 def get_javlib_cookie() -> [dict, str]:
     import cloudscraper
-    switch, proxy, timeout, retry_count, proxytype = settingService.getProxySetting()
+    proxyenable, proxy, timeout, retrycount, proxytype = settingService.getProxySetting()
     proxies = get_proxy(proxy, proxytype)
 
     raw_cookie = {}
     user_agent = ""
 
     # Get __cfduid/cf_clearance and user-agent
-    for i in range(retry_count):
+    for i in range(retrycount):
         try:
-            if switch == 1 or switch == '1':
+            if proxyenable:
                 raw_cookie, user_agent = cloudscraper.get_cookie_string(
                     "http://www.m45e.com/",
                     proxies=proxies

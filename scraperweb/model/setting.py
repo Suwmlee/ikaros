@@ -19,8 +19,8 @@ class _Settings(db.Model):
     soft_prefix = Column(String, default='/jav')
     failed_move = Column(Boolean, default=False)
 
-    proxy_enable = Column(Boolean, default=False)
-    proxy_type = Column(String, default='http')
+    proxy_enable = Column(Boolean, default=True)
+    proxy_type = Column(String, default='socks5')
     proxy_address = Column(String, default='127.0.0.1:1080')
     proxy_timeout = Column(Integer, default=5)
     proxy_retry = Column(Integer, default=3)
@@ -47,5 +47,10 @@ class _Settings(db.Model):
             'success_folder': self.success_folder,
             'failed_folder': self.failed_folder,
             'location_rule': self.location_rule,
-            'naming_rule': self.naming_rule
+            'naming_rule': self.naming_rule,
+            'proxy_enable':self.proxy_enable,
+            'proxy_type':self.proxy_type,
+            'proxy_address':self.proxy_address,
+            'proxy_timeout':self.proxy_timeout,
+            'proxy_retry':self.proxy_retry
         }

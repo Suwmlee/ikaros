@@ -36,16 +36,26 @@ class SettingService():
         if 'soft_prefix' in content and setting.soft_prefix != content['soft_prefix']:
             setting.soft_prefix = content['soft_prefix']
             changed = True
+        if 'proxy_enable' in content and setting.proxy_enable != content['proxy_enable']:
+            setting.proxy_enable = content['proxy_enable']
+            changed = True
+        if 'proxy_type' in content and setting.proxy_type != content['proxy_type']:
+            setting.proxy_type = content['proxy_type']
+            changed = True
+        if 'proxy_address' in content and setting.proxy_address != content['proxy_address']:
+            setting.proxy_address = content['proxy_address']
+            changed = True
         if changed:
             db.session.commit()
         return True
 
     def getProxySetting(self):
-        switch = self.getSetting().proxy_enable
-        proxytype = self.getSetting().proxy_type
-        address = self.getSetting().proxy_address
-        timeout = self.getSetting().proxy_timeout
-        retry_count = self.getSetting().proxy_retry
+        setting = self.getSetting()
+        switch = setting.proxy_enable
+        proxytype = setting.proxy_type
+        address = setting.proxy_address
+        timeout = setting.proxy_timeout
+        retry_count = setting.proxy_retry
         return switch, address, timeout, retry_count, proxytype
 
 
