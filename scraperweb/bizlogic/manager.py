@@ -60,7 +60,6 @@ def create_data_and_move(file_path: str, c, debug):
             (flag, new_path) = core_main(file_path, n_number, c)
             movie_info = infoService.updateInfo(file_path, new_path, flag)
         else:
-            wlogger.scrapedata(movie_info.serialize())
             wlogger.info("[!]Already done, the newname is [{}]".format(movie_info.newname))
         wlogger.info("[*]======================================================")
     except Exception as err:
