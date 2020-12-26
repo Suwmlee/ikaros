@@ -11,6 +11,7 @@ from ..bizlogic import manager
 from ..bizlogic import transfer
 from ..service.info import infoService
 from ..service.setting import settingService
+from ..service.task import taskService
 from ..utils.wlogger import wlogger
 from concurrent.futures import ThreadPoolExecutor
 
@@ -61,7 +62,10 @@ def get_scrape():
             data.append(i.serialize())
         ret = dict()
         ret['data'] = data
-        ret['running'] = manager.TaskScraping
+        if taskService.getTask().status == 2:
+            ret['running'] = True
+        else:
+            ret['running'] = False
         return json.dumps(ret)
     except Exception as err:
         wlogger.info(err)

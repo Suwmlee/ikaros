@@ -4,6 +4,7 @@ import os
 
 from ..service.setting import settingService
 from ..service.info import infoService
+from ..service.task import taskService
 from .scraper import *
 from ..utils.wlogger import wlogger
 from ..utils.number_parser import get_number
@@ -68,6 +69,11 @@ def create_data_and_move(file_path: str, c, debug):
 
 def start():
 
+    task = taskService.getTask()
+    if task.status == 2:
+        return
+    taskService.updateTaskStatus(2)
+
     version = '4.0.3'
 
     conf = settingService.getSetting()
@@ -99,3 +105,5 @@ def start():
     CEF(conf.failed_folder)
     wlogger.info("[+]All finished!!!")
     wlogger.info("[+]All finished!!!")
+
+    taskService.updateTaskStatus(1)

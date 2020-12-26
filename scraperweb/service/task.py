@@ -7,7 +7,7 @@ from .. import db
 
 class TaskService():
 
-    def getSetting(self, num=1):
+    def getTask(self, num=1):
         task = _Task.query.filter_by(id=num).first()
         if not task:
             task = _Task()
@@ -16,7 +16,12 @@ class TaskService():
         return task
 
     def updateTaskStatus(self, status, num=1):
-        task = self.getSetting(num)
+        """ status
+            0: wait
+            1: finished
+            2: runing
+        """
+        task = self.getTask(num)
         if task.status != status:
             task.status = status
             db.session.commit()
