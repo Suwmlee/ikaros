@@ -9,8 +9,8 @@ from flask import render_template, request, Response
 from . import web
 from ..bizlogic import manager
 from ..bizlogic import transfer
-from ..bizlogic.setting import settingService
-from ..bizlogic.info import infoService
+from ..service.info import infoService
+from ..service.setting import settingService
 from ..utils.wlogger import wlogger
 from concurrent.futures import ThreadPoolExecutor
 
@@ -56,9 +56,12 @@ def get_scrape():
         size = 10
         sort = 0
         infos = infoService.getInfoPage(page, size, sort)
-        ret = []
+        data = []
         for i in infos.items:
-            ret.append(i.serialize())
+            data.append(i.serialize())
+        ret = dict()
+        ret['data'] = data
+        ret['running'] = manager.TaskScraping
         return json.dumps(ret)
     except Exception as err:
         wlogger.info(err)

@@ -5,7 +5,7 @@ import os
 import errno
 import shutil
 from .manager import movie_lists
-from .info import transferService
+from ..service.info import transferService
 
 
 def copysub(src_folder, destfolder):

@@ -2,7 +2,7 @@ import requests
 from lxml import etree
 
 from ..utils.wlogger import wlogger
-from ..bizlogic.setting import settingService
+from ..service.setting import settingService
 
 SUPPORT_PROXY_TYPE = ("http", "socks5", "socks5h")
 

@@ -6,7 +6,7 @@ import datetime
 from flask import render_template, request, Response
 
 from . import web
-from ..bizlogic.setting import settingService
+from ..service.setting import settingService
 from ..utils.wlogger import wlogger
 
 

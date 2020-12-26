@@ -12,14 +12,14 @@ class _Settings(db.Model):
     debug_info = Column(Boolean, default=False)
     auto_exit = Column(Boolean, default=True)
 
-    scrape_folder = Column(String, default='/jav')
+    scrape_folder = Column(String, default='/media')
     failed_folder = Column(String, default='failed')
     success_folder = Column(String, default='output')
     soft_link = Column(Boolean, default=True)
-    soft_prefix = Column(String, default='/jav')
+    soft_prefix = Column(String, default='/media')
     failed_move = Column(Boolean, default=False)
 
-    proxy_enable = Column(Boolean, default=True)
+    proxy_enable = Column(Boolean, default=False)
     proxy_type = Column(String, default='socks5')
     proxy_address = Column(String, default='127.0.0.1:1080')
     proxy_timeout = Column(Integer, default=5)

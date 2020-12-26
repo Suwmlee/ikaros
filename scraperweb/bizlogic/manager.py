@@ -2,8 +2,8 @@
 import argparse
 import os
 
-from .setting import settingService
-from .info import infoService
+from ..service.setting import settingService
+from ..service.info import infoService
 from .scraper import *
 from ..utils.wlogger import wlogger
 from ..utils.number_parser import get_number

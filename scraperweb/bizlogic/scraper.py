@@ -6,7 +6,7 @@ import platform
 
 from PIL import Image
 
-from .setting import settingService
+from ..service.setting import settingService
 from ..utils.wlogger import wlogger
 from ..utils.ADC_function import *
 
