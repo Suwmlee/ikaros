@@ -6,7 +6,7 @@ import errno
 import shutil
 from .manager import movie_lists
 from ..service.info import transferService
-from ..utils.filehelper import video_type, video_filter, cleanfilebysuffix, cleanfolderwithoutsuffix
+from ..utils.filehelper import video_type, ext_type, cleanfilebysuffix, cleanfolderwithoutsuffix
 
 
 def copysub(src_folder, destfolder):
@@ -15,9 +15,9 @@ def copysub(src_folder, destfolder):
     dirs = os.listdir(src_folder)
     for item in dirs:
         (path, ext) = os.path.splitext(item)
-        if ext.lower() in video_type:
+        if ext.lower() in ext_type:
             src_file = os.path.join(src_folder, item)
-            print("copy sub" + src_file)
+            print("copy sub  " + src_file)
             shutil.copy(src_file, destfolder)
 
 

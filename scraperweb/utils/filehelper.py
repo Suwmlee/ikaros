@@ -19,6 +19,7 @@ def cleanfilebysuffix(folder, suffix):
         if os.path.isdir(f):
             cleanfilebysuffix(f, suffix)
         elif os.path.splitext(f)[1] in suffix:
+            print("clean file by suffix ")
             os.remove(f)
 
 
