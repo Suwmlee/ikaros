@@ -9,6 +9,7 @@ from PIL import Image
 from ..service.setting import settingService
 from ..utils.wlogger import wlogger
 from ..utils.ADC_function import *
+from ..utils.filehelper import ext_type
 
 # =========website========
 from ..scraperlib import avsox
@@ -456,7 +457,6 @@ def add_to_pic(pic_path, img_pic):
 
 def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径，番号，后缀，要移动至的位置
     houzhui = str(re.search('[.](AVI|RMVB|WMV|MOV|MP4|MKV|FLV|TS|WEBM|avi|rmvb|wmv|mov|mp4|mkv|flv|ts|webm)$', filepath).group())
-
     try:
         # 如果soft_link=1 使用软链接
         newpath = path + '/' + number + c_word + houzhui
@@ -467,15 +467,10 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
             os.symlink(soft_path, newpath)
         else:
             os.rename(filepath, newpath)
-        if os.path.exists(os.getcwd() + '/' + number + c_word + '.srt'):  # 字幕移动
-            os.rename(os.getcwd() + '/' + number + c_word + '.srt', path + '/' + number + c_word + '.srt')
-            wlogger.info('[+]Sub moved!')
-        elif os.path.exists(os.getcwd() + '/' + number + c_word + '.ssa'):
-            os.rename(os.getcwd() + '/' + number + c_word + '.ssa', path + '/' + number + c_word + '.ssa')
-            wlogger.info('[+]Sub moved!')
-        elif os.path.exists(os.getcwd() + '/' + number + c_word + '.sub'):
-            os.rename(os.getcwd() + '/' + number + c_word + '.sub', path + '/' + number + c_word + '.sub')
-            wlogger.info('[+]Sub moved!')
+        for match in ext_type:
+            if os.path.exists(os.getcwd() + '/' + number + c_word + match):
+                os.rename(os.getcwd() + '/' + number + c_word + match, path + '/' + number + c_word + match)
+                wlogger.info('[+]Sub moved!')
         return True, newpath
     except FileExistsError:
         wlogger.info('[-]File Exists! Please check your movie!')
@@ -490,21 +485,15 @@ def paste_file_to_folder_mode2(filepath, path, multi_part, number, part, c_word,
     if multi_part == 1:
         number += part  # 这时number会被附加上CD1后缀
     houzhui = str(re.search('[.](AVI|RMVB|WMV|MOV|MP4|MKV|FLV|TS|WEBM|avi|rmvb|wmv|mov|mp4|mkv|flv|ts|webm)$', filepath).group())
-
     try:
         if conf.soft_link:
             os.symlink(filepath, path + '/' + number + part + c_word + houzhui)
         else:
             os.rename(filepath, path + '/' + number + part + c_word + houzhui)
-        if os.path.exists(number + '.srt'):  # 字幕移动
-            os.rename(number + part + c_word + '.srt', path + '/' + number + part + c_word + '.srt')
-            wlogger.info('[+]Sub moved!')
-        elif os.path.exists(number + part + c_word + '.ass'):
-            os.rename(number + part + c_word + '.ass', path + '/' + number + part + c_word + '.ass')
-            wlogger.info('[+]Sub moved!')
-        elif os.path.exists(number + part + c_word + '.sub'):
-            os.rename(number + part + c_word + '.sub', path + '/' + number + part + c_word + '.sub')
-            wlogger.info('[+]Sub moved!')
+        for match in ext_type:
+            if os.path.exists(number + match):
+                os.rename(number + part + c_word + match, path + '/' + number + part + c_word + match)
+                wlogger.info('[+]Sub moved!')
         wlogger.info('[!]Success')
     except FileExistsError:
         wlogger.info('[-]File Exists! Please check your movie!')

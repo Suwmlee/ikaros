@@ -13,8 +13,8 @@ class _Settings(db.Model):
     auto_exit = Column(Boolean, default=True)
 
     scrape_folder = Column(String, default='/media')
-    failed_folder = Column(String, default='failed')
-    success_folder = Column(String, default='output')
+    failed_folder = Column(String, default='/media/failed')
+    success_folder = Column(String, default='/media/output')
     soft_link = Column(Boolean, default=True)
     soft_prefix = Column(String, default='/media')
     failed_move = Column(Boolean, default=False)

@@ -8,6 +8,7 @@ from ..service.task import taskService
 from .scraper import *
 from ..utils.wlogger import wlogger
 from ..utils.number_parser import get_number
+from ..utils.filehelper import video_type
 
 
 def movie_lists(root, escape_folder):
@@ -15,13 +16,12 @@ def movie_lists(root, escape_folder):
         if folder in root:
             return []
     total = []
-    file_type = ['.mp4', '.avi', '.rmvb', '.wmv', '.mov', '.mkv', '.flv', '.ts', '.webm', '.MP4', '.AVI', '.RMVB', '.WMV', '.MOV', '.MKV', '.FLV', '.TS', '.WEBM', '.iso', '.ISO']
     dirs = os.listdir(root)
     for entry in dirs:
         f = os.path.join(root, entry)
         if os.path.isdir(f):
             total += movie_lists(f, escape_folder)
-        elif os.path.splitext(f)[1] in file_type:
+        elif os.path.splitext(f)[1] in video_type:
             total.append(f)
     return total
 
