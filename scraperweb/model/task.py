@@ -8,5 +8,9 @@ class _Task(db.Model):
     __tablename__ = 'task'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, default='normaltask')
+    name = Column(String, default='task')
     status = Column(Integer, default=0)
+
+
+    def __init__(self, name):
+        self.name = name

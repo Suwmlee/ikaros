@@ -69,10 +69,10 @@ def create_data_and_move(file_path: str, c, debug):
 
 def start():
 
-    task = taskService.getTask()
+    task = taskService.getTask('scrape')
     if task.status == 2:
         return
-    taskService.updateTaskStatus(2)
+    taskService.updateTaskStatus(2, 'scrape')
 
     version = '4.0.3'
 
@@ -106,4 +106,4 @@ def start():
     wlogger.info("[+]All finished!!!")
     wlogger.info("[+]All finished!!!")
 
-    taskService.updateTaskStatus(1)
+    taskService.updateTaskStatus(1, 'scrape')

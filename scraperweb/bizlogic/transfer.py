@@ -6,6 +6,7 @@ import errno
 import shutil
 from .manager import movie_lists
 from ..service.info import transferService
+from ..service.task import taskService
 from ..utils.filehelper import video_type, ext_type, cleanfilebysuffix, cleanfolderwithoutsuffix
 
 
@@ -36,6 +37,11 @@ def symlink_force(target, link_name):
 
 
 def transfer(src_folder, dest_folder, prefix, escape_folders):
+
+    task = taskService.getTask('transfer')
+    if task.status == 2:
+        return
+    taskService.updateTaskStatus(2, 'transfer')
 
     movie_list = movie_lists(src_folder, escape_folders)
 
@@ -73,4 +79,7 @@ def transfer(src_folder, dest_folder, prefix, escape_folders):
     cleanfolderwithoutsuffix(dest_folder, video_type)
 
     print("transfer finished")
+
+    taskService.updateTaskStatus(1, 'transfer')
+    
     return True

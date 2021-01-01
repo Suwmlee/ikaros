@@ -52,3 +52,15 @@ class _TransferLog(db.Model):
     def __init__(self, basename, basepath):
         self.basename = basename
         self.basepath = basepath
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'basename': self.basename,
+            'basepath': self.basepath,
+            'filesize': self.filesize,
+            'success': self.success,
+            'softpath': self.softpath,
+            'destpath': self.destpath,
+            'updatetime': self.updatetime.strftime("%H:%M:%S %m/%d/%Y")
+        }

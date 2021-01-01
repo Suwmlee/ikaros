@@ -68,6 +68,10 @@ class TransferService():
             info.destpath = destpath
             info.updatetime = datetime.datetime.now()
             db.session.commit()
+    
+    def getLogPage(self, pagenum, pagesize, sort):
+        infos = _TransferLog.query.order_by(_TransferLog.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+        return infos
 
 
 infoService = InfoService()

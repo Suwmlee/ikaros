@@ -9,7 +9,7 @@ from flask import render_template, request, Response
 from . import web
 from ..bizlogic import manager
 from ..bizlogic import transfer
-from ..service.info import infoService
+from ..service.info import infoService, transferService
 from ..service.setting import settingService
 from ..service.task import taskService
 from ..utils.wlogger import wlogger
@@ -50,19 +50,47 @@ def start_transfer():
         return Response(status=500)
 
 
-@web.route("/api/scrapedata", methods=['GET'])
-def get_scrape():
+@web.route("/api/scrapedata/<page>", methods=['GET'])
+def get_scrape(page):
     try:
-        page = 1
+        pagenum = int(page)
         size = 10
         sort = 0
-        infos = infoService.getInfoPage(page, size, sort)
+        infos = infoService.getInfoPage(pagenum, size, sort)
         data = []
         for i in infos.items:
             data.append(i.serialize())
         ret = dict()
         ret['data'] = data
-        if taskService.getTask().status == 2:
+        ret['total'] = infos.total
+        ret['pages'] = infos.pages
+        ret['page'] = pagenum
+        if taskService.getTask('scrape').status == 2:
+            ret['running'] = True
+        else:
+            ret['running'] = False
+        return json.dumps(ret)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
+
+@web.route("/api/transferdata/<page>", methods=['GET'])
+def get_transfer(page):
+    try:
+        pagenum = int(page)
+        size = 10
+        sort = 0
+        infos = transferService.getLogPage(pagenum, size, sort)
+        data = []
+        for i in infos.items:
+            data.append(i.serialize())
+        ret = dict()
+        ret['data'] = data
+        ret['total'] = infos.total
+        ret['pages'] = infos.pages
+        ret['page'] = pagenum
+        if taskService.getTask('transfer').status == 2:
             ret['running'] = True
         else:
             ret['running'] = False
