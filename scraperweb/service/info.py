@@ -48,7 +48,9 @@ class TransferService():
         info = self.getTransferLogByPath(path)
         if not info:
             (filefolder, name) = os.path.split(path)
+            size = os.path.getsize(path) >> 20
             info = _TransferLog(name, path)
+            info.filesize = size
             db.session.add(info)
             db.session.commit()
             return info
