@@ -64,8 +64,8 @@ def create_data_and_move(file_path: str, c, debug):
             wlogger.info("[!]Already done, the newname is [{}]".format(movie_info.newname))
         wlogger.info("[*]======================================================")
     except Exception as err:
-        wlogger.info("[-] [{}] ERROR:".format(file_path))
-        wlogger.info(err)
+        wlogger.error("[-] [{}] ERROR:".format(file_path))
+        wlogger.error(err)
 
 def start():
 
