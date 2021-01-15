@@ -41,6 +41,17 @@ def start_transfer():
         return Response(status=500)
 
 
+@web.route("/api/stopall",methods=['POST'])
+def stop_all():
+    try:
+        taskService.updateTaskStatus(0, 'transfer')
+        taskService.updateTaskStatus(0, 'scrape')
+        return Response(status=200)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
+
 @web.route("/api/scrapedata/<page>", methods=['GET'])
 def get_scrape(page):
     try:
