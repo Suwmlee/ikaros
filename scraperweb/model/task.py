@@ -11,6 +11,5 @@ class _Task(db.Model):
     name = Column(String, default='task')
     status = Column(Integer, default=0)
 
-
     def __init__(self, name):
         self.name = name

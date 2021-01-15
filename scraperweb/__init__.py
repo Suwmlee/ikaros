@@ -25,10 +25,13 @@ def create_app():
 
     db.app = app
     db.init_app(app)
-    from .controller import register
-    register(app)
-    from .model import load_models
-    load_models()
+
+    from . import controller
+    from . import model
+    from . import task
+    controller.register(app)
+    model.load_models()
     db.create_all()
+    task.init_task(app)
 
     return app

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 import json
 import os
@@ -41,7 +42,7 @@ def start_transfer():
         return Response(status=500)
 
 
-@web.route("/api/stopall",methods=['POST'])
+@web.route("/api/stopall", methods=['POST'])
 def stop_all():
     try:
         taskService.updateTaskStatus(0, 'transfer')
