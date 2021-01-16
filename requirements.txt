@@ -6,7 +6,7 @@ cloudscraper==1.2.48
 cssselect==1.1.0
 Flask==1.1.2
 Flask-SQLAlchemy==2.4.4
-Flask-APScheduler
+Flask-APScheduler==1.11.0
 idna==2.10
 itsdangerous==1.1.0
 Jinja2==2.11.2
