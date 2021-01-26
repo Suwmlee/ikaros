@@ -473,7 +473,6 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
                 realpath = os.path.realpath(newpath)
                 if realpath == soft_path:
                     print("already exists")
-                    continue
                 else:
                     os.remove(newpath)
             (newfolder, tname) = os.path.split(newpath)
