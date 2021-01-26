@@ -467,7 +467,6 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
             src_folder = settings.scrape_folder
             dest_folder = settings.success_folder
             midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
-            newpath = os.path.join(dest_folder, midfolder, name)
             soft_path = os.path.join(soft_prefix, midfolder, name)
             if os.path.exists(newpath):
                 realpath = os.path.realpath(newpath)
