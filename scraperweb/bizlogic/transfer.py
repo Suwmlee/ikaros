@@ -2,12 +2,11 @@
 '''
 '''
 import os
-import errno
 import shutil
 from .manager import movie_lists
 from ..service.info import transferService
 from ..service.task import taskService
-from ..utils.filehelper import video_type, ext_type, cleanfilebysuffix, cleanfolderwithoutsuffix
+from ..utils.filehelper import video_type, ext_type, cleanfilebysuffix, cleanfolderwithoutsuffix, symlink_force
 from ..utils.wlogger import wlogger
 
 
@@ -22,19 +21,6 @@ def copysub(src_folder, destfolder):
             print("copy sub  " + src_file)
             shutil.copy(src_file, destfolder)
 
-
-def symlink_force(target, link_name):
-    """ create symlink
-    https://stackoverflow.com/questions/8299386/modifying-a-symlink-in-python
-    """
-    try:
-        os.symlink(target, link_name)
-    except OSError as e:
-        if e.errno == errno.EEXIST:
-            os.remove(link_name)
-            os.symlink(target, link_name)
-        else:
-            raise e
 
 
 def transfer(src_folder, dest_folder, prefix, escape_folders):
@@ -83,7 +69,9 @@ def transfer(src_folder, dest_folder, prefix, escape_folders):
         cleanfolderwithoutsuffix(dest_folder, video_type)
 
         print("transfer finished")
-    except Exception as err:
+    except:
+        import traceback
+        err = traceback.format_exc()
         wlogger.error(err)
 
     taskService.updateTaskStatus(1, 'transfer')

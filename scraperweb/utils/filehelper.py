@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import errno
 import shutil
 
 
@@ -40,3 +41,17 @@ def cleanfolderwithoutsuffix(folder, suffix):
         elif os.path.splitext(f)[1] in suffix:
             hassuffix = True
     return hassuffix
+
+
+def symlink_force(target, link_name):
+    """ create symlink
+    https://stackoverflow.com/questions/8299386/modifying-a-symlink-in-python
+    """
+    try:
+        os.symlink(target, link_name)
+    except OSError as e:
+        if e.errno == errno.EEXIST:
+            os.remove(link_name)
+            os.symlink(target, link_name)
+        else:
+            raise e

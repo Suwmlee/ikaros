@@ -12,6 +12,8 @@ from ..utils.filehelper import video_type
 
 
 def movie_lists(root, escape_folder):
+    """ collect movies
+    """
     for folder in escape_folder:
         if folder in root:
             return []
@@ -27,12 +29,14 @@ def movie_lists(root, escape_folder):
 
 
 def create_failed_folder(failed_folder):
+    """ create failed folder
+    """
     if not os.path.exists(failed_folder + '/'):
         try:
             os.makedirs(failed_folder + '/')
         except:
             wlogger.info("[-]failed!can not be make folder 'failed'\n[-](Please run as Administrator)")
-            os._exit(0)
+            # os._exit(0)
 
 
 def CEF(path):

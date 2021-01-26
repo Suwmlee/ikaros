@@ -9,7 +9,7 @@ from PIL import Image
 from ..service.setting import settingService
 from ..utils.wlogger import wlogger
 from ..utils.ADC_function import *
-from ..utils.filehelper import ext_type
+from ..utils.filehelper import ext_type, symlink_force
 
 # =========website========
 from ..scraperlib import avsox
@@ -462,9 +462,24 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
         newpath = path + '/' + number + c_word + houzhui
         if conf.soft_link:
             (filefolder, name) = os.path.split(filepath)
-            soft_prefix = settingService.getSetting().soft_prefix
-            soft_path = os.path.join(soft_prefix, name)
-            os.symlink(soft_path, newpath)
+            settings = settingService.getSetting()
+            soft_prefix = settings.soft_prefix
+            src_folder = settings.scrape_folder
+            dest_folder = settings.success_folder
+            midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
+            newpath = os.path.join(dest_folder, midfolder, name)
+            soft_path = os.path.join(soft_prefix, midfolder, name)
+            if os.path.exists(newpath):
+                realpath = os.path.realpath(newpath)
+                if realpath == soft_path:
+                    print("already exists")
+                    continue
+                else:
+                    os.remove(newpath)
+            (newfolder, tname) = os.path.split(newpath)
+            if not os.path.exists(newfolder):
+                os.makedirs(newfolder)
+            symlink_force(soft_path, newpath)
         else:
             os.rename(filepath, newpath)
         for match in ext_type:
