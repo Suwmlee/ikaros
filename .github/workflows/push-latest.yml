@@ -33,4 +33,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            suwmlee/jav-scraper:${{ github.event.inputs.publish_tag }}     
+            suwmlee/ikaros:${{ github.event.inputs.publish_tag }}     
