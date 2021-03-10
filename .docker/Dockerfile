@@ -14,9 +14,7 @@ RUN apt-get update \
     && wget -O - https://github.com/Suwmlee/Spike/archive/release.tar.gz | tar xvz \
     && mv ./Spike-release/index.html /ikaros/scraperweb/templates/ \ 
     && mv ./Spike-release/* /ikaros/scraperweb/static/
-RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pip -U \
-    && pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
-    && pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 RUN apt-get clean autoclean -y \
     && apt-get purge -y wget \
     && apt-get autoremove -y \
