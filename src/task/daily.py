@@ -6,7 +6,7 @@
 '''
 
 from flask_apscheduler import APScheduler
-
+from ..bizlogic import manager, scraper, transfer
 
 class DailyTask(object):
     """

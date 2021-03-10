@@ -14,7 +14,7 @@ def create_app():
     """ create application
     """
     global app
-    app = Flask(__name__, static_url_path='')
+    app = Flask(__name__, static_url_path='', static_folder='../web/static/', template_folder='../web/templates/')
     app.config.from_object(Config)
     # Configure logging
     formatter = logging.Formatter(app.config['LOGGING_FORMAT'])

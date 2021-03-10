@@ -12,16 +12,16 @@ from ..utils.ADC_function import *
 from ..utils.filehelper import ext_type, symlink_force
 
 # =========website========
-from ..scraperlib import avsox
-from ..scraperlib import fanza
-from ..scraperlib import fc2
-from ..scraperlib import jav321
-from ..scraperlib import javbus
-from ..scraperlib import javdb
-from ..scraperlib import mgstage
-from ..scraperlib import xcity
-from ..scraperlib import javlib
-from ..scraperlib import dlsite
+from ..scrapinglib import avsox
+from ..scrapinglib import fanza
+from ..scrapinglib import fc2
+from ..scrapinglib import jav321
+from ..scrapinglib import javbus
+from ..scrapinglib import javdb
+from ..scrapinglib import mgstage
+from ..scrapinglib import xcity
+from ..scrapinglib import javlib
+from ..scrapinglib import dlsite
 
 
 def escape_path(path, escape_literals: str):  # Remove escape literals

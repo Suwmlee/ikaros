@@ -12,8 +12,8 @@ RUN sed -i 's/deb.debian.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.li
 RUN apt-get update \
     && apt-get install -y wget ca-certificates \
     && wget -O - https://github.com/Suwmlee/Spike/archive/release.tar.gz | tar xvz \
-    && mv ./Spike-release/index.html /ikaros/scraperweb/templates/ \ 
-    && mv ./Spike-release/* /ikaros/scraperweb/static/
+    && mv ./Spike-release/index.html /ikaros/src/templates/ \ 
+    && mv ./Spike-release/* /ikaros/src/static/
 RUN pip install --no-cache-dir -r requirements.txt
 RUN apt-get clean autoclean -y \
     && apt-get purge -y wget \

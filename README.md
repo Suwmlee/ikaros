@@ -7,10 +7,10 @@
 以下以群晖docker安装为例:
 
 - 设置目录 
-![avatar](./scraperweb/images/synology_install_1.png)
+![avatar](./src/images/synology_install_1.png)
 __注意:__ 选择实际需要刮削/转移的目录
 - 设置端口
-![avatar](./scraperweb/images/synology_install_2.png)
+![avatar](./src/images/synology_install_2.png)
 
 
 #### 目录设置说明
