@@ -6,7 +6,7 @@ import platform
 
 from PIL import Image
 
-from ..service.setting import settingService
+from ..service.configservice import scrapingConfService
 from ..utils.wlogger import wlogger
 from ..utils.ADC_function import *
 from ..utils.filehelper import ext_type, symlink_force
@@ -284,7 +284,7 @@ def trimblank(s: str):
 
 
 def download_file_with_filename(url, filename, path, conf, filepath, failed_folder):
-    proxyenable, proxy, timeout, retrycount, proxytype = settingService.getProxySetting()
+    proxyenable, proxy, timeout, retrycount, proxytype = scrapingConfService.getProxySetting()
 
     for i in range(retrycount):
         try:
@@ -336,7 +336,7 @@ def image_download(cover, number, c_word, path, conf, filepath, failed_folder):
         moveFailedFolder(filepath, failed_folder)
         return
 
-    proxyenable, _proxy, _timeout, retry, _proxytype = settingService.getProxySetting()
+    proxyenable, _proxy, _timeout, retry, _proxytype = scrapingConfService.getProxySetting()
     for i in range(retry):
         if os.path.getsize(path + '/' + number + c_word + '-fanart.jpg') == 0:
             wlogger.info('[!]Image Download Failed! Trying again. [{}/3]', i + 1)
@@ -462,7 +462,7 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
         newpath = path + '/' + number + c_word + houzhui
         if conf.soft_link:
             (filefolder, name) = os.path.split(filepath)
-            settings = settingService.getSetting()
+            settings = scrapingConfService.getSetting()
             soft_prefix = settings.soft_prefix
             src_folder = settings.scrape_folder
             dest_folder = settings.success_folder

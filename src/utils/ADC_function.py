@@ -2,7 +2,7 @@ import requests
 from lxml import etree
 
 from ..utils.wlogger import wlogger
-from ..service.setting import settingService
+from ..service.configservice import scrapingConfService
 
 SUPPORT_PROXY_TYPE = ("http", "socks5", "socks5h")
 
@@ -42,7 +42,7 @@ def get_proxy(proxy: str, proxytype: str = None) -> dict:
 
 # 网页请求核心
 def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None):
-    proxyenable, proxy, timeout, retrycount, proxytype = settingService.getProxySetting()
+    proxyenable, proxy, timeout, retrycount, proxytype = scrapingConfService.getProxySetting()
     proxies = get_proxy(proxy, proxytype)
 
     if ua is None:
@@ -71,7 +71,7 @@ def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None)
 
 
 def post_html(url: str, query: dict) -> requests.Response:
-    proxyenable, proxy, timeout, retrycount, proxytype = settingService.getProxySetting()
+    proxyenable, proxy, timeout, retrycount, proxytype = scrapingConfService.getProxySetting()
     proxies = get_proxy(proxy, proxytype)
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3100.0 Safari/537.36"}
@@ -90,7 +90,7 @@ def post_html(url: str, query: dict) -> requests.Response:
 
 def get_javlib_cookie() -> [dict, str]:
     import cloudscraper
-    proxyenable, proxy, timeout, retrycount, proxytype = settingService.getProxySetting()
+    proxyenable, proxy, timeout, retrycount, proxytype = scrapingConfService.getProxySetting()
     proxies = get_proxy(proxy, proxytype)
 
     raw_cookie = {}
@@ -117,7 +117,7 @@ def get_javlib_cookie() -> [dict, str]:
 
 
 def translateTag_to_sc(tag):
-    tranlate_to_sc = settingService.setting.transalte_to_sc
+    tranlate_to_sc = scrapingConfService.setting.transalte_to_sc
     if tranlate_to_sc:
         dict_gen = {'中文字幕': '中文字幕',
                     '高清': 'XXXX', '字幕': 'XXXX', '推薦作品': '推荐作品', '通姦': '通奸', '淋浴': '淋浴', '舌頭': '舌头',

@@ -59,4 +59,4 @@ class SettingService():
         return switch, address, timeout, retry_count, proxytype
 
 
-settingService = SettingService()
+scrapingConfService = SettingService()

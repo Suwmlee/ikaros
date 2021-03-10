@@ -2,9 +2,9 @@
 import argparse
 import os
 
-from ..service.setting import settingService
-from ..service.info import infoService
-from ..service.task import taskService
+from ..service.configservice import scrapingConfService
+from ..service.logservice import scrapinglogService
+from ..service.taskservice import taskService
 from .scraper import *
 from ..utils.wlogger import wlogger
 from ..utils.number_parser import get_number
@@ -59,11 +59,11 @@ def create_data_and_move(file_path: str, c, debug):
 
     try:
         wlogger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
-        movie_info = infoService.getInfoByPath(file_path)
+        movie_info = scrapinglogService.getInfoByPath(file_path)
         if not movie_info or movie_info.status != 1:
-            movie_info = infoService.addInfo(file_path)
+            movie_info = scrapinglogService.addInfo(file_path)
             (flag, new_path) = core_main(file_path, n_number, c)
-            movie_info = infoService.updateInfo(file_path, n_number, new_path, flag)
+            movie_info = scrapinglogService.updateInfo(file_path, n_number, new_path, flag)
         else:
             wlogger.info("[!]Already done, the newname is [{}]".format(movie_info.newname))
         wlogger.info("[*]======================================================")
@@ -80,7 +80,7 @@ def start():
 
     version = '4.0.3'
 
-    conf = settingService.getSetting()
+    conf = scrapingConfService.getSetting()
 
     version_print = 'Version ' + version
     wlogger.info('[*]================== AV Data Capture ===================')

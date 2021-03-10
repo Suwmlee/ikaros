@@ -76,5 +76,5 @@ class TransferService():
         return infos
 
 
-infoService = InfoService()
-transferService = TransferService()
+scrapinglogService = InfoService()
+transferlogService = TransferService()

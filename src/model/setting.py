@@ -54,3 +54,14 @@ class _Settings(db.Model):
             'proxy_timeout':self.proxy_timeout,
             'proxy_retry':self.proxy_retry
         }
+
+
+class _TransferSettings(db.Model):
+    __tablename__ = 'transfersettings'
+
+    id = Column(Integer, primary_key=True)
+    source_folder = Column(String, default='/media')
+    soft_prefix = Column(String, default='volume1/media')
+    output_folder = Column(String, default='/media/output')
+    escape_folder = Column(String, default='')
+    mark = Column(String, default='默认配置')
