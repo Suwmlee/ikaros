@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime, BigInteger
 from .. import db
 
 
-class _Info(db.Model):
+class _ScrapingLog(db.Model):
     __tablename__ = 'info'
 
     id = Column(Integer, primary_key=True)
@@ -37,7 +37,7 @@ class _Info(db.Model):
 
 
 
-class _TransferLog(db.Model):
+class _TransLog(db.Model):
     __tablename__ = 'transferlog'
 
     id = Column(Integer, primary_key=True)

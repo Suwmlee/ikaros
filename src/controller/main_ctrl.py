@@ -10,8 +10,8 @@ from flask import render_template, request, Response
 from . import web
 from ..bizlogic import manager
 from ..bizlogic import transfer
-from ..service.logservice import scrapinglogService, transferlogService
-from ..service.configservice import scrapingConfService
+from ..service.logservice import scrapinglogService, translogService
+from ..service.configservice import scrapingConfService, transConfigService
 from ..service.taskservice import taskService
 from ..utils.wlogger import wlogger
 # from concurrent.futures import ThreadPoolExecutor
@@ -84,7 +84,7 @@ def get_transfer(page):
         pagenum = int(page)
         size = 10
         sort = 0
-        infos = transferlogService.getLogPage(pagenum, size, sort)
+        infos = translogService.getLogPage(pagenum, size, sort)
         data = []
         for i in infos.items:
             data.append(i.serialize())
@@ -118,6 +118,61 @@ def updateSetting():
     try:
         content = request.get_json()
         scrapingConfService.updateSetting(content)
+        return Response(status=200)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
+
+@web.route("/api/transconf/all", methods=['GET'])
+def getTransConfs():
+    """ 查询转移配置
+    """
+    try:
+        configs = transConfigService.getConfiglist()
+        all = []
+        for conf in configs:
+            all.append(conf.serialize())
+        return json.dumps(all)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
+
+@web.route("/api/transconf", methods=['POST'])
+def addTransConf():
+    """ 新增转移配置
+    """
+    try:
+        content = request.get_json()
+        content['id'] = -1
+        config = transConfigService.updateConf(content)
+        return json.dumps(config.serialize())
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
+
+@web.route("/api/transconf", methods=['PUT'])
+def updateTransConf():
+    """ 更新转移配置
+    """
+    try:
+        content = request.get_json()
+        config = transConfigService.updateConf(content)
+        return json.dumps(config.serialize())
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
+
+@web.route("/api/transconf/<cid>", methods=['DELETE'])
+def deleteTransConf(cid):
+    """ 删除转移配置
+    """
+    try:
+        iid = int(cid)
+        transConfigService.deleteConf(iid)
         return Response(status=200)
     except Exception as err:
         wlogger.info(err)

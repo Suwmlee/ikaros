@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 ''' 刮削配置
 '''
-from ..model.setting import _Settings
+from ..model.config import _ScrapingConfigs, _TransferConfigs
 from .. import db
 
 
-class SettingService():
+class ScrapingConfService():
 
     def getSetting(self):
-        setting = _Settings.query.filter_by(id=1).first()
+        setting = _ScrapingConfigs.query.filter_by(id=1).first()
         if not setting:
-            setting = _Settings()
+            setting = _ScrapingConfigs()
             db.session.add(setting)
             db.session.commit()
         return setting
@@ -59,4 +59,43 @@ class SettingService():
         return switch, address, timeout, retry_count, proxytype
 
 
-scrapingConfService = SettingService()
+class TransConfService():
+    """ 转移模块服务
+    """
+
+    def getConfiglist(self):
+        configs = _TransferConfigs.query.all()
+        return configs
+
+    def getConfig(self):
+        config = _TransferConfigs.query.filter_by(id=1).first()
+        if not config:
+            config = _TransferConfigs()
+            db.session.add(config)
+            db.session.commit()
+        return config
+
+    def updateConf(self, content):
+        cid = -1
+        if 'id' in content and content['id'] != '':
+            cid = content['id']
+        config = _TransferConfigs.query.filter_by(id=cid).first()
+        if not config:
+            config = _TransferConfigs()
+            db.session.add(config)
+        config.source_folder = content['source_folder']
+        config.soft_prefix = content['soft_prefix']
+        config.output_folder = content['output_folder']
+        config.escape_folder = content['escape_folder']
+        config.mark = content['mark']
+        db.session.commit()
+        return config
+
+    def deleteConf(self, cid):
+        config = _TransferConfigs.query.filter_by(id=cid).first()
+        if config:
+            db.session.delete(config)
+            db.session.commit()
+
+scrapingConfService = ScrapingConfService()
+transConfigService = TransConfService()

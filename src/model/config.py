@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, String, Boolean
 from .. import db
 
 
-class _Settings(db.Model):
+class _ScrapingConfigs(db.Model):
     __tablename__ = 'settings'
 
     id = Column(Integer, primary_key=True)
@@ -56,12 +56,22 @@ class _Settings(db.Model):
         }
 
 
-class _TransferSettings(db.Model):
-    __tablename__ = 'transfersettings'
+class _TransferConfigs(db.Model):
+    __tablename__ = 'transferconfigs'
 
     id = Column(Integer, primary_key=True)
     source_folder = Column(String, default='/media')
-    soft_prefix = Column(String, default='volume1/media')
+    soft_prefix = Column(String, default='/volume1/Media')
     output_folder = Column(String, default='/media/output')
     escape_folder = Column(String, default='')
-    mark = Column(String, default='默认配置')
+    mark = Column(String, default='备注')
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'source_folder': self.source_folder,
+            'soft_prefix': self.soft_prefix,
+            'output_folder': self.output_folder,
+            'escape_folder': self.escape_folder,
+            'mark': self.mark
+        }

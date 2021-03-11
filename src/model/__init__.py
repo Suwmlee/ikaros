@@ -1,5 +1,5 @@
 
 def load_models():
-    from . import setting
-    from . import info
+    from . import config
+    from . import log
     from . import task
