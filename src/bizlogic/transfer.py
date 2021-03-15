@@ -6,7 +6,7 @@ import shutil
 from .manager import movie_lists
 from ..service.logservice import translogService
 from ..service.taskservice import taskService
-from ..utils.filehelper import video_type, ext_type, cleanfilebysuffix, cleanfolderwithoutsuffix, symlink_force
+from ..utils.filehelper import video_type, ext_type, cleanfilebysuffix, cleanfolderwithoutsuffix, hardlink_force
 from ..utils.wlogger import wlogger
 
 
@@ -61,7 +61,8 @@ def transfer(src_folder, dest_folder, prefix, escape_folders):
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
             print("create soft link from [{}] to [{}]".format(soft_path, newpath))
-            symlink_force(soft_path, newpath)
+            # symlink_force(soft_path, newpath)
+            hardlink_force(soft_path, newpath)
             copysub(filefolder, newfolder)
             print("transfer Data for [{}], the number is [{}]".format(movie_path, newpath))
             translogService.updateTransferLog(movie_path, soft_path, newpath)
