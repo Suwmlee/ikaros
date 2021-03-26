@@ -17,7 +17,7 @@ def movie_lists(root, escape_folder):
     """ collect movies
     """
     for folder in escape_folder:
-        if folder in root:
+        if folder in root and folder != '':
             return []
     total = []
     dirs = os.listdir(root)
