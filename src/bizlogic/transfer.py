@@ -2,6 +2,7 @@
 '''
 '''
 import os
+import re
 import shutil
 from .manager import movie_lists
 from ..service.logservice import translogService
@@ -30,7 +31,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders):
     taskService.updateTaskStatus(2, 'transfer')
 
     try:
-        movie_list = movie_lists(src_folder, escape_folders)
+        movie_list = movie_lists(src_folder, re.split("[,，]", escape_folders))
 
         # 硬链接直接使用源目录
         if linktype == 1:

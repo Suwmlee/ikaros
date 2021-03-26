@@ -1,6 +1,8 @@
-
-import argparse
+# -*- coding: utf-8 -*-
+'''
+'''
 import os
+import re
 
 from ..service.configservice import scrapingConfService
 from ..service.logservice import scrapinglogService
@@ -70,6 +72,7 @@ def create_data_and_move(file_path: str, c, debug):
     except Exception as err:
         wlogger.error("[-] [{}] ERROR:".format(file_path))
         wlogger.error(err)
+
 
 def start():
 
