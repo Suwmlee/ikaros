@@ -62,14 +62,16 @@ class _TransferConfigs(db.Model):
     id = Column(Integer, primary_key=True)
     source_folder = Column(String, default='/media')
     soft_prefix = Column(String, default='/volume1/Media')
+    linktype = Column(Integer, default=0)
     output_folder = Column(String, default='/media/output')
-    escape_folder = Column(String, default='')
+    escape_folder = Column(String, default='Sample')
     mark = Column(String, default='备注')
 
     def serialize(self):
         return {
             'id': self.id,
             'source_folder': self.source_folder,
+            'linktype': self.linktype,
             'soft_prefix': self.soft_prefix,
             'output_folder': self.output_folder,
             'escape_folder': self.escape_folder,

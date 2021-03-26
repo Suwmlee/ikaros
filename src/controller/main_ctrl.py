@@ -35,7 +35,7 @@ def start_scraper():
 def start_transfer():
     try:
         content = request.get_json()
-        transfer.transfer(content['source_folder'], content['output_folder'], content['soft_prefix'], content['escape_folder'])
+        transfer.transfer(content['source_folder'], content['output_folder'], content['linktype'], content['soft_prefix'], content['escape_folder'])
         return Response(status=200)
     except Exception as err:
         wlogger.info(err)

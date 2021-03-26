@@ -6,7 +6,7 @@ import shutil
 from .manager import movie_lists
 from ..service.logservice import translogService
 from ..service.taskservice import taskService
-from ..utils.filehelper import video_type, ext_type, cleanfilebysuffix, cleanfolderwithoutsuffix, hardlink_force
+from ..utils.filehelper import video_type, ext_type, cleanfilebysuffix, cleanfolderwithoutsuffix, hardlink_force, symlink_force
 from ..utils.wlogger import wlogger
 
 
@@ -22,8 +22,7 @@ def copysub(src_folder, destfolder):
             shutil.copy(src_file, destfolder)
 
 
-
-def transfer(src_folder, dest_folder, prefix, escape_folders):
+def transfer(src_folder, dest_folder, linktype, prefix, escape_folders):
 
     task = taskService.getTask('transfer')
     if task.status == 2:
@@ -32,6 +31,10 @@ def transfer(src_folder, dest_folder, prefix, escape_folders):
 
     try:
         movie_list = movie_lists(src_folder, escape_folders)
+
+        # 硬链接直接使用源目录
+        if linktype == 1:
+            prefix = src_folder
 
         if not os.path.exists(dest_folder):
             os.makedirs(dest_folder)
@@ -46,26 +49,28 @@ def transfer(src_folder, dest_folder, prefix, escape_folders):
             (filefolder, name) = os.path.split(movie_path)
             midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
             newpath = os.path.join(dest_folder, midfolder, name)
-            soft_path = os.path.join(prefix, midfolder, name)
+            link_path = os.path.join(prefix, midfolder, name)
 
             if os.path.exists(newpath):
                 realpath = os.path.realpath(newpath)
-                if realpath == soft_path:
+                if realpath == link_path:
                     print("already exists")
-                    translogService.updateTransferLog(movie_path, soft_path, newpath)
+                    translogService.updateTransferLog(movie_path, link_path, newpath)
                     continue
                 else:
-                    print("clean soft link")
+                    print("clean link")
                     os.remove(newpath)
             (newfolder, tname) = os.path.split(newpath)
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
-            print("create soft link from [{}] to [{}]".format(soft_path, newpath))
-            # symlink_force(soft_path, newpath)
-            hardlink_force(soft_path, newpath)
+            print("create link from [{}] to [{}]".format(link_path, newpath))
+            if linktype == 0:
+                symlink_force(link_path, newpath)
+            else:
+                hardlink_force(link_path, newpath)
             copysub(filefolder, newfolder)
             print("transfer Data for [{}], the number is [{}]".format(movie_path, newpath))
-            translogService.updateTransferLog(movie_path, soft_path, newpath)
+            translogService.updateTransferLog(movie_path, link_path, newpath)
 
         cleanfolderwithoutsuffix(dest_folder, video_type)
 

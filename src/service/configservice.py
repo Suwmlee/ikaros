@@ -84,6 +84,7 @@ class TransConfService():
             config = _TransferConfigs()
             db.session.add(config)
         config.source_folder = content['source_folder']
+        config.linktype = content['linktype']
         config.soft_prefix = content['soft_prefix']
         config.output_folder = content['output_folder']
         config.escape_folder = content['escape_folder']
