@@ -9,7 +9,7 @@ from .. import db
 
 class ScrapingRecordService():
 
-    def add(self, path):
+    def add(self, path) -> _ScrapingRecords:
         info = self.queryByPath(path)
         if not info:
             (filefolder, name) = os.path.split(path)
@@ -24,7 +24,7 @@ class ScrapingRecordService():
         return _ScrapingRecords.query.all()
 
     def queryByPath(self, value) -> _ScrapingRecords:
-        return _ScrapingRecords.query.filter_by(basepath=value).first()
+        return _ScrapingRecords.query.filter_by(srcpath=value).first()
 
     def getRecordByID(self, value) -> _ScrapingRecords:
         return _ScrapingRecords.query.filter_by(id=value).first()
@@ -35,8 +35,8 @@ class ScrapingRecordService():
             if flag:
                 (filefolder, newname) = os.path.split(newpath)
                 info.status = 1
-                info.newname = newname
-                info.newpath = newpath
+                info.destname = newname
+                info.destpath = newpath
             else:
                 info.status = 2
             info.scrapingname = sname
@@ -50,7 +50,7 @@ class ScrapingRecordService():
 
 class TransRecordService():
 
-    def add(self, path):
+    def add(self, path) -> _TransRecords:
         info = self.queryByPath(path)
         if not info:
             (filefolder, name) = os.path.split(path)
@@ -62,8 +62,8 @@ class TransRecordService():
             return info
         return info
 
-    def queryByPath(self, value):
-        info = _TransRecords.query.filter_by(basepath=value).first()
+    def queryByPath(self, value) -> _TransRecords:
+        info = _TransRecords.query.filter_by(srcpath=value).first()
         if not info:
             return None
         return info
@@ -72,7 +72,7 @@ class TransRecordService():
         info = self.queryByPath(path)
         if info:
             info.success = True
-            info.softpath = softpath
+            info.linkpath = softpath
             info.destpath = destpath
             info.updatetime = datetime.datetime.now()
             db.session.commit()
