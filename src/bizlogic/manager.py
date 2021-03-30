@@ -5,7 +5,7 @@ import os
 import re
 
 from ..service.configservice import scrapingConfService
-from ..service.logservice import scrapinglogService
+from ..service.recordservice import scrapingrecordService
 from ..service.taskservice import taskService
 from .scraper import *
 from ..utils.wlogger import wlogger
@@ -61,11 +61,11 @@ def create_data_and_move(file_path: str, c, debug):
 
     try:
         wlogger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
-        movie_info = scrapinglogService.getInfoByPath(file_path)
+        movie_info = scrapingrecordService.queryByPath(file_path)
         if not movie_info or movie_info.status != 1:
-            movie_info = scrapinglogService.addInfo(file_path)
+            movie_info = scrapingrecordService.add(file_path)
             (flag, new_path) = core_main(file_path, n_number, c)
-            movie_info = scrapinglogService.updateInfo(file_path, n_number, new_path, flag)
+            movie_info = scrapingrecordService.update(file_path, n_number, new_path, flag)
         else:
             wlogger.info("[!]Already done, the newname is [{}]".format(movie_info.newname))
         wlogger.info("[*]======================================================")

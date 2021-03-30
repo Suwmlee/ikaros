@@ -10,7 +10,7 @@ from flask import render_template, request, Response
 from . import web
 from ..bizlogic import manager
 from ..bizlogic import transfer
-from ..service.logservice import scrapinglogService, translogService
+from ..service.recordservice import scrapingrecordService, transrecordService
 from ..service.configservice import scrapingConfService, transConfigService
 from ..service.taskservice import taskService
 from ..utils.wlogger import wlogger
@@ -59,7 +59,7 @@ def get_scrape(page):
         pagenum = int(page)
         size = 10
         sort = 0
-        infos = scrapinglogService.getInfoPage(pagenum, size, sort)
+        infos = scrapingrecordService.queryByPage(pagenum, size, sort)
         data = []
         for i in infos.items:
             data.append(i.serialize())
@@ -84,7 +84,7 @@ def get_transfer(page):
         pagenum = int(page)
         size = 10
         sort = 0
-        infos = translogService.getLogPage(pagenum, size, sort)
+        infos = transrecordService.queryByPage(pagenum, size, sort)
         data = []
         for i in infos.items:
             data.append(i.serialize())

@@ -5,7 +5,7 @@ import os
 import re
 import shutil
 from .manager import movie_lists
-from ..service.logservice import translogService
+from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
 from ..utils.filehelper import video_type, ext_type, cleanfilebysuffix, cleanfolderwithoutsuffix, hardlink_force, symlink_force
 from ..utils.wlogger import wlogger
@@ -43,9 +43,9 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders):
 
         for movie_path in movie_list:
             print("start check [{}] ".format(movie_path))
-            movie_info = translogService.getTransferLogByPath(movie_path)
+            movie_info = transrecordService.queryByPath(movie_path)
             if not movie_info:
-                movie_info = translogService.addTransferLog(movie_path)
+                movie_info = transrecordService.add(movie_path)
 
             (filefolder, name) = os.path.split(movie_path)
             midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
@@ -56,7 +56,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders):
                 realpath = os.path.realpath(newpath)
                 if realpath == link_path:
                     print("already exists")
-                    translogService.updateTransferLog(movie_path, link_path, newpath)
+                    transrecordService.update(movie_path, link_path, newpath)
                     continue
                 else:
                     print("clean link")
@@ -71,7 +71,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders):
                 hardlink_force(link_path, newpath)
             copysub(filefolder, newfolder)
             print("transfer Data for [{}], the number is [{}]".format(movie_path, newpath))
-            translogService.updateTransferLog(movie_path, link_path, newpath)
+            transrecordService.update(movie_path, link_path, newpath)
 
         cleanfolderwithoutsuffix(dest_folder, video_type)
 
