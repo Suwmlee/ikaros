@@ -64,7 +64,7 @@ class _TransferConfigs(db.Model):
     soft_prefix = Column(String, default='/volume1/Media')
     linktype = Column(Integer, default=0)
     output_folder = Column(String, default='/media/output')
-    escape_folder = Column(String, default='Sample')
+    escape_folder = Column(String, default='Sample,sample')
     mark = Column(String, default='备注')
 
     def serialize(self):

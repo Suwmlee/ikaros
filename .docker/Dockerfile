@@ -11,9 +11,9 @@ RUN sed -i 's/deb.debian.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.li
     && sed -i 's/security.debian.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list
 RUN apt-get update \
     && apt-get install -y wget ca-certificates \
-    && wget -O - https://github.com/Suwmlee/Spike/archive/release.tar.gz | tar xvz \
-    && mv ./Spike-release/index.html /ikaros/web/templates/ \ 
-    && mv ./Spike-release/* /ikaros/web/static/
+    && wget -O - https://github.com/Suwmlee/ikaros-web/archive/release.tar.gz | tar xvz \
+    && mv ./ikaros-web-release/index.html /ikaros/web/templates/ \ 
+    && mv ./ikaros-web-release/* /ikaros/web/static/
 RUN pip install --no-cache-dir -r requirements.txt
 RUN apt-get clean autoclean -y \
     && apt-get purge -y wget \
