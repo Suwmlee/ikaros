@@ -13,7 +13,8 @@ class ScrapingRecordService():
         info = self.queryByPath(path)
         if not info:
             (filefolder, name) = os.path.split(path)
-            size = os.path.getsize(path) >> 20
+            if os.path.exists(path):
+                size = os.path.getsize(path) >> 20
             info = _ScrapingRecords(name, path)
             info.srcsize = size
             db.session.add(info)
@@ -26,8 +27,26 @@ class ScrapingRecordService():
     def queryByPath(self, value) -> _ScrapingRecords:
         return _ScrapingRecords.query.filter_by(srcpath=value).first()
 
-    def getRecordByID(self, value) -> _ScrapingRecords:
+    def queryByID(self, value) -> _ScrapingRecords:
         return _ScrapingRecords.query.filter_by(id=value).first()
+
+    def deleteByID(self, value) -> _ScrapingRecords:
+        record = _ScrapingRecords.query.filter_by(id=value).first()
+        if not record:
+            db.session.delete(record)
+            db.session.commit()
+
+    def importRecord(self, name, path, size, status):
+        record = _ScrapingRecords.query.filter_by(srcpath=path).first()
+        if not record:
+            record = _ScrapingRecords(name, path)
+            record.srcsize = size
+            record.status = status
+            db.session.add(record)
+        else:
+            record.srcsize = size
+            record.status = status
+        db.session.commit()
 
     def update(self, path, sname, newpath, flag):
         info = self.queryByPath(path)
@@ -47,6 +66,7 @@ class ScrapingRecordService():
     def queryByPage(self, pagenum, pagesize, sort):
         infos = _ScrapingRecords.query.order_by(_ScrapingRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
         return infos
+
 
 class TransRecordService():
 
@@ -76,7 +96,7 @@ class TransRecordService():
             info.destpath = destpath
             info.updatetime = datetime.datetime.now()
             db.session.commit()
-    
+
     def queryByPage(self, pagenum, pagesize, sort):
         infos = _TransRecords.query.order_by(_TransRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
         return infos

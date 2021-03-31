@@ -2,6 +2,7 @@
 
 import os
 import xlwt
+import xlrd
 
 from flask import request, Response, send_from_directory
 
@@ -44,3 +45,78 @@ def export_excel():
         wlogger.info(err)
         return Response(status=500)
 
+
+def open_excel(file='file.xls'):
+    try:
+        data = xlrd.open_workbook(file, encoding_override="utf-8")
+        return data
+    except Exception as e:
+        print(str(e))
+
+
+def allowed_format(file='file.xls', colnameindex=0, by_index=0):
+    """
+# 根据索引获取Excel表格中的数据   
+# 参数:file：Excel文件路径    
+# colnameindex：表头列名所在行的索引 
+# by_index：表的索引
+    """
+    data = open_excel(file)
+    table = data.sheets()[by_index]
+    colnames = table.row_values(colnameindex)
+    if colnames[0] == "srcname" and \
+            colnames[1] == "srcpath" and \
+            colnames[2] == "srcsize" and \
+            colnames[3] == "status":
+        return 1
+    else:
+        return 0
+
+
+ALLOWED_EXTENSIONS = ['xls', 'xlsx']
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+
+@web.route("/api/import", methods=['POST'])
+def import_excel():
+    """ 导入JAV excel
+    """
+    try:
+        file = request.files['file']
+        filename = file.filename
+
+        if file and allowed_file(filename):
+            file.save('import' + filename)
+            flag = allowed_format(file='import' + filename)
+            if flag:
+                data = open_excel(file='import' + filename).sheets()[0]
+                nrows = data.nrows
+                pass_num = 0
+                success_num = 0
+                for i in range(1, nrows):
+                    test = data.row_values(i)[1]
+                    u = scrapingrecordService.queryByPath(test)
+                    if (u):
+                        pass_num += 1
+                        pass
+                    else:
+                        rowname = data.row_values(i)[0]
+                        rowpath = data.row_values(i)[1]
+                        rowsize = data.row_values(i)[2]
+                        rowstatus = data.row_values(i)[3]
+                        scrapingrecordService.importRecord(rowname, rowpath, rowsize, rowstatus)
+                        success_num += 1
+                os.remove('import' + filename)
+                return Response(status=200)
+            else:
+                os.remove('import' + filename)
+                return Response(status=500)
+        else:
+            return Response(status=403)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
