@@ -6,6 +6,11 @@ from .. import db
 
 
 class _ScrapingRecords(db.Model):
+    """ 刮削记录
+    status  0   未刮削
+            1   已刮削
+            2   失败
+    """
     __tablename__ = 'scrapingrecords'
 
     id = Column(Integer, primary_key=True)

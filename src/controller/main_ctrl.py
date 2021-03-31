@@ -5,7 +5,7 @@ import os
 import datetime
 from time import sleep
 from threading import Lock
-from flask import render_template, request, Response
+from flask import request, Response
 
 from . import web
 from ..bizlogic import manager

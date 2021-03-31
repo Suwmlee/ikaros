@@ -32,7 +32,7 @@ class ScrapingRecordService():
 
     def deleteByID(self, value) -> _ScrapingRecords:
         record = _ScrapingRecords.query.filter_by(id=value).first()
-        if not record:
+        if record:
             db.session.delete(record)
             db.session.commit()
 
