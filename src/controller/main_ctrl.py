@@ -19,9 +19,11 @@ from ..utils.wlogger import wlogger
 # DOCS https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor
 # executor = ThreadPoolExecutor(2)
 
+# action
 
-@web.route("/api/scrape", methods=['POST'])
-def start_scraper():
+
+@web.route("/api/scraping", methods=['POST'])
+def start_scraping():
     try:
         # executor.submit(manager.start)
         manager.start()
@@ -52,9 +54,55 @@ def stop_all():
         wlogger.info(err)
         return Response(status=500)
 
+# scrapingconf
 
-@web.route("/api/scrapedata/<page>", methods=['GET'])
-def get_scrape(page):
+
+@web.route("/api/scrapingconf", methods=['GET'])
+def getScrapingConf():
+    try:
+        content = scrapingConfService.getSetting().serialize()
+        return json.dumps(content)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
+
+@web.route("/api/scrapingconf", methods=['POST'])
+def updateScapingConf():
+    try:
+        content = request.get_json()
+        scrapingConfService.updateSetting(content)
+        return Response(status=200)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
+# scrapingrecords
+
+
+@web.route("/api/scrapingrecord", methods=['PUT'])
+def editScrapingdata():
+    try:
+        content = request.get_json()
+        # scrapingrecordService.update(content)
+        return Response(status=200)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
+
+@web.route("/api/scrapingrecord/<sid>", methods=['DELETE'])
+def deletescrapingrecord(sid):
+    try:
+        scrapingrecordService.deleteByID(sid)
+        return Response(status=200)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
+
+@web.route("/api/scrapingrecord/<page>", methods=['GET'])
+def getscrapingrecord(page):
     try:
         pagenum = int(page)
         size = 10
@@ -77,61 +125,7 @@ def get_scrape(page):
         wlogger.info(err)
         return Response(status=500)
 
-
-@web.route("/api/transferdata/<page>", methods=['GET'])
-def get_transfer(page):
-    try:
-        pagenum = int(page)
-        size = 10
-        sort = 0
-        infos = transrecordService.queryByPage(pagenum, size, sort)
-        data = []
-        for i in infos.items:
-            data.append(i.serialize())
-        ret = dict()
-        ret['data'] = data
-        ret['total'] = infos.total
-        ret['pages'] = infos.pages
-        ret['page'] = pagenum
-        if taskService.getTask('transfer').status == 2:
-            ret['running'] = True
-        else:
-            ret['running'] = False
-        return json.dumps(ret)
-    except Exception as err:
-        wlogger.info(err)
-        return Response(status=500)
-
-
-@web.route("/api/setting", methods=['GET'])
-def getSetting():
-    try:
-        content = scrapingConfService.getSetting().serialize()
-        return json.dumps(content)
-    except Exception as err:
-        wlogger.info(err)
-        return Response(status=500)
-
-
-@web.route("/api/setting", methods=['POST'])
-def updateSetting():
-    try:
-        content = request.get_json()
-        scrapingConfService.updateSetting(content)
-        return Response(status=200)
-    except Exception as err:
-        wlogger.info(err)
-        return Response(status=500)
-
-
-@web.route("/api/scrapingdata/<sid>", methods=['DELETE'])
-def deletedata(sid):
-    try:
-        scrapingrecordService.deleteByID(sid)
-        return Response(status=200)
-    except Exception as err:
-        wlogger.info(err)
-        return Response(status=500)
+# transconf
 
 
 @web.route("/api/transconf/all", methods=['GET'])
@@ -184,6 +178,33 @@ def deleteTransConf(cid):
         iid = int(cid)
         transConfigService.deleteConf(iid)
         return Response(status=200)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
+# transrecord
+
+
+@web.route("/api/transrecord/<page>", methods=['GET'])
+def gettransrecord(page):
+    try:
+        pagenum = int(page)
+        size = 10
+        sort = 0
+        infos = transrecordService.queryByPage(pagenum, size, sort)
+        data = []
+        for i in infos.items:
+            data.append(i.serialize())
+        ret = dict()
+        ret['data'] = data
+        ret['total'] = infos.total
+        ret['pages'] = infos.pages
+        ret['page'] = pagenum
+        if taskService.getTask('transfer').status == 2:
+            ret['running'] = True
+        else:
+            ret['running'] = False
+        return json.dumps(ret)
     except Exception as err:
         wlogger.info(err)
         return Response(status=500)
