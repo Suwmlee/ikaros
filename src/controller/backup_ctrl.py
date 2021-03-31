@@ -102,7 +102,6 @@ def import_excel():
                     u = scrapingrecordService.queryByPath(test)
                     if (u):
                         pass_num += 1
-                        pass
                     else:
                         rowname = data.row_values(i)[0]
                         rowpath = data.row_values(i)[1]

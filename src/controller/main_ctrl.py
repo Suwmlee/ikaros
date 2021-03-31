@@ -124,6 +124,16 @@ def updateSetting():
         return Response(status=500)
 
 
+@web.route("/api/scrapingdata/<sid>", methods=['DELETE'])
+def deletedata(sid):
+    try:
+        scrapingrecordService.deleteByID(sid)
+        return Response(status=200)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
+
 @web.route("/api/transconf/all", methods=['GET'])
 def getTransConfs():
     """ 查询转移配置
