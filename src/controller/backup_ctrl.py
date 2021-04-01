@@ -56,10 +56,10 @@ def open_excel(file='file.xls'):
 
 def allowed_format(file='file.xls', colnameindex=0, by_index=0):
     """
-# 根据索引获取Excel表格中的数据   
-# 参数:file：Excel文件路径    
-# colnameindex：表头列名所在行的索引 
-# by_index：表的索引
+    根据索引获取Excel表格中的数据   
+    参数:file：Excel文件路径    
+    colnameindex：表头列名所在行的索引 
+    by_index：表的索引
     """
     data = open_excel(file)
     table = data.sheets()[by_index]

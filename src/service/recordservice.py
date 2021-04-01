@@ -48,6 +48,14 @@ class ScrapingRecordService():
             record.status = status
         db.session.commit()
 
+    def editRecord(self, sid, status, scrapingname):
+        record = _ScrapingRecords.query.filter_by(id=sid).first()
+        if record:
+            record.status = status
+            record.scrapingname = scrapingname
+            record.updatetime = datetime.datetime.now()
+            db.session.commit()
+
     def update(self, path, sname, newpath, flag):
         info = self.queryByPath(path)
         if info:
