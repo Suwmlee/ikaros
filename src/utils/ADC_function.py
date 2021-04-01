@@ -70,11 +70,15 @@ def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None)
     wlogger.info('[-]Connect Failed! Please check your Proxy or Network!')
 
 
-def post_html(url: str, query: dict) -> requests.Response:
     proxyenable, proxy, timeout, retrycount, proxytype = scrapingConfService.getProxySetting()
+def post_html(url: str, query: dict, headers: dict = None) -> requests.Response:
     proxies = get_proxy(proxy, proxytype)
-    headers = {
+    headers_ua = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3100.0 Safari/537.36"}
+    if headers is None:
+        headers = headers_ua
+    else:
+        headers.update(headers_ua)
 
     for i in range(retrycount):
         try:
@@ -450,7 +454,7 @@ def translateTag_to_sc(tag):
                         '個人撮影', '不修改': '無修正', '角色扮演': 'コスプレ', '内衣': '下着', '美乳': '美乳', '游泳衣': '水着', '流出':
                         '流出', '制服': '制服', '小册子': 'パンチラ', '口交': 'フェラ', '模型': 'モデル', '中出': '中出し', '可爱':
                         '可愛い', '人妻': '人妻', '美少女': '美少女', '原始': 'オリジナル', '贫奶': '貧乳', '自慰': 'オナニー', '菠萝':
-                        'パイパン', 'ロリ': '萝莉', '生ハメ': '第一人称',
+                        'パイパン','ロリ':'萝莉','生ハメ':'第一人称',
                     }
         try:
             return dict_gen[tag]
@@ -459,11 +463,73 @@ def translateTag_to_sc(tag):
     else:
         return tag
 
+def translate(
+    src: str,
+    target_language: str = "zh_cn",
+    engine: str = "google-free",
+    app_id: str = "",
+    key: str = "",
+    delay: int = 0,
+):
+    trans_result = ""
+    if engine == "google-free":
+        url = (
+            "https://translate.google.cn/translate_a/single?client=gtx&dt=t&dj=1&ie=UTF-8&sl=auto&tl="
+            + target_language
+            + "&q="
+            + src
+        )
+        result = get_html(url=url, return_type="object")
 
-def translate(src: str, target_language: str = "zh_cn"):
-    url = "https://translate.google.cn/translate_a/single?client=gtx&dt=t&dj=1&ie=UTF-8&sl=auto&tl=" + target_language + "&q=" + src
-    result = get_html(url=url, return_type="object")
+        translate_list = [i["trans"] for i in result.json()["sentences"]]
+        trans_result = trans_result.join(translate_list)
+    # elif engine == "baidu":
+    #     url = "https://fanyi-api.baidu.com/api/trans/vip/translate"
+    #     salt = random.randint(1, 1435660288)
+    #     sign = app_id + src + str(salt) + key
+    #     sign = hashlib.md5(sign.encode()).hexdigest()
+    #     url += (
+    #         "?appid="
+    #         + app_id
+    #         + "&q="
+    #         + src
+    #         + "&from=auto&to="
+    #         + target_language
+    #         + "&salt="
+    #         + str(salt)
+    #         + "&sign="
+    #         + sign
+    #     )
+    #     result = get_html(url=url, return_type="object")
+    #
+    #     translate_list = [i["dst"] for i in result.json()["trans_result"]]
+    #     trans_result = trans_result.join(translate_list)
+    elif engine == "azure":
+        url = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=" + target_language
+        headers = {
+                'Ocp-Apim-Subscription-Key': key,
+                'Ocp-Apim-Subscription-Region': "global",
+                'Content-type': 'application/json',
+                'X-ClientTraceId': str(uuid.uuid4())
+            }
+        body = json.dumps([{'text': src}])
+        result = post_html(url=url,query=body,headers=headers)
+        translate_list = [i["text"] for i in result.json()[0]["translations"]]
+        trans_result = trans_result.join(translate_list)
 
-    translate_list = [i["trans"] for i in result.json()["sentences"]]
+    else:
+        raise ValueError("Non-existent translation engine")
+    
+    time.sleep(delay)
+    return trans_result
 
-    return "".join(translate_list)
+# ========================================================================是否为无码
+def is_uncensored(number):
+    if re.match('^\d{4,}', number) or re.match('n\d{4}', number) or 'HEYZO' in number.upper():
+        return True
+    configs = config.Config().get_uncensored()
+    prefix_list = str(configs).split(',')
+    for pre in prefix_list:
+        if pre.upper() in number.upper():
+            return True
+    return False
