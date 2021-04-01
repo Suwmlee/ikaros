@@ -22,6 +22,7 @@ from ..scrapinglib import mgstage
 from ..scrapinglib import xcity
 from ..scrapinglib import javlib
 from ..scrapinglib import dlsite
+from ..scrapinglib import airav
 
 
 def escape_path(path, escape_literals: str):  # Remove escape literals
@@ -33,17 +34,8 @@ def escape_path(path, escape_literals: str):  # Remove escape literals
 
 def moveFailedFolder(filepath, failed_folder):
     wlogger.info('[-]Move to Failed output folder')
-    shutil.move(filepath, str(os.getcwd()) + '/' + failed_folder + '/')
+    # shutil.move(filepath, str(os.getcwd()) + '/' + failed_folder + '/')
     return
-
-
-def CreatFailedFolder(failed_folder):
-    if not os.path.exists(failed_folder + '/'):  # 新建failed文件夹
-        try:
-            os.makedirs(failed_folder + '/')
-        except:
-            wlogger.info("[-]failed!can not be make Failed output folder\n[-](Please run as Administrator)")
-            return
 
 
 def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
@@ -57,6 +49,7 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
         "fanza": fanza.main,
         "javdb": javdb.main,
         "javbus": javbus.main,
+        "airav": airav.main,
         "mgstage": mgstage.main,
         "jav321": jav321.main,
         "xcity": xcity.main,
@@ -73,31 +66,27 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
                                "HEYZO" in file_number or "heyzo" in file_number or "Heyzo" in file_number
                                ):
         # if conf.debug() == True:
-        #     wlogger.info('[+]select avsox')
+        #     print('[+]select avsox')
         sources.insert(0, sources.pop(sources.index("avsox")))
     elif "mgstage" in sources and (re.match(r"\d+\D+", file_number) or
                                    "siro" in file_number or "SIRO" in file_number or "Siro" in file_number
                                    ):
         # if conf.debug() == True:
-            # wlogger.info('[+]select fanza')
+            # print('[+]select fanza')
         sources.insert(0, sources.pop(sources.index("mgstage")))
     elif "fc2" in sources and ("fc2" in file_number or "FC2" in file_number
                                ):
         # if conf.debug() == True:
-        #     wlogger.info('[+]select fc2')
+        #     print('[+]select fc2')
         sources.insert(0, sources.pop(sources.index("fc2")))
     elif "dlsite" in sources and (
         "RJ" in file_number or "rj" in file_number or "VJ" in file_number or "vj" in file_number
     ):
-        # if conf.debug() == True:
-        #     wlogger.info('[+]select dlsite')
         sources.insert(0, sources.pop(sources.index("dlsite")))
 
     json_data = {}
     for source in sources:
         try:
-            if conf.debug_info == True:
-                wlogger.info('[+]select', source)
             json_data = json.loads(func_mapping[source](file_number))
             # if any service return a valid return, break
             if get_data_state(json_data):
@@ -108,28 +97,33 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
     # Return if data not found in all sources
     if not json_data:
         wlogger.info('[-]Movie Data not found!')
-        # moveFailedFolder(filepath, conf.failed_folder)
         return
 
     # ================================================网站规则添加结束================================================
 
-    title = json_data['title']
-    actor_list = str(json_data['actor']).strip("[ ]").replace("'", '').split(',')  # 字符串转列表
-    release = json_data['release']
-    number = json_data['number']
-    studio = json_data['studio']
-    source = json_data['source']
-    runtime = json_data['runtime']
-    outline = json_data['outline']
-    label = json_data['label']
-    series = json_data['series']
-    year = json_data['year']
-    try:
-        cover_small = json_data['cover_small']
-    except:
+    title = json_data.get('title')
+    actor_list = str(json_data.get('actor')).strip("[ ]").replace("'", '').split(',')  # 字符串转列表
+    actor_list = [actor.strip() for actor in actor_list]  # 去除空白
+    release = json_data.get('release')
+    number = json_data.get('number')
+    studio = json_data.get('studio')
+    source = json_data.get('source')
+    runtime = json_data.get('runtime')
+    outline = json_data.get('outline')
+    label = json_data.get('label')
+    series = json_data.get('series')
+    year = json_data.get('year')
+
+    if json_data.get('cover_small') == None:
         cover_small = ''
-    imagecut = json_data['imagecut']
-    tag = str(json_data['tag']).strip("[ ]").replace("'", '').replace(" ", '').split(',')  # 字符串转列表 @
+    else:
+        cover_small = json_data.get('cover_small')
+
+    trailer = ''
+    extrafanart = ''
+
+    imagecut = json_data.get('imagecut')
+    tag = str(json_data.get('tag')).strip("[ ]").replace("'", '').replace(" ", '').split(',')  # 字符串转列表 @
     actor = str(actor_list).strip("[ ]").replace("'", '').replace(" ", '')
 
     if title == '' or number == '':
@@ -195,8 +189,6 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
 
     location_rule = eval(conf.location_rule)
 
-    # Process only Windows.
-    # if platform.system() == "Windows":
     if 'actor' in conf.location_rule and len(actor) > 100:
         wlogger.info(conf.location_rule)
         location_rule = eval(conf.location_rule.replace("actor", "'多人作品'"))
@@ -214,35 +206,36 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
     json_data['location_rule'] = location_rule
     json_data['year'] = year
     json_data['actor_list'] = actor_list
-    if conf.transalte_enable:
-        translate_values = conf.transalte_values.split(",")
-        for translate_value in translate_values:
-            json_data[translate_value] = translate(json_data[translate_value])
+
+    json_data['trailer'] = ''
+    json_data['extrafanart'] = ''
+
     naming_rule = ""
     for i in conf.naming_rule.split("+"):
         if i not in json_data:
             naming_rule += i.strip("'").strip('"')
         else:
-            naming_rule += json_data[i]
+            naming_rule += json_data.get(i)
     json_data['naming_rule'] = naming_rule
     return json_data
 
 
 def get_info(json_data):  # 返回json里的数据
-    title = json_data['title']
-    studio = json_data['studio']
-    year = json_data['year']
-    outline = json_data['outline']
-    runtime = json_data['runtime']
-    director = json_data['director']
-    actor_photo = json_data['actor_photo']
-    release = json_data['release']
-    number = json_data['number']
-    cover = json_data['cover']
-    website = json_data['website']
-    series = json_data['series']
+    title = json_data.get('title')
+    studio = json_data.get('studio')
+    year = json_data.get('year')
+    outline = json_data.get('outline')
+    runtime = json_data.get('runtime')
+    director = json_data.get('director')
+    actor_photo = json_data.get('actor_photo')
+    release = json_data.get('release')
+    number = json_data.get('number')
+    cover = json_data.get('cover')
+    trailer = json_data.get('trailer')
+    website = json_data.get('website')
+    series = json_data.get('series')
     label = json_data.get('label', "")
-    return title, studio, year, outline, runtime, director, actor_photo, release, number, cover, website, series, label
+    return title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label
 
 
 def small_cover_check(path, number, cover_small, c_word, conf, filepath, failed_folder):
@@ -251,7 +244,7 @@ def small_cover_check(path, number, cover_small, c_word, conf, filepath, failed_
 
 
 def create_folder(success_folder, location_rule, json_data, conf):  # 创建文件夹
-    title, studio, year, outline, runtime, director, actor_photo, release, number, cover, website, series, label = get_info(json_data)
+    title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label = get_info(json_data)
     if len(location_rule) > 240:  # 新建成功输出文件夹
         path = success_folder + '/' + location_rule.replace("'actor'", "'manypeople'", 3).replace("actor", "'manypeople'", 3)  # path为影片+元数据所在目录
     else:
@@ -262,7 +255,7 @@ def create_folder(success_folder, location_rule, json_data, conf):  # 创建文�
         try:
             os.makedirs(path)
         except:
-            path = success_folder + '/' + location_rule.replace('/[' + number + ']-' + title, "/number")
+            path = success_folder + '/' + location_rule.replace('/[' + number + ')-' + title, "/number")
             path = escape_path(path, conf.escape_literals)
 
             os.makedirs(path)
@@ -351,7 +344,7 @@ def image_download(cover, number, c_word, path, conf, filepath, failed_folder):
 
 
 def print_files(path, c_word, naming_rule, part, cn_sub, json_data, filepath, failed_folder, tag, actor_list, liuchu):
-    title, studio, year, outline, runtime, director, actor_photo, release, number, cover, website, series, label = get_info(json_data)
+    title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label = get_info(json_data)
 
     try:
         if not os.path.exists(path):
@@ -362,7 +355,7 @@ def print_files(path, c_word, naming_rule, part, cn_sub, json_data, filepath, fa
             print(" <title>" + naming_rule + "</title>", file=code)
             print("  <set>", file=code)
             print("  </set>", file=code)
-            print("  <studio>" + studio + "+</studio>", file=code)
+            print("  <studio>" + studio + "</studio>", file=code)
             print("  <year>" + year + "</year>", file=code)
             print("  <outline>" + outline + "</outline>", file=code)
             print("  <plot>" + outline + "</plot>", file=code)
@@ -456,7 +449,7 @@ def add_to_pic(pic_path, img_pic):
 
 
 def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径，番号，后缀，要移动至的位置
-    houzhui = str(re.search('[.](AVI|RMVB|WMV|MOV|MP4|MKV|FLV|TS|WEBM|avi|rmvb|wmv|mov|mp4|mkv|flv|ts|webm)$', filepath).group())
+    houzhui = os.path.splitext(filepath)[1].replace(",", "")
     try:
         # 如果soft_link=1 使用软链接
         newpath = path + '/' + number + c_word + houzhui
@@ -497,7 +490,7 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
 def paste_file_to_folder_mode2(filepath, path, multi_part, number, part, c_word, conf):  # 文件路径，番号，后缀，要移动至的位置
     if multi_part == 1:
         number += part  # 这时number会被附加上CD1后缀
-    houzhui = str(re.search('[.](AVI|RMVB|WMV|MOV|MP4|MKV|FLV|TS|WEBM|avi|rmvb|wmv|mov|mp4|mkv|flv|ts|webm)$', filepath).group())
+    houzhui = os.path.splitext(filepath)[1].replace(",", "")
     try:
         if conf.soft_link:
             os.symlink(filepath, path + '/' + number + part + c_word + houzhui)
@@ -553,7 +546,8 @@ def core_main(file_path, number_th, conf):
     cn_sub = ''
     liuchu = ''
 
-    filepath = file_path  # 影片的路径
+    # 影片的路径 绝对路径
+    filepath = file_path
     number = number_th
     json_data = get_data_from_json(number, filepath, conf)  # 定义番号
 
@@ -568,8 +562,8 @@ def core_main(file_path, number_th, conf):
         # but paste_file_to_folder() still use the input raw search id
         # so the solution is: use the normalized search id
         number = json_data["number"]
-    imagecut = json_data['imagecut']
-    tag = json_data['tag']
+    imagecut = json_data.get('imagecut')
+    tag = json_data.get('tag')
     # =======================================================================判断-C,-CD后缀
     if '-CD' in filepath or '-cd' in filepath:
         multi_part = 1
@@ -577,38 +571,40 @@ def core_main(file_path, number_th, conf):
     if '-c.' in filepath or '-C.' in filepath or '中文' in filepath or '字幕' in filepath:
         cn_sub = '1'
         c_word = '-C'  # 中文字幕影片后缀
+
+    # 判断是否无码
+    if is_uncensored(number):
+        uncensored = 1
+    else:
+        uncensored = 0
+
     if '流出' in filepath:
         liuchu = '流出'
-
-    # 创建输出失败目录
-    CreatFailedFolder(conf.failed_folder)
-
-    # 调试模式检测
-    if conf.debug_info:
-        debug_print(json_data)
-
-    # 创建文件夹
-    path = create_folder(conf.success_folder, json_data['location_rule'], json_data, conf)
+        leak = 1
+    else:
+        leak = 0
 
     # main_mode
     #  1: 刮削模式 / Scraping mode
     #  2: 整理模式 / Organizing mode
+    #  3：不改变路径刮削
     if conf.main_mode == 1:
+        # 创建文件夹
+        path = create_folder(conf.success_folder,  json_data.get('location_rule'), json_data, conf)
         if multi_part == 1:
             number += part  # 这时number会被附加上CD1后缀
 
         # 检查小封面, 如果image cut为3，则下载小封面
         if imagecut == 3:
-            small_cover_check(path, number, json_data['cover_small'], c_word, conf, filepath, conf.failed_folder)
+            small_cover_check(path, number,  json_data.get('cover_small'), c_word, conf, filepath, conf.failed_folder)
 
         # creatFolder会返回番号路径
-        image_download(json_data['cover'], number, c_word, path, conf, filepath, conf.failed_folder)
-
+        image_download(json_data.get('cover'), number, c_word, path, conf, filepath, conf.failed_folder)
         # 裁剪图
         cutImage(imagecut, path, number, c_word)
 
         # 打印文件
-        print_files(path, c_word, json_data['naming_rule'], part, cn_sub, json_data, filepath, conf.failed_folder, tag, json_data['actor_list'], liuchu)
+        print_files(path, c_word,  json_data.get('naming_rule'), part, cn_sub, json_data, filepath, conf.failed_folder, tag,  json_data.get('actor_list'), liuchu)
 
         # 移动文件
         (flag, path) = paste_file_to_folder(filepath, path, number, c_word, conf)

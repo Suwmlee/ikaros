@@ -60,18 +60,31 @@ def create_data_and_move(file_path: str, c, debug):
     n_number = get_number(debug, file_path)
 
     try:
-        wlogger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
         movie_info = scrapingrecordService.queryByPath(file_path)
         if not movie_info or movie_info.status != 1:
             movie_info = scrapingrecordService.add(file_path)
+            if movie_info.scrapingname != '':
+                n_number = movie_info.scrapingname
+            wlogger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
             (flag, new_path) = core_main(file_path, n_number, c)
             movie_info = scrapingrecordService.update(file_path, n_number, new_path, flag)
         else:
-            wlogger.info("[!]Already done, the newname is [{}]".format(movie_info.newname))
+            wlogger.info("[!]Already done: [{}]".format(file_path))
         wlogger.info("[*]======================================================")
     except Exception as err:
         wlogger.error("[-] [{}] ERROR:".format(file_path))
         wlogger.error(err)
+
+
+def CreatFailedFolder(failed_folder):
+    """ TODO:优化掉
+    """
+    if not os.path.exists(failed_folder + '/'):  # 新建failed文件夹
+        try:
+            os.makedirs(failed_folder + '/')
+        except:
+            wlogger.info("[-]failed!can not be make Failed output folder\n[-](Please run as Administrator)")
+            return
 
 
 def start():
@@ -81,17 +94,8 @@ def start():
         return
     taskService.updateTaskStatus(2, 'scrape')
 
-    version = '4.0.3'
-
     conf = scrapingConfService.getSetting()
-
-    version_print = 'Version ' + version
-    wlogger.info('[*]================== AV Data Capture ===================')
-    wlogger.info('[*]' + version_print.center(54))
-    wlogger.info('[*]======================================================')
-
-    # create_failed_folder(conf.failed_folder)
-    # os.chdir(conf.scrape_folder)
+    CreatFailedFolder(conf.failed_folder)
 
     movie_list = movie_lists(conf.scrape_folder, re.split("[,，]", conf.escape_folders))
 
