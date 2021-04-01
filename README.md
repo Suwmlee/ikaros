@@ -6,39 +6,32 @@
 
 以下以群晖docker安装为例:
 
-- 设置目录 
-![avatar](./src/images/synology_install_1.png)
-__注意:__ 选择实际需要刮削/转移的目录
-- 设置端口
-![avatar](./src/images/synology_install_2.png)
+群晖docker设置路径
 
-
-#### 目录设置说明
-
-本项目挂载设置:
-
-| 群晖目录 | 本项目docker内目录|
+| 文件/文件夹 | 装载路径|
 | ---- | ----|
 |/volume1/Media |  /media|
+|/docker/ikaros |  /ikaros/database|
 
-emby套件无需设置挂载目录
+emby/jellyfin挂载设置说明:
 
-jellyfin-docker挂载目录:
+| 群晖路径 | jellyfin-docker| emby套件 |
+| ----    | ----| ----|
+|/volume1/Media |  /media| 不需要设置 |
 
-| 群晖目录 | jellyfin目录|
-| ----    | ----|
-|/volume1/Media |  /media|
+#### 刮削配置
 
+群晖内实际刮削目录: `/volume1/Media/Movies`
+群晖内实际输出目录: `/volume1/Media/output`
 
-刮削目录: __/volume1/Media/Movie__
-输出目录: __/volume1/Media/ForServer__
-
-| | emby使用 | jellyfin使用 |
+| | 针对emby设置 | 针对jellyfin设置 |
 | ----        | ---- |----|
-| 输入目录    | /media/Movie | /media/Movie |  
+| 刮削目录    | /media/Movies | /media/Movies |  
 | 软链接前缀  | /volume1/Media/Movie | /media/Movie |
-| 输出目录    | /media/ForServer | /media/ForServer |
+| 硬链接  | 不需要设置 | 不需要设置 |
+| 输出路径    | /media/output | /media/output |
 
+注意:转移同理
 
 #### 致谢
 
