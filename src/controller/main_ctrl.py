@@ -84,7 +84,7 @@ def updateScapingConf():
 def editScrapingdata():
     try:
         content = request.get_json()
-        scrapingrecordService.editRecord(content['id'], content['status'], content['scrapingname'])
+        scrapingrecordService.editRecord(content['id'], content['status'], content['scrapingname'], content['cnsubtag'])
         return Response(status=200)
     except Exception as err:
         wlogger.info(err)
