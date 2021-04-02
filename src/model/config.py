@@ -29,7 +29,7 @@ class _ScrapingConfigs(db.Model):
     naming_rule = Column(String, default="number+' '+title")
     max_title_len = Column(Integer, default=50)
     update_check = Column(Boolean, default=False)
-    website_priority = Column(String, default="javbus,javdb,fanza,xcity,mgstage,fc2,jav321,javlib,dlsite")
+    website_priority = Column(String, default="javbus,javdb,airav,fanza,xcity,mgstage,fc2,avsox,jav321,javlib,dlsite")
 
     escape_folders = Column(String, default="failed,output")
     escape_literals = Column(String, default="\()/")

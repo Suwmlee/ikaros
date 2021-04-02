@@ -7,10 +7,10 @@ import re
 from ..service.configservice import scrapingConfService
 from ..service.recordservice import scrapingrecordService
 from ..service.taskservice import taskService
-from .scraper import *
+from .scraper import core_main
 from ..utils.wlogger import wlogger
 from ..utils.number_parser import get_number
-from ..utils.filehelper import video_type
+from ..utils.filehelper import video_type, CreatFolder
 
 
 def movie_lists(root, escape_folder):
@@ -30,17 +30,6 @@ def movie_lists(root, escape_folder):
     return total
 
 
-def create_failed_folder(failed_folder):
-    """ create failed folder
-    """
-    if not os.path.exists(failed_folder + '/'):
-        try:
-            os.makedirs(failed_folder + '/')
-        except:
-            wlogger.info("[-]failed!can not be make folder 'failed'\n[-](Please run as Administrator)")
-            # os._exit(0)
-
-
 def CEF(path):
     """ clean empty folder
     """
@@ -53,7 +42,7 @@ def CEF(path):
         pass
 
 
-def create_data_and_move(file_path: str, c, debug):
+def create_data_and_move(file_path: str, conf, debug):
     """ start scrape single file
     """
     # Normalized number, eg: 111xxx-222.mp4 -> xxx-222.mp4
@@ -66,7 +55,7 @@ def create_data_and_move(file_path: str, c, debug):
             if movie_info.scrapingname != '':
                 n_number = movie_info.scrapingname
             wlogger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
-            (flag, new_path) = core_main(file_path, n_number, c)
+            (flag, new_path) = core_main(file_path, n_number, conf)
             movie_info = scrapingrecordService.update(file_path, n_number, new_path, flag)
         else:
             wlogger.info("[!]Already done: [{}]".format(file_path))
@@ -76,18 +65,9 @@ def create_data_and_move(file_path: str, c, debug):
         wlogger.error(err)
 
 
-def CreatFailedFolder(failed_folder):
-    """ TODO:优化掉
-    """
-    if not os.path.exists(failed_folder + '/'):  # 新建failed文件夹
-        try:
-            os.makedirs(failed_folder + '/')
-        except:
-            wlogger.info("[-]failed!can not be make Failed output folder\n[-](Please run as Administrator)")
-            return
-
-
 def start():
+    """ 启动入口
+    """
 
     task = taskService.getTask('scrape')
     if task.status == 2:
@@ -95,14 +75,14 @@ def start():
     taskService.updateTaskStatus(2, 'scrape')
 
     conf = scrapingConfService.getSetting()
-    CreatFailedFolder(conf.failed_folder)
+    CreatFolder(conf.failed_folder)
 
     movie_list = movie_lists(conf.scrape_folder, re.split("[,，]", conf.escape_folders))
 
     count = 0
     count_all = str(len(movie_list))
     wlogger.info('[+]Find  ' + count_all+'  movies')
-    if conf.debug_info == True:
+    if conf.debug_info:
         wlogger.info('[+]'+' DEBUG MODE ON '.center(54, '-'))
     if conf.soft_link:
         wlogger.info('[!] --- Soft link mode is ENABLE! ----')

@@ -11,6 +11,17 @@ video_filter = ['*.mp4', '*.avi', '*.rmvb', '*.wmv', '*.mov', '*.mkv', '*.flv', 
 ext_filter = ['*.ass', '*.srt', '*.sub']
 
 
+def CreatFolder(foldername):
+    """ 创建文件
+    """
+    if not os.path.exists(foldername + '/'):
+        try:
+            os.makedirs(foldername + '/')
+        except:
+            print("[-]failed!can not be make Failed output folder\n[-](Please run as Administrator)")
+            return
+
+
 def cleanfilebysuffix(folder, suffix):
     """ 清理指定目录下所有匹配格式文件
     """
@@ -55,6 +66,7 @@ def symlink_force(target, link_name):
             os.symlink(target, link_name)
         else:
             raise e
+
 
 def hardlink_force(target, link_name):
     """ create hard link

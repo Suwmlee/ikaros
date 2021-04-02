@@ -10,6 +10,9 @@ from .. import db
 class ScrapingRecordService():
 
     def add(self, path) -> _ScrapingRecords:
+        """ 优先查询已有数据
+        存在则返回，不存在则新增
+        """
         info = self.queryByPath(path)
         if not info:
             (filefolder, name) = os.path.split(path)
