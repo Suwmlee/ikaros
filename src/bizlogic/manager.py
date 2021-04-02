@@ -42,20 +42,23 @@ def CEF(path):
         pass
 
 
-def create_data_and_move(file_path: str, conf, debug):
+def create_data_and_move(file_path: str, conf):
     """ start scrape single file
     """
     # Normalized number, eg: 111xxx-222.mp4 -> xxx-222.mp4
+    debug = conf.debug_info
     n_number = get_number(debug, file_path)
-
+    scrapingtag_cnsub = False
     try:
         movie_info = scrapingrecordService.queryByPath(file_path)
         if not movie_info or movie_info.status != 1:
             movie_info = scrapingrecordService.add(file_path)
             if movie_info.scrapingname != '':
                 n_number = movie_info.scrapingname
+            if movie_info.cnsubtag:
+                scrapingtag_cnsub = True
             wlogger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
-            (flag, new_path) = core_main(file_path, n_number, conf)
+            (flag, new_path) = core_main(file_path, n_number, scrapingtag_cnsub, conf)
             movie_info = scrapingrecordService.update(file_path, n_number, new_path, flag)
         else:
             wlogger.info("[!]Already done: [{}]".format(file_path))
@@ -90,7 +93,7 @@ def start():
         count = count + 1
         percentage = str(count / int(count_all) * 100)[:4] + '%'
         wlogger.info('[!] - ' + percentage + ' [' + str(count) + '/' + count_all + '] -')
-        create_data_and_move(movie_path, conf, conf.debug_info)
+        create_data_and_move(movie_path, conf)
 
     CEF(conf.success_folder)
     CEF(conf.failed_folder)

@@ -20,6 +20,7 @@ class _ScrapingRecords(db.Model):
     status = Column(Integer, default=0)
     scrapingname = Column(String, default='', comment='used name for scraping')
     scrapingurl = Column(String, default='', comment='scraping site url')
+    cnsubtag = Column(Boolean, default=False, comment='add cn sub')
     linktype = Column(Integer, default='', comment='ln type')
     destname = Column(String, default='', comment='final name')
     destpath = Column(String, default='', comment='final path')
@@ -37,6 +38,7 @@ class _ScrapingRecords(db.Model):
             'srcsize': self.srcsize,
             'status': self.status,
             'scrapingname': self.scrapingname,
+            'cnsubtag': self.cnsubtag,
             'scrapingurl': self.scrapingurl,
             'linktype': self.linktype,
             'destname': self.destname,

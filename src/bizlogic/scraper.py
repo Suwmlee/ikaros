@@ -243,7 +243,9 @@ def small_cover_check(path, number, cover_small, c_word, conf, filepath, failed_
     wlogger.info('[+]Image Downloaded! ' + path + '/' + number + c_word + '-poster.jpg')
 
 
-def create_folder(success_folder, location_rule, json_data, conf):  # 创建文件夹
+def create_folder(success_folder, location_rule, json_data, conf):
+    """ 根据json数据创建文件夹
+    """
     title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label = get_info(json_data)
     if len(location_rule) > 240:  # 新建成功输出文件夹
         path = success_folder + '/' + location_rule.replace("'actor'", "'manypeople'", 3).replace("actor", "'manypeople'", 3)  # path为影片+元数据所在目录
@@ -256,7 +258,7 @@ def create_folder(success_folder, location_rule, json_data, conf):  # 创建文�
             os.makedirs(path)
         except:
             path = success_folder + '/' + location_rule.replace('/[' + number + ')-' + title, "/number")
-            path = escape_path(path, conf.escape_literals)
+            # path = escape_path(path, conf.escape_literals)
 
             os.makedirs(path)
     return path
@@ -415,37 +417,83 @@ def cutImage(imagecut, path, number, c_word):
             imgSize = img.size
             w = img.width
             h = img.height
-            img2 = img.crop((w - h / 1.5, 0, w, h))
-            if c_word == '-C':
-                wlogger.info('[+]Add mark!         Chinese subtitle ')
-                add_to_pic(path + '/' + number + c_word + '-poster.jpg', img2)
-            else:
-                img2.save(path + '/' + number + c_word + '-poster.jpg')
-                wlogger.info('[+]Image Cutted!     ' + path + '/' + number + c_word + '-poster.jpg')
+            img2 = img.crop((w / 1.9, 0, w, h))
+            img2.save(path + '/' + number + c_word + '-poster.jpg')
+            wlogger.info('[+]Image Cutted!     ' + path + '/' + number + c_word + '-poster.jpg')
         except:
             wlogger.info('[-]Cover cut failed!')
     elif imagecut == 0:  # 复制封面
-        if c_word == '-C':
-            img3 = Image.open(path + '/' + number + c_word + '-fanart.jpg')
-            add_to_pic(path + '/' + number + c_word + '-poster.jpg', img3)
-        else:
-            shutil.copyfile(path + '/' + number + c_word + '-fanart.jpg', path + '/' + number + c_word + '-poster.jpg')
+        shutil.copyfile(path + '/' + number + c_word + '-fanart.jpg', path + '/' + number + c_word + '-poster.jpg')
         wlogger.info('[+]Image Copyed!     ' + path + '/' + number + c_word + '-poster.jpg')
 
+# 此函数从gui版copy过来用用
+# 参数说明
+# poster_path
+# thumb_path
+# cn_sub   中文字幕  参数值为 1  0
+# leak     流出     参数值为 1   0
+# uncensored 无码   参数值为 1   0
+# ========================================================================加水印
 
-def add_to_pic(pic_path, img_pic):
-    size = 10
+
+def add_mark(poster_path, thumb_path, cn_sub, leak, uncensored, conf):
+    mark_type = ''
+    if cn_sub:
+        mark_type += ',字幕'
+    if leak:
+        mark_type += ',流出'
+    if uncensored:
+        mark_type += ',无码'
+    if mark_type == '':
+        return
+    add_mark_thread(thumb_path, cn_sub, leak, uncensored, conf)
+    print('[+]Thumb Add Mark:   ' + mark_type.strip(','))
+    add_mark_thread(poster_path, cn_sub, leak, uncensored, conf)
+    print('[+]Poster Add Mark:  ' + mark_type.strip(','))
+
+
+def add_mark_thread(pic_path, cn_sub, leak, uncensored, conf):
+    size = 14
+    img_pic = Image.open(pic_path)
+    # 获取自定义位置，取余配合pos达到顺时针添加的效果
+    # 左上 0, 右上 1, 右下 2， 左下 3
+    # count = conf.watermark_type()
+    count = 3
+    if cn_sub == 1 or cn_sub == '1':
+        add_to_pic(pic_path, img_pic, size, count, 1)  # 添加
+        count = (count + 1) % 4
+    if leak == 1 or leak == '1':
+        add_to_pic(pic_path, img_pic, size, count, 2)
+        count = (count + 1) % 4
+    if uncensored == 1 or uncensored == '1':
+        add_to_pic(pic_path, img_pic, size, count, 3)
+    img_pic.close()
+
+
+def add_to_pic(pic_path, img_pic, size, count, mode):
+    mark_pic_path = ''
     basedir = os.path.abspath(os.path.dirname(__file__))
-    mark_pic_path = basedir +'/../images/ch.png'
+    if mode == 1:
+        mark_pic_path = basedir +'/../images/CNSUB.png'
+    elif mode == 2:
+        mark_pic_path = basedir +'/../images/LEAK.png'
+    elif mode == 3:
+        mark_pic_path = basedir +'/../images/UNCENSORED.png'
     img_subt = Image.open(mark_pic_path)
     scroll_high = int(img_pic.height / size)
     scroll_wide = int(scroll_high * img_subt.width / img_subt.height)
     img_subt = img_subt.resize((scroll_wide, scroll_high), Image.ANTIALIAS)
     r, g, b, a = img_subt.split()  # 获取颜色通道，保持png的透明性
     # 封面四个角的位置
-    pos = {'x': 0, 'y': img_pic.height - scroll_high}
-    img_pic.paste(img_subt, (pos['x'], pos['y']), mask=a)
+    pos = [
+        {'x': 0, 'y': 0},
+        {'x': img_pic.width - scroll_wide, 'y': 0},
+        {'x': img_pic.width - scroll_wide, 'y': img_pic.height - scroll_high},
+        {'x': 0, 'y': img_pic.height - scroll_high},
+    ]
+    img_pic.paste(img_subt, (pos[count]['x'], pos[count]['y']), mask=a)
     img_pic.save(pic_path, quality=95)
+# ========================结束=================================
 
 
 def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径，番号，后缀，要移动至的位置
@@ -538,7 +586,10 @@ def debug_print(data: json):
         pass
 
 
-def core_main(file_path, number_th, conf):
+def core_main(file_path, scrapingnum, cnsubtag, conf):
+    """
+    开始刮削
+    """
     # =======================================================================初始化所需变量
     multi_part = 0
     part = ''
@@ -548,27 +599,29 @@ def core_main(file_path, number_th, conf):
 
     # 影片的路径 绝对路径
     filepath = file_path
-    number = number_th
+    number = scrapingnum
     json_data = get_data_from_json(number, filepath, conf)  # 定义番号
 
     # Return if blank dict returned (data not found)
     if not json_data:
         return False, ''
 
-    if json_data["number"] != number:
+    if json_data.get("number") != number:
         # fix issue #119
         # the root cause is we normalize the search id
         # print_files() will use the normalized id from website,
         # but paste_file_to_folder() still use the input raw search id
         # so the solution is: use the normalized search id
-        number = json_data["number"]
+        number = json_data.get("number")
     imagecut = json_data.get('imagecut')
     tag = json_data.get('tag')
     # =======================================================================判断-C,-CD后缀
     if '-CD' in filepath or '-cd' in filepath:
         multi_part = 1
         part = get_part(filepath, conf.failed_folder)
-    if '-c.' in filepath or '-C.' in filepath or '中文' in filepath or '字幕' in filepath:
+
+    # TODO:根据路径判定是否合理
+    if '-c.' in filepath or '-C.' in filepath or '中文' in filepath or '字幕' in filepath or cnsubtag:
         cn_sub = '1'
         c_word = '-C'  # 中文字幕影片后缀
 
@@ -578,7 +631,8 @@ def core_main(file_path, number_th, conf):
     else:
         uncensored = 0
 
-    if '流出' in filepath:
+    # TODO:根据路径判定是否合理
+    if '流出' in filepath or '-leak' in filepath:
         liuchu = '流出'
         leak = 1
     else:
@@ -590,18 +644,23 @@ def core_main(file_path, number_th, conf):
     #  3：不改变路径刮削
     if conf.main_mode == 1:
         # 创建文件夹
-        path = create_folder(conf.success_folder,  json_data.get('location_rule'), json_data, conf)
+        path = create_folder(conf.success_folder, json_data.get('location_rule'), json_data, conf)
         if multi_part == 1:
             number += part  # 这时number会被附加上CD1后缀
 
         # 检查小封面, 如果image cut为3，则下载小封面
         if imagecut == 3:
-            small_cover_check(path, number,  json_data.get('cover_small'), c_word, conf, filepath, conf.failed_folder)
+            small_cover_check(path, number, json_data.get('cover_small'), c_word, conf, filepath, conf.failed_folder)
 
         # creatFolder会返回番号路径
         image_download(json_data.get('cover'), number, c_word, path, conf, filepath, conf.failed_folder)
         # 裁剪图
         cutImage(imagecut, path, number, c_word)
+
+        # TODO:合并
+        poster_path = path + '/' + number + c_word + '-poster.jpg'
+        thumb_path = path + '/' + number + c_word + '-thumb.jpg'
+        add_mark(poster_path, thumb_path, cn_sub, leak, uncensored, conf)
 
         # 打印文件
         print_files(path, c_word,  json_data.get('naming_rule'), part, cn_sub, json_data, filepath, conf.failed_folder, tag,  json_data.get('actor_list'), liuchu)
