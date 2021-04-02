@@ -20,7 +20,7 @@ class _ScrapingConfigs(db.Model):
     failed_move = Column(Boolean, default=False)
 
     proxy_enable = Column(Boolean, default=False)
-    proxy_type = Column(String, default='socks5')
+    proxy_type = Column(String, default='socks5h')
     proxy_address = Column(String, default='127.0.0.1:1080')
     proxy_timeout = Column(Integer, default=5)
     proxy_retry = Column(Integer, default=3)

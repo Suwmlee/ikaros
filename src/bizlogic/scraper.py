@@ -453,12 +453,12 @@ def add_mark(poster_path, thumb_path, cn_sub, leak, uncensored, conf):
 
 
 def add_mark_thread(pic_path, cn_sub, leak, uncensored, conf):
-    size = 14
     img_pic = Image.open(pic_path)
-    # 获取自定义位置，取余配合pos达到顺时针添加的效果
-    # 左上 0, 右上 1, 右下 2， 左下 3
-    # count = conf.watermark_type()
-    count = 3
+    # 获取自定义位置
+    # 右上 0, 左上 1, 左下 2，右下 3
+    count = 0
+    # 添加的水印相对比例
+    size = 10
     if cn_sub == 1 or cn_sub == '1':
         add_to_pic(pic_path, img_pic, size, count, 1)  # 添加
         count = (count + 1) % 4
@@ -486,10 +486,10 @@ def add_to_pic(pic_path, img_pic, size, count, mode):
     r, g, b, a = img_subt.split()  # 获取颜色通道，保持png的透明性
     # 封面四个角的位置
     pos = [
-        {'x': 0, 'y': 0},
         {'x': img_pic.width - scroll_wide, 'y': 0},
-        {'x': img_pic.width - scroll_wide, 'y': img_pic.height - scroll_high},
+        {'x': 0, 'y': 0},
         {'x': 0, 'y': img_pic.height - scroll_high},
+        {'x': img_pic.width - scroll_wide, 'y': img_pic.height - scroll_high},
     ]
     img_pic.paste(img_subt, (pos[count]['x'], pos[count]['y']), mask=a)
     img_pic.save(pic_path, quality=95)
