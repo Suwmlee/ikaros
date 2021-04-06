@@ -18,33 +18,13 @@ class ScrapingConfService():
     def updateSetting(self, content):
         changed = False
         setting = self.getSetting()
-        if 'scrape_folder' in content and setting.scrape_folder != content['scrape_folder']:
-            setting.scrape_folder = content['scrape_folder']
-            changed = True
-        if 'success_folder' in content and setting.success_folder != content['success_folder']:
-            setting.success_folder = content['success_folder']
-            changed = True
-        if 'location_rule' in content and setting.location_rule != content['location_rule']:
-            setting.location_rule = content['location_rule']
-            changed = True
-        if 'naming_rule' in content and setting.naming_rule != content['naming_rule']:
-            setting.naming_rule = content['naming_rule']
-            changed = True
-        if 'soft_link' in content and setting.soft_link != content['soft_link']:
-            setting.soft_link = content['soft_link']
-            changed = True
-        if 'soft_prefix' in content and setting.soft_prefix != content['soft_prefix']:
-            setting.soft_prefix = content['soft_prefix']
-            changed = True
-        if 'proxy_enable' in content and setting.proxy_enable != content['proxy_enable']:
-            setting.proxy_enable = content['proxy_enable']
-            changed = True
-        if 'proxy_type' in content and setting.proxy_type != content['proxy_type']:
-            setting.proxy_type = content['proxy_type']
-            changed = True
-        if 'proxy_address' in content and setting.proxy_address != content['proxy_address']:
-            setting.proxy_address = content['proxy_address']
-            changed = True
+        for singlekey in content.keys():
+            if hasattr(setting, singlekey):
+                value = getattr(setting, singlekey)
+                newvalue = content.get(singlekey)
+                if value != newvalue:
+                    setattr(setting, singlekey, newvalue)
+                    changed = True
         if changed:
             db.session.commit()
         return True
@@ -83,12 +63,12 @@ class TransConfService():
         if not config:
             config = _TransferConfigs()
             db.session.add(config)
-        config.source_folder = content['source_folder']
-        config.linktype = content['linktype']
-        config.soft_prefix = content['soft_prefix']
-        config.output_folder = content['output_folder']
-        config.escape_folder = content['escape_folder']
-        config.mark = content['mark']
+        for singlekey in content.keys():
+            if hasattr(config, singlekey):
+                value = getattr(config, singlekey)
+                newvalue = content.get(singlekey)
+                if value != newvalue:
+                    setattr(config, singlekey, newvalue)
         db.session.commit()
         return config
 

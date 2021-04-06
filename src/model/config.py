@@ -12,7 +12,7 @@ class _ScrapingConfigs(db.Model):
     debug_info = Column(Boolean, default=False)
     auto_exit = Column(Boolean, default=True)
 
-    scrape_folder = Column(String, default='/media')
+    scraping_folder = Column(String, default='/media')
     failed_folder = Column(String, default='/media/failed')
     success_folder = Column(String, default='/media/output')
     soft_link = Column(Boolean, default=True)
@@ -31,6 +31,10 @@ class _ScrapingConfigs(db.Model):
     update_check = Column(Boolean, default=False)
     website_priority = Column(String, default="javbus,javdb,airav,fanza,xcity,mgstage,fc2,avsox,jav321,javlib,dlsite")
 
+    watermark_enable = Column(Boolean, default=True, comment='enable water mark')
+    watermark_size = Column(Integer, default=9)
+    watermark_location = Column(Integer, default=2)
+
     escape_folders = Column(String, default="failed,output")
     escape_literals = Column(String, default="\()/")
 
@@ -38,21 +42,23 @@ class _ScrapingConfigs(db.Model):
     transalte_to_sc = Column(Boolean, default=False)
     transalte_values = Column(String, default="title,outline")
 
-
     def serialize(self):
         return {
             'soft_link': self.soft_link,
             'soft_prefix': self.soft_prefix,
-            'scrape_folder': self.scrape_folder,
+            'scraping_folder': self.scraping_folder,
             'success_folder': self.success_folder,
             'failed_folder': self.failed_folder,
             'location_rule': self.location_rule,
             'naming_rule': self.naming_rule,
-            'proxy_enable':self.proxy_enable,
-            'proxy_type':self.proxy_type,
-            'proxy_address':self.proxy_address,
-            'proxy_timeout':self.proxy_timeout,
-            'proxy_retry':self.proxy_retry
+            'watermark_enable': self.watermark_enable,
+            'watermark_location': self.watermark_location,
+            'watermark_size': self.watermark_size,
+            'proxy_enable': self.proxy_enable,
+            'proxy_type': self.proxy_type,
+            'proxy_address': self.proxy_address,
+            'proxy_timeout': self.proxy_timeout,
+            'proxy_retry': self.proxy_retry
         }
 
 

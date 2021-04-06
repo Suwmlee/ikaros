@@ -80,7 +80,7 @@ def start():
     conf = scrapingConfService.getSetting()
     CreatFolder(conf.failed_folder)
 
-    movie_list = movie_lists(conf.scrape_folder, re.split("[,，]", conf.escape_folders))
+    movie_list = movie_lists(conf.scraping_folder, re.split("[,，]", conf.escape_folders))
 
     count = 0
     count_all = str(len(movie_list))

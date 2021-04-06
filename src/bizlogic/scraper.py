@@ -456,9 +456,9 @@ def add_mark_thread(pic_path, cn_sub, leak, uncensored, conf):
     img_pic = Image.open(pic_path)
     # 获取自定义位置
     # 右上 0, 左上 1, 左下 2，右下 3
-    count = 0
-    # 添加的水印相对比例
-    size = 10
+    count = conf.watermark_location
+    # 添加的水印相对整图的比例
+    size = conf.watermark_size
     if cn_sub == 1 or cn_sub == '1':
         add_to_pic(pic_path, img_pic, size, count, 1)  # 添加
         count = (count + 1) % 4
@@ -505,7 +505,7 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
             (filefolder, name) = os.path.split(filepath)
             settings = scrapingConfService.getSetting()
             soft_prefix = settings.soft_prefix
-            src_folder = settings.scrape_folder
+            src_folder = settings.scraping_folder
             dest_folder = settings.success_folder
             midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
             soft_path = os.path.join(soft_prefix, midfolder, name)
@@ -657,10 +657,10 @@ def core_main(file_path, scrapingnum, cnsubtag, conf):
         # 裁剪图
         cutImage(imagecut, path, number, c_word)
 
-        # TODO:合并
-        poster_path = path + '/' + number + c_word + '-poster.jpg'
-        thumb_path = path + '/' + number + c_word + '-thumb.jpg'
-        add_mark(poster_path, thumb_path, cn_sub, leak, uncensored, conf)
+        if conf.watermark_enable:
+            poster_path = path + '/' + number + c_word + '-poster.jpg'
+            thumb_path = path + '/' + number + c_word + '-thumb.jpg'
+            add_mark(poster_path, thumb_path, cn_sub, leak, uncensored, conf)
 
         # 打印文件
         print_files(path, c_word,  json_data.get('naming_rule'), part, cn_sub, json_data, filepath, conf.failed_folder, tag,  json_data.get('actor_list'), liuchu)
