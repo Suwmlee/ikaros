@@ -3,6 +3,7 @@
 '''
 import os
 import datetime
+from sqlalchemy import or_
 from ..model.record import _ScrapingRecords, _TransRecords
 from .. import db
 
@@ -75,8 +76,48 @@ class ScrapingRecordService():
             db.session.commit()
         return info
 
-    def queryByPage(self, pagenum, pagesize, sort):
-        infos = _ScrapingRecords.query.order_by(_ScrapingRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+    def queryByPage(self, pagenum, pagesize, sortprop, sortorder, blur):
+        """ 查询
+        """
+        if sortprop == 'status':
+            if sortorder == 'ascending':
+                infos = _ScrapingRecords.query.filter(
+                    or_(_ScrapingRecords.srcname.like("%" + blur + "%") if blur is not None else "",
+                        _ScrapingRecords.scrapingname.like("%" + blur + "%") if blur is not None else "",
+                        _ScrapingRecords.destname.like("%" + blur + "%") if blur is not None else "")
+                ).order_by(_ScrapingRecords.status.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+            else:
+                infos = _ScrapingRecords.query.filter(
+                    or_(_ScrapingRecords.srcname.like("%" + blur + "%") if blur is not None else "",
+                        _ScrapingRecords.scrapingname.like("%" + blur + "%") if blur is not None else "",
+                        _ScrapingRecords.destname.like("%" + blur + "%") if blur is not None else "")
+                ).order_by(_ScrapingRecords.status.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+        elif sortprop == 'cnsubtag':
+            if sortorder == 'ascending':
+                infos = _ScrapingRecords.query.filter(
+                    or_(_ScrapingRecords.srcname.like("%" + blur + "%") if blur is not None else "",
+                        _ScrapingRecords.scrapingname.like("%" + blur + "%") if blur is not None else "",
+                        _ScrapingRecords.destname.like("%" + blur + "%") if blur is not None else "")
+                ).order_by(_ScrapingRecords.cnsubtag.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+            else:
+                infos = _ScrapingRecords.query.filter(
+                    or_(_ScrapingRecords.srcname.like("%" + blur + "%") if blur is not None else "",
+                        _ScrapingRecords.scrapingname.like("%" + blur + "%") if blur is not None else "",
+                        _ScrapingRecords.destname.like("%" + blur + "%") if blur is not None else "")
+                ).order_by(_ScrapingRecords.cnsubtag.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+        else:
+            if sortorder == 'ascending':
+                infos = _ScrapingRecords.query.filter(
+                    or_(_ScrapingRecords.srcname.like("%" + blur + "%") if blur is not None else "",
+                        _ScrapingRecords.scrapingname.like("%" + blur + "%") if blur is not None else "",
+                        _ScrapingRecords.destname.like("%" + blur + "%") if blur is not None else "")
+                ).order_by(_ScrapingRecords.updatetime.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+            else:
+                infos = _ScrapingRecords.query.filter(
+                    or_(_ScrapingRecords.srcname.like("%" + blur + "%") if blur is not None else "",
+                        _ScrapingRecords.scrapingname.like("%" + blur + "%") if blur is not None else "",
+                        _ScrapingRecords.destname.like("%" + blur + "%") if blur is not None else "")
+                ).order_by(_ScrapingRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
         return infos
 
 

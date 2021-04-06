@@ -101,13 +101,25 @@ def deletescrapingrecord(sid):
         return Response(status=500)
 
 
-@web.route("/api/scrapingrecord/<page>", methods=['GET'])
-def getscrapingrecord(page):
+@web.route("/api/scrapingrecord", methods=['GET'])
+def getscrapingrecord():
+    """ 查询
+    """
     try:
-        pagenum = int(page)
-        size = 10
-        sort = 0
-        infos = scrapingrecordService.queryByPage(pagenum, size, sort)
+        page = int(request.args.get('page'))
+        size = int(request.args.get('size'))
+        # 排序  cnsubtag|status|updatetime,descending|ascending
+        sortprop = request.args.get('sortprop')
+        sortorder = request.args.get('sortorder')
+        # 模糊查询
+        blur = request.args.get('blur')
+        if not blur:
+            blur = ''
+        if not sortprop:
+            sortprop = ''
+            sortorder = 'desc'
+
+        infos = scrapingrecordService.queryByPage(page, size, sortprop, sortorder, blur)
         data = []
         for i in infos.items:
             data.append(i.serialize())
@@ -115,7 +127,7 @@ def getscrapingrecord(page):
         ret['data'] = data
         ret['total'] = infos.total
         ret['pages'] = infos.pages
-        ret['page'] = pagenum
+        ret['page'] = page
         if taskService.getTask('scrape').status == 2:
             ret['running'] = True
         else:
