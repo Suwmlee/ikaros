@@ -161,7 +161,7 @@ def addTransConf():
     """
     try:
         content = request.get_json()
-        content['id'] = -1
+        content['id'] = None
         config = transConfigService.updateConf(content)
         return json.dumps(config.serialize())
     except Exception as err:

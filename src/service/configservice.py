@@ -45,6 +45,13 @@ class TransConfService():
 
     def getConfiglist(self):
         configs = _TransferConfigs.query.all()
+        if not configs:
+            config = _TransferConfigs()
+            db.session.add(config)
+            db.session.commit()
+            configs = []
+            configs.append(config)
+            return configs
         return configs
 
     def getConfig(self):
@@ -56,8 +63,8 @@ class TransConfService():
         return config
 
     def updateConf(self, content):
-        cid = -1
-        if 'id' in content and content['id'] != '':
+        cid = None
+        if 'id' in content and not content['id']:
             cid = content['id']
         config = _TransferConfigs.query.filter_by(id=cid).first()
         if not config:
