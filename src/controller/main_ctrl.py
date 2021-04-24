@@ -10,6 +10,7 @@ from flask import request, Response
 from . import web
 from ..bizlogic import manager
 from ..bizlogic import transfer
+from ..bizlogic import rename
 from ..service.recordservice import scrapingrecordService, transrecordService
 from ..service.configservice import scrapingConfService, transConfigService
 from ..service.taskservice import taskService
@@ -53,6 +54,18 @@ def stop_all():
     except Exception as err:
         wlogger.info(err)
         return Response(status=500)
+
+
+@web.route("/api/rename", methods=['POST'])
+def startrename():
+    try:
+        content = request.get_json()
+        rename.rename(content['source_folder'], content['base'], content['newfix'])
+        return Response(status=200)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
 
 # scrapingconf
 
@@ -197,9 +210,12 @@ def deleteTransConf(cid):
 # transrecord
 
 
-@web.route("/api/transrecord/<page>", methods=['GET'])
-def gettransrecord(page):
+@web.route("/api/transrecord", methods=['GET'])
+def gettransrecord():
+    """ 查询
+    """
     try:
+        page = request.args.get('page')
         pagenum = int(page)
         size = 10
         sort = 0
