@@ -64,14 +64,14 @@ class TransConfService():
 
     def updateConf(self, content):
         cid = None
-        if 'id' in content and not content['id']:
+        if 'id' in content and content['id']:
             cid = content['id']
         config = _TransferConfigs.query.filter_by(id=cid).first()
         if not config:
             config = _TransferConfigs()
             db.session.add(config)
         for singlekey in content.keys():
-            if hasattr(config, singlekey):
+            if hasattr(config, singlekey) and singlekey != 'id':
                 value = getattr(config, singlekey)
                 newvalue = content.get(singlekey)
                 if value != newvalue:
