@@ -56,12 +56,23 @@ def stop_all():
         return Response(status=500)
 
 
-@web.route("/api/rename", methods=['POST'])
-def startrename():
+@web.route("/api/previewrename", methods=['POST'])
+def previewrename():
     try:
         content = request.get_json()
-        rename.rename(content['source_folder'], content['base'], content['newfix'])
-        return Response(status=200)
+        ret = rename.renamebyreg(content['source_folder'], content['reg'], content['reg2'], content['prefix'], True)
+        return json.dumps(ret)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
+
+@web.route("/api/renamebyreg", methods=['POST'])
+def renamebyreg():
+    try:
+        content = request.get_json()
+        ret = rename.renamebyreg(content['source_folder'], content['reg'], content['reg2'], content['prefix'], False)
+        return json.dumps(ret)
     except Exception as err:
         wlogger.info(err)
         return Response(status=500)
