@@ -60,9 +60,9 @@ def renamebyreg(root, reg, reg2, prefix, preview: bool):
             epresult = extractep(nameresult[0])
             if epresult != '':
                 print("   "+epresult)
-                renum = "." + prefix + epresult + "."
+                renum = " " + prefix + epresult + " "
                 print("替换内容：" + renum)
-                newname = srcname.replace(nameresult[0], renum)
+                newname = basename.replace(nameresult[0], renum)
                 print("rename [{}] to [{}]".format(basename, newname))
 
                 if not preview:
