@@ -23,12 +23,43 @@ def filtername(basename, reg):
     return result
 
 
-def extractep(src):
+def extractep(src:list):
     """ 提取剧集编号
+    1. 头尾匹配 空格 [] 第话
+    2. 剔除头尾修饰字符
+    3. 校验含有数字
+    4. 如果不包含E,仍需校验是否是年份，个位数
     """
-    result = src.lstrip('第.EPpe\[ ')
-    result = result.rstrip('話话]. ')
-    return result
+    eps = []
+    origin = []
+    for single in src:
+        left = single[0]
+        right = single[-1:]
+        if left == right or (left == '[' and right == ']') or (left == '第' and (right == '话' or right == '話')):
+
+            result = single.lstrip('第.EPep\[ ')
+            result = result.rstrip('話话]. ')
+
+            if bool(re.search(r'\d', result)):
+                if not bool(re.search(r'[Ee]', single)):
+                    if len(result) == 1:
+                        continue
+                    match = re.match(r'.*([1-3][0-9]{3})', result)
+                    if match:
+                        continue
+                    eps.append(result)
+                    origin.append(single)
+                else:
+                    eps.append(result)
+                    origin.append(single)
+                    
+    if len(eps) != 1:
+        print("提取剧集异常")
+        print(origin)
+        print(eps)
+        return '', ''
+    else:
+        return origin[0], eps[0]
 
 
 def rename(root, base, newfix):
@@ -55,14 +86,19 @@ def renamebyreg(root, reg, reg2, prefix, preview: bool):
         if not nameresult or len(nameresult) == 0:
             # reg2 = "\.e[0-9videvoa\(\)]{1,}[.]"
             nameresult = filtername(basename, reg2)
-        if nameresult and len(nameresult) == 1:
-            print("提取剧集标签 "+nameresult[0])
-            epresult = extractep(nameresult[0])
+        if nameresult:
+            # print("提取剧集标签 "+nameresult)
+            originep, epresult = extractep(nameresult)
             if epresult != '':
-                print("   "+epresult)
-                renum = " " + prefix + epresult + " "
+                print(originep +"   "+epresult)
+                if originep[0] == '.':
+                    renum = "." + prefix + epresult + "."
+                elif originep[0] == '[':
+                    renum = "[" + prefix + epresult + "]"
+                else:
+                    renum = " " + prefix + epresult + " "
                 print("替换内容：" + renum)
-                newname = basename.replace(nameresult[0], renum)
+                newname = basename.replace(originep, renum)
                 print("rename [{}] to [{}]".format(basename, newname))
 
                 if not preview:
@@ -71,6 +107,7 @@ def renamebyreg(root, reg, reg2, prefix, preview: bool):
 
                 todolist.append(basename)
                 newlist.append(newname)
+
     ret = dict()
     ret['todo'] = todolist
     ret['prefix'] = newlist
