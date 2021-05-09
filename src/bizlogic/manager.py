@@ -25,7 +25,7 @@ def movie_lists(root, escape_folder):
         f = os.path.join(root, entry)
         if os.path.isdir(f):
             total += movie_lists(f, escape_folder)
-        elif os.path.splitext(f)[1] in video_type:
+        elif os.path.splitext(f)[1].lower() in video_type:
             total.append(f)
     return total
 

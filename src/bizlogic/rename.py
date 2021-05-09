@@ -10,7 +10,7 @@ def file_lists(root):
     dirs = os.listdir(root)
     for entry in dirs:
         f = os.path.join(root, entry)
-        if os.path.splitext(f)[1] in video_type or os.path.splitext(f)[1] in ext_type:
+        if os.path.splitext(f)[1].lower() in video_type or os.path.splitext(f)[1].lower() in ext_type:
             total.append(f)
     return total
 
@@ -23,7 +23,7 @@ def filtername(basename, reg):
     return result
 
 
-def extractep(src:list):
+def extractep(src: list):
     """ 提取剧集编号
     1. 头尾匹配 空格 [] 第话
     2. 剔除头尾修饰字符
@@ -52,7 +52,7 @@ def extractep(src:list):
                 else:
                     eps.append(result)
                     origin.append(single)
-                    
+
     if len(eps) != 1:
         print("提取剧集异常")
         print(origin)
@@ -90,7 +90,7 @@ def renamebyreg(root, reg, reg2, prefix, preview: bool):
             # print("提取剧集标签 "+nameresult)
             originep, epresult = extractep(nameresult)
             if epresult != '':
-                print(originep +"   "+epresult)
+                print(originep + "   "+epresult)
                 if originep[0] == '.':
                     renum = "." + prefix + epresult + "."
                 elif originep[0] == '[':
@@ -136,4 +136,3 @@ Shadow.2021.E14(0A).WEB-DL.4k.H265.60fps.AAC.2Audio
 Shadow.2021.E.WEB-DL.4k.H265.60fps.AAC.2Audio
 Person.of.Interest.S03E01.2013.1080p.Blu-ray.x265.10bit.AC3
     """
-

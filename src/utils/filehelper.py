@@ -4,10 +4,12 @@ import errno
 import shutil
 
 
-video_type = ['.mp4', '.avi', '.rmvb', '.wmv', '.mov', '.mkv', '.flv', '.ts', '.webm', '.MP4', '.AVI', '.RMVB', '.WMV', '.MOV', '.MKV', '.FLV', '.TS', '.WEBM', '.iso', '.ISO']
+video_type = ['.mp4', '.avi', '.rmvb', '.wmv',
+              '.mov', '.mkv', '.flv', '.ts', '.webm', '.iso']
 ext_type = ['.ass', '.srt', '.sub', '.ssa']
 
-video_filter = ['*.mp4', '*.avi', '*.rmvb', '*.wmv', '*.mov', '*.mkv', '*.flv', '*.ts', '*.webm', '*.iso']
+video_filter = ['*.mp4', '*.avi', '*.rmvb', '*.wmv',
+                '*.mov', '*.mkv', '*.flv', '*.ts', '*.webm', '*.iso']
 ext_filter = ['*.ass', '*.srt', '*.sub', '*.ssa']
 
 
@@ -30,7 +32,7 @@ def cleanfilebysuffix(folder, suffix):
         f = os.path.join(folder, file)
         if os.path.isdir(f):
             cleanfilebysuffix(f, suffix)
-        elif os.path.splitext(f)[1] in suffix:
+        elif os.path.splitext(f)[1].lower() in suffix:
             print("clean file by suffix ")
             os.remove(f)
 
@@ -49,7 +51,7 @@ def cleanfolderwithoutsuffix(folder, suffix):
             else:
                 print("clean empty media folder")
                 shutil.rmtree(f)
-        elif os.path.splitext(f)[1] in suffix:
+        elif os.path.splitext(f)[1].lower() in suffix:
             hassuffix = True
     return hassuffix
 
