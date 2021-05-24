@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 '''
-import os
+import os, stat
 import re
 import shutil
 from .manager import movie_lists
@@ -20,7 +20,9 @@ def copysub(src_folder, destfolder):
         if ext.lower() in ext_type:
             src_file = os.path.join(src_folder, item)
             print("copy sub  " + src_file)
-            shutil.copy(src_file, destfolder)
+            dest = shutil.copy(src_file, destfolder)
+            # modify permission
+            os.chmod(dest, stat.S_IRWXU|stat.S_IRWXG|stat.S_IRWXO)
 
 
 def transfer(src_folder, dest_folder, linktype, prefix, escape_folders):
@@ -39,7 +41,8 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders):
 
         if not os.path.exists(dest_folder):
             os.makedirs(dest_folder)
-        cleanfilebysuffix(dest_folder, video_type)
+        clean_type = video_type + ext_type
+        cleanfilebysuffix(dest_folder, clean_type)
 
         for movie_path in movie_list:
             print("start check [{}] ".format(movie_path))
