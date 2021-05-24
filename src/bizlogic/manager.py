@@ -51,7 +51,8 @@ def create_data_and_move(file_path: str, conf):
     scrapingtag_cnsub = False
     try:
         movie_info = scrapingrecordService.queryByPath(file_path)
-        if not movie_info or movie_info.status != 1:
+        # 查看单个文件刮削状态
+        if not movie_info or movie_info.status != 1 or movie_info.status != 3:
             movie_info = scrapingrecordService.add(file_path)
             if movie_info.scrapingname != '':
                 n_number = movie_info.scrapingname

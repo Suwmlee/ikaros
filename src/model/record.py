@@ -10,6 +10,7 @@ class _ScrapingRecords(db.Model):
     status  0   未刮削
             1   已刮削
             2   失败
+            3   忽略
     """
     __tablename__ = 'scrapingrecords'
 

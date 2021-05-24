@@ -669,6 +669,8 @@ def core_main(file_path, scrapingnum, cnsubtag, conf):
         (flag, path) = paste_file_to_folder(filepath, path, number, c_word, conf)
         return flag, path
     elif conf.main_mode == 2:
+        # 创建文件夹
+        path = create_folder(conf.success_folder, json_data.get('location_rule'), json_data, conf)
         # 移动文件
         paste_file_to_folder_mode2(filepath, path, multi_part, number, part, c_word, conf)
     return False, ''
