@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 '''
 '''
-import os, stat
+import os
+import stat
 import re
 import shutil
+
 from .manager import movie_lists
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
@@ -22,7 +24,7 @@ def copysub(src_folder, destfolder):
             print("copy sub  " + src_file)
             dest = shutil.copy(src_file, destfolder)
             # modify permission
-            os.chmod(dest, stat.S_IRWXU|stat.S_IRWXG|stat.S_IRWXO)
+            os.chmod(dest, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
 
 
 def transfer(src_folder, dest_folder, linktype, prefix, escape_folders):
@@ -38,7 +40,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders):
         # 硬链接直接使用源目录
         if linktype == 1:
             prefix = src_folder
-
+        # 清理目标目录下的文件：视频 字幕
         if not os.path.exists(dest_folder):
             os.makedirs(dest_folder)
         clean_type = video_type + ext_type
@@ -52,7 +54,9 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders):
 
             (filefolder, name) = os.path.split(movie_path)
             midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
+            # 目的地址
             newpath = os.path.join(dest_folder, midfolder, name)
+            # 链接的源地址
             link_path = os.path.join(prefix, midfolder, name)
 
             if os.path.exists(newpath):
