@@ -7,6 +7,7 @@ import re
 import shutil
 
 from .manager import movie_lists
+from .rename import renamebyreg
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
 from ..utils.filehelper import video_type, ext_type, cleanfilebysuffix, cleanfolderwithoutsuffix, hardlink_force, symlink_force
@@ -27,7 +28,7 @@ def copysub(src_folder, destfolder):
             os.chmod(dest, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
 
 
-def transfer(src_folder, dest_folder, linktype, prefix, escape_folders):
+def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renameflag=False, renameprefix='S01E'):
 
     task = taskService.getTask('transfer')
     if task.status == 2:
@@ -81,6 +82,11 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders):
             transrecordService.update(movie_path, link_path, newpath)
 
         cleanfolderwithoutsuffix(dest_folder, video_type)
+        # 重命名
+        if renameflag:
+            reg = '[\[第 ][0-9.svidevoa\(\)]*[\]話话 ]'
+            reg2 = "\.e[0-9videvoa\(\)]{1,}[.]"
+            renamebyreg(dest_folder, reg, reg2, renameprefix, False)
 
         print("transfer finished")
     except:
