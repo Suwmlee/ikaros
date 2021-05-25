@@ -25,7 +25,8 @@ def copysub(src_folder, destfolder):
             print("copy sub  " + src_file)
             dest = shutil.copy(src_file, destfolder)
             # modify permission
-            os.chmod(dest, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+            os.chmod(dest, stat.S_IRWXU | stat.S_IRGRP |
+                     stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH)
 
 
 def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renameflag=False, renameprefix='S01E'):
@@ -54,7 +55,8 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
                 movie_info = transrecordService.add(movie_path)
 
             (filefolder, name) = os.path.split(movie_path)
-            midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
+            midfolder = filefolder.replace(
+                src_folder, '').lstrip("\\").lstrip("/")
             # 目的地址
             newpath = os.path.join(dest_folder, midfolder, name)
             # 链接的源地址
@@ -72,13 +74,15 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
             (newfolder, tname) = os.path.split(newpath)
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
+
             print("create link from [{}] to [{}]".format(link_path, newpath))
             if linktype == 0:
                 symlink_force(link_path, newpath)
             else:
                 hardlink_force(link_path, newpath)
             copysub(filefolder, newfolder)
-            print("transfer Data for [{}], the number is [{}]".format(movie_path, newpath))
+            print("transfer Data for [{}], the number is [{}]".format(
+                movie_path, newpath))
             transrecordService.update(movie_path, link_path, newpath)
 
         cleanfolderwithoutsuffix(dest_folder, video_type)

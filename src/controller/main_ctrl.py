@@ -46,7 +46,7 @@ def start_transfer():
         return Response(status=500)
 
 
-@web.route("/api/stopall", methods=['POST'])
+@web.route("/api/stopall", methods=['GET'])
 def stop_all():
     try:
         taskService.updateTaskStatus(0, 'transfer')
@@ -61,7 +61,8 @@ def stop_all():
 def previewrename():
     try:
         content = request.get_json()
-        ret = rename.renamebyreg(content['source_folder'], content['reg'], content['reg2'], content['prefix'], True)
+        ret = rename.renamebyreg(
+            content['source_folder'], content['reg'], content['reg2'], content['prefix'], True)
         return json.dumps(ret)
     except Exception as err:
         wlogger.info(err)
@@ -72,7 +73,8 @@ def previewrename():
 def renamebyreg():
     try:
         content = request.get_json()
-        ret = rename.renamebyreg(content['source_folder'], content['reg'], content['reg2'], content['prefix'], False)
+        ret = rename.renamebyreg(
+            content['source_folder'], content['reg'], content['reg2'], content['prefix'], False)
         return json.dumps(ret)
     except Exception as err:
         wlogger.info(err)
@@ -109,7 +111,8 @@ def updateScapingConf():
 def editScrapingdata():
     try:
         content = request.get_json()
-        scrapingrecordService.editRecord(content['id'], content['status'], content['scrapingname'], content['cnsubtag'])
+        scrapingrecordService.editRecord(
+            content['id'], content['status'], content['scrapingname'], content['cnsubtag'])
         return Response(status=200)
     except Exception as err:
         wlogger.info(err)
@@ -144,7 +147,8 @@ def getscrapingrecord():
             sortprop = ''
             sortorder = 'desc'
 
-        infos = scrapingrecordService.queryByPage(page, size, sortprop, sortorder, blur)
+        infos = scrapingrecordService.queryByPage(
+            page, size, sortprop, sortorder, blur)
         data = []
         for i in infos.items:
             data.append(i.serialize())
