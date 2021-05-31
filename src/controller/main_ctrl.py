@@ -81,6 +81,16 @@ def renamebyreg():
         return Response(status=500)
 
 
+@web.route("/api/renamebyrep", methods=['POST'])
+def renamebyreplace():
+    try:
+        content = request.get_json()
+        ret = rename.rename(content['source_folder'], content['base'], content['newfix'])
+        return json.dumps(ret)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
+
 # scrapingconf
 
 
