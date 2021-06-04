@@ -4,10 +4,12 @@
 """
 import logging
 from flask import Flask
+import flask_migrate
 from flask_sqlalchemy import SQLAlchemy
 from .config import Config
 
 db = SQLAlchemy()
+migrate = flask_migrate.Migrate()
 app = None
 
 def create_app():
@@ -25,6 +27,10 @@ def create_app():
 
     db.app = app
     db.init_app(app)
+    migrate.init_app(app, db)
+
+    with app.app_context():
+        flask_migrate.upgrade()
 
     from . import controller
     from . import model
