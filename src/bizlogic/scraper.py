@@ -279,17 +279,17 @@ def trimblank(s: str):
 
 
 def download_file_with_filename(url, filename, path, conf, filepath, failed_folder):
-    proxyenable, proxy, timeout, retrycount, proxytype = scrapingConfService.getProxySetting()
+    configProxy = scrapingConfService.getProxySetting()
 
-    for i in range(retrycount):
+    for i in range(configProxy.retry):
         try:
-            if proxyenable:
+            if configProxy.enable:
                 if not os.path.exists(path):
                     os.makedirs(path)
-                proxies = get_proxy(proxy, proxytype)
+                proxies = configProxy.proxies()
                 headers = {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'}
-                r = requests.get(url, headers=headers, timeout=timeout, proxies=proxies)
+                r = requests.get(url, headers=headers, timeout=configProxy.timeout, proxies=proxies)
                 if r == '':
                     wlogger.info('[-]Movie Data not found!')
                     return
@@ -301,7 +301,7 @@ def download_file_with_filename(url, filename, path, conf, filepath, failed_fold
                     os.makedirs(path)
                 headers = {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'}
-                r = requests.get(url, timeout=timeout, headers=headers)
+                r = requests.get(url, timeout=configProxy.timeout, headers=headers)
                 if r == '':
                     wlogger.info('[-]Movie Data not found!')
                     return
@@ -310,16 +310,16 @@ def download_file_with_filename(url, filename, path, conf, filepath, failed_fold
                 return
         except requests.exceptions.RequestException:
             i += 1
-            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retrycount))
+            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
         except requests.exceptions.ConnectionError:
             i += 1
-            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retrycount))
+            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
         except requests.exceptions.ProxyError:
             i += 1
-            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retrycount))
+            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
         except requests.exceptions.ConnectTimeout:
             i += 1
-            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retrycount))
+            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
     wlogger.info('[-]Connect Failed! Please check your Proxy or Network!')
     moveFailedFolder(filepath, failed_folder)
     return
@@ -331,8 +331,8 @@ def image_download(cover, number, c_word, path, conf, filepath, failed_folder):
         moveFailedFolder(filepath, failed_folder)
         return
 
-    proxyenable, _proxy, _timeout, retry, _proxytype = scrapingConfService.getProxySetting()
-    for i in range(retry):
+    configProxy = scrapingConfService.getProxySetting()
+    for i in range(configProxy.retry):
         if os.path.getsize(path + '/' + number + c_word + '-fanart.jpg') == 0:
             wlogger.info('[!]Image Download Failed! Trying again. [{}/3]', i + 1)
             download_file_with_filename(cover, number + c_word + '-fanart.jpg', path, conf, filepath, failed_folder)

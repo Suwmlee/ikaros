@@ -31,12 +31,9 @@ class ScrapingConfService():
 
     def getProxySetting(self):
         setting = self.getSetting()
-        switch = setting.proxy_enable
-        proxytype = setting.proxy_type
-        address = setting.proxy_address
-        timeout = setting.proxy_timeout
-        retry_count = setting.proxy_retry
-        return switch, address, timeout, retry_count, proxytype
+        proxyConfig = ProxyConfig(setting.proxy_enable, setting.proxy_address,
+                                  setting.proxy_timeout, setting.proxy_retry, setting.proxy_type)
+        return proxyConfig
 
 
 class TransConfService():
@@ -84,6 +81,43 @@ class TransConfService():
         if config:
             db.session.delete(config)
             db.session.commit()
+
+
+class ProxyConfig():
+    """ Proxy Config
+    """
+    SUPPORT_PROXY_TYPE = ("http", "socks5", "socks5h")
+
+    enable = False
+    address = ""
+    timeout = 5
+    retry = 3
+    proxytype = "socks5"
+
+    def __init__(self, enable, address, timeout, retry, proxytype) -> None:
+        """ Initial Proxy
+        """
+        self.enable = enable
+        self.address = address
+        self.timeout = timeout
+        self.retry = retry
+        self.proxytype = proxytype
+
+    def proxies(self):
+        ''' 获得代理参数
+        '''
+        if self.address:
+            if self.proxytype in self.SUPPORT_PROXY_TYPE:
+                proxies = {"http": self.proxytype + "://" + self.address,
+                           "https": self.proxytype + "://" + self.address}
+            else:
+                proxies = {"http": "http://" + self.address,
+                           "https": "https://" + self.address}
+        else:
+            proxies = {}
+
+        return proxies
+
 
 scrapingConfService = ScrapingConfService()
 transConfigService = TransConfService()
