@@ -8,10 +8,13 @@ import re
 
 
 def main(number: str) -> json:
-    result = post_html(url="https://www.jav321.com/search", query={"sn": number})
-
-    soup = BeautifulSoup(result.text, "html.parser")
-    lx = html.fromstring(str(soup))
+    try:
+        result = post_html(url="https://www.jav321.com/search", query={"sn": number})
+        soup = BeautifulSoup(result.text, "html.parser")
+        lx = html.fromstring(str(soup))
+    except:
+        dic = {"title": ""}
+        return json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'))
 
     if "/video/" in result.url:
         data = parse_info(soup)
@@ -31,7 +34,7 @@ def main(number: str) -> json:
             **data,
         }
     else:
-        dic = {}
+        dic = {"title": ""}
 
     return json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'))
 
@@ -59,7 +62,7 @@ def parse_info(soup: BeautifulSoup) -> dict:
             "series": get_series(data_dic),
         }
     else:
-        return {}
+        return {"title": ""}
 
 
 def get_bold_text(h: str) -> str:

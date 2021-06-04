@@ -5,19 +5,34 @@ from lxml import etree
 import json
 from bs4 import BeautifulSoup
 from ..utils.ADC_function import *
+from . import airav
 # import sys
 # import io
 # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, errors = 'replace', line_buffering = True)
 
 def getTitle(a):
     html = etree.fromstring(a, etree.HTMLParser())
-    result = html.xpath("/html/body/section/div/h2/strong/text()")[0]
-    return result
-def getActor(a):  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result1 = str(html.xpath('//strong[contains(text(),"演員")]/../span/text()')).strip(" ['']")
-    result2 = str(html.xpath('//strong[contains(text(),"演員")]/../span/a/text()')).strip(" ['']")
-    return str(result1 + result2).strip('+').replace(",\\xa0", "").replace("'", "").replace(' ', '').replace(',,', '').replace('N/A', '').lstrip(',').replace(',', ', ')
+    browser_title = str(html.xpath("/html/head/title/text()")[0])
+    return browser_title[:browser_title.find(' | JavDB')].strip()
+
+def getActor(a):
+    html = etree.fromstring(a, etree.HTMLParser())
+    actors = html.xpath('//span[@class="value"]/a[contains(@href,"/actors/")]/text()')
+    genders = html.xpath('//span[@class="value"]/a[contains(@href,"/actors/")]/../strong/@class')
+    r = []
+    idx = 0
+    # actor_gendor = config.Config().actor_gender()
+    # if not actor_gendor in ['female','male','both','all']:
+    #     actor_gendor = 'female'
+    actor_gendor = 'female'
+    for act in actors:
+        if((actor_gendor == 'all')
+        or (actor_gendor == 'both' and genders[idx] in ['symbol female', 'symbol male'])
+        or (actor_gendor == 'female' and genders[idx] == 'symbol female')
+        or (actor_gendor == 'male' and genders[idx] == 'symbol male')):
+            r.append(act)
+        idx = idx + 1
+    return r
 
 def getaphoto(url):
     html_page = get_html(url)
@@ -38,13 +53,13 @@ def getActorPhoto(html): #//*[@id="star_qdt"]/li/a/img
         actor = actor_prether.findall(actoralls)
         actor_photo = {}
         for i in actor:
-            actor_photo[i[1]] = getaphoto('https://javdb.com'+i[0])
+            actor_photo[i[1]] = getaphoto('https://' + javdb_site + '.com'+i[0])
 
         return actor_photo
 
     else:
         return {}
-    
+
 def getStudio(a):
     # html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     # result1 = str(html.xpath('//strong[contains(text(),"片商")]/../span/text()')).strip(" ['']")
@@ -57,7 +72,7 @@ def getStudio(a):
     else:
         result = ""
     return result
-    
+
 def getRuntime(a):
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     result1 = str(html.xpath('//strong[contains(text(),"時長")]/../span/text()')).strip(" ['']")
@@ -179,16 +194,22 @@ def getDirector(a):
     result1 = str(html.xpath('//strong[contains(text(),"導演")]/../span/text()')).strip(" ['']")
     result2 = str(html.xpath('//strong[contains(text(),"導演")]/../span/a/text()')).strip(" ['']")
     return str(result1 + result2).strip('+').replace("', '", '').replace('"', '')
-def getOutline(htmlcode):
-    html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = str(html.xpath('//*[@id="introduction"]/dd/p[1]/text()')).strip(" ['']")
-    return result
+def getOutline(number):  #获取剧情介绍
+    try:
+        response = json.loads(airav.main(number))
+        result = response['outline']
+        return result
+    except:
+        return ''
 def getSeries(a):
     #/html/body/section/div/div[3]/div[2]/nav/div[7]/span/a
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     result1 = str(html.xpath('//strong[contains(text(),"系列")]/../span/text()')).strip(" ['']")
     result2 = str(html.xpath('//strong[contains(text(),"系列")]/../span/a/text()')).strip(" ['']")
     return str(result1 + result2).strip('+').replace("', '", '').replace('"', '')
+
+javdb_site = "javdb9"
+
 def main(number):
     try:
         # if re.search(r'[a-zA-Z]+\.\d{2}\.\d{2}\.\d{2}', number).group():
@@ -196,10 +217,22 @@ def main(number):
         # else:
         #     number = number.upper()
         number = number.upper()
+        isFC2PPV = bool(re.search(r'^FC2-\d+', number))
+        cookie_json = './' + javdb_site + '.json'
+        javdb_cookies = None
+        # 不加载过期的cookie，javdb登录界面显示为7天免登录，故假定cookie有效期为7天
+        cdays = file_modification_days(cookie_json)
+        if cdays < 7:
+            javdb_cookies = load_cookies(cookie_json)
+        elif cdays != 9999:
+            print('[!]Cookies file ' + cookie_json + ' was updated ' + str(cdays) +
+                  ' days ago, it will not be used for HTTP requests.')
+
         try:
-            query_result = get_html('https://javdb.com/search?q=' + number + '&f=all')
+            javdb_url = 'https://' + javdb_site + '.com/search?q=' + number + '&f=all'
+            query_result = get_html(javdb_url, cookies=javdb_cookies)
         except:
-            query_result = get_html('https://javdb4.com/search?q=' + number + '&f=all')
+            query_result = get_html('https://javdb9.com/search?q=' + number + '&f=all')
         html = etree.fromstring(query_result, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
         # javdb sometime returns multiple results,
         # and the first elememt maybe not the one we are looking for
@@ -210,8 +243,19 @@ def main(number):
             correct_url = urls[0]
         else:
             ids =html.xpath('//*[@id="videos"]/div/div/a/div[contains(@class, "uid")]/text()')
-            correct_url = urls[ids.index(number)]
-        detail_page = get_html('https://javdb.com' + correct_url)
+            try:
+                correct_url = urls[ids.index(number)]
+            except:
+                # 为避免获得错误番号，FC2 PPV 只要精确对应的结果
+                if isFC2PPV and ids[0] != number:
+                    raise ValueError("number not found")
+                # if input number is "STAR438" not "STAR-438", use first search result.
+                correct_url = urls[0]
+        try:
+            javdb_detail_url = 'https://' + javdb_site + '.com' + correct_url
+            detail_page = get_html(javdb_detail_url, cookies=javdb_cookies)
+        except:
+            detail_page = get_html('https://' + javdb_site + '.com' + correct_url)
 
         # no cut image by default
         imagecut = 3
@@ -219,15 +263,22 @@ def main(number):
         if re.search(r'[a-zA-Z]+\.\d{2}\.\d{2}\.\d{2}', number):
             cover_small = getCover_small(query_result)
         else:
-            cover_small = getCover_small(query_result, index=ids.index(number))
+            try:
+                cover_small = getCover_small(query_result, index=ids.index(number))
+            except:
+                # if input number is "STAR438" not "STAR-438", use first search result.
+                cover_small = getCover_small(query_result)
         if 'placeholder' in cover_small:
             # replace wit normal cover and cut it
             imagecut = 1
             cover_small = getCover(detail_page)
 
-        number = getNum(detail_page)
+        dp_number = getNum(detail_page)
+        if isFC2PPV and dp_number != number:
+            raise ValueError("number not found")
         title = getTitle(detail_page)
-        if title and number:
+        if title and dp_number:
+            number = dp_number
             # remove duplicate title
             title = title.replace(number, '').strip()
 
@@ -235,7 +286,7 @@ def main(number):
             'actor': getActor(detail_page),
             'title': title,
             'studio': getStudio(detail_page),
-            'outline': getOutline(detail_page),
+            'outline': getOutline(number),
             'runtime': getRuntime(detail_page),
             'director': getDirector(detail_page),
             'release': getRelease(detail_page),
@@ -255,7 +306,8 @@ def main(number):
 
         }
     except Exception as e:
-        print(e)
+        if scrapingConfService.getSetting().debug_info:
+            print(e)
         dic = {"title": ""}
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
@@ -265,4 +317,7 @@ def main(number):
 if __name__ == "__main__":
     # print(main('blacked.20.05.30'))
     # print(main('AGAV-042'))
-    print(main('BANK-022'))
+    # print(main('BANK-022'))
+    print(main('FC2-735670'))
+    print(main('FC2-1174949'))
+    print(main('MVSD-439'))

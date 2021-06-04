@@ -75,6 +75,7 @@ def getTag(a):
 def getCover(htmlcode):
     html = etree.fromstring(htmlcode, etree.HTMLParser())
     result = str(html.xpath('//*[@id="center_column"]/div[1]/div[1]/div/div/h2/img/@src')).strip(" ['']")
+    result = str(html.xpath('//*[@id="EnlargeImage"]/@href')).strip(" ['']")
     #                    /html/body/div[2]/article[2]/div[1]/div[1]/div/div/h2/img/@src
     return result
 def getDirector(a):
@@ -114,29 +115,34 @@ def main(number2):
     a = str(soup.find(attrs={'class': 'detail_data'})).replace('\n                                        ','').replace('                                ','').replace('\n                            ','').replace('\n                        ','')
     b = str(soup.find(attrs={'id': 'introduction'})).replace('\n                                        ','').replace('                                ','').replace('\n                            ','').replace('\n                        ','')
     #print(b)
-    dic = {
-        'title': getTitle(htmlcode).replace("\\n",'').replace('        ',''),
-        'studio': getStudio(a),
-        'outline': getOutline(b),
-        'runtime': getRuntime(a),
-        'director': getDirector(a),
-        'actor': getActor(a),
-        'release': getRelease(a),
-        'number': getNum(a),
-        'cover': getCover(htmlcode),
-        'imagecut': 0,
-        'tag': getTag(a),
-        'label':getLabel(a),
-        'extrafanart': getExtrafanart(htmlcode),
-        'year': getYear(getRelease(a)),  # str(re.search('\d{4}',getRelease(a)).group()),
-        'actor_photo': '',
-        'website':'https://www.mgstage.com/product/product_detail/'+str(number)+'/',
-        'source': 'mgstage.py',
-        'series': getSeries(a),
-    }
+    try:
+        dic = {
+            'title': getTitle(htmlcode).replace("\\n", '').replace('        ', ''),
+            'studio': getStudio(a),
+            'outline': getOutline(b),
+            'runtime': getRuntime(a),
+            'director': getDirector(a),
+            'actor': getActor(a),
+            'release': getRelease(a),
+            'number': getNum(a),
+            'cover': getCover(htmlcode),
+            'imagecut': 0,
+            'tag': getTag(a),
+            'label': getLabel(a),
+            'extrafanart': getExtrafanart(htmlcode),
+            'year': getYear(getRelease(a)),  # str(re.search('\d{4}',getRelease(a)).group()),
+            'actor_photo': '',
+            'website': 'https://www.mgstage.com/product/product_detail/' + str(number) + '/',
+            'source': 'mgstage.py',
+            'series': getSeries(a),
+        }
+    except Exception as e:
+        if scrapingConfService.getSetting().debug_info:
+            print(e)
+        dic = {"title": ""}
+
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
-    #print(htmlcode)
 
 if __name__ == '__main__':
     print(main('SIRO-4149'))

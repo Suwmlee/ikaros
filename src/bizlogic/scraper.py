@@ -20,9 +20,10 @@ from ..scrapinglib import javbus
 from ..scrapinglib import javdb
 from ..scrapinglib import mgstage
 from ..scrapinglib import xcity
-from ..scrapinglib import javlib
+# from ..scrapinglib import javlib
 from ..scrapinglib import dlsite
 from ..scrapinglib import airav
+from ..scrapinglib import carib
 
 
 def escape_path(path, escape_literals: str):  # Remove escape literals
@@ -44,17 +45,18 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
     """
 
     func_mapping = {
+        "airav": airav.main,
         "avsox": avsox.main,
         "fc2": fc2.main,
         "fanza": fanza.main,
         "javdb": javdb.main,
         "javbus": javbus.main,
-        "airav": airav.main,
         "mgstage": mgstage.main,
         "jav321": jav321.main,
         "xcity": xcity.main,
-        "javlib": javlib.main,
+        # "javlib": javlib.main,
         "dlsite": dlsite.main,
+        "carib": carib.main,
     }
 
     # default fetch order list, from the beginning to the end
@@ -62,29 +64,30 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
 
     # if the input file name matches certain rules,
     # move some web service to the beginning of the list
-    if "avsox" in sources and (re.match(r"^\d{5,}", file_number) or
-                               "HEYZO" in file_number or "heyzo" in file_number or "Heyzo" in file_number
-                               ):
-        # if conf.debug() == True:
-        #     print('[+]select avsox')
-        sources.insert(0, sources.pop(sources.index("avsox")))
+    lo_file_number = file_number.lower()
+    if "carib" in sources and (re.match(r"^\d{6}-\d{3}", file_number)
+    ):
+        sources.insert(0, sources.pop(sources.index("carib")))
+    elif "avsox" in sources and (re.match(r"^\d{5,}", file_number) or
+        "heyzo" in lo_file_number
+    ):
+        sources.insert(0, sources.pop(sources.index("javdb")))
+        sources.insert(1, sources.pop(sources.index("avsox")))
     elif "mgstage" in sources and (re.match(r"\d+\D+", file_number) or
-                                   "siro" in file_number or "SIRO" in file_number or "Siro" in file_number
-                                   ):
-        # if conf.debug() == True:
-            # print('[+]select fanza')
+        "siro" in lo_file_number
+    ):
         sources.insert(0, sources.pop(sources.index("mgstage")))
-    elif "fc2" in sources and ("fc2" in file_number or "FC2" in file_number
-                               ):
-        # if conf.debug() == True:
-        #     print('[+]select fc2')
-        sources.insert(0, sources.pop(sources.index("fc2")))
+    elif "fc2" in sources and ("fc2" in lo_file_number
+    ):
+        sources.insert(0, sources.pop(sources.index("javdb")))
+        sources.insert(1, sources.pop(sources.index("fc2")))
     elif "dlsite" in sources and (
-        "RJ" in file_number or "rj" in file_number or "VJ" in file_number or "vj" in file_number
+        "rj" in lo_file_number or "vj" in lo_file_number
     ):
         sources.insert(0, sources.pop(sources.index("dlsite")))
 
     json_data = {}
+    
     for source in sources:
         try:
             json_data = json.loads(func_mapping[source](file_number))
@@ -148,43 +151,44 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
     tmpArr = cover_small.split(',')
     if len(tmpArr) > 0:
         cover_small = tmpArr[0].strip('\"').strip('\'')
+
     # ====================处理异常字符 END================== #\/:*?"<>|
 
     # ===  替换Studio片假名
-    studio = studio.replace('アイエナジー', 'Energy')
-    studio = studio.replace('アイデアポケット', 'Idea Pocket')
-    studio = studio.replace('アキノリ', 'AKNR')
-    studio = studio.replace('アタッカーズ', 'Attackers')
-    studio = re.sub('アパッチ.*', 'Apache', studio)
-    studio = studio.replace('アマチュアインディーズ', 'SOD')
-    studio = studio.replace('アリスJAPAN', 'Alice Japan')
-    studio = studio.replace('オーロラプロジェクト・アネックス', 'Aurora Project Annex')
-    studio = studio.replace('クリスタル映像', 'Crystal 映像')
-    studio = studio.replace('グローリークエスト', 'Glory Quest')
-    studio = studio.replace('ダスッ！', 'DAS！')
-    studio = studio.replace('ディープス', 'DEEP’s')
-    studio = studio.replace('ドグマ', 'Dogma')
-    studio = studio.replace('プレステージ', 'PRESTIGE')
-    studio = studio.replace('ムーディーズ', 'MOODYZ')
-    studio = studio.replace('メディアステーション', '宇宙企画')
-    studio = studio.replace('ワンズファクトリー', 'WANZ FACTORY')
-    studio = studio.replace('エスワン ナンバーワンスタイル', 'S1')
-    studio = studio.replace('エスワンナンバーワンスタイル', 'S1')
-    studio = studio.replace('SODクリエイト', 'SOD')
-    studio = studio.replace('サディスティックヴィレッジ', 'SOD')
-    studio = studio.replace('V＆Rプロダクツ', 'V＆R PRODUCE')
-    studio = studio.replace('V＆RPRODUCE', 'V＆R PRODUCE')
-    studio = studio.replace('レアルワークス', 'Real Works')
-    studio = studio.replace('マックスエー', 'MAX-A')
-    studio = studio.replace('ピーターズMAX', 'PETERS MAX')
-    studio = studio.replace('プレミアム', 'PREMIUM')
-    studio = studio.replace('ナチュラルハイ', 'NATURAL HIGH')
-    studio = studio.replace('マキシング', 'MAXING')
-    studio = studio.replace('エムズビデオグループ', 'M’s Video Group')
-    studio = studio.replace('ミニマム', 'Minimum')
-    studio = studio.replace('ワープエンタテインメント', 'WAAP Entertainment')
-    studio = re.sub('.*/妄想族', '妄想族', studio)
-    studio = studio.replace('/', ' ')
+    studio = studio.replace('アイエナジー','Energy')
+    studio = studio.replace('アイデアポケット','Idea Pocket')
+    studio = studio.replace('アキノリ','AKNR')
+    studio = studio.replace('アタッカーズ','Attackers')
+    studio = re.sub('アパッチ.*','Apache',studio)
+    studio = studio.replace('アマチュアインディーズ','SOD')
+    studio = studio.replace('アリスJAPAN','Alice Japan')
+    studio = studio.replace('オーロラプロジェクト・アネックス','Aurora Project Annex')
+    studio = studio.replace('クリスタル映像','Crystal 映像')
+    studio = studio.replace('グローリークエスト','Glory Quest')
+    studio = studio.replace('ダスッ！','DAS！')
+    studio = studio.replace('ディープス','DEEP’s')
+    studio = studio.replace('ドグマ','Dogma')
+    studio = studio.replace('プレステージ','PRESTIGE')
+    studio = studio.replace('ムーディーズ','MOODYZ')
+    studio = studio.replace('メディアステーション','宇宙企画')
+    studio = studio.replace('ワンズファクトリー','WANZ FACTORY')
+    studio = studio.replace('エスワン ナンバーワンスタイル','S1')
+    studio = studio.replace('エスワンナンバーワンスタイル','S1')
+    studio = studio.replace('SODクリエイト','SOD')
+    studio = studio.replace('サディスティックヴィレッジ','SOD')
+    studio = studio.replace('V＆Rプロダクツ','V＆R PRODUCE')
+    studio = studio.replace('V＆RPRODUCE','V＆R PRODUCE')
+    studio = studio.replace('レアルワークス','Real Works')
+    studio = studio.replace('マックスエー','MAX-A')
+    studio = studio.replace('ピーターズMAX','PETERS MAX')
+    studio = studio.replace('プレミアム','PREMIUM')
+    studio = studio.replace('ナチュラルハイ','NATURAL HIGH')
+    studio = studio.replace('マキシング','MAXING')
+    studio = studio.replace('エムズビデオグループ','M’s Video Group')
+    studio = studio.replace('ミニマム','Minimum')
+    studio = studio.replace('ワープエンタテインメント','WAAP Entertainment')
+    studio = re.sub('.*/妄想族','妄想族',studio)
+    studio = studio.replace('/',' ')
     # ===  替换Studio片假名 END
 
     location_rule = eval(conf.location_rule)

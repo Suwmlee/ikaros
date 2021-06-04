@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup#need install
 import json
 from ..utils.ADC_function import *
 from . import fanza
+from . import airav
 
 def getActorPhoto(htmlcode): #//*[@id="star_qdt"]/li/a/img
     soup = BeautifulSoup(htmlcode, 'lxml')
@@ -46,6 +47,8 @@ def getYear(htmlcode):   #获取年份
 def getCover(htmlcode):  #获取封面链接
     doc = pq(htmlcode)
     image = doc('a.bigImage')
+    if not "javbus.com" in image.attr('href'):
+        return "https://www.javbus.com" + image.attr('href')
     return image.attr('href')
 def getRelease(htmlcode): #获取出版日期
     html = etree.fromstring(htmlcode, etree.HTMLParser())
@@ -79,10 +82,10 @@ def getCID(htmlcode):
     string = html.xpath("//a[contains(@class,'sample-box')][1]/@href")[0].replace('https://pics.dmm.co.jp/digital/video/','')
     result = re.sub('/.*?.jpg','',string)
     return result
-def getOutline(htmlcode):  #获取演员
-    html = etree.fromstring(htmlcode, etree.HTMLParser())
+def getOutline(number):  #获取剧情介绍
     try:
-        result = html.xpath("string(//div[contains(@class,'mg-b20 lh4')])").replace('\n','')
+        response = json.loads(airav.main(number))
+        result = response['outline']
         return result
     except:
         return ''
@@ -102,7 +105,7 @@ def getTag(htmlcode):  # 获取标签
     soup = BeautifulSoup(htmlcode, 'lxml')
     a = soup.find_all(attrs={'class': 'genre'})
     for i in a:
-        if 'onmouseout' in str(i):
+        if 'onmouseout' in str(i) or '多選提交' in str(i):
             continue
         tag.append(translateTag_to_sc(i.get_text()))
     return tag
@@ -122,15 +125,11 @@ def main_uncensored(number):
     htmlcode = get_html('https://www.javbus.com/ja/' + number)
     if getTitle(htmlcode) == '':
         htmlcode = get_html('https://www.javbus.com/ja/' + number.replace('-','_'))
-    try:
-        dww_htmlcode = fanza.main_htmlcode(getCID(htmlcode))
-    except:
-        dww_htmlcode = ''
     dic = {
         'title': str(re.sub('\w+-\d+-','',getTitle(htmlcode))).replace(getNum(htmlcode)+'-',''),
         'studio': getStudio(htmlcode),
         'year': getYear(htmlcode),
-        'outline': getOutline(dww_htmlcode),
+        'outline': getOutline(number),
         'runtime': getRuntime(htmlcode),
         'director': getDirector(htmlcode),
         'actor': getActor(htmlcode),
@@ -157,15 +156,11 @@ def main(number):
                 htmlcode = get_html('https://www.fanbus.us/' + number)
             except:
                 htmlcode = get_html('https://www.javbus.com/' + number)
-            try:
-                dww_htmlcode = fanza.main_htmlcode(getCID(htmlcode))
-            except:
-                dww_htmlcode = ''
             dic = {
                 'title': str(re.sub('\w+-\d+-', '', getTitle(htmlcode))),
                 'studio': getStudio(htmlcode),
                 'year': str(re.search('\d{4}', getYear(htmlcode)).group()),
-                'outline': getOutline(dww_htmlcode),
+                'outline': getOutline(number),
                 'runtime': getRuntime(htmlcode),
                 'director': getDirector(htmlcode),
                 'actor': getActor(htmlcode),
@@ -185,7 +180,9 @@ def main(number):
             return js
         except:
             return main_uncensored(number)
-    except:
+    except Exception as e:
+        if scrapingConfService.getSetting().debug_info:
+            print(e)
         data = {
             "title": "",
         }

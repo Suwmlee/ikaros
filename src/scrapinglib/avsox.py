@@ -96,29 +96,34 @@ def main(number):
             a = get_html(site + '/cn/search/' + number.replace('_', ''))
             html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
             result1 = str(html.xpath('//*[@id="waterfall"]/div/a/@href')).strip(" ['']")
-    web = get_html(result1)
+    web = get_html("https:" + result1)
     soup = BeautifulSoup(web, 'lxml')
     info = str(soup.find(attrs={'class': 'row movie'}))
-    dic = {
-        'actor': getActor(web),
-        'title': getTitle(web).strip(getNum(web)),
-        'studio': getStudio(info),
-        'outline': '',#
-        'runtime': getRuntime(info),
-        'director': '', #
-        'release': getRelease(info),
-        'number': getNum(info),
-        'cover': getCover(web),
-        'cover_small': getCover_small(a),
-        'imagecut': 3,
-        'tag': getTag(web),
-        'label': getLabel(info),
-        'year': getYear(getRelease(info)),  # str(re.search('\d{4}',getRelease(a)).group()),
-        'actor_photo': getActorPhoto(web),
-        'website': result1,
-        'source': 'avsox.py',
-        'series': getSeries(info),
-    }
+    try:
+        dic = {
+            'actor': getActor(web),
+            'title': getTitle(web).strip(getNum(web)),
+            'studio': getStudio(info),
+            'outline': '',  #
+            'runtime': getRuntime(info),
+            'director': '',  #
+            'release': getRelease(info),
+            'number': getNum(info),
+            'cover': getCover(web),
+            'cover_small': getCover_small(a),
+            'imagecut': 3,
+            'tag': getTag(web),
+            'label': getLabel(info),
+            'year': getYear(getRelease(info)),  # str(re.search('\d{4}',getRelease(a)).group()),
+            'actor_photo': getActorPhoto(web),
+            'website': "https:" + result1,
+            'source': 'avsox.py',
+            'series': getSeries(info),
+        }
+    except Exception as e:
+        if scrapingConfService.getSetting().debug_info:
+            print(e)
+        dic = {"title": ""}
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
 
