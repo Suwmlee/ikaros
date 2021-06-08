@@ -21,6 +21,17 @@ from ..utils.wlogger import wlogger
 # executor = ThreadPoolExecutor(2)
 
 # action
+@web.route("/api/intro", methods=['GET'])
+def intro():
+    try:
+        localPath = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(localPath,"..","..", 'README.md'), encoding='utf-8') as f:
+            content = f.read()
+            f.close()
+        return content
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
 
 
 @web.route("/api/scraping", methods=['POST'])
