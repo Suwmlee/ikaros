@@ -6,7 +6,7 @@ import json
 import pathlib
 import time
 from lxml import etree
-
+from http.cookies import SimpleCookie
 from ..utils.wlogger import wlogger
 from ..service.configservice import scrapingConfService
 
@@ -526,11 +526,22 @@ def is_uncensored(number):
 '''
 # 从网站登录后，通过浏览器插件(CookieBro或EdittThisCookie)或者直接在地址栏网站链接信息处都可以复制或者导出cookie内容，
 # 并填写到以上json文件的相应字段中
-def load_cookies(filename):
+def load_javdb_cookies():
     try:
-        return json.load(open(filename))
+        javdb = scrapingConfService.getSetting().cookies_javdb
+        cookies = load_cookies(javdb)
+        return cookies
     except:
         return None
+
+
+def load_cookies(rawcookie):
+    cookie = SimpleCookie()
+    cookie.load(rawcookie)
+    cookies = {}
+    for key, morsel in cookie.items():
+        cookies[key] = morsel.value
+    return cookies
 
 
 # 文件修改时间距此时的天数

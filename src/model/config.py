@@ -60,7 +60,8 @@ class _ScrapingConfigs(db.Model):
             'proxy_type': self.proxy_type,
             'proxy_address': self.proxy_address,
             'proxy_timeout': self.proxy_timeout,
-            'proxy_retry': self.proxy_retry
+            'proxy_retry': self.proxy_retry,
+            'cookies_javdb': self.cookies_javdb,
         }
 
 

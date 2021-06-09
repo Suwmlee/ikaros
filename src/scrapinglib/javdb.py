@@ -218,15 +218,7 @@ def main(number):
         #     number = number.upper()
         number = number.upper()
         isFC2PPV = bool(re.search(r'^FC2-\d+', number))
-        cookie_json = './' + javdb_site + '.json'
-        javdb_cookies = None
-        # 不加载过期的cookie，javdb登录界面显示为7天免登录，故假定cookie有效期为7天
-        cdays = file_modification_days(cookie_json)
-        if cdays < 7:
-            javdb_cookies = load_cookies(cookie_json)
-        elif cdays != 9999:
-            print('[!]Cookies file ' + cookie_json + ' was updated ' + str(cdays) +
-                  ' days ago, it will not be used for HTTP requests.')
+        javdb_cookies = load_javdb_cookies()
 
         try:
             javdb_url = 'https://' + javdb_site + '.com/search?q=' + number + '&f=all'
