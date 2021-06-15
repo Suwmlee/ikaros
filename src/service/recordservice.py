@@ -37,6 +37,10 @@ class ScrapingRecordService():
     def deleteByID(self, value) -> _ScrapingRecords:
         record = _ScrapingRecords.query.filter_by(id=value).first()
         if record:
+            if record.destpath != '':
+                folder = os.path.dirname(record.destpath)
+                if os.path.exists(folder):
+                    os.remove(folder)
             db.session.delete(record)
             db.session.commit()
 
