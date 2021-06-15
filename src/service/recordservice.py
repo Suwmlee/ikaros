@@ -2,6 +2,7 @@
 '''
 '''
 import os
+import shutil
 import datetime
 from sqlalchemy import or_
 from ..model.record import _ScrapingRecords, _TransRecords
@@ -40,7 +41,7 @@ class ScrapingRecordService():
             if record.destpath != '':
                 folder = os.path.dirname(record.destpath)
                 if os.path.exists(folder):
-                    os.remove(folder)
+                    shutil.rmtree(folder)
             db.session.delete(record)
             db.session.commit()
 

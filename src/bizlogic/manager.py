@@ -3,6 +3,7 @@
 '''
 import os
 import re
+import shutil
 
 from ..service.configservice import scrapingConfService
 from ..service.recordservice import scrapingrecordService
@@ -58,7 +59,7 @@ def create_data_and_move(file_path: str, conf):
             if movie_info.destpath != '':
                 folder = os.path.dirname(movie_info.destpath)
                 if os.path.exists(folder):
-                    os.remove(folder)
+                    shutil.rmtree(folder)
             # 查询是否有额外设置
             if movie_info.scrapingname != '':
                 n_number = movie_info.scrapingname
