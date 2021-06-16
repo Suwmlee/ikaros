@@ -349,7 +349,7 @@ def image_download(cover, number, c_word, path, conf, filepath, failed_folder):
     shutil.copyfile(path + '/' + number + c_word + '-fanart.jpg', path + '/' + number + c_word + '-thumb.jpg')
 
 
-def print_files(path, c_word, naming_rule, part, cn_sub, json_data, filepath, failed_folder, tag, actor_list, liuchu):
+def print_files(path, c_word, naming_rule, part, cn_sub, json_data, filepath, failed_folder, tag, actor_list, liuchu, uncensored):
     title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label = get_info(json_data)
 
     try:
@@ -383,19 +383,26 @@ def print_files(path, c_word, naming_rule, part, cn_sub, json_data, filepath, fa
                 print("  <tag>中文字幕</tag>", file=code)
             if liuchu == '流出':
                 print("  <tag>流出</tag>", file=code)
+            if uncensored == 1:
+                print("  <tag>无码</tag>", file=code)
             try:
                 for i in tag:
                     print("  <tag>" + i + "</tag>", file=code)
                 print("  <tag>" + series + "</tag>", file=code)
             except:
                 aaaaa = ''
+            if cn_sub == '1':
+                print("  <genre>中文字幕</genre>", file=code)
+            if liuchu == '流出':
+                print("  <genre>流出</genre>", file=code)
+            if uncensored == 1:
+                print("  <genre>无码</genre>", file=code)
             try:
                 for i in tag:
                     print("  <genre>" + i + "</genre>", file=code)
+                print("  <genre>" + series + "</genre>", file=code)
             except:
                 aaaaaaaa = ''
-            if cn_sub == '1':
-                print("  <genre>中文字幕</genre>", file=code)
             print("  <num>" + number + "</num>", file=code)
             print("  <premiered>" + release + "</premiered>", file=code)
             print("  <cover>" + cover + "</cover>", file=code)
@@ -667,7 +674,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf):
             add_mark(poster_path, thumb_path, cn_sub, leak, uncensored, conf)
 
         # 打印文件
-        print_files(path, c_word,  json_data.get('naming_rule'), part, cn_sub, json_data, filepath, conf.failed_folder, tag,  json_data.get('actor_list'), liuchu)
+        print_files(path, c_word,  json_data.get('naming_rule'), part, cn_sub, json_data, filepath, conf.failed_folder, tag,  json_data.get('actor_list'), liuchu, uncensored)
 
         # 移动文件
         (flag, path) = paste_file_to_folder(filepath, path, number, c_word, conf)
