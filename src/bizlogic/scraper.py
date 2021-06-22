@@ -257,12 +257,12 @@ def create_folder(success_folder, location_rule, json_data, conf):
         path = success_folder + '/' + location_rule
     path = trimblank(path)
     if not os.path.exists(path):
-        # path = escape_path(path, conf.escape_literals)
+        path = escape_path(path, conf.escape_literals)
         try:
             os.makedirs(path)
         except:
             path = success_folder + '/' + location_rule.replace('/[' + number + ')-' + title, "/number")
-            # path = escape_path(path, conf.escape_literals)
+            path = escape_path(path, conf.escape_literals)
 
             os.makedirs(path)
     return path
