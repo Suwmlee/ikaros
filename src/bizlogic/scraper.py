@@ -532,10 +532,12 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
             symlink_force(soft_path, newpath)
         else:
             os.rename(filepath, newpath)
-        for match in ext_type:
-            if os.path.exists(os.getcwd() + '/' + number + c_word + match):
-                os.rename(os.getcwd() + '/' + number + c_word + match, path + '/' + number + c_word + match)
-                wlogger.info('[+]Sub moved!')
+        # 字幕移动
+        for subname in ext_type:
+            if os.path.exists(filepath.replace(houzhui, subname)):
+                os.rename(filepath.replace(houzhui, subname), path + '/' + number + c_word + subname)
+                print('[+]Sub moved!')
+                return True
         return True, newpath
     except FileExistsError:
         wlogger.info('[-]File Exists! Please check your movie!')

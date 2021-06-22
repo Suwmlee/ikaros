@@ -6,11 +6,13 @@ import shutil
 
 video_type = ['.mp4', '.avi', '.rmvb', '.wmv',
               '.mov', '.mkv', '.flv', '.ts', '.webm', '.iso']
-ext_type = ['.ass', '.srt', '.sub', '.ssa']
+ext_type = ['.ass', '.srt', '.sub', '.ssa', '.smi', '.idx', '.sup',
+            '.psb', '.usf', '.xss', '.ssf', '.rt', '.lrc', '.sbv', '.vtt', '.ttml']
 
 video_filter = ['*.mp4', '*.avi', '*.rmvb', '*.wmv',
                 '*.mov', '*.mkv', '*.flv', '*.ts', '*.webm', '*.iso']
-ext_filter = ['*.ass', '*.srt', '*.sub', '*.ssa']
+ext_filter = ['*.ass', '*.srt', '*.sub', '*.ssa', '*.smi', '*.idx', '*.sup',
+            '*.psb', '*.usf', '*.xss', '*.ssf', '*.rt', '*.lrc', '*.sbv', '*.vtt', '*.ttml']
 
 
 def CreatFolder(foldername):
