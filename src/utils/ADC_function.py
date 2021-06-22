@@ -5,6 +5,8 @@ import requests
 import json
 import pathlib
 import time
+import os
+import uuid
 from lxml import etree
 from http.cookies import SimpleCookie
 from ..utils.wlogger import wlogger
@@ -555,3 +557,13 @@ def file_modification_days(filename) -> int:
     if days < 0:
         return 9999
     return days
+
+
+def is_link(filename: str):
+    """ 检查文件是否是链接
+    """
+    if os.path.islink(filename):
+        return True # symlink
+    elif os.stat(filename).st_nlink > 1:
+        return True # hard link Linux MAC OSX Windows NTFS
+    return False

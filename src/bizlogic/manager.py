@@ -10,6 +10,7 @@ from ..service.recordservice import scrapingrecordService
 from ..service.taskservice import taskService
 from .scraper import core_main
 from ..utils.wlogger import wlogger
+from ..utils.ADC_function import is_link
 from ..utils.number_parser import get_number
 from ..utils.filehelper import video_type, CreatFolder
 
@@ -17,9 +18,8 @@ from ..utils.filehelper import video_type, CreatFolder
 def movie_lists(root, escape_folder):
     """ collect movies
     """
-    for folder in escape_folder:
-        if folder in root and folder != '':
-            return []
+    if os.path.basename(root) in escape_folder:
+        return []
     total = []
     dirs = os.listdir(root)
     for entry in dirs:
@@ -27,20 +27,25 @@ def movie_lists(root, escape_folder):
         if os.path.isdir(f):
             total += movie_lists(f, escape_folder)
         elif os.path.splitext(f)[1].lower() in video_type:
-            total.append(f)
+            absf = os.path.abspath(f)
+            if not is_link(absf):
+                total.append(absf)
     return total
 
 
-def CEF(path):
+def rm_empty_folder(path):
     """ clean empty folder
     """
     try:
         files = os.listdir(path)  # 获取路径下的子文件(夹)列表
-        for file in files:
-            os.removedirs(path + '/' + file)  # 删除这个空文件夹
-            wlogger.info('[+]Deleting empty folder', path + '/' + file)
     except:
-        pass
+        return
+    for file in files:
+        try:
+            os.rmdir(path + '/' + file)  # 删除这个空文件夹
+            wlogger.info('[+]Deleting empty folder', path + '/' + file)
+        except:
+            pass
 
 
 def create_data_and_move(file_path: str, conf):
@@ -93,19 +98,16 @@ def start():
     count = 0
     count_all = str(len(movie_list))
     wlogger.info('[+]Find  ' + count_all+'  movies')
-    if conf.debug_info:
-        wlogger.info('[+]'+' DEBUG MODE ON '.center(54, '-'))
-    if conf.soft_link:
-        wlogger.info('[!] --- Soft link mode is ENABLE! ----')
+
     for movie_path in movie_list:  # 遍历电影列表 交给core处理
         count = count + 1
         percentage = str(count / int(count_all) * 100)[:4] + '%'
         wlogger.info('[!] - ' + percentage + ' [' + str(count) + '/' + count_all + '] -')
         create_data_and_move(movie_path, conf)
 
-    CEF(conf.success_folder)
-    CEF(conf.failed_folder)
-    wlogger.info("[+]All finished!!!")
+    rm_empty_folder(conf.success_folder)
+    rm_empty_folder(conf.failed_folder)
+    
     wlogger.info("[+]All finished!!!")
 
     taskService.updateTaskStatus(1, 'scrape')
