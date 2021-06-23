@@ -60,8 +60,8 @@ def create_data_and_move(file_path: str, conf):
         # 查看单个文件刮削状态
         if not movie_info or (movie_info.status != 1 and movie_info.status != 3):
             movie_info = scrapingrecordService.add(file_path)
-            # 查询是否已经存在刮削目录
-            if movie_info.destpath != '':
+            # 查询是否已经存在刮削目录 并且不能为直接刮削模式
+            if movie_info.destpath != '' and conf.main_mode != 3:
                 folder = os.path.dirname(movie_info.destpath)
                 if os.path.exists(folder):
                     name = os.path.basename(movie_info.destpath)
