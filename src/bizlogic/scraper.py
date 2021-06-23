@@ -537,7 +537,6 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
             if os.path.exists(filepath.replace(houzhui, subname)):
                 os.rename(filepath.replace(houzhui, subname), path + '/' + number + c_word + subname)
                 print('[+]Sub moved!')
-                return True
         return True, newpath
     except FileExistsError:
         wlogger.info('[-]File Exists! Please check your movie!')
@@ -686,4 +685,27 @@ def core_main(file_path, scrapingnum, cnsubtag, conf):
         path = create_folder(conf.success_folder, json_data.get('location_rule'), json_data, conf)
         # 移动文件
         paste_file_to_folder_mode2(filepath, path, multi_part, number, part, c_word, conf)
+    elif conf.main_mode == 3:
+        path = file_path.rsplit('/', 1)[0]
+        path = path.rsplit('\\', 1)[0]
+        if multi_part == 1:
+            number += part  # 这时number会被附加上CD1后缀
+
+        # 检查小封面, 如果image cut为3，则下载小封面
+        if imagecut == 3:
+            small_cover_check(path, number, json_data.get('cover_small'), c_word, conf, filepath, conf.failed_folder)
+
+        # creatFolder会返回番号路径
+        image_download(json_data.get('cover'), number, c_word, path, conf, filepath, conf.failed_folder)
+        # 裁剪图
+        cutImage(imagecut, path, number, c_word)
+
+        # 打印文件
+        print_files(path, c_word,  json_data.get('naming_rule'), part, cn_sub, json_data, filepath, conf.failed_folder, tag,  json_data.get('actor_list'), liuchu, uncensored)
+        
+        if conf.watermark_enable:
+            poster_path = path + '/' + number + c_word + '-poster.jpg'
+            thumb_path = path + '/' + number + c_word + '-thumb.jpg'
+            add_mark(poster_path, thumb_path, cn_sub, leak, uncensored, conf)
+        return True, file_path
     return False, ''

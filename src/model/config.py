@@ -46,6 +46,7 @@ class _ScrapingConfigs(db.Model):
 
     def serialize(self):
         return {
+            'main_mode': self.main_mode,
             'soft_link': self.soft_link,
             'soft_prefix': self.soft_prefix,
             'scraping_folder': self.scraping_folder,
@@ -56,6 +57,7 @@ class _ScrapingConfigs(db.Model):
             'watermark_enable': self.watermark_enable,
             'watermark_location': self.watermark_location,
             'watermark_size': self.watermark_size,
+            'escape_folders': self.escape_folders,
             'proxy_enable': self.proxy_enable,
             'proxy_type': self.proxy_type,
             'proxy_address': self.proxy_address,
