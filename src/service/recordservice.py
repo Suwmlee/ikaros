@@ -40,8 +40,9 @@ class ScrapingRecordService():
         record = _ScrapingRecords.query.filter_by(id=value).first()
         if record:
             if record.destpath != '':
+                basefolder = os.path.dirname(record.srcpath)
                 folder = os.path.dirname(record.destpath)
-                if os.path.exists(folder):
+                if os.path.exists(folder) and basefolder != folder:
                     name = os.path.basename(record.destpath)
                     filter  = os.path.splitext(name)[0]
                     cleanfolderbyfilter(folder, filter)

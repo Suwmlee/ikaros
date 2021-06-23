@@ -355,7 +355,12 @@ def print_files(path, c_word, naming_rule, part, cn_sub, json_data, filepath, fa
     try:
         if not os.path.exists(path):
             os.makedirs(path)
-        with open(path + "/" + number + part + c_word + ".nfo", "wt", encoding='UTF-8') as code:
+        filename = number + part + c_word
+        # TODO: 直接刮削文件名临时修改
+        if os.path.dirname(filepath) == path:
+            name = os.path.basename(filepath)
+            filename  = os.path.splitext(name)[0]
+        with open(path + "/" + filename + ".nfo", "wt", encoding='UTF-8') as code:
             print('<?xml version="1.0" encoding="UTF-8" ?>', file=code)
             print("<movie>", file=code)
             print(" <title>" + naming_rule + "</title>", file=code)
@@ -686,10 +691,12 @@ def core_main(file_path, scrapingnum, cnsubtag, conf):
         # 移动文件
         paste_file_to_folder_mode2(filepath, path, multi_part, number, part, c_word, conf)
     elif conf.main_mode == 3:
-        path = file_path.rsplit('/', 1)[0]
-        path = path.rsplit('\\', 1)[0]
-        if multi_part == 1:
-            number += part  # 这时number会被附加上CD1后缀
+        path = os.path.dirname(filepath)
+        name = os.path.basename(filepath)
+        # TODO:本地刮削，传参混乱
+        # 临时修改，解决命名不一致问题
+        number  = os.path.splitext(name)[0]
+        c_word = ''
 
         # 检查小封面, 如果image cut为3，则下载小封面
         if imagecut == 3:
