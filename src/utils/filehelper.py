@@ -58,6 +58,26 @@ def cleanfolderwithoutsuffix(folder, suffix):
     return hassuffix
 
 
+def cleanfolderbyfilter(folder, filter):
+    """ clean folder by filter
+    
+    if all files removed, rm folder
+    """
+    cleanAll = True
+    dirs = os.listdir(folder)
+    for file in dirs:
+        f = os.path.join(folder, file)
+        if os.path.isdir(f):
+            cleanAll = False
+        else:
+            if filter in file:
+               os.remove(f)
+            else:
+                cleanAll = False
+    if cleanAll:
+        shutil.rmtree(folder)
+
+
 def symlink_force(target, link_name):
     """ create symlink
     https://stackoverflow.com/questions/8299386/modifying-a-symlink-in-python

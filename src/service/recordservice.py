@@ -6,6 +6,7 @@ import shutil
 import datetime
 from sqlalchemy import or_
 from ..model.record import _ScrapingRecords, _TransRecords
+from ..utils.filehelper import cleanfolderbyfilter
 from .. import db
 
 
@@ -41,7 +42,9 @@ class ScrapingRecordService():
             if record.destpath != '':
                 folder = os.path.dirname(record.destpath)
                 if os.path.exists(folder):
-                    shutil.rmtree(folder)
+                    name = os.path.basename(record.destpath)
+                    filter  = os.path.splitext(name)[0]
+                    cleanfolderbyfilter(folder, filter)
             db.session.delete(record)
             db.session.commit()
 

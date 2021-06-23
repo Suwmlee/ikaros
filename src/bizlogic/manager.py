@@ -12,7 +12,7 @@ from .scraper import core_main
 from ..utils.wlogger import wlogger
 from ..utils.ADC_function import is_link
 from ..utils.number_parser import get_number
-from ..utils.filehelper import video_type, CreatFolder
+from ..utils.filehelper import video_type, CreatFolder, cleanfolderbyfilter
 
 
 def movie_lists(root, escape_folder):
@@ -64,7 +64,9 @@ def create_data_and_move(file_path: str, conf):
             if movie_info.destpath != '':
                 folder = os.path.dirname(movie_info.destpath)
                 if os.path.exists(folder):
-                    shutil.rmtree(folder)
+                    name = os.path.basename(movie_info.destpath)
+                    filter  = os.path.splitext(name)[0]
+                    cleanfolderbyfilter(folder, filter)
             # 查询是否有额外设置
             if movie_info.scrapingname != '':
                 n_number = movie_info.scrapingname
