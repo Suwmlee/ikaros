@@ -14,15 +14,15 @@ from ..utils.filehelper import video_type, ext_type, cleanfilebysuffix, cleanfol
 from ..utils.wlogger import wlogger
 
 
-def copysub(src_folder, destfolder):
+def copysub(src_folder, destfolder, filter):
     """ copy subtitle
     """
     dirs = os.listdir(src_folder)
     for item in dirs:
         (path, ext) = os.path.splitext(item)
-        if ext.lower() in ext_type:
+        if ext.lower() in ext_type and filter in item:
             src_file = os.path.join(src_folder, item)
-            print("copy sub  " + src_file)
+            print("[-] - copy sub  " + src_file)
             dest = shutil.copy(src_file, destfolder)
             # modify permission
             os.chmod(dest, stat.S_IRWXU | stat.S_IRGRP |
@@ -38,6 +38,9 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
 
     try:
         movie_list = movie_lists(src_folder, re.split("[,，]", escape_folders))
+        total = str(len(movie_list))
+        count = 0
+        print('[+]Find  ' + total+'  movies')
 
         # 硬链接直接使用源目录
         if linktype == 1:
@@ -49,7 +52,9 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
         cleanfilebysuffix(dest_folder, clean_type)
 
         for movie_path in movie_list:
-            print("start check [{}] ".format(movie_path))
+            count += 1
+            print('[!] - ' + str(count) + '/' + total + '] -')
+            print("[+] start check [{}] ".format(movie_path))
             movie_info = transrecordService.queryByPath(movie_path)
             if not movie_info:
                 movie_info = transrecordService.add(movie_path)
@@ -80,7 +85,8 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
                 symlink_force(link_path, newpath)
             else:
                 hardlink_force(link_path, newpath)
-            copysub(filefolder, newfolder)
+            basename = os.path.splitext(name)[0]
+            copysub(filefolder, newfolder, basename)
             print("transfer Data for [{}], the number is [{}]".format(
                 movie_path, newpath))
             transrecordService.update(movie_path, link_path, newpath)
