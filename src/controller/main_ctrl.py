@@ -178,8 +178,11 @@ def getscrapingrecord():
         ret['total'] = infos.total
         ret['pages'] = infos.pages
         ret['page'] = page
-        if taskService.getTask('scrape').status == 2:
+        taskinfo = taskService.getTask('scrape')
+        if taskinfo.status == 2:
             ret['running'] = True
+            ret['tasktotal'] = taskinfo.total
+            ret['taskfinished'] = taskinfo.finished
         else:
             ret['running'] = False
         return json.dumps(ret)
