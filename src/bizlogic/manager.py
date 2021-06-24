@@ -3,7 +3,6 @@
 '''
 import os
 import re
-import shutil
 
 from ..service.configservice import scrapingConfService
 from ..service.recordservice import scrapingrecordService
@@ -99,13 +98,15 @@ def start():
     movie_list = movie_lists(conf.scraping_folder, re.split("[,，]", conf.escape_folders))
 
     count = 0
-    count_all = str(len(movie_list))
-    wlogger.info('[+]Find  ' + count_all+'  movies')
+    total = str(len(movie_list))
+    taskService.updateTaskTotal(total, 'scrape')
+    wlogger.info('[+]Find  ' + total+'  movies')
 
     for movie_path in movie_list:  # 遍历电影列表 交给core处理
         count = count + 1
-        percentage = str(count / int(count_all) * 100)[:4] + '%'
-        wlogger.info('[!] - ' + percentage + ' [' + str(count) + '/' + count_all + '] -')
+        taskService.updateTaskFinished(count, 'scrape')
+        percentage = str(count / int(total) * 100)[:4] + '%'
+        wlogger.info('[!] - ' + percentage + ' [' + str(count) + '/' + total + '] -')
         create_data_and_move(movie_path, conf)
 
     rm_empty_folder(conf.success_folder)

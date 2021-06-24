@@ -26,4 +26,22 @@ class TaskService():
             task.status = status
             db.session.commit()
 
+    def updateTaskTotal(self, num, taskname):
+        """ Update total num
+        """
+        task = self.getTask(taskname)
+        if task.total != num:
+            task.total = num
+            db.session.commit()
+
+
+    def updateTaskFinished(self, num, taskname):
+        """ Update finished num
+        """
+        task = self.getTask(taskname)
+        if task.finished != num:
+            task.finished = num
+            db.session.commit()
+
+
 taskService = TaskService()
