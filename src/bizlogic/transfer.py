@@ -70,24 +70,24 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
             if os.path.exists(newpath):
                 realpath = os.path.realpath(newpath)
                 if realpath == link_path:
-                    print("already exists")
+                    print("[!] already exists")
                     transrecordService.update(movie_path, link_path, newpath)
                     continue
                 else:
-                    print("clean link")
+                    print("[-] clean link")
                     os.remove(newpath)
             (newfolder, tname) = os.path.split(newpath)
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
 
-            print("create link from [{}] to [{}]".format(link_path, newpath))
+            print("[-] create link from [{}] to [{}]".format(link_path, newpath))
             if linktype == 0:
                 symlink_force(link_path, newpath)
             else:
                 hardlink_force(link_path, newpath)
             basename = os.path.splitext(name)[0]
             copysub(filefolder, newfolder, basename)
-            print("[-]  transfer finished [{}]".format(movie_path))
+            print("[-] transfer finished [{}]".format(movie_path))
             transrecordService.update(movie_path, link_path, newpath)
 
         cleanfolderwithoutsuffix(dest_folder, video_type)
