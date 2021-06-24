@@ -16,6 +16,8 @@ from ..utils.filehelper import video_type, CreatFolder, cleanfolderbyfilter
 
 def movie_lists(root, escape_folder):
     """ collect movies
+    
+    won't check link path
     """
     if os.path.basename(root) in escape_folder:
         return []
@@ -26,9 +28,7 @@ def movie_lists(root, escape_folder):
         if os.path.isdir(f):
             total += movie_lists(f, escape_folder)
         elif os.path.splitext(f)[1].lower() in video_type:
-            absf = os.path.abspath(f)
-            if not is_link(absf):
-                total.append(absf)
+            total.append(f)
     return total
 
 

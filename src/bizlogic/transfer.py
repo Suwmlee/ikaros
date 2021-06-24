@@ -53,7 +53,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
 
         for movie_path in movie_list:
             count += 1
-            print('[!] - ' + str(count) + '/' + total + '] -')
+            print('[!] - ' + str(count) + '/' + total + ' -')
             print("[+] start check [{}] ".format(movie_path))
             movie_info = transrecordService.queryByPath(movie_path)
             if not movie_info:
@@ -87,8 +87,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
                 hardlink_force(link_path, newpath)
             basename = os.path.splitext(name)[0]
             copysub(filefolder, newfolder, basename)
-            print("transfer Data for [{}], the number is [{}]".format(
-                movie_path, newpath))
+            print("[-]  transfer finished [{}]".format(movie_path))
             transrecordService.update(movie_path, link_path, newpath)
 
         cleanfolderwithoutsuffix(dest_folder, video_type)
