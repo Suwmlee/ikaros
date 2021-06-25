@@ -268,8 +268,11 @@ def gettransrecord():
         ret['total'] = infos.total
         ret['pages'] = infos.pages
         ret['page'] = pagenum
-        if taskService.getTask('transfer').status == 2:
+        taskinfo = taskService.getTask('transfer')
+        if taskinfo.status == 2:
             ret['running'] = True
+            ret['tasktotal'] = taskinfo.total
+            ret['taskfinished'] = taskinfo.finished
         else:
             ret['running'] = False
         return json.dumps(ret)

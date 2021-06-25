@@ -38,8 +38,10 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
 
     try:
         movie_list = movie_lists(src_folder, re.split("[,，]", escape_folders))
-        total = str(len(movie_list))
+
         count = 0
+        total = str(len(movie_list))
+        taskService.updateTaskTotal(total, 'transfer')
         print('[+]Find  ' + total+'  movies')
 
         # 硬链接直接使用源目录
@@ -53,6 +55,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
 
         for movie_path in movie_list:
             count += 1
+            taskService.updateTaskFinished(count, 'transfer')
             print('[!] - ' + str(count) + '/' + total + ' -')
             print("[+] start check [{}] ".format(movie_path))
             movie_info = transrecordService.queryByPath(movie_path)
