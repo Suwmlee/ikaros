@@ -38,7 +38,7 @@ def extractep(src: list):
         if left == right or (left == '[' and right == ']') or (left == '第' and (right == '话' or right == '話')):
 
             result = single.lstrip('第.EPep\[ ')
-            result = result.rstrip('話话]. ')
+            result = result.rstrip('話话集]. ')
 
             if bool(re.search(r'\d', result)):
                 if not bool(re.search(r'[Ee]', single)):

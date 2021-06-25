@@ -96,7 +96,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
         cleanfolderwithoutsuffix(dest_folder, video_type)
         # 重命名
         if renameflag:
-            reg = '[\[第 ][0-9.svidevoa\(\)]*[\]話话 ]'
+            reg = '[\[第 ][0-9.svidevoa\(\)]*[\]話话集 ]'
             reg2 = "\.e[0-9videvoa\(\)]{1,}[.]"
             renamebyreg(dest_folder, reg, reg2, renameprefix, False)
 
