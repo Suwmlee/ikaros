@@ -117,22 +117,23 @@ def renamebyreg(root, reg, reg2, prefix, preview: bool):
 if __name__ == "__main__":
 
     """
-[ANK-Raws] 生徒会役員共＊ 09 (BDrip 1920x1080 HEVC-YUV420P10 FLAC)
+动画:
+生徒会役員共＊ 09 (BDrip 1920x1080 HEVC-YUV420P10 FLAC)
 [Rip] SLAM DUNK 第013話「湘北VS陵南 燃える主将!」(BDrip 1440x1080 H264 FLAC)
 [Rip] SLAM DUNK [013]「湘北VS陵南 燃える主将!」(BDrip 1440x1080 H264 FLAC)
-[Rip] SLAM DUNK [E013]「湘北VS陵南 燃える主将!」(BDrip 1440x1080 H264 FLAC)
 [Rip] SLAM DUNK [13.5]「湘北VS陵南 燃える主将!」(BDrip 1440x1080 H264 FLAC)
 [Rip] SLAM DUNK [13v2]「湘北VS陵南 燃える主将!」(BDrip 1440x1080 H264 FLAC)
 [Rip] SLAM DUNK [13(OA)]「湘北VS陵南 燃える主将!」(BDrip 1440x1080 H264 FLAC)
 [Neon Genesis Evangelion][23(Video)][BDRIP][1440x1080][H264_FLACx2]
 [Studio] Fullmetal Alchemist꞉ Brotherhood [01][Ma10p_1080p][x265_flac]
-[raws][Code Geass Lelouch of the Rebellion][01][BDRIP][Hi10P FLAC][1920X1080]
 [raws][Code Geass Lelouch of the Rebellion R2][15][BDRIP][Hi10P FLAC][1920X1080]
-Sunshine.Police.2020.E24.WEB-DL.4k.H265.HDR.AAC
+电视剧:
 Shadow.2021.E11.WEB-DL.4k.H265.60fps.AAC.2Audio
-Shadow.2021.e12.WEB-DL.4k.H265.60fps.AAC.2Audio
+Shadow.2021.第11集.WEB-DL.4k.H265.60fps.AAC.2Audio
 Shadow.2021.E13v2.WEB-DL.4k.H265.60fps.AAC.2Audio
 Shadow.2021.E14(0A).WEB-DL.4k.H265.60fps.AAC.2Audio
-Shadow.2021.E.WEB-DL.4k.H265.60fps.AAC.2Audio
+
+符合规则:
+S03/Person.of.Interest.EP01.2013.1080p.Blu-ray.x265.10bit.AC3
 Person.of.Interest.S03E01.2013.1080p.Blu-ray.x265.10bit.AC3
     """

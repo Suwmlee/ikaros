@@ -65,6 +65,12 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
             (filefolder, name) = os.path.split(movie_path)
             midfolder = filefolder.replace(
                 src_folder, '').lstrip("\\").lstrip("/")
+            # 过滤 midfolder 特殊字符  中字￡CMCT轻语  AC3￡cXcY@FRDS
+            filterliterals = ["￡","@"]
+            for literal in filterliterals:
+                if literal in midfolder:
+                    midfolder.replace(literal, '-')
+                    print("[-] handling filterliterals: " + literal)
             # 目的地址
             newpath = os.path.join(dest_folder, midfolder, name)
             # 链接的源地址
