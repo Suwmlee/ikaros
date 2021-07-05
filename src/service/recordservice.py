@@ -163,6 +163,11 @@ class TransRecordService():
         infos = _TransRecords.query.order_by(_TransRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
         return infos
 
+    def deleteRecords(self):
+        nums  = _TransRecords.query.delete()
+        db.session.commit()
+        return nums
+
 
 scrapingrecordService = ScrapingRecordService()
 transrecordService = TransRecordService()

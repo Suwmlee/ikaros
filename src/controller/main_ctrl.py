@@ -279,3 +279,15 @@ def gettransrecord():
     except Exception as err:
         wlogger.info(err)
         return Response(status=500)
+
+
+@web.route("/api/transrecord", methods=['DELETE'])
+def deltransrecord():
+    """ 清理转移
+    """
+    try:
+        transrecordService.deleteRecords()
+        return Response(status=200)
+    except Exception as err:
+        wlogger.info(err)
+        return Response(status=500)
