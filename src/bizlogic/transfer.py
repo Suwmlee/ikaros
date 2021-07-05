@@ -69,7 +69,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
             filterliterals = ["￡","@"]
             for literal in filterliterals:
                 if literal in midfolder:
-                    midfolder.replace(literal, '-')
+                    midfolder = midfolder.replace(literal, '-')
                     print("[-] handling filterliterals: " + literal)
             # 目的地址
             newpath = os.path.join(dest_folder, midfolder, name)
