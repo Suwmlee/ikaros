@@ -67,11 +67,11 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
                 src_folder, '').lstrip("\\").lstrip("/")
             # 链接的源地址
             link_path = os.path.join(prefix, midfolder, name)
-            # 过滤 midfolder 特殊字符  中字￡CMCT轻语  AC3￡cXcY@FRDS
-            filterliterals = ["￡","@"]
+            # 过滤 midfolder 内特殊内容
+            filterliterals = ["加长版.","4K修复版."]
             for literal in filterliterals:
                 if literal in midfolder:
-                    midfolder = midfolder.replace(literal, '-')
+                    midfolder = midfolder.replace(literal, '')
                     print("[-] handling filterliterals: " + literal)
             # 目的地址
             newpath = os.path.join(dest_folder, midfolder, name)
