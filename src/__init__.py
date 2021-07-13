@@ -2,6 +2,7 @@
 """
     init app
 """
+import os
 import logging
 from flask import Flask
 import flask_migrate
@@ -29,8 +30,9 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
-    with app.app_context():
-        flask_migrate.upgrade()
+    if os.path.exists(app.config['SQLALCHEMY_DATABASE_URI']):
+        with app.app_context():
+            flask_migrate.upgrade()
 
     from . import controller
     from . import model
