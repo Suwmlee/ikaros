@@ -33,6 +33,10 @@ def create_app():
     if os.path.exists(app.config['SQLALCHEMY_DATABASE_URI']):
         with app.app_context():
             flask_migrate.upgrade()
+    else:
+        # init alembic version
+        with app.app_context():
+            flask_migrate.stamp()
 
     from . import controller
     from . import model

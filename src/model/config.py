@@ -53,7 +53,7 @@ class _ScrapingConfigs(db.Model):
     transalte_to_sc = Column(Boolean, default=False)
     transalte_values = Column(String, default="title,outline")
     
-    cookies_javdb = Column(String, default="cookies=")
+    cookies_javdb = Column(String, default="")
 
     def serialize(self):
         return {
