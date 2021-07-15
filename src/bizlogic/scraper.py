@@ -9,7 +9,7 @@ from PIL import Image
 from ..service.configservice import scrapingConfService
 from ..utils.wlogger import wlogger
 from ..utils.ADC_function import *
-from ..utils.filehelper import ext_type, symlink_force
+from ..utils.filehelper import ext_type, symlink_force, hardlink_force
 
 # =========website========
 from ..scrapinglib import avsox
@@ -515,9 +515,8 @@ def add_to_pic(pic_path, img_pic, size, count, mode):
 def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径，番号，后缀，要移动至的位置
     houzhui = os.path.splitext(filepath)[1].replace(",", "")
     try:
-        # 如果soft_link=1 使用软链接
         newpath = path + '/' + number + c_word + houzhui
-        if conf.soft_link:
+        if conf.link_type == 1:
             (filefolder, name) = os.path.split(filepath)
             settings = scrapingConfService.getSetting()
             soft_prefix = settings.soft_prefix
@@ -535,6 +534,8 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
             symlink_force(soft_path, newpath)
+        elif conf.link_type == 2:
+            hardlink_force(filepath, newpath)
         else:
             os.rename(filepath, newpath)
         # 字幕移动
@@ -557,8 +558,10 @@ def paste_file_to_folder_mode2(filepath, path, multi_part, number, part, c_word,
         number += part  # 这时number会被附加上CD1后缀
     houzhui = os.path.splitext(filepath)[1].replace(",", "")
     try:
-        if conf.soft_link:
+        if conf.link_type == 1:
             os.symlink(filepath, path + '/' + number + part + c_word + houzhui)
+        elif conf.link_type == 2:
+            hardlink_force(filepath, path + '/' + number + part + c_word + houzhui)
         else:
             os.rename(filepath, path + '/' + number + part + c_word + houzhui)
         for match in ext_type:
@@ -656,9 +659,10 @@ def core_main(file_path, scrapingnum, cnsubtag, conf):
         leak = 0
 
     # main_mode
-    #  1: 刮削模式 / Scraping mode
+    #  1: 创建链接刮削 / Scraping mode
+    #       - 软链接    - 硬链接    - 移动文件
     #  2: 整理模式 / Organizing mode
-    #  3：不改变路径刮削
+    #  3：直接刮削
     if conf.main_mode == 1:
         # 创建文件夹
         path = create_folder(conf.success_folder, json_data.get('location_rule'), json_data, conf)
@@ -693,7 +697,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf):
     elif conf.main_mode == 3:
         path = os.path.dirname(filepath)
         name = os.path.basename(filepath)
-        # TODO:本地刮削，传参混乱
+        # TODO:直接刮削，传参混乱
         # 临时修改，解决命名不一致问题
         number  = os.path.splitext(name)[0]
         c_word = ''
