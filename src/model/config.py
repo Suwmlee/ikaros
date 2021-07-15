@@ -5,6 +5,16 @@ from .. import db
 
 
 class _ScrapingConfigs(db.Model):
+    """ 
+    main_mode:
+    1. 移动刮削
+        link_type:
+        0. 移动文件
+        1. 软链接
+        2. 硬链接
+    2. 整理
+    3. 直接刮削
+    """
     __tablename__ = 'settings'
 
     id = Column(Integer, primary_key=True)
@@ -15,7 +25,8 @@ class _ScrapingConfigs(db.Model):
     scraping_folder = Column(String, default='/media')
     failed_folder = Column(String, default='/media/failed')
     success_folder = Column(String, default='/media/output')
-    soft_link = Column(Boolean, default=True)
+    link_type = Column(Integer, default=1)
+    soft_link = Column(Boolean, default=True, comment="deprecated")
     soft_prefix = Column(String, default='/media')
     failed_move = Column(Boolean, default=False)
 
@@ -48,6 +59,7 @@ class _ScrapingConfigs(db.Model):
         return {
             'main_mode': self.main_mode,
             'soft_link': self.soft_link,
+            'link_type': self.link_type,
             'soft_prefix': self.soft_prefix,
             'scraping_folder': self.scraping_folder,
             'success_folder': self.success_folder,
