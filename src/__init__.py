@@ -31,19 +31,23 @@ def create_app():
     migrate.init_app(app, db)
 
     if os.path.exists(app.config['SQLALCHEMY_DATABASE_URI']):
+        print("Upgrade db")
         with app.app_context():
             flask_migrate.upgrade()
-    else:
-        # init alembic version
-        with app.app_context():
-            flask_migrate.stamp()
 
     from . import controller
     from . import model
     from . import task
     controller.register(app)
     model.load_models()
-    db.create_all()
     task.init_task(app)
+
+    if not os.path.exists(app.config['SQLALCHEMY_DATABASE_URI']):
+        print("Create db")
+        db.create_all()
+        # init alembic version
+        with app.app_context():
+            print("Fix alembic version")
+            flask_migrate.stamp()
 
     return app
