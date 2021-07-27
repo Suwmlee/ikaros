@@ -47,7 +47,7 @@ def moveFailedFolder(filepath, failed_folder):
         pass
 
 
-def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
+def get_data_from_json(file_number, conf: _ScrapingConfigs):
     """
     iterate through all services and fetch the data 
     """
@@ -109,7 +109,6 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
 
     # Return if data not found in all sources
     if not json_data:
-        wlogger.info('[-]Movie Data not found!')
         return
 
     # ================================================网站规则添加结束================================================
@@ -140,8 +139,6 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
     actor = str(actor_list).strip("[ ]").replace("'", '').replace(" ", '')
 
     if title == '' or number == '':
-        wlogger.info('[-]Movie Data not found!')
-        moveFailedFolder(filepath, conf.failed_folder)
         return
 
     # if imagecut == '3':
@@ -456,9 +453,9 @@ def cutImage(imagecut, path, number, c_word):
 # 参数说明
 # poster_path
 # thumb_path
-# cn_sub   中文字幕  参数值为 1  0
-# leak     流出     参数值为 1   0
-# uncensored 无码   参数值为 1   0
+# chs_tag        中文字幕  bool
+# leak_tag       流出      bool
+# uncensored_tag 无码      bool
 # ========================================================================加水印
 
 
@@ -600,25 +597,17 @@ def get_part(filepath, failed_folder):
         return
 
 
-def debug_print(data: json):
-    try:
-        wlogger.info("[+] ---Debug info---")
-        for i, v in data.items():
-            if i == 'outline':
-                wlogger.info('[+]  -', i, '    :', len(v), 'characters')
-                continue
-            if i == 'actor_photo' or i == 'year':
-                continue
-            wlogger.info('[+]  -', "%-11s" % i, ':', v)
-
-        wlogger.info("[+] ---Debug info---")
-    except:
-        pass
-
-
-def core_main(file_path, scrapingnum, cnsubtag, conf):
+def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
     """
     开始刮削
+
+    番号
+    --爬取数据
+    --中文/无码等额外信息
+    --下载封面--下载预告--下载剧照
+    --裁剪图片--增加水印
+    --生成nfo--移动视频/字幕
+
     """
     # =======================================================================初始化所需变量
     multi_part = 0
@@ -630,10 +619,13 @@ def core_main(file_path, scrapingnum, cnsubtag, conf):
     # 影片的路径 绝对路径
     filepath = file_path
     number = scrapingnum
-    json_data = get_data_from_json(number, filepath, conf)  # 定义番号
+    json_data = get_data_from_json(number, conf)  # 定义番号
 
     # Return if blank dict returned (data not found)
     if not json_data:
+        wlogger.info('[-]Movie Data not found!')
+        if conf.main_mode == 1 and (conf.link_type == 1 or conf.link_type == 2):
+            moveFailedFolder(filepath, conf.failed_folder)
         return False, ''
 
     if json_data.get("number") != number:
