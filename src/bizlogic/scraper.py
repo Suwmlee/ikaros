@@ -43,16 +43,16 @@ def create_folder(json_data: dict, conf: _ScrapingConfigs):
     location_rule = json_data.get('location_rule')
     if len(location_rule) > 240:
         # path为影片+元数据所在目录
-        path = os.path.join(success_folder, location_rule.replace("'actor'", "'manypeople'", 3).replace("actor", "'manypeople'", 3))
+        path = success_folder + '/' + location_rule.replace("'actor'", "'manypeople'", 3).replace("actor","'manypeople'",3)
     else:
-        path = os.path.join(success_folder, location_rule)
+        path = success_folder + '/' + location_rule
     path = trimblank(path)
     if not os.path.exists(path):
         path = escape_path(path, conf.escape_literals)
         try:
             os.makedirs(path)
         except:
-            path = os.path.join(success_folder, location_rule.replace('/[' + number + ')-' + title, "/number"))
+            path = success_folder + '/' + location_rule.replace('/[' + number + ')-' + title, "/number")
             path = escape_path(path, conf.escape_literals)
 
             os.makedirs(path)
@@ -698,7 +698,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
             moveFailedFolder(filepath)
 
         # 移动文件
-        (flag, newpath) = paste_file_to_folder(filepath, path, number, c_word, conf)
+        (flag, newpath) = paste_file_to_folder(filepath, path, prefilename, conf)
         return flag, newpath
     elif conf.main_mode == 2:
         # 创建文件夹
