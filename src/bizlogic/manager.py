@@ -9,9 +9,8 @@ from ..service.recordservice import scrapingrecordService
 from ..service.taskservice import taskService
 from .scraper import core_main
 from ..utils.wlogger import wlogger
-from ..utils.ADC_function import is_link
 from ..utils.number_parser import get_number
-from ..utils.filehelper import video_type, CreatFolder, cleanfolderbyfilter
+from ..utils.filehelper import video_type, CleanFolder, cleanfolderbyfilter
 
 
 def movie_lists(root, escape_folder):
@@ -30,21 +29,6 @@ def movie_lists(root, escape_folder):
         elif os.path.splitext(f)[1].lower() in video_type:
             total.append(f)
     return total
-
-
-def rm_empty_folder(path):
-    """ clean empty folder
-    """
-    try:
-        files = os.listdir(path)  # 获取路径下的子文件(夹)列表
-    except:
-        return
-    for file in files:
-        try:
-            os.rmdir(path + '/' + file)  # 删除这个空文件夹
-            wlogger.info('[+]Deleting empty folder', path + '/' + file)
-        except:
-            pass
 
 
 def create_data_and_move(file_path: str, conf):
@@ -93,25 +77,23 @@ def start():
     taskService.updateTaskStatus(2, 'scrape')
 
     conf = scrapingConfService.getSetting()
-    CreatFolder(conf.failed_folder)
+    CleanFolder(conf.failed_folder)
 
     movie_list = movie_lists(conf.scraping_folder, re.split("[,，]", conf.escape_folders))
 
     count = 0
     total = str(len(movie_list))
+    taskService.updateTaskFinished(0, 'scrape')
     taskService.updateTaskTotal(total, 'scrape')
     wlogger.info('[+]Find  ' + total+'  movies')
 
-    for movie_path in movie_list:  # 遍历电影列表 交给core处理
-        count = count + 1
+    for movie_path in movie_list:
         taskService.updateTaskFinished(count, 'scrape')
         percentage = str(count / int(total) * 100)[:4] + '%'
         wlogger.info('[!] - ' + percentage + ' [' + str(count) + '/' + total + '] -')
         create_data_and_move(movie_path, conf)
+        count = count + 1
 
-    rm_empty_folder(conf.success_folder)
-    rm_empty_folder(conf.failed_folder)
-    
     wlogger.info("[+]All finished!!!")
 
     taskService.updateTaskStatus(1, 'scrape')

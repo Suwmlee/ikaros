@@ -26,6 +26,13 @@ def CreatFolder(foldername):
             return
 
 
+def CleanFolder(foldername):
+    """ rm and create folder
+    """
+    shutil.rmtree(foldername)
+    CreatFolder(foldername)
+
+
 def cleanfilebysuffix(folder, suffix):
     """ 清理指定目录下所有匹配格式文件
     """

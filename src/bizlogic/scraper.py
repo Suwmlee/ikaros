@@ -34,8 +34,13 @@ def escape_path(path, escape_literals: str):  # Remove escape literals
 
 
 def moveFailedFolder(filepath, failed_folder):
+    """ 只创建失败文件的硬链接
+        每次刮削清空文件夹
+    """
     wlogger.info('[-]Move to Failed output folder')
-    # shutil.move(filepath, str(os.getcwd()) + '/' + failed_folder + '/')
+    (filefolder, name) = os.path.split(filepath)
+    newpath = os.path.join(failed_folder, name)
+    hardlink_force(filepath, newpath)
     return
 
 
