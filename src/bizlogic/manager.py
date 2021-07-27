@@ -7,7 +7,7 @@ import re
 from ..service.configservice import scrapingConfService
 from ..service.recordservice import scrapingrecordService
 from ..service.taskservice import taskService
-from .scraper import core_main
+from .scraper import core_main, moveFailedFolder
 from ..utils.wlogger import wlogger
 from ..utils.number_parser import get_number
 from ..utils.filehelper import video_type, CleanFolder, cleanfolderbyfilter
@@ -65,6 +65,8 @@ def create_data_and_move(file_path: str, conf):
     except Exception as err:
         wlogger.error("[-] [{}] ERROR:".format(file_path))
         wlogger.error(err)
+        if conf.main_mode == 1 and (conf.link_type == 1 or conf.link_type == 2):
+            moveFailedFolder(file_path, conf.failed_folder)
 
 
 def start():

@@ -37,11 +37,13 @@ def moveFailedFolder(filepath, failed_folder):
     """ 只创建失败文件的硬链接
         每次刮削清空文件夹
     """
-    wlogger.info('[-]Move to Failed output folder')
-    (filefolder, name) = os.path.split(filepath)
-    newpath = os.path.join(failed_folder, name)
-    hardlink_force(filepath, newpath)
-    return
+    try:
+        wlogger.info('[-]Move to Failed folder')
+        (filefolder, name) = os.path.split(filepath)
+        newpath = os.path.join(failed_folder, name)
+        hardlink_force(filepath, newpath)
+    except:
+        pass
 
 
 def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
