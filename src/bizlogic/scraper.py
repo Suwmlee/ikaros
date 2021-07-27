@@ -298,8 +298,7 @@ def download_file_with_filename(url, filename, path, conf, filepath, failed_fold
                 if not os.path.exists(path):
                     os.makedirs(path)
                 proxies = configProxy.proxies()
-                headers = {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'}
+                headers = {'User-Agent': G_USER_AGENT}
                 r = requests.get(url, headers=headers, timeout=configProxy.timeout, proxies=proxies)
                 if r == '':
                     wlogger.info('[-]Movie Data not found!')
@@ -310,8 +309,7 @@ def download_file_with_filename(url, filename, path, conf, filepath, failed_fold
             else:
                 if not os.path.exists(path):
                     os.makedirs(path)
-                headers = {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'}
+                headers = {'User-Agent': G_USER_AGENT}
                 r = requests.get(url, timeout=configProxy.timeout, headers=headers)
                 if r == '':
                     wlogger.info('[-]Movie Data not found!')
@@ -560,8 +558,8 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
         return False, ''
 
 
-def paste_file_to_folder_mode2(filepath, path, multi_part, number, part, c_word, conf):  # 文件路径，番号，后缀，要移动至的位置
-    if multi_part == 1:
+def paste_file_to_folder_mode2(filepath, path, multipart_tag, number, part, c_word, conf):  # 文件路径，番号，后缀，要移动至的位置
+    if multipart_tag:
         number += part  # 这时number会被附加上CD1后缀
     houzhui = os.path.splitext(filepath)[1].replace(",", "")
     try:
@@ -610,8 +608,9 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
 
     """
     # =======================================================================初始化所需变量
-    multi_part = 0
+    
     part = ''
+    multipart_tag = False
     chs_tag = False
     uncensored_tag = False
     leak_tag = False
@@ -640,7 +639,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
     tag = json_data.get('tag')
     # =======================================================================判断-C,-CD后缀
     if '-CD' in filepath or '-cd' in filepath:
-        multi_part = 1
+        multipart_tag = True
         part = get_part(filepath, conf.failed_folder)
 
     if cnsubtag:
@@ -659,7 +658,6 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
     if is_uncensored(number):
         uncensored_tag = True
 
-    # TODO:根据路径判定是否合理
     if '流出' in filepath or '-leak' in filepath:
         leak_tag = True
 
@@ -671,15 +669,16 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
     if conf.main_mode == 1:
         # 创建文件夹
         path = create_folder(conf.success_folder, json_data.get('location_rule'), json_data, conf)
-        if multi_part == 1:
+        if multipart_tag:
             number += part  # 这时number会被附加上CD1后缀
 
         # 检查小封面, 如果image cut为3，则下载小封面
         if imagecut == 3:
             small_cover_check(path, number, json_data.get('cover_small'), c_word, conf, filepath, conf.failed_folder)
 
-        # creatFolder会返回番号路径
-        image_download(json_data.get('cover'), number, c_word, path, conf, filepath, conf.failed_folder)
+        if not multipart_tag or part.lower() == '-cd1':
+            
+            image_download(json_data.get('cover'), number, c_word, path, conf, filepath, conf.failed_folder)
         # 裁剪图
         cutImage(imagecut, path, number, c_word)
 
@@ -698,7 +697,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
         # 创建文件夹
         path = create_folder(conf.success_folder, json_data.get('location_rule'), json_data, conf)
         # 移动文件
-        paste_file_to_folder_mode2(filepath, path, multi_part, number, part, c_word, conf)
+        paste_file_to_folder_mode2(filepath, path, multipart_tag, number, part, c_word, conf)
     elif conf.main_mode == 3:
         path = os.path.dirname(filepath)
         name = os.path.basename(filepath)
