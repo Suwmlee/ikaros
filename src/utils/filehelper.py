@@ -29,7 +29,10 @@ def CreatFolder(foldername):
 def CleanFolder(foldername):
     """ rm and create folder
     """
-    shutil.rmtree(foldername)
+    try:
+        shutil.rmtree(foldername)
+    except:
+        pass
     CreatFolder(foldername)
 
 
