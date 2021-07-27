@@ -436,21 +436,25 @@ def print_files(path, c_word, naming_rule, part, chs_tag, json_data, filepath, f
         return
 
 
-def cutImage(imagecut, path, number, c_word):
-    if imagecut == 1:  # 剪裁大封面
+def crop_poster(imagecut, path, prefilename):
+    """ covert fanart to poster
+    """
+    # 剪裁大封面
+    if imagecut == 1:
         try:
-            img = Image.open(path + '/' + fanartname)
+            img = Image.open(path + '/' + prefilename + '-fanart.jpg')
             imgSize = img.size
             w = img.width
             h = img.height
             img2 = img.crop((w / 1.9, 0, w, h))
-            img2.save(path + '/' + number + c_word + '-poster.jpg')
-            wlogger.info('[+]Image Cutted!     ' + path + '/' + number + c_word + '-poster.jpg')
+            img2.save(path + '/' + prefilename + '-poster.jpg')
+            wlogger.info('[+]Image Cutted!     ' + path + '/' + prefilename + '-poster.jpg')
         except:
             wlogger.info('[-]Cover cut failed!')
-    elif imagecut == 0:  # 复制封面
-        shutil.copyfile(path + '/' + fanartname, path + '/' + number + c_word + '-poster.jpg')
-        wlogger.info('[+]Image Copyed!     ' + path + '/' + number + c_word + '-poster.jpg')
+    elif imagecut == 0: # 复制封面
+        shutil.copyfile(path + '/' + prefilename + '-fanart.jpg',
+                        path + '/' + prefilename + '-poster.jpg')
+        wlogger.info('[+]Image Copyed!     ' + path + '/' + prefilename + '-poster.jpg')
 
 # 此函数从gui版copy过来用用
 # 参数说明
@@ -462,7 +466,7 @@ def cutImage(imagecut, path, number, c_word):
 # ========================================================================加水印
 
 
-def add_mark(poster_path, thumb_path, chs_tag, leak_tag, uncensored_tag, conf):
+def add_mark(poster_path, thumb_path, chs_tag, leak_tag, uncensored_tag, conf: _ScrapingConfigs):
     mark_type = ''
     if chs_tag:
         mark_type += ',字幕'
@@ -478,7 +482,7 @@ def add_mark(poster_path, thumb_path, chs_tag, leak_tag, uncensored_tag, conf):
     print('[+]Poster Add Mark:  ' + mark_type.strip(','))
 
 
-def add_mark_thread(pic_path, chs_tag, leak_tag, uncensored_tag, conf):
+def add_mark_thread(pic_path, chs_tag, leak_tag, uncensored_tag, conf: _ScrapingConfigs):
     img_pic = Image.open(pic_path)
     # 获取自定义位置
     # 右上 0, 左上 1, 左下 2，右下 3
@@ -608,7 +612,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
     --爬取数据
     --中文/无码等额外信息
     --下载封面--下载预告--下载剧照
-    --裁剪图片--增加水印
+    --裁剪出Poster--增加水印
     --生成nfo--移动视频/字幕
 
     """
@@ -692,11 +696,11 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
                 moveFailedFolder(filepath)
 
         # 裁剪图
-        cutImage(imagecut, path, number, c_word)
+        crop_poster(imagecut, path, prefilename)
 
         if conf.watermark_enable:
-            poster_path = path + '/' + number + c_word + '-poster.jpg'
-            thumb_path = path + '/' + number + c_word + '-thumb.jpg'
+            poster_path = path + '/' + prefilename + '-poster.jpg'
+            thumb_path = path + '/' + prefilename + '-thumb.jpg'
             add_mark(poster_path, thumb_path, chs_tag, leak_tag, uncensored_tag, conf)
 
         # 打印文件
@@ -727,14 +731,15 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
             moveFailedFolder(filepath)
 
         # 裁剪图
-        cutImage(imagecut, path, number, c_word)
+        crop_poster(imagecut, path, prefilename)
+        
+        if conf.watermark_enable:
+            poster_path = path + '/' + prefilename + '-poster.jpg'
+            thumb_path = path + '/' + prefilename + '-thumb.jpg'
+            add_mark(poster_path, thumb_path, chs_tag, leak_tag, uncensored_tag, conf)
 
         # 打印文件
         print_files(path, c_word,  json_data.get('naming_rule'), part, chs_tag, json_data, filepath, conf.failed_folder, tag,  json_data.get('actor_list'), leak_tag, uncensored_tag)
         
-        if conf.watermark_enable:
-            poster_path = path + '/' + number + c_word + '-poster.jpg'
-            thumb_path = path + '/' + number + c_word + '-thumb.jpg'
-            add_mark(poster_path, thumb_path, chs_tag, leak_tag, uncensored_tag, conf)
         return True, file_path
     return False, ''
