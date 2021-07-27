@@ -356,7 +356,7 @@ def image_download(cover, number, c_word, path, conf, filepath, failed_folder):
     shutil.copyfile(path + '/' + number + c_word + '-fanart.jpg', path + '/' + number + c_word + '-thumb.jpg')
 
 
-def print_files(path, c_word, naming_rule, part, chs_tag, json_data, filepath, failed_folder, tag, actor_list, liuchu, uncensored):
+def print_files(path, c_word, naming_rule, part, chs_tag, json_data, filepath, failed_folder, tag, actor_list, liuchu, uncensored_tag):
     title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label = get_info(json_data)
 
     try:
@@ -395,7 +395,7 @@ def print_files(path, c_word, naming_rule, part, chs_tag, json_data, filepath, f
                 print("  <tag>中文字幕</tag>", file=code)
             if liuchu == '流出':
                 print("  <tag>流出</tag>", file=code)
-            if uncensored == 1:
+            if uncensored_tag:
                 print("  <tag>无码</tag>", file=code)
             try:
                 for i in tag:
@@ -407,7 +407,7 @@ def print_files(path, c_word, naming_rule, part, chs_tag, json_data, filepath, f
                 print("  <genre>中文字幕</genre>", file=code)
             if liuchu == '流出':
                 print("  <genre>流出</genre>", file=code)
-            if uncensored == 1:
+            if uncensored_tag:
                 print("  <genre>无码</genre>", file=code)
             try:
                 for i in tag:
@@ -459,23 +459,23 @@ def cutImage(imagecut, path, number, c_word):
 # ========================================================================加水印
 
 
-def add_mark(poster_path, thumb_path, chs_tag, leak, uncensored, conf):
+def add_mark(poster_path, thumb_path, chs_tag, leak, uncensored_tag, conf):
     mark_type = ''
     if chs_tag:
         mark_type += ',字幕'
     if leak:
         mark_type += ',流出'
-    if uncensored:
+    if uncensored_tag:
         mark_type += ',无码'
     if mark_type == '':
         return
-    add_mark_thread(thumb_path, chs_tag, leak, uncensored, conf)
+    add_mark_thread(thumb_path, chs_tag, leak, uncensored_tag, conf)
     print('[+]Thumb Add Mark:   ' + mark_type.strip(','))
-    add_mark_thread(poster_path, chs_tag, leak, uncensored, conf)
+    add_mark_thread(poster_path, chs_tag, leak, uncensored_tag, conf)
     print('[+]Poster Add Mark:  ' + mark_type.strip(','))
 
 
-def add_mark_thread(pic_path, chs_tag, leak, uncensored, conf):
+def add_mark_thread(pic_path, chs_tag, leak, uncensored_tag, conf):
     img_pic = Image.open(pic_path)
     # 获取自定义位置
     # 右上 0, 左上 1, 左下 2，右下 3
@@ -488,7 +488,7 @@ def add_mark_thread(pic_path, chs_tag, leak, uncensored, conf):
     if leak == 1 or leak == '1':
         add_to_pic(pic_path, img_pic, size, count, 2)
         count = (count + 1) % 4
-    if uncensored == 1 or uncensored == '1':
+    if uncensored_tag:
         add_to_pic(pic_path, img_pic, size, count, 3)
     img_pic.close()
 
@@ -612,8 +612,9 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
     # =======================================================================初始化所需变量
     multi_part = 0
     part = ''
-    c_word = ''
     chs_tag = False
+    uncensored_tag = False
+    c_word = ''
     liuchu = ''
 
     # 影片的路径 绝对路径
@@ -656,9 +657,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
 
     # 判断是否无码
     if is_uncensored(number):
-        uncensored = 1
-    else:
-        uncensored = 0
+        uncensored_tag = True
 
     # TODO:根据路径判定是否合理
     if '流出' in filepath or '-leak' in filepath:
@@ -690,10 +689,10 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
         if conf.watermark_enable:
             poster_path = path + '/' + number + c_word + '-poster.jpg'
             thumb_path = path + '/' + number + c_word + '-thumb.jpg'
-            add_mark(poster_path, thumb_path, chs_tag, leak, uncensored, conf)
+            add_mark(poster_path, thumb_path, chs_tag, leak, uncensored_tag, conf)
 
         # 打印文件
-        print_files(path, c_word,  json_data.get('naming_rule'), part, chs_tag, json_data, filepath, conf.failed_folder, tag,  json_data.get('actor_list'), liuchu, uncensored)
+        print_files(path, c_word,  json_data.get('naming_rule'), part, chs_tag, json_data, filepath, conf.failed_folder, tag,  json_data.get('actor_list'), liuchu, uncensored_tag)
 
         # 移动文件
         (flag, path) = paste_file_to_folder(filepath, path, number, c_word, conf)
@@ -721,11 +720,11 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
         cutImage(imagecut, path, number, c_word)
 
         # 打印文件
-        print_files(path, c_word,  json_data.get('naming_rule'), part, chs_tag, json_data, filepath, conf.failed_folder, tag,  json_data.get('actor_list'), liuchu, uncensored)
+        print_files(path, c_word,  json_data.get('naming_rule'), part, chs_tag, json_data, filepath, conf.failed_folder, tag,  json_data.get('actor_list'), liuchu, uncensored_tag)
         
         if conf.watermark_enable:
             poster_path = path + '/' + number + c_word + '-poster.jpg'
             thumb_path = path + '/' + number + c_word + '-thumb.jpg'
-            add_mark(poster_path, thumb_path, chs_tag, leak, uncensored, conf)
+            add_mark(poster_path, thumb_path, chs_tag, leak, uncensored_tag, conf)
         return True, file_path
     return False, ''
