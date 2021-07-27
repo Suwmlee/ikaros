@@ -8,8 +8,8 @@ import time
 import os
 import uuid
 from lxml import etree
+from urllib.parse import urljoin
 from http.cookies import SimpleCookie
-from ..utils.wlogger import wlogger
 from ..service.configservice import scrapingConfService
 
 
@@ -32,14 +32,15 @@ def getXpathSingle(htmlcode, xpath):
     return result1
 
 
+G_USER_AGENT = r'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36'
+
 # 网页请求核心
 def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None):
     configProxy = scrapingConfService.getProxySetting()
     errors = ""
 
     if ua is None:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3100.0 Safari/537.36"}  # noqa
+        headers = {"User-Agent": G_USER_AGENT}  # noqa
     else:
         headers = {"User-Agent": ua}
 
@@ -74,8 +75,7 @@ def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None)
 def post_html(url: str, query: dict, headers: dict = None) -> requests.Response:
     configProxy = scrapingConfService.getProxySetting()
     errors = ""
-    headers_ua = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3100.0 Safari/537.36"}
+    headers_ua = {"User-Agent": G_USER_AGENT}
     if headers is None:
         headers = headers_ua
     else:
@@ -448,10 +448,10 @@ def translate(
     trans_result = ""
     if engine == "google-free":
         url = (
-            "https://translate.google.cn/translate_a/single?client=gtx&dt=t&dj=1&ie=UTF-8&sl=auto&tl="
-            + target_language
-            + "&q="
-            + src
+                "https://translate.google.cn/translate_a/single?client=gtx&dt=t&dj=1&ie=UTF-8&sl=auto&tl="
+                + target_language
+                + "&q="
+                + src
         )
         result = get_html(url=url, return_type="object")
 
@@ -567,3 +567,11 @@ def is_link(filename: str):
     elif os.stat(filename).st_nlink > 1:
         return True # hard link Linux MAC OSX Windows NTFS
     return False
+
+
+def abs_url(base_url: str, href: str) -> str:
+    """ URL相对路径转绝对路径
+    """
+    if href.startswith('http'):
+        return href
+    return urljoin(base_url, href)
