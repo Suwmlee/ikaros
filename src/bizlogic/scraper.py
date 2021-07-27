@@ -254,21 +254,25 @@ def small_cover_check(path, number, cover_small, c_word, conf, filepath, failed_
     wlogger.info('[+]Image Downloaded! ' + path + '/' + number + c_word + '-poster.jpg')
 
 
-def create_folder(success_folder, location_rule, json_data, conf):
+def create_folder(json_data: dict, conf: _ScrapingConfigs):
     """ 根据json数据创建文件夹
     """
-    title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label = get_info(json_data)
-    if len(location_rule) > 240:  # 新建成功输出文件夹
-        path = success_folder + '/' + location_rule.replace("'actor'", "'manypeople'", 3).replace("actor", "'manypeople'", 3)  # path为影片+元数据所在目录
+    success_folder = conf.success_folder
+    title = json_data.get('title')
+    number = json_data.get('number')
+    location_rule = json_data.get('location_rule')
+    if len(location_rule) > 240:
+        # path为影片+元数据所在目录
+        path = os.path.join(success_folder, location_rule.replace("'actor'", "'manypeople'", 3).replace("actor", "'manypeople'", 3))
     else:
-        path = success_folder + '/' + location_rule
+        path = os.path.join(success_folder, location_rule)
     path = trimblank(path)
     if not os.path.exists(path):
         path = escape_path(path, conf.escape_literals)
         try:
             os.makedirs(path)
         except:
-            path = success_folder + '/' + location_rule.replace('/[' + number + ')-' + title, "/number")
+            path = os.path.join(success_folder, location_rule.replace('/[' + number + ')-' + title, "/number"))
             path = escape_path(path, conf.escape_literals)
 
             os.makedirs(path)
@@ -668,7 +672,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
     #  3：直接刮削
     if conf.main_mode == 1:
         # 创建文件夹
-        path = create_folder(conf.success_folder, json_data.get('location_rule'), json_data, conf)
+        path = create_folder(json_data, conf)
         if multipart_tag:
             number += part  # 这时number会被附加上CD1后缀
 
@@ -679,6 +683,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
         if not multipart_tag or part.lower() == '-cd1':
             
             image_download(json_data.get('cover'), number, c_word, path, conf, filepath, conf.failed_folder)
+
         # 裁剪图
         cutImage(imagecut, path, number, c_word)
 
@@ -695,7 +700,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
         return flag, path
     elif conf.main_mode == 2:
         # 创建文件夹
-        path = create_folder(conf.success_folder, json_data.get('location_rule'), json_data, conf)
+        path = create_folder(json_data, conf)
         # 移动文件
         paste_file_to_folder_mode2(filepath, path, multipart_tag, number, part, c_word, conf)
     elif conf.main_mode == 3:
