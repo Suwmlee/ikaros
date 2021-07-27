@@ -85,28 +85,28 @@ def cleanfolderbyfilter(folder, filter):
         shutil.rmtree(folder)
 
 
-def symlink_force(target, link_name):
+def symlink_force(srcpath, dstpath):
     """ create symlink
     https://stackoverflow.com/questions/8299386/modifying-a-symlink-in-python
     """
     try:
-        os.symlink(target, link_name)
+        os.symlink(srcpath, dstpath)
     except OSError as e:
         if e.errno == errno.EEXIST:
-            os.remove(link_name)
-            os.symlink(target, link_name)
+            os.remove(dstpath)
+            os.symlink(srcpath, dstpath)
         else:
             raise e
 
 
-def hardlink_force(target, link_name):
+def hardlink_force(srcpath, dstpath):
     """ create hard link
     """
     try:
-        os.link(target, link_name)
+        os.link(srcpath, dstpath)
     except OSError as e:
         if e.errno == errno.EEXIST:
-            os.remove(link_name)
-            os.link(target, link_name)
+            os.remove(dstpath)
+            os.link(srcpath, dstpath)
         else:
             raise e

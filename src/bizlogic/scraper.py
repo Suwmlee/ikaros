@@ -257,7 +257,9 @@ def get_data_from_json(file_number, conf: _ScrapingConfigs):
     return json_data
 
 
-def get_info(json_data):  # 返回json里的数据
+def get_info(json_data):
+    """   返回json里的数据
+    """
     title = json_data.get('title')
     studio = json_data.get('studio')
     year = json_data.get('year')
@@ -359,18 +361,16 @@ def download_cover(cover_url, prefilename, path):
     return True
 
 
-def print_files(path, c_word, naming_rule, part, chs_tag, json_data, filepath, failed_folder, tag, actor_list, leak_tag, uncensored_tag):
+def create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
     title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label = get_info(json_data)
-
+    naming_rule = json_data.get('naming_rule')
+    actor_list = json_data.get('actor_list')
+    tags = json_data.get('tag')
     try:
         if not os.path.exists(path):
             os.makedirs(path)
-        filename = number + part + c_word
-        # TODO: 直接刮削文件名临时修改
-        if os.path.dirname(filepath) == path:
-            name = os.path.basename(filepath)
-            filename  = os.path.splitext(name)[0]
-        with open(os.path.join(str(path), filename + ".nfo"), "wt", encoding='UTF-8') as code:
+
+        with open(os.path.join(str(path), prefilename + ".nfo"), "wt", encoding='UTF-8') as code:
             print('<?xml version="1.0" encoding="UTF-8" ?>', file=code)
             print("<movie>", file=code)
             print(" <title>" + naming_rule + "</title>", file=code)
@@ -382,16 +382,16 @@ def print_files(path, c_word, naming_rule, part, chs_tag, json_data, filepath, f
             print("  <plot>" + outline + "</plot>", file=code)
             print("  <runtime>" + str(runtime).replace(" ", "") + "</runtime>", file=code)
             print("  <director>" + director + "</director>", file=code)
-            print("  <poster>" + number + c_word + "-poster.jpg</poster>", file=code)
-            print("  <thumb>" + number + c_word + "-thumb.jpg</thumb>", file=code)
-            print("  <fanart>" + fanartname + "</fanart>", file=code)
+            print("  <poster>" + prefilename + "-poster.jpg</poster>", file=code)
+            print("  <thumb>" + prefilename + "-thumb.jpg</thumb>", file=code)
+            print("  <fanart>" + prefilename + '-fanart.jpg' + "</fanart>", file=code)
             try:
                 for key in actor_list:
                     print("  <actor>", file=code)
                     print("   <name>" + key + "</name>", file=code)
                     print("  </actor>", file=code)
             except:
-                aaaa = ''
+                pass
             print("  <maker>" + studio + "</maker>", file=code)
             print("  <label>" + label + "</label>", file=code)
             if chs_tag:
@@ -401,11 +401,11 @@ def print_files(path, c_word, naming_rule, part, chs_tag, json_data, filepath, f
             if uncensored_tag:
                 print("  <tag>无码</tag>", file=code)
             try:
-                for i in tag:
+                for i in tags:
                     print("  <tag>" + i + "</tag>", file=code)
                 print("  <tag>" + series + "</tag>", file=code)
             except:
-                aaaaa = ''
+                pass
             if chs_tag:
                 print("  <genre>中文字幕</genre>", file=code)
             if leak_tag:
@@ -413,27 +413,26 @@ def print_files(path, c_word, naming_rule, part, chs_tag, json_data, filepath, f
             if uncensored_tag:
                 print("  <genre>无码</genre>", file=code)
             try:
-                for i in tag:
+                for i in tags:
                     print("  <genre>" + i + "</genre>", file=code)
                 print("  <genre>" + series + "</genre>", file=code)
             except:
-                aaaaaaaa = ''
+                pass
             print("  <num>" + number + "</num>", file=code)
             print("  <premiered>" + release + "</premiered>", file=code)
             print("  <cover>" + cover + "</cover>", file=code)
             print("  <website>" + website + "</website>", file=code)
             print("</movie>", file=code)
-            wlogger.info("[+]Wrote!            " + path + "/" + number + part + c_word + ".nfo")
+            wlogger.info("[+]Wrote!            " + path + "/" + prefilename + ".nfo")
+            return True
     except IOError as e:
         wlogger.info("[-]Write Failed!")
         wlogger.error(e)
-        moveFailedFolder(filepath)
-        return
+        return False
     except Exception as e1:
         wlogger.error(e1)
         wlogger.info("[-]Write Failed!")
-        moveFailedFolder(filepath)
-        return
+        return False
 
 
 def crop_poster(imagecut, path, prefilename):
@@ -526,16 +525,17 @@ def add_to_pic(pic_path, img_pic, size, count, mode):
 # ========================结束=================================
 
 
-def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径，番号，后缀，要移动至的位置
+def paste_file_to_folder(filepath, path, prefilename, conf: _ScrapingConfigs):
+    """   move video and subtitle
+    """
     houzhui = os.path.splitext(filepath)[1].replace(",", "")
     try:
-        newpath = path + '/' + number + c_word + houzhui
+        newpath = path + '/' + prefilename + houzhui
         if conf.link_type == 1:
             (filefolder, name) = os.path.split(filepath)
             settings = scrapingConfService.getSetting()
             soft_prefix = settings.soft_prefix
             src_folder = settings.scraping_folder
-            dest_folder = settings.success_folder
             midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
             soft_path = os.path.join(soft_prefix, midfolder, name)
             if os.path.exists(newpath):
@@ -555,7 +555,7 @@ def paste_file_to_folder(filepath, path, number, c_word, conf):  # 文件路径�
         # 字幕移动
         for subname in ext_type:
             if os.path.exists(filepath.replace(houzhui, subname)):
-                os.rename(filepath.replace(houzhui, subname), path + '/' + number + c_word + subname)
+                os.rename(filepath.replace(houzhui, subname), path + '/' + prefilename + subname)
                 print('[+]Sub moved!')
         return True, newpath
     except FileExistsError:
@@ -592,7 +592,7 @@ def paste_file_to_folder_mode2(filepath, path, multipart_tag, number, part, c_wo
         return
 
 
-def get_part(filepath, failed_folder):
+def get_part(filepath):
     try:
         if re.search('-CD\d+', filepath):
             return re.findall('-CD\d+', filepath)[0]
@@ -645,11 +645,11 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
         # so the solution is: use the normalized search id
         number = json_data.get("number")
     imagecut = json_data.get('imagecut')
-    tag = json_data.get('tag')
+    
     # =======================================================================判断-C,-CD后缀
     if '-CD' in filepath or '-cd' in filepath:
         multipart_tag = True
-        part = get_part(filepath, conf.failed_folder)
+        part = get_part(filepath)
 
     if cnsubtag:
         chs_tag = True
@@ -695,7 +695,6 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
             if not download_cover(json_data.get('cover'), prefilename, path):
                 moveFailedFolder(filepath)
 
-        # 裁剪图
         crop_poster(imagecut, path, prefilename)
 
         if conf.watermark_enable:
@@ -703,12 +702,12 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
             thumb_path = path + '/' + prefilename + '-thumb.jpg'
             add_mark(poster_path, thumb_path, chs_tag, leak_tag, uncensored_tag, conf)
 
-        # 打印文件
-        print_files(path, c_word,  json_data.get('naming_rule'), part, chs_tag, json_data, filepath, conf.failed_folder, tag,  json_data.get('actor_list'), leak_tag, uncensored_tag)
+        if not create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
+            moveFailedFolder(filepath)
 
         # 移动文件
-        (flag, path) = paste_file_to_folder(filepath, path, number, c_word, conf)
-        return flag, path
+        (flag, newpath) = paste_file_to_folder(filepath, path, number, c_word, conf)
+        return flag, newpath
     elif conf.main_mode == 2:
         # 创建文件夹
         path = create_folder(json_data, conf)
@@ -717,12 +716,8 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
     elif conf.main_mode == 3:
         path = os.path.dirname(filepath)
         name = os.path.basename(filepath)
-        # TODO:直接刮削，传参混乱
-        # 临时修改，解决命名不一致问题
-        number  = os.path.splitext(name)[0]
-        c_word = ''
-        # 文件名:   番号-Tags-Leak-C
-        prefilename = number + c_word
+
+        prefilename = os.path.splitext(name)[0]
         # 检查小封面, 如果image cut为3，则下载小封面
         if imagecut == 3:
             if not download_poster(path, prefilename, json_data.get('cover_small')):
@@ -738,8 +733,8 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
             thumb_path = path + '/' + prefilename + '-thumb.jpg'
             add_mark(poster_path, thumb_path, chs_tag, leak_tag, uncensored_tag, conf)
 
-        # 打印文件
-        print_files(path, c_word,  json_data.get('naming_rule'), part, chs_tag, json_data, filepath, conf.failed_folder, tag,  json_data.get('actor_list'), leak_tag, uncensored_tag)
+        if not create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
+            moveFailedFolder(filepath)
         
         return True, file_path
     return False, ''
