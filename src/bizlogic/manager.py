@@ -66,7 +66,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
         wlogger.error("[-] [{}] ERROR:".format(file_path))
         wlogger.error(err)
         if conf.main_mode == 1 and (conf.link_type == 1 or conf.link_type == 2):
-            moveFailedFolder(file_path, conf.failed_folder)
+            moveFailedFolder(file_path)
 
 
 def start():

@@ -345,20 +345,12 @@ def download_cover(cover_url, prefilename, path):
     """ Download Cover
     """
     fanartname = prefilename + '-fanart.jpg'
-
-    configProxy = scrapingConfService.getProxySetting()
-    for i in range(configProxy.retry):
-        if os.path.getsize(path + '/' + fanartname) == 0:
-            wlogger.info('[!]Image Download Failed! Trying again. [{}/3]', i + 1)
-            download_file_with_filename(cover_url, fanartname, path)
-            continue
-        else:
-            break
-    if os.path.getsize(path + '/' + fanartname) == 0:
+    if download_file_with_filename(cover_url, fanartname, path):
+        wlogger.info('[+]Image Downloaded! ' + path + '/' + fanartname)
+        shutil.copyfile(path + '/' + fanartname, path + '/' + prefilename + '-thumb.jpg')
+        return True
+    else:
         return False
-    wlogger.info('[+]Image Downloaded! ' + path + '/' + fanartname)
-    shutil.copyfile(path + '/' + fanartname, path + '/' + prefilename + '-thumb.jpg')
-    return True
 
 
 def create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
