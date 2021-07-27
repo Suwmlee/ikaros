@@ -34,12 +34,38 @@ def escape_path(path, escape_literals: str):  # Remove escape literals
     return path
 
 
-def moveFailedFolder(filepath, failed_folder):
+def create_folder(json_data: dict, conf: _ScrapingConfigs):
+    """ 根据json数据创建文件夹
+    """
+    success_folder = conf.success_folder
+    title = json_data.get('title')
+    number = json_data.get('number')
+    location_rule = json_data.get('location_rule')
+    if len(location_rule) > 240:
+        # path为影片+元数据所在目录
+        path = os.path.join(success_folder, location_rule.replace("'actor'", "'manypeople'", 3).replace("actor", "'manypeople'", 3))
+    else:
+        path = os.path.join(success_folder, location_rule)
+    path = trimblank(path)
+    if not os.path.exists(path):
+        path = escape_path(path, conf.escape_literals)
+        try:
+            os.makedirs(path)
+        except:
+            path = os.path.join(success_folder, location_rule.replace('/[' + number + ')-' + title, "/number"))
+            path = escape_path(path, conf.escape_literals)
+
+            os.makedirs(path)
+    return path
+
+
+def moveFailedFolder(filepath):
     """ 只创建失败文件的硬链接
         每次刮削清空文件夹
     """
     try:
         wlogger.info('[-]Move to Failed folder')
+        failed_folder = scrapingConfService.getSetting().failed_folder
         (filefolder, name) = os.path.split(filepath)
         newpath = os.path.join(failed_folder, name)
         hardlink_force(filepath, newpath)
@@ -249,36 +275,6 @@ def get_info(json_data):  # 返回json里的数据
     return title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label
 
 
-def small_cover_check(path, number, cover_small, c_word, conf, filepath, failed_folder):
-    download_file_with_filename(cover_small, number + c_word + '-poster.jpg', path, conf, filepath, failed_folder)
-    wlogger.info('[+]Image Downloaded! ' + path + '/' + number + c_word + '-poster.jpg')
-
-
-def create_folder(json_data: dict, conf: _ScrapingConfigs):
-    """ 根据json数据创建文件夹
-    """
-    success_folder = conf.success_folder
-    title = json_data.get('title')
-    number = json_data.get('number')
-    location_rule = json_data.get('location_rule')
-    if len(location_rule) > 240:
-        # path为影片+元数据所在目录
-        path = os.path.join(success_folder, location_rule.replace("'actor'", "'manypeople'", 3).replace("actor", "'manypeople'", 3))
-    else:
-        path = os.path.join(success_folder, location_rule)
-    path = trimblank(path)
-    if not os.path.exists(path):
-        path = escape_path(path, conf.escape_literals)
-        try:
-            os.makedirs(path)
-        except:
-            path = os.path.join(success_folder, location_rule.replace('/[' + number + ')-' + title, "/number"))
-            path = escape_path(path, conf.escape_literals)
-
-            os.makedirs(path)
-    return path
-
-
 def trimblank(s: str):
     """
     Clear the blank on the right side of the folder name
@@ -290,37 +286,31 @@ def trimblank(s: str):
 
 # =====================资源下载部分===========================
 
-# path = examle:photo , video.in the Project Folder!
-
-
-def download_file_with_filename(url, filename, path, conf, filepath, failed_folder):
+def download_file_with_filename(url, filename, path):
     configProxy = scrapingConfService.getProxySetting()
 
+    if not os.path.exists(path):
+        os.makedirs(path)
+    headers = {'User-Agent': G_USER_AGENT}
     for i in range(configProxy.retry):
         try:
             if configProxy.enable:
-                if not os.path.exists(path):
-                    os.makedirs(path)
                 proxies = configProxy.proxies()
-                headers = {'User-Agent': G_USER_AGENT}
                 r = requests.get(url, headers=headers, timeout=configProxy.timeout, proxies=proxies)
                 if r == '':
                     wlogger.info('[-]Movie Data not found!')
-                    return
-                with open(str(path) + "/" + filename, "wb") as code:
+                    return False
+                with open(os.path.join(str(path), filename), "wb") as code:
                     code.write(r.content)
-                return
+                return True
             else:
-                if not os.path.exists(path):
-                    os.makedirs(path)
-                headers = {'User-Agent': G_USER_AGENT}
-                r = requests.get(url, timeout=configProxy.timeout, headers=headers)
+                r = requests.get(url, headers=headers, timeout=configProxy.timeout)
                 if r == '':
                     wlogger.info('[-]Movie Data not found!')
-                    return
-                with open(str(path) + "/" + filename, "wb") as code:
+                    return False
+                with open(os.path.join(str(path), filename), "wb") as code:
                     code.write(r.content)
-                return
+                return True
         except requests.exceptions.RequestException:
             i += 1
             wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
@@ -334,28 +324,39 @@ def download_file_with_filename(url, filename, path, conf, filepath, failed_fold
             i += 1
             wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
     wlogger.info('[-]Connect Failed! Please check your Proxy or Network!')
-    moveFailedFolder(filepath, failed_folder)
-    return
+    return False
 
 
-# 封面是否下载成功，否则移动到failed
-def image_download(cover, number, c_word, path, conf, filepath, failed_folder):
-    if download_file_with_filename(cover, number + c_word + '-fanart.jpg', path, conf, filepath, failed_folder) == 'failed':
-        moveFailedFolder(filepath, failed_folder)
-        return
+def download_poster(path, prefilename, cover_small_url):
+    """ Download Poster
+    """
+    postername = prefilename + '-poster.jpg'
+    if download_file_with_filename(cover_small_url, postername, path):
+        wlogger.info('[+]Poster Downloaded! ' + path + '/' + postername)
+        return True
+    else:
+        wlogger.info('[+]Download Poster Failed! ' + path + '/' + postername)
+        return False
+
+
+def download_cover(cover_url, prefilename, path):
+    """ Download Cover
+    """
+    fanartname = prefilename + '-fanart.jpg'
 
     configProxy = scrapingConfService.getProxySetting()
     for i in range(configProxy.retry):
-        if os.path.getsize(path + '/' + number + c_word + '-fanart.jpg') == 0:
+        if os.path.getsize(path + '/' + fanartname) == 0:
             wlogger.info('[!]Image Download Failed! Trying again. [{}/3]', i + 1)
-            download_file_with_filename(cover, number + c_word + '-fanart.jpg', path, conf, filepath, failed_folder)
+            download_file_with_filename(cover_url, fanartname, path)
             continue
         else:
             break
-    if os.path.getsize(path + '/' + number + c_word + '-fanart.jpg') == 0:
-        return
-    wlogger.info('[+]Image Downloaded! ' + path + '/' + number + c_word + '-fanart.jpg')
-    shutil.copyfile(path + '/' + number + c_word + '-fanart.jpg', path + '/' + number + c_word + '-thumb.jpg')
+    if os.path.getsize(path + '/' + fanartname) == 0:
+        return False
+    wlogger.info('[+]Image Downloaded! ' + path + '/' + fanartname)
+    shutil.copyfile(path + '/' + fanartname, path + '/' + prefilename + '-thumb.jpg')
+    return True
 
 
 def print_files(path, c_word, naming_rule, part, chs_tag, json_data, filepath, failed_folder, tag, actor_list, leak_tag, uncensored_tag):
@@ -369,7 +370,7 @@ def print_files(path, c_word, naming_rule, part, chs_tag, json_data, filepath, f
         if os.path.dirname(filepath) == path:
             name = os.path.basename(filepath)
             filename  = os.path.splitext(name)[0]
-        with open(path + "/" + filename + ".nfo", "wt", encoding='UTF-8') as code:
+        with open(os.path.join(str(path), filename + ".nfo"), "wt", encoding='UTF-8') as code:
             print('<?xml version="1.0" encoding="UTF-8" ?>', file=code)
             print("<movie>", file=code)
             print(" <title>" + naming_rule + "</title>", file=code)
@@ -383,7 +384,7 @@ def print_files(path, c_word, naming_rule, part, chs_tag, json_data, filepath, f
             print("  <director>" + director + "</director>", file=code)
             print("  <poster>" + number + c_word + "-poster.jpg</poster>", file=code)
             print("  <thumb>" + number + c_word + "-thumb.jpg</thumb>", file=code)
-            print("  <fanart>" + number + c_word + '-fanart.jpg' + "</fanart>", file=code)
+            print("  <fanart>" + fanartname + "</fanart>", file=code)
             try:
                 for key in actor_list:
                     print("  <actor>", file=code)
@@ -426,19 +427,19 @@ def print_files(path, c_word, naming_rule, part, chs_tag, json_data, filepath, f
     except IOError as e:
         wlogger.info("[-]Write Failed!")
         wlogger.error(e)
-        moveFailedFolder(filepath, failed_folder)
+        moveFailedFolder(filepath)
         return
     except Exception as e1:
         wlogger.error(e1)
         wlogger.info("[-]Write Failed!")
-        moveFailedFolder(filepath, failed_folder)
+        moveFailedFolder(filepath)
         return
 
 
 def cutImage(imagecut, path, number, c_word):
     if imagecut == 1:  # 剪裁大封面
         try:
-            img = Image.open(path + '/' + number + c_word + '-fanart.jpg')
+            img = Image.open(path + '/' + fanartname)
             imgSize = img.size
             w = img.width
             h = img.height
@@ -448,7 +449,7 @@ def cutImage(imagecut, path, number, c_word):
         except:
             wlogger.info('[-]Cover cut failed!')
     elif imagecut == 0:  # 复制封面
-        shutil.copyfile(path + '/' + number + c_word + '-fanart.jpg', path + '/' + number + c_word + '-poster.jpg')
+        shutil.copyfile(path + '/' + fanartname, path + '/' + number + c_word + '-poster.jpg')
         wlogger.info('[+]Image Copyed!     ' + path + '/' + number + c_word + '-poster.jpg')
 
 # 此函数从gui版copy过来用用
@@ -595,7 +596,7 @@ def get_part(filepath, failed_folder):
             return re.findall('-cd\d+', filepath)[0]
     except:
         wlogger.info("[-]failed!Please rename the filename again!")
-        moveFailedFolder(filepath, failed_folder)
+        moveFailedFolder(filepath)
         return
 
 
@@ -629,7 +630,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
     if not json_data:
         wlogger.info('[-]Movie Data not found!')
         if conf.main_mode == 1 and (conf.link_type == 1 or conf.link_type == 2):
-            moveFailedFolder(filepath, conf.failed_folder)
+            moveFailedFolder(filepath)
         return False, ''
 
     if json_data.get("number") != number:
@@ -673,16 +674,22 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
     if conf.main_mode == 1:
         # 创建文件夹
         path = create_folder(json_data, conf)
-        if multipart_tag:
-            number += part  # 这时number会被附加上CD1后缀
 
-        # 检查小封面, 如果image cut为3，则下载小封面
-        if imagecut == 3:
-            small_cover_check(path, number, json_data.get('cover_small'), c_word, conf, filepath, conf.failed_folder)
+        # 文件名:   番号-Tags-Leak-C
+        prefilename = number + c_word
+        
+        if multipart_tag:
+            # 番号-Tags-Leak-C-CD1
+            prefilename += part
 
         if not multipart_tag or part.lower() == '-cd1':
-            
-            image_download(json_data.get('cover'), number, c_word, path, conf, filepath, conf.failed_folder)
+             # 检查小封面, 如果image cut为3，则下载小封面
+            if imagecut == 3:
+                if not download_poster(path, prefilename, json_data.get('cover_small')):
+                    moveFailedFolder(filepath)
+
+            if not download_cover(json_data.get('cover'), prefilename, path):
+                moveFailedFolder(filepath)
 
         # 裁剪图
         cutImage(imagecut, path, number, c_word)
@@ -710,13 +717,15 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
         # 临时修改，解决命名不一致问题
         number  = os.path.splitext(name)[0]
         c_word = ''
-
+        # 文件名:   番号-Tags-Leak-C
+        prefilename = number + c_word
         # 检查小封面, 如果image cut为3，则下载小封面
         if imagecut == 3:
-            small_cover_check(path, number, json_data.get('cover_small'), c_word, conf, filepath, conf.failed_folder)
+            if not download_poster(path, prefilename, json_data.get('cover_small')):
+                moveFailedFolder(filepath)
+        if not download_cover(json_data.get('cover'), prefilename, path):
+            moveFailedFolder(filepath)
 
-        # creatFolder会返回番号路径
-        image_download(json_data.get('cover'), number, c_word, path, conf, filepath, conf.failed_folder)
         # 裁剪图
         cutImage(imagecut, path, number, c_word)
 
