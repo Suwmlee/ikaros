@@ -6,7 +6,7 @@ import platform
 
 from PIL import Image
 
-from ..service.configservice import scrapingConfService
+from ..service.configservice import scrapingConfService, _ScrapingConfigs
 from ..utils.wlogger import wlogger
 from ..utils.ADC_function import *
 from ..utils.filehelper import ext_type, symlink_force, hardlink_force
@@ -24,6 +24,7 @@ from ..scrapinglib import xcity
 from ..scrapinglib import dlsite
 from ..scrapinglib import airav
 from ..scrapinglib import carib
+from ..scrapinglib import fc2club
 
 
 def escape_path(path, escape_literals: str):  # Remove escape literals
@@ -64,34 +65,36 @@ def get_data_from_json(file_number, filepath, conf):  # 从JSON返回元数据
         # "javlib": javlib.main,
         "dlsite": dlsite.main,
         "carib": carib.main,
+        "fc2club": fc2club.main
     }
 
     # default fetch order list, from the beginning to the end
     sources = conf.website_priority.split(',')
-
-    # if the input file name matches certain rules,
-    # move some web service to the beginning of the list
-    lo_file_number = file_number.lower()
-    if "carib" in sources and (re.match(r"^\d{6}-\d{3}", file_number)
-    ):
-        sources.insert(0, sources.pop(sources.index("carib")))
-    elif "avsox" in sources and (re.match(r"^\d{5,}", file_number) or
-        "heyzo" in lo_file_number
-    ):
-        sources.insert(0, sources.pop(sources.index("javdb")))
-        sources.insert(1, sources.pop(sources.index("avsox")))
-    elif "mgstage" in sources and (re.match(r"\d+\D+", file_number) or
-        "siro" in lo_file_number
-    ):
-        sources.insert(0, sources.pop(sources.index("mgstage")))
-    elif "fc2" in sources and ("fc2" in lo_file_number
-    ):
-        sources.insert(0, sources.pop(sources.index("javdb")))
-        sources.insert(1, sources.pop(sources.index("fc2")))
-    elif "dlsite" in sources and (
-        "rj" in lo_file_number or "vj" in lo_file_number
-    ):
-        sources.insert(0, sources.pop(sources.index("dlsite")))
+    if not len(conf.website_priority) > 60:
+        # if the input file name matches certain rules,
+        # move some web service to the beginning of the list
+        lo_file_number = file_number.lower()
+        if "carib" in sources and (re.match(r"^\d{6}-\d{3}", file_number)
+        ):
+            sources.insert(0, sources.pop(sources.index("carib")))
+        elif "avsox" in sources and (re.match(r"^\d{5,}", file_number) or
+                                     "heyzo" in lo_file_number
+        ):
+            sources.insert(0, sources.pop(sources.index("javdb")))
+            sources.insert(1, sources.pop(sources.index("avsox")))
+        elif "mgstage" in sources and (re.match(r"\d+\D+", file_number) or
+                                       "siro" in lo_file_number
+        ):
+            sources.insert(0, sources.pop(sources.index("mgstage")))
+        elif "fc2" in sources and ("fc2" in lo_file_number
+        ):
+            sources.insert(0, sources.pop(sources.index("javdb")))
+            sources.insert(1, sources.pop(sources.index("fc2")))
+            sources.insert(2, sources.pop(sources.index("fc2club")))
+        elif "dlsite" in sources and (
+                "rj" in lo_file_number or "vj" in lo_file_number
+        ):
+            sources.insert(0, sources.pop(sources.index("dlsite")))
 
     json_data = {}
     

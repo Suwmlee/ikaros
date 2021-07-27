@@ -4,7 +4,7 @@
 import os
 import re
 
-from ..service.configservice import scrapingConfService
+from ..service.configservice import scrapingConfService, _ScrapingConfigs
 from ..service.recordservice import scrapingrecordService
 from ..service.taskservice import taskService
 from .scraper import core_main, moveFailedFolder
@@ -31,7 +31,7 @@ def movie_lists(root, escape_folder):
     return total
 
 
-def create_data_and_move(file_path: str, conf):
+def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
     """ start scrape single file
     """
     # Normalized number, eg: 111xxx-222.mp4 -> xxx-222.mp4
@@ -49,7 +49,7 @@ def create_data_and_move(file_path: str, conf):
                 folder = os.path.dirname(movie_info.destpath)
                 if os.path.exists(folder) and basefolder != folder:
                     name = os.path.basename(movie_info.destpath)
-                    filter  = os.path.splitext(name)[0]
+                    filter = os.path.splitext(name)[0]
                     cleanfolderbyfilter(folder, filter)
             # 查询是否有额外设置
             if movie_info.scrapingname != '':
