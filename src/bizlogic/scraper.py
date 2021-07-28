@@ -155,10 +155,10 @@ def download_cover(cover_url, prefilename, path):
         return False
 
 
-def download_extrafanart(data, path, conf: _ScrapingConfigs):
+def download_extrafanart(urls, path, extrafanart_folder):
     j = 1
-    path = path + '/' + conf.extrafanart_folder
-    for url in data:
+    path = path + '/' + extrafanart_folder
+    for url in urls:
         if download_file_with_filename(url, 'extrafanart-' + str(j)+'.jpg', path):
             print('[+]Extrafanart Downloaded!', path + '/extrafanart-' + str(j) + '.jpg')
             j += 1
@@ -503,8 +503,8 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
         if not multipart_tag or part.lower() == '-cd1':
             try:
                 # 下载剧照
-                if json_data.get('trailer'):
-                    download_extrafanart(json_data.get('trailer'), path, filepath)
+                if json_data.get('extrafanart'):
+                    download_extrafanart(json_data.get('extrafanart'), path, conf.extrafanart_folder)
             except:
                 pass
 
