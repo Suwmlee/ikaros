@@ -2,7 +2,6 @@
 """
     init app
 """
-import os
 import logging
 from flask import Flask
 import flask_migrate
@@ -30,11 +29,6 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
-    if os.path.exists(app.config['SQLALCHEMY_DATABASE_URI']):
-        print("Upgrade db")
-        with app.app_context():
-            flask_migrate.upgrade()
-
     from . import controller
     from . import model
     from . import task
@@ -42,11 +36,12 @@ def create_app():
     model.load_models()
     task.init_task(app)
 
-    if not os.path.exists(app.config['SQLALCHEMY_DATABASE_URI']):
-        print("Create db")
-        db.create_all()
-        # init alembic version
-        with app.app_context():
+    db.create_all()
+    with app.app_context():
+        try:
+            print("Upgrade db")
+            flask_migrate.upgrade()
+        except:
             print("Fix alembic version")
             flask_migrate.stamp()
 
