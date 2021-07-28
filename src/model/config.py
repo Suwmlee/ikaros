@@ -33,7 +33,7 @@ class _ScrapingConfigs(db.Model):
     proxy_enable = Column(Boolean, default=False)
     proxy_type = Column(String, default='socks5h')
     proxy_address = Column(String, default='127.0.0.1:1080')
-    proxy_timeout = Column(Integer, default=5)
+    proxy_timeout = Column(Integer, default=10)
     proxy_retry = Column(Integer, default=3)
 
     location_rule = Column(String, default="actor+'/'+number+' '+title")
@@ -41,7 +41,9 @@ class _ScrapingConfigs(db.Model):
     max_title_len = Column(Integer, default=50)
     update_check = Column(Boolean, default=False)
     website_priority = Column(String, default="javbus,javdb,airav,fanza,xcity,mgstage,fc2,avsox,jav321,javlib,dlsite")
-
+    
+    extrafanart_enable = Column(Boolean, default=True)
+    extrafanart_folder = Column(String, default='extrafanart')
     watermark_enable = Column(Boolean, default=True, comment='enable water mark')
     watermark_size = Column(Integer, default=9)
     watermark_location = Column(Integer, default=2)
@@ -66,6 +68,8 @@ class _ScrapingConfigs(db.Model):
             'failed_folder': self.failed_folder,
             'location_rule': self.location_rule,
             'naming_rule': self.naming_rule,
+            'extrafanart_enable':self.extrafanart_enable,
+            'extrafanart_folder':self.extrafanart_folder,
             'watermark_enable': self.watermark_enable,
             'watermark_location': self.watermark_location,
             'watermark_size': self.watermark_size,

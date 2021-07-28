@@ -159,7 +159,10 @@ def get_data_from_json(file_number, conf: _ScrapingConfigs):
         cover_small = json_data.get('cover_small')
 
     trailer = ''
-    extrafanart = ''
+    if not json_data.get('extrafanart'):
+        extrafanart = ''
+    else:
+        extrafanart = json_data.get('extrafanart')
 
     imagecut = json_data.get('imagecut')
     tag = str(json_data.get('tag')).strip("[ ]").replace("'", '').replace(" ", '').split(',')  # 字符串转列表 @
@@ -246,7 +249,13 @@ def get_data_from_json(file_number, conf: _ScrapingConfigs):
     json_data['actor_list'] = actor_list
 
     json_data['trailer'] = ''
-    json_data['extrafanart'] = ''
+    if conf.extrafanart_enable:
+        if extrafanart:
+            json_data['extrafanart'] = extrafanart
+        else:
+            json_data['extrafanart'] = ''
+    else:
+        json_data['extrafanart'] = ''
 
     naming_rule = ""
     for i in conf.naming_rule.split("+"):
@@ -353,6 +362,18 @@ def download_cover(cover_url, prefilename, path):
     else:
         wlogger.info('[+]Download Cover Failed! ' + path + '/' + fanartname)
         return False
+
+
+def download_extrafanart(data, path, conf: _ScrapingConfigs):
+    j = 1
+    path = path + '/' + conf.extrafanart_folder
+    for url in data:
+        if download_file_with_filename(url, 'extrafanart-' + str(j)+'.jpg', path):
+            print('[+]Extrafanart Downloaded!', path + '/extrafanart-' + str(j) + '.jpg')
+            j += 1
+        else:
+            print('[+]Download Extrafanart Failed!', path + '/extrafanart-' + str(j) + '.jpg')
+    return True
 
 
 def create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
@@ -679,14 +700,22 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
             # 番号-Tags-Leak-C-CD1
             prefilename += part
 
-        if not multipart_tag or part.lower() == '-cd1':
-             # 检查小封面, 如果image cut为3，则下载小封面
-            if imagecut == 3:
-                if not download_poster(path, prefilename, json_data.get('cover_small')):
-                    moveFailedFolder(filepath)
-
-            if not download_cover(json_data.get('cover'), prefilename, path):
+        # 检查小封面, 如果image cut为3，则下载小封面
+        if imagecut == 3:
+            if not download_poster(path, prefilename, json_data.get('cover_small')):
                 moveFailedFolder(filepath)
+
+        if not download_cover(json_data.get('cover'), prefilename, path):
+            moveFailedFolder(filepath)
+
+        
+        if not multipart_tag or part.lower() == '-cd1':
+            try:
+                # 下载剧照
+                if json_data.get('trailer'):
+                    download_extrafanart(json_data.get('trailer'), path, filepath)
+            except:
+                pass
 
         crop_poster(imagecut, path, prefilename)
 
