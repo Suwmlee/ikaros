@@ -331,13 +331,13 @@ def add_to_pic(pic_path, img_pic, size, count, mode):
 # ========================结束=================================
 
 
-def paste_file_to_folder(filepath, path, prefilename, conf: _ScrapingConfigs):
+def paste_file_to_folder(filepath, path, prefilename, link_type):
     """   move video and subtitle
     """
     houzhui = os.path.splitext(filepath)[1].replace(",", "")
     try:
         newpath = path + '/' + prefilename + houzhui
-        if conf.link_type == 1:
+        if link_type == 1:
             (filefolder, name) = os.path.split(filepath)
             settings = scrapingConfService.getSetting()
             soft_prefix = settings.soft_prefix
@@ -354,7 +354,7 @@ def paste_file_to_folder(filepath, path, prefilename, conf: _ScrapingConfigs):
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
             symlink_force(soft_path, newpath)
-        elif conf.link_type == 2:
+        elif link_type == 2:
             hardlink_force(filepath, newpath)
         else:
             os.rename(filepath, newpath)
@@ -371,31 +371,9 @@ def paste_file_to_folder(filepath, path, prefilename, conf: _ScrapingConfigs):
     except PermissionError:
         wlogger.info('[-]Error! Please run as administrator!')
         return False, ''
-
-
-def paste_file_to_folder_mode2(filepath, path, multipart_tag, number, part, c_word, conf):  # 文件路径，番号，后缀，要移动至的位置
-    if multipart_tag:
-        number += part  # 这时number会被附加上CD1后缀
-    houzhui = os.path.splitext(filepath)[1].replace(",", "")
-    try:
-        if conf.link_type == 1:
-            os.symlink(filepath, path + '/' + number + part + c_word + houzhui)
-        elif conf.link_type == 2:
-            hardlink_force(filepath, path + '/' + number + part + c_word + houzhui)
-        else:
-            os.rename(filepath, path + '/' + number + part + c_word + houzhui)
-        for match in ext_type:
-            if os.path.exists(number + match):
-                os.rename(number + part + c_word + match, path + '/' + number + part + c_word + match)
-                wlogger.info('[+]Sub moved!')
-        wlogger.info('[!]Success')
-    except FileExistsError:
-        wlogger.info('[-]File Exists! Please check your movie!')
-        wlogger.info('[-]move to the root folder of the program.')
-        return
-    except PermissionError:
-        wlogger.info('[-]Error! Please run as administrator!')
-        return
+    except OSError as oserr:
+        wlogger.info('[-]OS Error errno ' + oserr.errno)
+        return False, ''
 
 
 def get_part(filepath):
@@ -478,67 +456,63 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
     # main_mode
     #  1: 创建链接刮削 / Scraping mode
     #       - 软链接    - 硬链接    - 移动文件
-    #  2: 整理模式 / Organizing mode
+    #  2: 整理模式 / Organizing mode ??
     #  3：直接刮削
     if conf.main_mode == 1:
         # 创建文件夹
         path = create_folder(json_data, conf)
 
-        # 文件名:   番号-Tags-Leak-C
+        # 文件名
         prefilename = number + c_word
-        
         if multipart_tag:
             # 番号-Tags-Leak-C-CD1
             prefilename += part
 
-        # 检查小封面, 如果image cut为3，则下载小封面
         if imagecut == 3:
             if not download_poster(path, prefilename, json_data.get('cover_small')):
                 moveFailedFolder(filepath)
-
         if not download_cover(json_data.get('cover'), prefilename, path):
             moveFailedFolder(filepath)
-
-        
         if not multipart_tag or part.lower() == '-cd1':
             try:
-                # 下载剧照
-                if json_data.get('extrafanart'):
+                if conf.extrafanart_enable and json_data.get('extrafanart'):
                     download_extrafanart(json_data.get('extrafanart'), path, conf.extrafanart_folder)
             except:
                 pass
 
         crop_poster(imagecut, path, prefilename)
-
         if conf.watermark_enable:
             poster_path = path + '/' + prefilename + '-poster.jpg'
             thumb_path = path + '/' + prefilename + '-thumb.jpg'
             add_mark(poster_path, thumb_path, chs_tag, leak_tag, uncensored_tag, conf)
-
         if not create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
             moveFailedFolder(filepath)
 
         # 移动文件
-        (flag, newpath) = paste_file_to_folder(filepath, path, prefilename, conf)
+        (flag, newpath) = paste_file_to_folder(filepath, path, prefilename, conf.link_type)
         return flag, newpath
     elif conf.main_mode == 2:
-        # 创建文件夹
         path = create_folder(json_data, conf)
-        # 移动文件
-        paste_file_to_folder_mode2(filepath, path, multipart_tag, number, part, c_word, conf)
+        prefilename = number + c_word
+        if multipart_tag:
+            prefilename += part
+        (flag, newpath) = paste_file_to_folder(filepath, path, prefilename, conf.link_type)
+        return flag, newpath
     elif conf.main_mode == 3:
         path = os.path.dirname(filepath)
         name = os.path.basename(filepath)
-
         prefilename = os.path.splitext(name)[0]
-        # 检查小封面, 如果image cut为3，则下载小封面
         if imagecut == 3:
             if not download_poster(path, prefilename, json_data.get('cover_small')):
                 moveFailedFolder(filepath)
         if not download_cover(json_data.get('cover'), prefilename, path):
             moveFailedFolder(filepath)
-
-        # 裁剪图
+        if not multipart_tag or part.lower() == '-cd1':
+            try:
+                if conf.extrafanart_enable and json_data.get('extrafanart'):
+                    download_extrafanart(json_data.get('extrafanart'), path, conf.extrafanart_folder)
+            except:
+                pass
         crop_poster(imagecut, path, prefilename)
         
         if conf.watermark_enable:
