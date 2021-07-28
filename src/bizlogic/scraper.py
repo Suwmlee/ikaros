@@ -65,10 +65,11 @@ def moveFailedFolder(filepath):
     """
     try:
         wlogger.info('[-]Move to Failed folder')
-        failed_folder = scrapingConfService.getSetting().failed_folder
-        (filefolder, name) = os.path.split(filepath)
-        newpath = os.path.join(failed_folder, name)
-        hardlink_force(filepath, newpath)
+        conf = scrapingConfService.getSetting()
+        if conf.main_mode == 1 and (conf.link_type == 1 or conf.link_type == 2):
+            (filefolder, name) = os.path.split(filepath)
+            newpath = os.path.join(conf.failed_folder, name)
+            hardlink_force(filepath, newpath)
     except:
         pass
 
@@ -152,7 +153,7 @@ def get_data_from_json(file_number, conf: _ScrapingConfigs):
     series = json_data.get('series')
     year = json_data.get('year')
 
-    if json_data.get('cover_small') == None:
+    if not json_data.get('cover_small'):
         cover_small = ''
     else:
         cover_small = json_data.get('cover_small')
@@ -346,10 +347,11 @@ def download_cover(cover_url, prefilename, path):
     """
     fanartname = prefilename + '-fanart.jpg'
     if download_file_with_filename(cover_url, fanartname, path):
-        wlogger.info('[+]Image Downloaded! ' + path + '/' + fanartname)
+        wlogger.info('[+]Cover Downloaded! ' + path + '/' + fanartname)
         shutil.copyfile(path + '/' + fanartname, path + '/' + prefilename + '-thumb.jpg')
         return True
     else:
+        wlogger.info('[+]Download Cover Failed! ' + path + '/' + fanartname)
         return False
 
 
@@ -610,12 +612,12 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
     """
     # =======================================================================初始化所需变量
     
-    part = ''
     multipart_tag = False
     chs_tag = False
     uncensored_tag = False
     leak_tag = False
     c_word = ''
+    part = ''
 
     # 影片的路径 绝对路径
     filepath = file_path
@@ -625,8 +627,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
     # Return if blank dict returned (data not found)
     if not json_data:
         wlogger.info('[-]Movie Data not found!')
-        if conf.main_mode == 1 and (conf.link_type == 1 or conf.link_type == 2):
-            moveFailedFolder(filepath)
+        moveFailedFolder(filepath)
         return False, ''
 
     if json_data.get("number") != number:
