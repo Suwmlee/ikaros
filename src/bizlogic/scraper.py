@@ -1,4 +1,7 @@
-import os.path
+# -*- coding: utf-8 -*-
+'''
+'''
+import os
 import re
 import shutil
 import requests
@@ -242,9 +245,8 @@ def create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_
 
 
 def crop_poster(imagecut, path, prefilename):
-    """ covert fanart to poster
+    """ crop fanart to poster
     """
-    # 剪裁大封面
     if imagecut == 1:
         try:
             img = Image.open(path + '/' + prefilename + '-fanart.jpg')
@@ -256,22 +258,22 @@ def crop_poster(imagecut, path, prefilename):
             wlogger.info('[+]Image Cutted!     ' + path + '/' + prefilename + '-poster.jpg')
         except:
             wlogger.info('[-]Cover cut failed!')
-    elif imagecut == 0: # 复制封面
+    elif imagecut == 0: 
+        # 复制封面
         shutil.copyfile(path + '/' + prefilename + '-fanart.jpg',
                         path + '/' + prefilename + '-poster.jpg')
         wlogger.info('[+]Image Copyed!     ' + path + '/' + prefilename + '-poster.jpg')
 
-# 此函数从gui版copy过来用用
-# 参数说明
-# poster_path
-# thumb_path
-# chs_tag        中文字幕  bool
-# leak_tag       流出      bool
-# uncensored_tag 无码      bool
-# ========================================================================加水印
 
-
-def add_mark(poster_path, thumb_path, chs_tag, leak_tag, uncensored_tag, conf: _ScrapingConfigs):
+def add_mark(pics, chs_tag, leak_tag, uncensored_tag, count, size):
+    """ 
+    Add water mark 
+    :param chs_tag          中文字幕  bool
+    :param leak_tag         流出      bool
+    :param uncensored_tag   无码      bool
+    :param count            右上 0, 左上 1, 左下 2，右下 3
+    :param size             添加的水印相对整图的比例
+    """
     mark_type = ''
     if chs_tag:
         mark_type += ',字幕'
@@ -281,21 +283,15 @@ def add_mark(poster_path, thumb_path, chs_tag, leak_tag, uncensored_tag, conf: _
         mark_type += ',无码'
     if mark_type == '':
         return
-    add_mark_thread(thumb_path, chs_tag, leak_tag, uncensored_tag, conf)
-    print('[+]Thumb Add Mark:   ' + mark_type.strip(','))
-    add_mark_thread(poster_path, chs_tag, leak_tag, uncensored_tag, conf)
-    print('[+]Poster Add Mark:  ' + mark_type.strip(','))
+    for pic in pics:
+        add_mark_thread(pic, chs_tag, leak_tag, uncensored_tag, count, size)
+        print('[+]Image Add Mark:   ' + mark_type.strip(','))
 
 
-def add_mark_thread(pic_path, chs_tag, leak_tag, uncensored_tag, conf: _ScrapingConfigs):
+def add_mark_thread(pic_path, chs_tag, leak_tag, uncensored_tag, count, size):
     img_pic = Image.open(pic_path)
-    # 获取自定义位置
-    # 右上 0, 左上 1, 左下 2，右下 3
-    count = conf.watermark_location
-    # 添加的水印相对整图的比例
-    size = conf.watermark_size
     if chs_tag:
-        add_to_pic(pic_path, img_pic, size, count, 1)  # 添加
+        add_to_pic(pic_path, img_pic, size, count, 1)
         count = (count + 1) % 4
     if leak_tag:
         add_to_pic(pic_path, img_pic, size, count, 2)
@@ -328,7 +324,6 @@ def add_to_pic(pic_path, img_pic, size, count, mode):
     ]
     img_pic.paste(img_subt, (pos[count]['x'], pos[count]['y']), mask=a)
     img_pic.save(pic_path, quality=95)
-# ========================结束=================================
 
 
 def paste_file_to_folder(filepath, path, prefilename, link_type):
@@ -482,9 +477,9 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
 
         crop_poster(imagecut, path, prefilename)
         if conf.watermark_enable:
-            poster_path = path + '/' + prefilename + '-poster.jpg'
-            thumb_path = path + '/' + prefilename + '-thumb.jpg'
-            add_mark(poster_path, thumb_path, chs_tag, leak_tag, uncensored_tag, conf)
+            pics = [path + '/' + prefilename + '-poster.jpg',
+                    path + '/' + prefilename + '-thumb.jpg']
+            add_mark(pics, chs_tag, leak_tag, uncensored_tag, conf.watermark_location, conf.watermark_size)
         if not create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
             moveFailedFolder(filepath)
 
@@ -502,6 +497,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
         path = os.path.dirname(filepath)
         name = os.path.basename(filepath)
         prefilename = os.path.splitext(name)[0]
+
         if imagecut == 3:
             if not download_poster(path, prefilename, json_data.get('cover_small')):
                 moveFailedFolder(filepath)
@@ -513,13 +509,12 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
                     download_extrafanart(json_data.get('extrafanart'), path, conf.extrafanart_folder)
             except:
                 pass
-        crop_poster(imagecut, path, prefilename)
-        
-        if conf.watermark_enable:
-            poster_path = path + '/' + prefilename + '-poster.jpg'
-            thumb_path = path + '/' + prefilename + '-thumb.jpg'
-            add_mark(poster_path, thumb_path, chs_tag, leak_tag, uncensored_tag, conf)
 
+        crop_poster(imagecut, path, prefilename)
+        if conf.watermark_enable:
+            pics = [path + '/' + prefilename + '-poster.jpg',
+                    path + '/' + prefilename + '-thumb.jpg']
+            add_mark(pics, chs_tag, leak_tag, uncensored_tag, conf.watermark_location, conf.watermark_size)
         if not create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
             moveFailedFolder(filepath)
         
