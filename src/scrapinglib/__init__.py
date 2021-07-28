@@ -35,7 +35,8 @@ def get_data_state(data: dict) -> bool:
 
     return True
 
-def get_data_from_json(file_number, c_sources, c_location_rule, c_naming_rule, max_title_len):
+
+def get_data_from_json(file_number, c_sources, c_naming_rule):
     """
     iterate through all services and fetch the data 
     """
@@ -85,7 +86,7 @@ def get_data_from_json(file_number, c_sources, c_location_rule, c_naming_rule, m
             sources.insert(0, sources.pop(sources.index("dlsite")))
 
     json_data = {}
-    
+
     for source in sources:
         try:
             json_data = json.loads(func_mapping[source](file_number))
@@ -102,7 +103,8 @@ def get_data_from_json(file_number, c_sources, c_location_rule, c_naming_rule, m
     # ================================================网站规则添加结束================================================
 
     title = json_data.get('title')
-    actor_list = str(json_data.get('actor')).strip("[ ]").replace("'", '').split(',')  # 字符串转列表
+    actor_list = str(json_data.get('actor')).strip(
+        "[ ]").replace("'", '').split(',')  # 字符串转列表
     actor_list = [actor.strip() for actor in actor_list]  # 去除空白
     release = json_data.get('release')
     number = json_data.get('number')
@@ -126,7 +128,8 @@ def get_data_from_json(file_number, c_sources, c_location_rule, c_naming_rule, m
         extrafanart = ''
 
     imagecut = json_data.get('imagecut')
-    tag = str(json_data.get('tag')).strip("[ ]").replace("'", '').replace(" ", '').split(',')  # 字符串转列表 @
+    tag = str(json_data.get('tag')).strip("[ ]").replace(
+        "'", '').replace(" ", '').split(',')  # 字符串转列表 @
     actor = str(actor_list).strip("[ ]").replace("'", '').replace(" ", '')
 
     if title == '' or number == '':
@@ -153,50 +156,41 @@ def get_data_from_json(file_number, c_sources, c_location_rule, c_naming_rule, m
     # ====================处理异常字符 END================== #\/:*?"<>|
 
     # ===  替换Studio片假名
-    studio = studio.replace('アイエナジー','Energy')
-    studio = studio.replace('アイデアポケット','Idea Pocket')
-    studio = studio.replace('アキノリ','AKNR')
-    studio = studio.replace('アタッカーズ','Attackers')
-    studio = re.sub('アパッチ.*','Apache',studio)
-    studio = studio.replace('アマチュアインディーズ','SOD')
-    studio = studio.replace('アリスJAPAN','Alice Japan')
-    studio = studio.replace('オーロラプロジェクト・アネックス','Aurora Project Annex')
-    studio = studio.replace('クリスタル映像','Crystal 映像')
-    studio = studio.replace('グローリークエスト','Glory Quest')
-    studio = studio.replace('ダスッ！','DAS！')
-    studio = studio.replace('ディープス','DEEP’s')
-    studio = studio.replace('ドグマ','Dogma')
-    studio = studio.replace('プレステージ','PRESTIGE')
-    studio = studio.replace('ムーディーズ','MOODYZ')
-    studio = studio.replace('メディアステーション','宇宙企画')
-    studio = studio.replace('ワンズファクトリー','WANZ FACTORY')
-    studio = studio.replace('エスワン ナンバーワンスタイル','S1')
-    studio = studio.replace('エスワンナンバーワンスタイル','S1')
-    studio = studio.replace('SODクリエイト','SOD')
-    studio = studio.replace('サディスティックヴィレッジ','SOD')
-    studio = studio.replace('V＆Rプロダクツ','V＆R PRODUCE')
-    studio = studio.replace('V＆RPRODUCE','V＆R PRODUCE')
-    studio = studio.replace('レアルワークス','Real Works')
-    studio = studio.replace('マックスエー','MAX-A')
-    studio = studio.replace('ピーターズMAX','PETERS MAX')
-    studio = studio.replace('プレミアム','PREMIUM')
-    studio = studio.replace('ナチュラルハイ','NATURAL HIGH')
-    studio = studio.replace('マキシング','MAXING')
-    studio = studio.replace('エムズビデオグループ','M’s Video Group')
-    studio = studio.replace('ミニマム','Minimum')
-    studio = studio.replace('ワープエンタテインメント','WAAP Entertainment')
-    studio = re.sub('.*/妄想族','妄想族',studio)
-    studio = studio.replace('/',' ')
+    studio = studio.replace('アイエナジー', 'Energy')
+    studio = studio.replace('アイデアポケット', 'Idea Pocket')
+    studio = studio.replace('アキノリ', 'AKNR')
+    studio = studio.replace('アタッカーズ', 'Attackers')
+    studio = re.sub('アパッチ.*', 'Apache', studio)
+    studio = studio.replace('アマチュアインディーズ', 'SOD')
+    studio = studio.replace('アリスJAPAN', 'Alice Japan')
+    studio = studio.replace('オーロラプロジェクト・アネックス', 'Aurora Project Annex')
+    studio = studio.replace('クリスタル映像', 'Crystal 映像')
+    studio = studio.replace('グローリークエスト', 'Glory Quest')
+    studio = studio.replace('ダスッ！', 'DAS！')
+    studio = studio.replace('ディープス', 'DEEP’s')
+    studio = studio.replace('ドグマ', 'Dogma')
+    studio = studio.replace('プレステージ', 'PRESTIGE')
+    studio = studio.replace('ムーディーズ', 'MOODYZ')
+    studio = studio.replace('メディアステーション', '宇宙企画')
+    studio = studio.replace('ワンズファクトリー', 'WANZ FACTORY')
+    studio = studio.replace('エスワン ナンバーワンスタイル', 'S1')
+    studio = studio.replace('エスワンナンバーワンスタイル', 'S1')
+    studio = studio.replace('SODクリエイト', 'SOD')
+    studio = studio.replace('サディスティックヴィレッジ', 'SOD')
+    studio = studio.replace('V＆Rプロダクツ', 'V＆R PRODUCE')
+    studio = studio.replace('V＆RPRODUCE', 'V＆R PRODUCE')
+    studio = studio.replace('レアルワークス', 'Real Works')
+    studio = studio.replace('マックスエー', 'MAX-A')
+    studio = studio.replace('ピーターズMAX', 'PETERS MAX')
+    studio = studio.replace('プレミアム', 'PREMIUM')
+    studio = studio.replace('ナチュラルハイ', 'NATURAL HIGH')
+    studio = studio.replace('マキシング', 'MAXING')
+    studio = studio.replace('エムズビデオグループ', 'M’s Video Group')
+    studio = studio.replace('ミニマム', 'Minimum')
+    studio = studio.replace('ワープエンタテインメント', 'WAAP Entertainment')
+    studio = re.sub('.*/妄想族', '妄想族', studio)
+    studio = studio.replace('/', ' ')
     # ===  替换Studio片假名 END
-
-    location_rule = eval(c_location_rule)
-
-    if 'actor' in c_location_rule and len(actor) > 100:
-        location_rule = eval(c_location_rule.replace("actor", "'多人作品'"))
-    maxlen = max_title_len
-    if 'title' in c_location_rule and len(title) > maxlen:
-        shorttitle = title[0:maxlen]
-        location_rule = location_rule.replace(title, shorttitle)
 
     # 返回处理后的json_data
     json_data['title'] = title
@@ -204,22 +198,16 @@ def get_data_from_json(file_number, c_sources, c_location_rule, c_naming_rule, m
     json_data['release'] = release
     json_data['cover_small'] = cover_small
     json_data['tag'] = tag
-    json_data['location_rule'] = location_rule
     json_data['year'] = year
     json_data['actor_list'] = actor_list
-
     json_data['trailer'] = ''
-   
-    if extrafanart:
-        json_data['extrafanart'] = extrafanart
-    else:
-        json_data['extrafanart'] = ''
+    json_data['extrafanart'] = extrafanart
 
-    naming_rule = ""
-    for i in c_naming_rule.split("+"):
-        if i not in json_data:
-            naming_rule += i.strip("'").strip('"')
-        else:
-            naming_rule += json_data.get(i)
+    naming_rule = title
+    try:
+        naming_rule = eval(c_naming_rule)
+    except:
+        pass
     json_data['naming_rule'] = naming_rule
+
     return json_data

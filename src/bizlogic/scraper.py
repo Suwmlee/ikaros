@@ -14,7 +14,9 @@ from ..utils.filehelper import ext_type, symlink_force, hardlink_force
 from ..scrapinglib import get_data_from_json
 
 
-def escape_path(path, escape_literals: str):  # Remove escape literals
+def escape_path(path, escape_literals: str):
+    """ Remove escape literals
+    """
     backslash = '\\'
     for literal in escape_literals:
         path = path.replace(backslash + literal, '')
@@ -27,19 +29,25 @@ def create_folder(json_data: dict, conf: _ScrapingConfigs):
     success_folder = conf.success_folder
     title = json_data.get('title')
     number = json_data.get('number')
-    location_rule = json_data.get('location_rule')
-    if len(location_rule) > 240:
-        # path为影片+元数据所在目录
-        path = success_folder + '/' + location_rule.replace("'actor'", "'manypeople'", 3).replace("actor","'manypeople'",3)
-    else:
-        path = success_folder + '/' + location_rule
-    path = trimblank(path)
+    actor = json_data.get('actor')
+
+    location_rule = eval(conf.location_rule, json_data)
+    if 'actor' in conf.location_rule and len(actor) > 100:
+        location_rule = eval(conf.location_rule.replace("actor", "'多人作品'"), json_data)
+    maxlen = conf.max_title_len
+    if 'title' in conf.location_rule and len(title) > maxlen:
+        shorttitle = title[0:maxlen]
+        location_rule = location_rule.replace(title, shorttitle)
+
+    # path为影片+元数据所在目录
+    path = success_folder + '/' + location_rule
+    path = trimrightblank(path)
     if not os.path.exists(path):
         path = escape_path(path, conf.escape_literals)
         try:
             os.makedirs(path)
         except:
-            path = success_folder + '/' + location_rule.replace('/[' + number + ')-' + title, "/number")
+            path = success_folder + '/' + location_rule.replace('/[' + number + '] ' + title, "/number")
             path = escape_path(path, conf.escape_literals)
 
             os.makedirs(path)
@@ -81,12 +89,12 @@ def get_info(json_data):
     return title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label
 
 
-def trimblank(s: str):
+def trimrightblank(s: str):
     """
     Clear the blank on the right side of the folder name
     """
     if s[-1] == " ":
-        return trimblank(s[:-1])
+        return trimrightblank(s[:-1])
     else:
         return s
 
@@ -407,7 +415,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
     # 影片的路径 绝对路径
     filepath = file_path
     number = scrapingnum
-    json_data = get_data_from_json(number, conf.website_priority, conf.location_rule, conf.naming_rule, conf.max_title_len)
+    json_data = get_data_from_json(number, conf.website_priority, conf.naming_rule)
 
     # Return if blank dict returned (data not found)
     if not json_data:
@@ -450,7 +458,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
 
     # main_mode
     #  1: 创建链接刮削 / Scraping mode
-    #       - 软链接    - 硬链接    - 移动文件
+    #       - 1 软链接    - 2 硬链接    - 0 移动文件
     #  2: 整理模式 / Organizing mode ??
     #  3：直接刮削
     if conf.main_mode == 1:

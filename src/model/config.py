@@ -7,13 +7,13 @@ from .. import db
 class _ScrapingConfigs(db.Model):
     """ 
     main_mode:
-    1. 移动刮削
+    :1  移动刮削
         link_type:
-        0. 移动文件
-        1. 软链接
-        2. 硬链接
-    2. 整理
-    3. 直接刮削
+        :0  移动文件
+        :1  软链接
+        :2  硬链接
+    :2  整理
+    :3  直接刮削
     """
     __tablename__ = 'settings'
 
