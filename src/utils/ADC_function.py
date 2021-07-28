@@ -7,35 +7,17 @@ import pathlib
 import time
 import os
 import uuid
-from lxml import etree
 from urllib.parse import urljoin
 from http.cookies import SimpleCookie
 from ..service.configservice import scrapingConfService
 
 
-def get_data_state(data: dict) -> bool:  # 元数据获取失败检测
-    if "title" not in data or "number" not in data:
-        return False
-
-    if data["title"] is None or data["title"] == "" or data["title"] == "null":
-        return False
-
-    if data["number"] is None or data["number"] == "" or data["number"] == "null":
-        return False
-
-    return True
-
-
-def getXpathSingle(htmlcode, xpath):
-    html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result1 = str(html.xpath(xpath)).strip(" ['']")
-    return result1
-
-
 G_USER_AGENT = r'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36'
 
-# 网页请求核心
+
 def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None):
+    """ 网页请求核心
+    """
     configProxy = scrapingConfService.getProxySetting()
     errors = ""
 

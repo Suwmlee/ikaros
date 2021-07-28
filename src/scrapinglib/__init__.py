@@ -4,10 +4,7 @@
     
 """
 import json
-
 import re
-from ..service.configservice import _ScrapingConfigs
-from ..utils.ADC_function import get_data_state
 
 from . import avsox
 from . import fanza
@@ -24,7 +21,21 @@ from . import carib
 from . import fc2club
 
 
-def get_data_from_json(file_number, conf: _ScrapingConfigs):
+def get_data_state(data: dict) -> bool:
+    """ 元数据获取失败检测
+    """
+    if "title" not in data or "number" not in data:
+        return False
+
+    if data["title"] is None or data["title"] == "" or data["title"] == "null":
+        return False
+
+    if data["number"] is None or data["number"] == "" or data["number"] == "null":
+        return False
+
+    return True
+
+def get_data_from_json(file_number, c_sources, c_location_rule, c_naming_rule, max_title_len):
     """
     iterate through all services and fetch the data 
     """
@@ -46,8 +57,8 @@ def get_data_from_json(file_number, conf: _ScrapingConfigs):
     }
 
     # default fetch order list, from the beginning to the end
-    sources = conf.website_priority.split(',')
-    if not len(conf.website_priority) > 60:
+    sources = c_sources.split(',')
+    if not len(c_sources) > 60:
         # if the input file name matches certain rules,
         # move some web service to the beginning of the list
         lo_file_number = file_number.lower()
@@ -103,16 +114,16 @@ def get_data_from_json(file_number, conf: _ScrapingConfigs):
     series = json_data.get('series')
     year = json_data.get('year')
 
-    if not json_data.get('cover_small'):
-        cover_small = ''
-    else:
+    if json_data.get('cover_small'):
         cover_small = json_data.get('cover_small')
+    else:
+        cover_small = ''
 
     trailer = ''
-    if not json_data.get('extrafanart'):
-        extrafanart = ''
-    else:
+    if json_data.get('extrafanart'):
         extrafanart = json_data.get('extrafanart')
+    else:
+        extrafanart = ''
 
     imagecut = json_data.get('imagecut')
     tag = str(json_data.get('tag')).strip("[ ]").replace("'", '').replace(" ", '').split(',')  # 字符串转列表 @
@@ -178,12 +189,12 @@ def get_data_from_json(file_number, conf: _ScrapingConfigs):
     studio = studio.replace('/',' ')
     # ===  替换Studio片假名 END
 
-    location_rule = eval(conf.location_rule)
+    location_rule = eval(c_location_rule)
 
-    if 'actor' in conf.location_rule and len(actor) > 100:
-        location_rule = eval(conf.location_rule.replace("actor", "'多人作品'"))
-    maxlen = conf.max_title_len
-    if 'title' in conf.location_rule and len(title) > maxlen:
+    if 'actor' in c_location_rule and len(actor) > 100:
+        location_rule = eval(c_location_rule.replace("actor", "'多人作品'"))
+    maxlen = max_title_len
+    if 'title' in c_location_rule and len(title) > maxlen:
         shorttitle = title[0:maxlen]
         location_rule = location_rule.replace(title, shorttitle)
 
@@ -198,16 +209,14 @@ def get_data_from_json(file_number, conf: _ScrapingConfigs):
     json_data['actor_list'] = actor_list
 
     json_data['trailer'] = ''
-    if conf.extrafanart_enable:
-        if extrafanart:
-            json_data['extrafanart'] = extrafanart
-        else:
-            json_data['extrafanart'] = ''
+   
+    if extrafanart:
+        json_data['extrafanart'] = extrafanart
     else:
         json_data['extrafanart'] = ''
 
     naming_rule = ""
-    for i in conf.naming_rule.split("+"):
+    for i in c_naming_rule.split("+"):
         if i not in json_data:
             naming_rule += i.strip("'").strip('"')
         else:
