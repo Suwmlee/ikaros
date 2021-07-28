@@ -40,7 +40,7 @@ class _ScrapingConfigs(db.Model):
     naming_rule = Column(String, default="number+' '+title")
     max_title_len = Column(Integer, default=50)
     update_check = Column(Boolean, default=False)
-    website_priority = Column(String, default="javbus,javdb,airav,fanza,xcity,mgstage,fc2,avsox,jav321,javlib,dlsite")
+    website_priority = Column(String, default="javbus,javdb,fc2club,airav,fanza,xcity,mgstage,fc2,avsox,jav321,javlib,dlsite")
     
     extrafanart_enable = Column(Boolean, default=True)
     extrafanart_folder = Column(String, default='extrafanart')
