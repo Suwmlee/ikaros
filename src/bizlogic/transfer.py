@@ -11,7 +11,7 @@ from .rename import renamebyreg
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
 from ..utils.filehelper import video_type, ext_type, cleanfilebysuffix, cleanfolderwithoutsuffix, hardlink_force, symlink_force
-from ..utils.wlogger import wlogger
+from ..utils.log import log
 
 
 def copysub(src_folder, destfolder, filter):
@@ -22,7 +22,7 @@ def copysub(src_folder, destfolder, filter):
         (path, ext) = os.path.splitext(item)
         if ext.lower() in ext_type and filter in item:
             src_file = os.path.join(src_folder, item)
-            print("[-] - copy sub  " + src_file)
+            log.info("[-] - copy sub  " + src_file)
             dest = shutil.copy(src_file, destfolder)
             # modify permission
             os.chmod(dest, stat.S_IRWXU | stat.S_IRGRP |
@@ -42,7 +42,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
         count = 0
         total = str(len(movie_list))
         taskService.updateTaskTotal(total, 'transfer')
-        print('[+]Find  ' + total+'  movies')
+        log.info('[+]Find  ' + total+'  movies')
 
         # 硬链接直接使用源目录
         if linktype == 1:
@@ -56,8 +56,8 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
         for movie_path in movie_list:
             count += 1
             taskService.updateTaskFinished(count, 'transfer')
-            print('[!] - ' + str(count) + '/' + total + ' -')
-            print("[+] start check [{}] ".format(movie_path))
+            log.info('[!] - ' + str(count) + '/' + total + ' -')
+            log.info("[+] start check [{}] ".format(movie_path))
             movie_info = transrecordService.queryByPath(movie_path)
             if not movie_info:
                 movie_info = transrecordService.add(movie_path)
@@ -72,30 +72,30 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
             for literal in filterliterals:
                 if literal in midfolder:
                     midfolder = midfolder.replace(literal, '')
-                    print("[-] handling filterliterals: " + literal)
+                    log.info("[-] handling filterliterals: " + literal)
             # 目的地址
             newpath = os.path.join(dest_folder, midfolder, name)
             if os.path.exists(newpath):
                 realpath = os.path.realpath(newpath)
                 if realpath == link_path:
-                    print("[!] already exists")
+                    log.info("[!] already exists")
                     transrecordService.update(movie_path, link_path, newpath)
                     continue
                 else:
-                    print("[-] clean link")
+                    log.info("[-] clean link")
                     os.remove(newpath)
             (newfolder, tname) = os.path.split(newpath)
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
 
-            print("[-] create link from [{}] to [{}]".format(link_path, newpath))
+            log.info("[-] create link from [{}] to [{}]".format(link_path, newpath))
             if linktype == 0:
                 symlink_force(link_path, newpath)
             else:
                 hardlink_force(link_path, newpath)
             basename = os.path.splitext(name)[0]
             copysub(filefolder, newfolder, basename)
-            print("[-] transfer finished [{}]".format(movie_path))
+            log.info("[-] transfer finished [{}]".format(movie_path))
             transrecordService.update(movie_path, link_path, newpath)
 
         cleanfolderwithoutsuffix(dest_folder, video_type)
@@ -105,11 +105,11 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
             reg2 = "\.e[0-9videvoa\(\)]{1,}[.]"
             renamebyreg(dest_folder, reg, reg2, renameprefix, False)
 
-        print("transfer finished")
+        log.info("transfer finished")
     except:
         import traceback
         err = traceback.format_exc()
-        wlogger.error(err)
+        log.error(err)
 
     taskService.updateTaskStatus(1, 'transfer')
 

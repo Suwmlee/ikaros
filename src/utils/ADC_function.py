@@ -9,6 +9,7 @@ import os
 import uuid
 from urllib.parse import urljoin
 from http.cookies import SimpleCookie
+from .log import log
 from ..service.configservice import scrapingConfService
 
 
@@ -45,13 +46,12 @@ def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None)
             else:
                 return result.text
         except requests.exceptions.ProxyError:
-            print("[-]Proxy error! Please check your Proxy")
+            log.info("[-]Proxy error! Please check your Proxy")
             return
         except Exception as e:
-            print("[-]Connect retry {}/{}".format(i + 1, configProxy.retry))
-            errors = str(e)
-    print('[-]Connect Failed! Please check your Proxy or Network!')
-    print("[-]" + errors)
+            log.info("[-]Connect retry {}/{}".format(i + 1, configProxy.retry))
+            log.error(e)
+    log.info('[-]Connect Failed! Please check your Proxy or Network!')
 
 
 def post_html(url: str, query: dict, headers: dict = None) -> requests.Response:
@@ -74,10 +74,9 @@ def post_html(url: str, query: dict, headers: dict = None) -> requests.Response:
                     url, data=query, headers=headers, timeout=configProxy.timeout)
             return result
         except Exception as e:
-            print("[-]Connect retry {}/{}".format(i + 1, configProxy.retry))
-            errors = str(e)
-    print("[-]Connect Failed! Please check your Proxy or Network!")
-    print("[-]" + errors)
+            log.info("[-]Connect retry {}/{}".format(i + 1, configProxy.retry))
+            log.error(e)
+    log.info("[-]Connect Failed! Please check your Proxy or Network!")
 
 
 def translateTag_to_sc(tag):

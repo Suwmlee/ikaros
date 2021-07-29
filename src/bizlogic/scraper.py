@@ -8,7 +8,7 @@ import requests
 from PIL import Image
 
 from ..service.configservice import scrapingConfService, _ScrapingConfigs
-from ..utils.wlogger import wlogger
+from ..utils.log import log
 from ..utils.ADC_function import G_USER_AGENT, is_uncensored
 from ..utils.filehelper import ext_type, symlink_force, hardlink_force
 from ..scrapinglib import get_data_from_json
@@ -59,7 +59,7 @@ def moveFailedFolder(filepath):
         每次刮削清空文件夹
     """
     try:
-        wlogger.info('[-]Move to Failed folder')
+        log.info('[-]Move to Failed folder')
         conf = scrapingConfService.getSetting()
         if conf.main_mode == 1 and (conf.link_type == 1 or conf.link_type == 2):
             (filefolder, name) = os.path.split(filepath)
@@ -112,7 +112,7 @@ def download_file_with_filename(url, filename, path):
                 proxies = configProxy.proxies()
                 r = requests.get(url, headers=headers, timeout=configProxy.timeout, proxies=proxies)
                 if r == '':
-                    wlogger.info('[-]Movie Data not found!')
+                    log.info('[-]Movie Data not found!')
                     return False
                 with open(os.path.join(str(path), filename), "wb") as code:
                     code.write(r.content)
@@ -120,24 +120,24 @@ def download_file_with_filename(url, filename, path):
             else:
                 r = requests.get(url, headers=headers, timeout=configProxy.timeout)
                 if r == '':
-                    wlogger.info('[-]Movie Data not found!')
+                    log.info('[-]Movie Data not found!')
                     return False
                 with open(os.path.join(str(path), filename), "wb") as code:
                     code.write(r.content)
                 return True
         except requests.exceptions.RequestException:
             i += 1
-            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
+            log.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
         except requests.exceptions.ConnectionError:
             i += 1
-            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
+            log.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
         except requests.exceptions.ProxyError:
             i += 1
-            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
+            log.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
         except requests.exceptions.ConnectTimeout:
             i += 1
-            wlogger.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
-    wlogger.info('[-]Connect Failed! Please check your Proxy or Network!')
+            log.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
+    log.info('[-]Connect Failed! Please check your Proxy or Network!')
     return False
 
 
@@ -146,10 +146,10 @@ def download_poster(path, prefilename, cover_small_url):
     """
     postername = prefilename + '-poster.jpg'
     if download_file_with_filename(cover_small_url, postername, path):
-        wlogger.info('[+]Poster Downloaded! ' + path + '/' + postername)
+        log.info('[+]Poster Downloaded! ' + path + '/' + postername)
         return True
     else:
-        wlogger.info('[+]Download Poster Failed! ' + path + '/' + postername)
+        log.info('[+]Download Poster Failed! ' + path + '/' + postername)
         return False
 
 
@@ -158,11 +158,11 @@ def download_cover(cover_url, prefilename, path):
     """
     fanartname = prefilename + '-fanart.jpg'
     if download_file_with_filename(cover_url, fanartname, path):
-        wlogger.info('[+]Cover Downloaded! ' + path + '/' + fanartname)
+        log.info('[+]Cover Downloaded! ' + path + '/' + fanartname)
         shutil.copyfile(path + '/' + fanartname, path + '/' + prefilename + '-thumb.jpg')
         return True
     else:
-        wlogger.info('[+]Download Cover Failed! ' + path + '/' + fanartname)
+        log.info('[+]Download Cover Failed! ' + path + '/' + fanartname)
         return False
 
 
@@ -171,10 +171,10 @@ def download_extrafanart(urls, path, extrafanart_folder):
     path = path + '/' + extrafanart_folder
     for url in urls:
         if download_file_with_filename(url, 'extrafanart-' + str(j)+'.jpg', path):
-            print('[+]Extrafanart Downloaded!', path + '/extrafanart-' + str(j) + '.jpg')
+            log.info('[+]Extrafanart Downloaded! ' + path + '/extrafanart-' + str(j) + '.jpg')
             j += 1
         else:
-            print('[+]Download Extrafanart Failed!', path + '/extrafanart-' + str(j) + '.jpg')
+            log.info('[+]Download Extrafanart Failed! ' + path + '/extrafanart-' + str(j) + '.jpg')
     return True
 
 
@@ -240,15 +240,15 @@ def create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_
             print("  <cover>" + cover + "</cover>", file=code)
             print("  <website>" + website + "</website>", file=code)
             print("</movie>", file=code)
-            wlogger.info("[+]Wrote!            " + path + "/" + prefilename + ".nfo")
+            log.info("[+]Wrote!            " + path + "/" + prefilename + ".nfo")
             return True
     except IOError as e:
-        wlogger.info("[-]Write Failed!")
-        wlogger.error(e)
+        log.error("[-]Write Failed!")
+        log.error(e)
         return False
     except Exception as e1:
-        wlogger.error(e1)
-        wlogger.info("[-]Write Failed!")
+        log.error("[-]Write Failed!")
+        log.error(e1)
         return False
 
 
@@ -263,14 +263,14 @@ def crop_poster(imagecut, path, prefilename):
             h = img.height
             img2 = img.crop((w / 1.9, 0, w, h))
             img2.save(path + '/' + prefilename + '-poster.jpg')
-            wlogger.info('[+]Image Cutted!     ' + path + '/' + prefilename + '-poster.jpg')
+            log.info('[+]Image Cutted!     ' + path + '/' + prefilename + '-poster.jpg')
         except:
-            wlogger.info('[-]Cover cut failed!')
+            log.info('[-]Cover cut failed!')
     elif imagecut == 0: 
         # 复制封面
         shutil.copyfile(path + '/' + prefilename + '-fanart.jpg',
                         path + '/' + prefilename + '-poster.jpg')
-        wlogger.info('[+]Image Copyed!     ' + path + '/' + prefilename + '-poster.jpg')
+        log.info('[+]Image Copyed!     ' + path + '/' + prefilename + '-poster.jpg')
 
 
 def add_mark(pics, chs_tag, leak_tag, uncensored_tag, count, size):
@@ -293,7 +293,7 @@ def add_mark(pics, chs_tag, leak_tag, uncensored_tag, count, size):
         return
     for pic in pics:
         add_mark_thread(pic, chs_tag, leak_tag, uncensored_tag, count, size)
-        print('[+]Image Add Mark:   ' + mark_type.strip(','))
+        log.info('[+]Image Add Mark:   ' + mark_type.strip(','))
 
 
 def add_mark_thread(pic_path, chs_tag, leak_tag, uncensored_tag, count, size):
@@ -350,7 +350,7 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
             if os.path.exists(newpath):
                 realpath = os.path.realpath(newpath)
                 if realpath == soft_path:
-                    print("already exists")
+                    log.info("[-]already exists")
                 else:
                     os.remove(newpath)
             (newfolder, tname) = os.path.split(newpath)
@@ -365,17 +365,16 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
         for subname in ext_type:
             if os.path.exists(filepath.replace(houzhui, subname)):
                 os.rename(filepath.replace(houzhui, subname), path + '/' + prefilename + subname)
-                print('[+]Sub moved!')
+                log.info('[+]Sub moved!')
         return True, newpath
     except FileExistsError:
-        wlogger.info('[-]File Exists! Please check your movie!')
-        wlogger.info('[-]move to the root folder of the program.')
+        log.error('[-]File Exists! Please check your movie!')
         return False, ''
     except PermissionError:
-        wlogger.info('[-]Error! Please run as administrator!')
+        log.error('[-]Error! Please run as administrator!')
         return False, ''
     except OSError as oserr:
-        wlogger.info('[-]OS Error errno ' + oserr.errno)
+        log.error('[-]OS Error errno ' + oserr.errno)
         return False, ''
 
 
@@ -386,7 +385,7 @@ def get_part(filepath):
         if re.search('-cd\d+', filepath):
             return re.findall('-cd\d+', filepath)[0]
     except:
-        wlogger.info("[-]failed!Please rename the filename again!")
+        log.error("[-]failed!Please rename the filename again!")
         moveFailedFolder(filepath)
         return
 
@@ -419,7 +418,7 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
 
     # Return if blank dict returned (data not found)
     if not json_data:
-        wlogger.info('[-]Movie Data not found!')
+        log.info('[-]Movie Data not found!')
         moveFailedFolder(filepath)
         return False, ''
 

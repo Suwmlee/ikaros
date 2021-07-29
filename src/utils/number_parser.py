@@ -1,6 +1,6 @@
 import os
 import re
-
+from .log import log
 
 G_spat = re.compile(
     "(^22-sht\.me|-fhd|_fhd|^fhd_|^fhd-|-hd|_hd|^hd_|^hd-|-sd|_sd|-1080p|_1080p|-720p|_720p)",
@@ -59,7 +59,7 @@ def get_number(debug,filepath: str) -> str:
                 except:
                     return re.search(r'(.+?)\.', filepath)[0]
         except Exception as e:
-            print('[-]' + str(e))
+            log.error(e)
             return
     elif debug == True:
         if '-' in filepath or '_' in filepath:  # 普通提取番号 主要处理包含减号-和_的番号

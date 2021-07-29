@@ -8,7 +8,7 @@ from flask import request, Response, send_from_directory
 
 from . import web
 from ..service.recordservice import scrapingrecordService
-from ..utils.wlogger import wlogger
+from ..utils.log import log
 
 
 @web.route("/api/export", methods=['GET'])
@@ -42,7 +42,7 @@ def export_excel():
         xlsfile.save(filefolder + filename)
         return send_from_directory(filefolder, filename, as_attachment=True)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 
@@ -51,7 +51,7 @@ def open_excel(file='file.xls'):
         data = xlrd.open_workbook(file, encoding_override="utf-8")
         return data
     except Exception as e:
-        print(str(e))
+        log.error(e)
 
 
 def allowed_format(file='file.xls', colnameindex=0, by_index=0):
@@ -117,5 +117,5 @@ def import_excel():
         else:
             return Response(status=403)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)

@@ -14,7 +14,7 @@ from ..bizlogic import rename
 from ..service.recordservice import scrapingrecordService, transrecordService
 from ..service.configservice import scrapingConfService, transConfigService
 from ..service.taskservice import taskService
-from ..utils.wlogger import wlogger
+from ..utils.log import log
 # from concurrent.futures import ThreadPoolExecutor
 
 # DOCS https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor
@@ -30,7 +30,7 @@ def intro():
             f.close()
         return content
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 
@@ -41,7 +41,7 @@ def start_scraping():
         manager.start()
         return Response(status=200)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 
@@ -53,7 +53,7 @@ def start_transfer():
                           content['soft_prefix'], content['escape_folder'], content['renameflag'], content['renameprefix'])
         return Response(status=200)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 
@@ -64,7 +64,7 @@ def stop_all():
         taskService.updateTaskStatus(0, 'scrape')
         return Response(status=200)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 
@@ -76,7 +76,7 @@ def previewrename():
             content['source_folder'], content['reg'], content['reg2'], content['prefix'], True)
         return json.dumps(ret)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 
@@ -88,7 +88,7 @@ def renamebyreg():
             content['source_folder'], content['reg'], content['reg2'], content['prefix'], False)
         return json.dumps(ret)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 
@@ -99,7 +99,7 @@ def renamebyreplace():
         ret = rename.rename(content['source_folder'], content['base'], content['newfix'])
         return json.dumps(ret)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 # scrapingconf
@@ -111,7 +111,7 @@ def getScrapingConf():
         content = scrapingConfService.getSetting().serialize()
         return json.dumps(content)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 
@@ -122,7 +122,7 @@ def updateScapingConf():
         scrapingConfService.updateSetting(content)
         return Response(status=200)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 # scrapingrecords
@@ -136,7 +136,7 @@ def editScrapingdata():
             content['id'], content['status'], content['scrapingname'], content['cnsubtag'])
         return Response(status=200)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 
@@ -146,7 +146,7 @@ def deletescrapingrecord(sid):
         scrapingrecordService.deleteByID(sid)
         return Response(status=200)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 
@@ -187,7 +187,7 @@ def getscrapingrecord():
             ret['running'] = False
         return json.dumps(ret)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 # transconf
@@ -204,7 +204,7 @@ def getTransConfs():
             all.append(conf.serialize())
         return json.dumps(all)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 
@@ -218,7 +218,7 @@ def addTransConf():
         config = transConfigService.updateConf(content)
         return json.dumps(config.serialize())
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 
@@ -231,7 +231,7 @@ def updateTransConf():
         config = transConfigService.updateConf(content)
         return json.dumps(config.serialize())
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 
@@ -244,7 +244,7 @@ def deleteTransConf(cid):
         transConfigService.deleteConf(iid)
         return Response(status=200)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 # transrecord
@@ -277,7 +277,7 @@ def gettransrecord():
             ret['running'] = False
         return json.dumps(ret)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)
 
 
@@ -289,5 +289,5 @@ def deltransrecord():
         transrecordService.deleteRecords()
         return Response(status=200)
     except Exception as err:
-        wlogger.info(err)
+        log.error(err)
         return Response(status=500)

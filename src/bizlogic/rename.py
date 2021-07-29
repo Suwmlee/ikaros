@@ -2,6 +2,7 @@
 
 import os
 import re
+from ..utils.log import log
 from ..utils.filehelper import video_type, ext_type
 
 
@@ -54,9 +55,9 @@ def extractep(src: list):
                     origin.append(single)
 
     if len(eps) != 1:
-        print("提取剧集异常")
-        print(origin)
-        print(eps)
+        log.info("提取剧集异常")
+        log.info(origin)
+        log.info(eps)
         return '', ''
     else:
         return origin[0], eps[0]
@@ -70,7 +71,7 @@ def rename(root, base, newfix):
             newname = basename.replace(base, newfix)
             newfull = os.path.join(dirname, newname)
             os.rename(name, newfull)
-            print("rename [{}] to [{}]".format(name, newfull))
+            log.info("rename [{}] to [{}]".format(name, newfull))
 
 
 def renamebyreg(root, reg, reg2, prefix, preview: bool):
@@ -80,26 +81,26 @@ def renamebyreg(root, reg, reg2, prefix, preview: bool):
     # reg = "[\[第 ][0-9.videvoa\(\)]*[\]話话 ]"
     for name in tvs:
         dirname, basename = os.path.split(name)
-        print("开始. : "+basename)
+        log.info("开始. : "+basename)
 
         nameresult = filtername(basename, reg)
         if not nameresult or len(nameresult) == 0:
             # reg2 = "\.e[0-9videvoa\(\)]{1,}[.]"
             nameresult = filtername(basename, reg2)
         if nameresult:
-            # print("提取剧集标签 "+nameresult)
+            # log.info("提取剧集标签 "+nameresult)
             originep, epresult = extractep(nameresult)
             if epresult != '':
-                print(originep + "   "+epresult)
+                log.info(originep + "   "+epresult)
                 if originep[0] == '.':
                     renum = "." + prefix + epresult + "."
                 elif originep[0] == '[':
                     renum = "[" + prefix + epresult + "]"
                 else:
                     renum = " " + prefix + epresult + " "
-                print("替换内容：" + renum)
+                log.info("替换内容：" + renum)
                 newname = basename.replace(originep, renum)
-                print("rename [{}] to [{}]".format(basename, newname))
+                log.info("rename [{}] to [{}]".format(basename, newname))
 
                 if not preview:
                     newfull = os.path.join(dirname, newname)

@@ -8,7 +8,7 @@ from ..service.configservice import scrapingConfService, _ScrapingConfigs
 from ..service.recordservice import scrapingrecordService
 from ..service.taskservice import taskService
 from .scraper import core_main, moveFailedFolder
-from ..utils.wlogger import wlogger
+from ..utils.log import log
 from ..utils.number_parser import get_number
 from ..utils.filehelper import video_type, CleanFolder, cleanfolderbyfilter
 
@@ -56,16 +56,16 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
                 n_number = movie_info.scrapingname
             if movie_info.cnsubtag:
                 scrapingtag_cnsub = True
-            wlogger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
+            log.info("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
             (flag, new_path) = core_main(file_path, n_number, scrapingtag_cnsub, conf)
             movie_info = scrapingrecordService.update(file_path, n_number, new_path, flag)
         else:
-            wlogger.info("[!]Already done: [{}]".format(file_path))
-        wlogger.info("[*]======================================================")
+            log.info("[!]Already done: [{}]".format(file_path))
     except Exception as err:
-        wlogger.error("[-] [{}] ERROR:".format(file_path))
-        wlogger.error(err)
+        log.error("[!] ERROR: [{}] ".format(file_path))
+        log.error(err)
         moveFailedFolder(file_path)
+    log.info("[*]======================================================")
 
 
 def start():
@@ -86,15 +86,15 @@ def start():
     total = str(len(movie_list))
     taskService.updateTaskFinished(0, 'scrape')
     taskService.updateTaskTotal(total, 'scrape')
-    wlogger.info('[+]Find  ' + total+'  movies')
+    log.info('[+]Find  ' + total+'  movies')
 
     for movie_path in movie_list:
         taskService.updateTaskFinished(count, 'scrape')
         percentage = str(count / int(total) * 100)[:4] + '%'
-        wlogger.info('[!] - ' + percentage + ' [' + str(count) + '/' + total + '] -')
+        log.info('[!] - ' + percentage + ' [' + str(count) + '/' + total + '] -')
         create_data_and_move(movie_path, conf)
         count = count + 1
 
-    wlogger.info("[+]All finished!!!")
+    log.info("[+]All finished!!!")
 
     taskService.updateTaskStatus(1, 'scrape')

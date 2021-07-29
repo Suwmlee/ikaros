@@ -2,7 +2,7 @@
 import os
 import errno
 import shutil
-
+from .log import log
 
 video_type = ['.mp4', '.avi', '.rmvb', '.wmv',
               '.mov', '.mkv', '.flv', '.ts', '.webm', '.iso']
@@ -21,8 +21,9 @@ def CreatFolder(foldername):
     if not os.path.exists(foldername + '/'):
         try:
             os.makedirs(foldername + '/')
-        except:
-            print("[-]failed!can not be make Failed output folder\n[-](Please run as Administrator)")
+        except Exception as e:
+            log.info("[-]failed!can not be make Failed output folder\n[-](Please run as Administrator)")
+            log.error(e)
             return
 
 
@@ -45,7 +46,7 @@ def cleanfilebysuffix(folder, suffix):
         if os.path.isdir(f):
             cleanfilebysuffix(f, suffix)
         elif os.path.splitext(f)[1].lower() in suffix:
-            print("clean file by suffix ")
+            log.info("clean file by suffix ")
             os.remove(f)
 
 
@@ -61,7 +62,7 @@ def cleanfolderwithoutsuffix(folder, suffix):
             if hastag:
                 hassuffix = True
             else:
-                print("clean empty media folder")
+                log.info("clean empty media folder")
                 shutil.rmtree(f)
         elif os.path.splitext(f)[1].lower() in suffix:
             hassuffix = True
