@@ -5,6 +5,7 @@
 """
 import json
 import re
+from multiprocessing.pool import ThreadPool
 
 from . import avsox
 from . import fanza
@@ -36,7 +37,7 @@ def get_data_state(data: dict) -> bool:
     return True
 
 
-def get_data_from_json(file_number, c_sources, c_naming_rule):
+def get_data_from_json(file_number, c_sources, c_naming_rule, c_multi_threading=True):
     """
     iterate through all services and fetch the data 
     """
@@ -69,17 +70,17 @@ def get_data_from_json(file_number, c_sources, c_naming_rule):
         elif "avsox" in sources and (re.match(r"^\d{5,}", file_number) or
                                      "heyzo" in lo_file_number
         ):
-            sources.insert(0, sources.pop(sources.index("javdb")))
-            sources.insert(1, sources.pop(sources.index("avsox")))
+            sources.insert(0, sources.pop(sources.index("avsox")))
+            sources.insert(1, sources.pop(sources.index("javdb")))
         elif "mgstage" in sources and (re.match(r"\d+\D+", file_number) or
                                        "siro" in lo_file_number
         ):
             sources.insert(0, sources.pop(sources.index("mgstage")))
         elif "fc2" in sources and ("fc2" in lo_file_number
         ):
-            sources.insert(0, sources.pop(sources.index("javdb")))
+            sources.insert(0, sources.pop(sources.index("fc2club")))
             sources.insert(1, sources.pop(sources.index("fc2")))
-            sources.insert(2, sources.pop(sources.index("fc2club")))
+            sources.insert(2, sources.pop(sources.index("javdb")))
         elif "dlsite" in sources and (
                 "rj" in lo_file_number or "vj" in lo_file_number
         ):
@@ -87,17 +88,38 @@ def get_data_from_json(file_number, c_sources, c_naming_rule):
 
     json_data = {}
 
-    for source in sources:
-        try:
-            json_data = json.loads(func_mapping[source](file_number))
+    if c_multi_threading:
+        print('[+] Multi threading enabled')
+        pool = ThreadPool(processes=len(c_sources.split(',')))
+
+        # Set the priority of multi-thread crawling and join the multi-thread queue
+        for source in sources:
+            pool.apply_async(func_mapping[source], (file_number,))
+
+        # Get multi-threaded crawling response
+        for source in sources:
+            print('[-] Check', source)
+            json_data = json.loads(pool.apply_async(
+                func_mapping[source], (file_number,)).get())
             # if any service return a valid return, break
             if get_data_state(json_data):
                 break
-        except:
-            break
+        pool.close()
+        pool.terminate()
+    else:
+        for source in sources:
+            try:
+                print('[+] Select', source)
+                json_data = json.loads(func_mapping[source](file_number))
+                # if any service return a valid return, break
+                if get_data_state(json_data):
+                    break
+            except:
+                break
 
     # Return if data not found in all sources
     if not json_data:
+        print('[-]Movie Data not found!')
         return
 
     # ================================================网站规则添加结束================================================
@@ -121,7 +143,11 @@ def get_data_from_json(file_number, c_sources, c_naming_rule):
     else:
         cover_small = ''
 
-    trailer = ''
+    if json_data.get('trailer'):
+        trailer = json_data.get('trailer')
+    else:
+        trailer = ''
+
     if json_data.get('extrafanart'):
         extrafanart = json_data.get('extrafanart')
     else:
@@ -200,7 +226,7 @@ def get_data_from_json(file_number, c_sources, c_naming_rule):
     json_data['tag'] = tag
     json_data['year'] = year
     json_data['actor_list'] = actor_list
-    json_data['trailer'] = ''
+    json_data['trailer'] = trailer
     json_data['extrafanart'] = extrafanart
 
     naming_rule = title

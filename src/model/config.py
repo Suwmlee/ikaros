@@ -68,6 +68,7 @@ class _ScrapingConfigs(db.Model):
             'failed_folder': self.failed_folder,
             'location_rule': self.location_rule,
             'naming_rule': self.naming_rule,
+            'website_priority': self.website_priority,
             'extrafanart_enable':self.extrafanart_enable,
             'extrafanart_folder':self.extrafanart_folder,
             'watermark_enable': self.watermark_enable,
