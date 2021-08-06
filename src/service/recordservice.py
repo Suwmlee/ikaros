@@ -61,12 +61,13 @@ class ScrapingRecordService():
             record.status = status
         db.session.commit()
 
-    def editRecord(self, sid, status, scrapingname, cnsubtag):
+    def editRecord(self, sid, status, scrapingname, cnsubtag, cdnum):
         record = _ScrapingRecords.query.filter_by(id=sid).first()
         if record:
             record.status = status
             record.scrapingname = scrapingname
             record.cnsubtag = cnsubtag
+            record.cdnum = cdnum
             record.updatetime = datetime.datetime.now()
             db.session.commit()
 
