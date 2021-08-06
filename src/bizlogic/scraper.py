@@ -390,9 +390,13 @@ def get_part(filepath):
         return
 
 
-def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
-    """
-    开始刮削
+def core_main(file_path, scrapingnum, cnsubtag, cdnum, conf: _ScrapingConfigs):
+    """ 开始刮削
+    :param file_path    文件路径
+    :param scrapingnum  使用的番号
+    :param cnsubtag     是否增加中文标记
+    :param cdnum        是否增加多集标识
+    :param conf         刮削配置
 
     番号
     --爬取数据
@@ -432,9 +436,13 @@ def core_main(file_path, scrapingnum, cnsubtag, conf: _ScrapingConfigs):
     imagecut = json_data.get('imagecut')
     
     # =======================================================================判断-C,-CD后缀
-    if '-CD' in filepath or '-cd' in filepath:
+    if cdnum:
         multipart_tag = True
-        part = get_part(filepath)
+        part = '-cd' + str(cdnum)
+    else:
+        if '-CD' in filepath or '-cd' in filepath:
+            multipart_tag = True
+            part = get_part(filepath)
 
     if cnsubtag:
         chs_tag = True

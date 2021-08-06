@@ -38,6 +38,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
     debug = conf.debug_info
     n_number = get_number(debug, file_path)
     scrapingtag_cnsub = False
+    scrapingtag_cdnum = 0
     try:
         movie_info = scrapingrecordService.queryByPath(file_path)
         # 查看单个文件刮削状态
@@ -50,14 +51,22 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
                 if os.path.exists(folder) and basefolder != folder:
                     name = os.path.basename(movie_info.destpath)
                     filter = os.path.splitext(name)[0]
-                    cleanfolderbyfilter(folder, filter)
+                    if movie_info.cdnum and movie_info.cdnum > 0:
+                        cleanfolderbyfilter(folder, filter + '.')
+                        cleanfolderbyfilter(folder, filter + '-fanart')
+                        cleanfolderbyfilter(folder, filter + '-poster')
+                        cleanfolderbyfilter(folder, filter + '-thumb')
+                    else:
+                        cleanfolderbyfilter(folder, filter)
             # 查询是否有额外设置
             if movie_info.scrapingname != '':
                 n_number = movie_info.scrapingname
             if movie_info.cnsubtag:
                 scrapingtag_cnsub = True
+            if movie_info.cdnum:
+                scrapingtag_cdnum = movie_info.cdnum
             log.info("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
-            (flag, new_path) = core_main(file_path, n_number, scrapingtag_cnsub, conf)
+            (flag, new_path) = core_main(file_path, n_number, scrapingtag_cnsub, scrapingtag_cdnum, conf)
             movie_info = scrapingrecordService.update(file_path, n_number, new_path, flag)
         else:
             log.info("[!]Already done: [{}]".format(file_path))

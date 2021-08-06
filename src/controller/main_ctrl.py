@@ -133,7 +133,7 @@ def editScrapingdata():
     try:
         content = request.get_json()
         scrapingrecordService.editRecord(
-            content['id'], content['status'], content['scrapingname'], content['cnsubtag'])
+            content['id'], content['status'], content['scrapingname'], content['cnsubtag'], content['cdnum'])
         return Response(status=200)
     except Exception as err:
         log.error(err)
