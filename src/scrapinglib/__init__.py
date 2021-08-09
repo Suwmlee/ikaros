@@ -37,7 +37,7 @@ def get_data_state(data: dict) -> bool:
     return True
 
 
-def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_threading=False):
+def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_threading=True):
     """
     iterate through all services and fetch the data 
     """
@@ -97,7 +97,7 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
 
     if c_multi_threading:
         print('[+] Multi threading enabled')
-        pool = ThreadPool(processes=len(c_sources.split(',')))
+        pool = ThreadPool(processes=len(sources))
 
         # Set the priority of multi-thread crawling and join the multi-thread queue
         for source in sources:
