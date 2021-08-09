@@ -89,6 +89,20 @@ def cleanfolderbyfilter(folder, filter):
         shutil.rmtree(folder)
 
 
+def cleanscrapingfile(folder, filter):
+    """ clean scraping file
+    """
+    filters = [filter + '.', filter + '-fanart.', filter + '-poster.', filter + '-thumb.']
+
+    dirs = os.listdir(folder)
+    for file in dirs:
+        f = os.path.join(folder, file)
+        if not os.path.isdir(f):
+            for s in filters:
+                if s in file:
+                    os.remove(f)
+
+
 def symlink_force(srcpath, dstpath):
     """ create symlink
     https://stackoverflow.com/questions/8299386/modifying-a-symlink-in-python

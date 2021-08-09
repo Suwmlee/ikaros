@@ -10,7 +10,7 @@ from ..service.taskservice import taskService
 from .scraper import core_main, moveFailedFolder
 from ..utils.log import log
 from ..utils.number_parser import get_number
-from ..utils.filehelper import video_type, CleanFolder, cleanfolderbyfilter
+from ..utils.filehelper import cleanscrapingfile, video_type, CleanFolder, cleanfolderbyfilter
 
 
 def movie_lists(root, escape_folder):
@@ -52,10 +52,8 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
                     name = os.path.basename(movie_info.destpath)
                     filter = os.path.splitext(name)[0]
                     if movie_info.cdnum and movie_info.cdnum > 0:
-                        cleanfolderbyfilter(folder, filter + '.')
-                        cleanfolderbyfilter(folder, filter + '-fanart')
-                        cleanfolderbyfilter(folder, filter + '-poster')
-                        cleanfolderbyfilter(folder, filter + '-thumb')
+                        # 如果是多集，则只清理当前文件
+                        cleanscrapingfile(folder, filter)
                     else:
                         cleanfolderbyfilter(folder, filter)
             # 查询是否有额外设置
