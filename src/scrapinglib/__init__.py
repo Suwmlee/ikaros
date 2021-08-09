@@ -37,7 +37,7 @@ def get_data_state(data: dict) -> bool:
     return True
 
 
-def get_data_from_json(file_number, c_sources, c_naming_rule, c_multi_threading=True):
+def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_threading=False):
     """
     iterate through all services and fetch the data 
     """
@@ -64,27 +64,34 @@ def get_data_from_json(file_number, c_sources, c_naming_rule, c_multi_threading=
         # if the input file name matches certain rules,
         # move some web service to the beginning of the list
         lo_file_number = file_number.lower()
-        if "carib" in sources and (re.match(r"^\d{6}-\d{3}", file_number)
-        ):
+        if "carib" in sources and (re.match(r"^\d{6}-\d{3}", file_number)):
             sources.insert(0, sources.pop(sources.index("carib")))
-        elif "avsox" in sources and (re.match(r"^\d{5,}", file_number) or
-                                     "heyzo" in lo_file_number
-        ):
-            sources.insert(0, sources.pop(sources.index("avsox")))
-            sources.insert(1, sources.pop(sources.index("javdb")))
-        elif "mgstage" in sources and (re.match(r"\d+\D+", file_number) or
-                                       "siro" in lo_file_number
-        ):
+        elif re.match(r"^\d{5,}", file_number) or "heyzo" in lo_file_number:
+            if "javdb" in sources:
+                sources.insert(0, sources.pop(sources.index("javdb")))
+            if "avsox" in sources:
+                sources.insert(0, sources.pop(sources.index("avsox")))
+        elif "mgstage" in sources and (re.match(r"\d+\D+", file_number) or "siro" in lo_file_number):
             sources.insert(0, sources.pop(sources.index("mgstage")))
-        elif "fc2" in sources and ("fc2" in lo_file_number
-        ):
-            sources.insert(0, sources.pop(sources.index("fc2club")))
-            sources.insert(1, sources.pop(sources.index("fc2")))
-            sources.insert(2, sources.pop(sources.index("javdb")))
-        elif "dlsite" in sources and (
-                "rj" in lo_file_number or "vj" in lo_file_number
-        ):
+        elif "fc2" in lo_file_number:
+            if "javdb" in sources:
+                sources.insert(0, sources.pop(sources.index("javdb")))
+            if "fc2" in sources:
+                sources.insert(0, sources.pop(sources.index("fc2")))
+            if "fc2club" in sources:
+                sources.insert(0, sources.pop(sources.index("fc2club")))
+        elif "dlsite" in sources and ("rj" in lo_file_number or "vj" in lo_file_number):
             sources.insert(0, sources.pop(sources.index("dlsite")))
+
+    # check sources in func_mapping
+    todel = []
+    for s in sources:
+        if not s in func_mapping:
+            print('[!] Source Not Exist : ' + s)
+            todel.append(s)
+    for d in todel:
+        print('[!] Remove Source : ' + s)
+        sources.remove(d)
 
     json_data = {}
 
@@ -109,13 +116,14 @@ def get_data_from_json(file_number, c_sources, c_naming_rule, c_multi_threading=
     else:
         for source in sources:
             try:
-                print('[+] Select', source)
+                print('[+] Select Source: ' + source)
                 json_data = json.loads(func_mapping[source](file_number))
                 # if any service return a valid return, break
                 if get_data_state(json_data):
                     break
             except:
-                break
+                print('[!] Source error')
+                continue
 
     # Return if data not found in all sources
     if not json_data:
