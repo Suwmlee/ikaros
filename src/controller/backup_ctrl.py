@@ -3,11 +3,13 @@
 import os
 import xlwt
 import xlrd
+import datetime
 
 from flask import request, Response, send_from_directory
 
 from . import web
 from ..service.recordservice import scrapingrecordService
+from ..model.record import _ScrapingRecords
 from ..utils.log import log
 
 
@@ -26,18 +28,26 @@ def export_excel():
         if os.path.exists(filefolder + filename):
             os.remove(filefolder + filename)
         records = scrapingrecordService.queryAll()
+
+        temp = _ScrapingRecords('','')
+        temp.updatetime = datetime.datetime.now()
+        headers = temp.serialize()
+
         xlsfile = xlwt.Workbook(encoding='utf-8')
         sheet = xlsfile.add_sheet("Sheet1")
-        sheet.write(0, 0, 'srcname')
-        sheet.write(0, 1, 'srcpath')
-        sheet.write(0, 2, 'srcsize')
-        sheet.write(0, 3, 'status')
+        header_keys = list(headers.keys())
+
+        i = 0
+        for header in header_keys:
+            sheet.write(0, i, header)
+            i = i + 1
         for rownum in range(len(records)):
             record = records[rownum]
-            sheet.write(rownum+1, 0, record.srcname)
-            sheet.write(rownum+1, 1, record.srcpath)
-            sheet.write(rownum+1, 2, record.srcsize)
-            sheet.write(rownum+1, 3, record.status)
+            j = 0
+            for header in header_keys:
+                value = getattr(record, header)
+                sheet.write(rownum + 1, j, value)
+                j = j + 1
 
         xlsfile.save(filefolder + filename)
         return send_from_directory(filefolder, filename, as_attachment=True)
@@ -91,23 +101,27 @@ def import_excel():
 
         if file and allowed_file(filename):
             file.save('import' + filename)
-            flag = allowed_format(file='import' + filename)
-            if flag:
-                data = open_excel(file='import' + filename).sheets()[0]
-                nrows = data.nrows
-                pass_num = 0
-                success_num = 0
+            data = open_excel(file='import' + filename).sheets()[0]
+            nrows = data.nrows
+            pass_num = 0
+            success_num = 0
+            headers = data.row_values(0)
+            if "srcpath" in headers:
                 for i in range(1, nrows):
-                    test = data.row_values(i)[1]
-                    u = scrapingrecordService.queryByPath(test)
-                    if (u):
+                    srcpath = data.row_values(i)[headers.index('srcpath')]
+                    u = scrapingrecordService.queryByPath(srcpath)
+                    if u:
                         pass_num += 1
                     else:
-                        rowname = data.row_values(i)[0]
-                        rowpath = data.row_values(i)[1]
-                        rowsize = data.row_values(i)[2]
-                        rowstatus = data.row_values(i)[3]
-                        scrapingrecordService.importRecord(rowname, rowpath, rowsize, rowstatus)
+                        t = scrapingrecordService.add(srcpath)
+                        for singlekey in headers:
+                            if hasattr(t, singlekey) and singlekey != 'id':
+                                if singlekey == 'updatetime':
+                                    t.updatetime = datetime.datetime.now()
+                                else:
+                                    newvalue = data.row_values(i)[headers.index(singlekey)]
+                                    setattr(t, singlekey, newvalue)
+                        scrapingrecordService.commit()
                         success_num += 1
                 os.remove('import' + filename)
                 return Response(status=200)
@@ -116,6 +130,22 @@ def import_excel():
                 return Response(status=500)
         else:
             return Response(status=403)
+    except Exception as err:
+        log.error(err)
+        return Response(status=500)
+
+
+@web.route("/api/cleandb", methods=['GET'])
+def clean_empty():
+    """ clean record file not exist
+    """
+    try:
+        records = scrapingrecordService.queryAll()
+        for i in records:
+            srcpath = i.srcpath
+            if not os.path.exists(srcpath):
+                scrapingrecordService.deleteByID(i.id)
+        return Response(status=200)
     except Exception as err:
         log.error(err)
         return Response(status=500)

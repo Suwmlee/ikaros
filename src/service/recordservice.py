@@ -6,7 +6,7 @@ import shutil
 import datetime
 from sqlalchemy import or_
 from ..model.record import _ScrapingRecords, _TransRecords
-from ..utils.filehelper import cleanfolderbyfilter
+from ..utils.filehelper import cleanfolderbyfilter, cleanscrapingfile
 from .. import db
 
 
@@ -21,6 +21,8 @@ class ScrapingRecordService():
             (filefolder, name) = os.path.split(path)
             if os.path.exists(path):
                 size = os.path.getsize(path) >> 20
+            else:
+                size = 0
             info = _ScrapingRecords(name, path)
             info.srcsize = size
             db.session.add(info)
@@ -45,7 +47,10 @@ class ScrapingRecordService():
                 if os.path.exists(folder) and basefolder != folder:
                     name = os.path.basename(record.destpath)
                     filter  = os.path.splitext(name)[0]
-                    cleanfolderbyfilter(folder, filter)
+                    if record.cdnum and record.cdnum > 0:
+                        cleanscrapingfile(folder, filter)
+                    else:
+                        cleanfolderbyfilter(folder, filter)
             db.session.delete(record)
             db.session.commit()
 
@@ -85,6 +90,9 @@ class ScrapingRecordService():
             info.updatetime = datetime.datetime.now()
             db.session.commit()
         return info
+
+    def commit(self):
+        db.session.commit()
 
     def queryByPage(self, pagenum, pagesize, sortprop, sortorder, blur):
         """ 查询
