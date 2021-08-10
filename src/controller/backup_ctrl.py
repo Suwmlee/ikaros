@@ -147,6 +147,7 @@ def clean_empty():
         for i in records:
             srcpath = i.srcpath
             if not os.path.exists(srcpath):
+                print("[Clean scrapingrecord] : " + srcpath)
                 scrapingrecordService.deleteByID(i.id)
         return Response(status=200)
     except Exception as err:
