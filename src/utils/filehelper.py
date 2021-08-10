@@ -82,7 +82,7 @@ def cleanfolderbyfilter(folder, filter):
             cleanAll = False
         else:
             if filter in file:
-               os.remove(f)
+                os.remove(f)
             else:
                 cleanAll = False
     if cleanAll:

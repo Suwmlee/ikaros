@@ -257,7 +257,7 @@ def gettransrecord():
     try:
         page = request.args.get('page')
         pagenum = int(page)
-        size = 10
+        size = int(request.args.get('size'))
         sort = 0
         infos = transrecordService.queryByPage(pagenum, size, sort)
         data = []
