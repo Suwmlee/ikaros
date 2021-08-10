@@ -11,6 +11,7 @@ from . import web
 from ..service.recordservice import scrapingrecordService
 from ..model.record import _ScrapingRecords
 from ..utils.log import log
+from ..utils.filehelper import cleanfilebysuffix
 
 
 @web.route("/api/export", methods=['GET'])
@@ -23,14 +24,14 @@ def export_excel():
     """
     try:
         directory = os.getcwd()
-        filename = "javrecords.xls"
+        nowtime = datetime.datetime.now()
+        filename = "records-"+nowtime.strftime("%H%M%S-%m%d%Y")+".xls"
         filefolder = directory + '/database/'
-        if os.path.exists(filefolder + filename):
-            os.remove(filefolder + filename)
+        cleanfilebysuffix(filefolder, ['.xls', '.xlsx'])
         records = scrapingrecordService.queryAll()
 
         temp = _ScrapingRecords('','')
-        temp.updatetime = datetime.datetime.now()
+        temp.updatetime = nowtime
         headers = temp.serialize()
 
         xlsfile = xlwt.Workbook(encoding='utf-8')
@@ -50,7 +51,7 @@ def export_excel():
                 j = j + 1
 
         xlsfile.save(filefolder + filename)
-        return send_from_directory(filefolder, filename, as_attachment=True)
+        return send_from_directory(filefolder, filename, as_attachment=True, cache_timeout=0)
     except Exception as err:
         log.error(err)
         return Response(status=500)
@@ -112,6 +113,7 @@ def import_excel():
                     u = scrapingrecordService.queryByPath(srcpath)
                     if u:
                         pass_num += 1
+                        print("[Backup] Pass: " + srcpath)
                     else:
                         t = scrapingrecordService.add(srcpath)
                         for singlekey in headers:
@@ -123,6 +125,7 @@ def import_excel():
                                     setattr(t, singlekey, newvalue)
                         scrapingrecordService.commit()
                         success_num += 1
+                        print("[Backup] Add: " + srcpath)
                 os.remove('import' + filename)
                 return Response(status=200)
             else:
