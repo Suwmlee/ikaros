@@ -146,9 +146,14 @@ def clean_empty():
         records = scrapingrecordService.queryAll()
         for i in records:
             srcpath = i.srcpath
+            dstpath = i.destpath
             if not os.path.exists(srcpath):
-                print("[Clean scrapingrecord] : " + srcpath)
-                scrapingrecordService.deleteByID(i.id)
+                if i.linktype == 1:
+                    print("[Clean scrapingrecord] : " + srcpath)
+                    scrapingrecordService.deleteByID(i.id)
+                if not os.path.exists(dstpath):
+                    print("[Clean scrapingrecord] : " + srcpath)
+                    scrapingrecordService.deleteByID(i.id)
         return Response(status=200)
     except Exception as err:
         log.error(err)

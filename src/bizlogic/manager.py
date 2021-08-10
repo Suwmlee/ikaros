@@ -65,7 +65,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
                 scrapingtag_cdnum = movie_info.cdnum
             log.info("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
             (flag, new_path) = core_main(file_path, n_number, scrapingtag_cnsub, scrapingtag_cdnum, conf)
-            movie_info = scrapingrecordService.update(file_path, n_number, new_path, flag)
+            movie_info = scrapingrecordService.update(file_path, n_number, new_path, flag, conf.link_type)
         else:
             log.info("[!]Already done: [{}]".format(file_path))
     except Exception as err:

@@ -76,7 +76,7 @@ class ScrapingRecordService():
             record.updatetime = datetime.datetime.now()
             db.session.commit()
 
-    def update(self, path, sname, newpath, flag):
+    def update(self, path, sname, newpath, flag, linktype):
         info = self.queryByPath(path)
         if info:
             if flag:
@@ -84,6 +84,7 @@ class ScrapingRecordService():
                 info.status = 1
                 info.destname = newname
                 info.destpath = newpath
+                info.linktype = linktype
             else:
                 info.status = 2
             info.scrapingname = sname
