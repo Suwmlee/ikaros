@@ -15,7 +15,7 @@ from . import javbus
 from . import javdb
 from . import mgstage
 from . import xcity
-# from . import javlib
+from . import javlib
 from . import dlsite
 from . import airav
 from . import carib
@@ -52,7 +52,7 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
         "mgstage": mgstage.main,
         "jav321": jav321.main,
         "xcity": xcity.main,
-        # "javlib": javlib.main,
+        "javlib": javlib.main,
         "dlsite": dlsite.main,
         "carib": carib.main,
         "fc2club": fc2club.main

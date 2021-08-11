@@ -518,6 +518,15 @@ def load_javdb_cookies():
         return None
 
 
+def load_javlib_cookies():
+    try:
+        javlib = scrapingConfService.getSetting().cookies_javlib
+        cookies = load_cookies(javlib)
+        return cookies
+    except:
+        return None
+
+
 def load_cookies(rawcookie):
     cookie = SimpleCookie()
     cookie.load(rawcookie)

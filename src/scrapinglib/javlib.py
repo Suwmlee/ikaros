@@ -6,30 +6,17 @@ import re
 from . import airav
 from bs4 import BeautifulSoup
 from lxml import html
-from http.cookies import SimpleCookie
 
-from ..utils.ADC_function import get_javlib_cookie, get_html
+from ..utils.ADC_function import load_javlib_cookies, get_html
 
 
 def main(number: str):
-    raw_cookies, user_agent = get_javlib_cookie()
-
-    # Blank cookies mean javlib site return error
-    if not raw_cookies:
-        return json.dumps({}, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'))
-
-    # Manually construct a dictionary
-    s_cookie = SimpleCookie()
-    s_cookie.load(raw_cookies)
-    cookies = {}
-    for key, morsel in s_cookie.items():
-        cookies[key] = morsel.value
+    javlib_cookies = load_javlib_cookies()
 
     # Scraping
     result = get_html(
         "http://www.javlibrary.com/cn/vl_searchbyid.php?keyword={}".format(number),
-        cookies=cookies,
-        ua=user_agent,
+        cookies=javlib_cookies,
         return_type="object"
     )
     soup = BeautifulSoup(result.text, "html.parser")
@@ -67,8 +54,7 @@ def main(number: str):
         av_url = s[number.upper()]
         result = get_html(
             av_url,
-            cookies=cookies,
-            ua=user_agent,
+            cookies=javlib_cookies,
             return_type="object"
         )
         soup = BeautifulSoup(result.text, "html.parser")
