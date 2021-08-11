@@ -2,10 +2,7 @@
 
 import json
 import os
-import datetime
-from time import sleep
-from threading import Lock
-from flask import request, Response
+from flask import request, Response, current_app
 
 from . import web
 from ..bizlogic import manager
@@ -20,7 +17,7 @@ from ..utils.log import log
 # DOCS https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor
 # executor = ThreadPoolExecutor(2)
 
-# action
+# Intro
 @web.route("/api/intro", methods=['GET'])
 def intro():
     try:
@@ -32,6 +29,18 @@ def intro():
     except Exception as err:
         log.error(err)
         return Response(status=500)
+
+
+@web.route("/api/version", methods=['GET'])
+def version():
+    try:
+        num = current_app.config['VERSION']
+        return num
+    except Exception as err:
+        log.error(err)
+        return Response(status=500)
+
+# action
 
 
 @web.route("/api/scraping", methods=['POST'])
