@@ -21,12 +21,13 @@ class _ScrapingConfigs(db.Model):
     main_mode = Column(Integer, default=1)
     debug_info = Column(Boolean, default=False)
     auto_exit = Column(Boolean, default=True)
+    multi_scraping = Column(Boolean, default=False, comment="Multiple file scraping at the same time")
+    async_request = Column(Boolean, default=False, comment="Scrape a movie asynchronously")
 
     scraping_folder = Column(String, default='/media')
     failed_folder = Column(String, default='/media/failed')
     success_folder = Column(String, default='/media/output')
     link_type = Column(Integer, default=1)
-    soft_link = Column(Boolean, default=True, comment="deprecated")
     soft_prefix = Column(String, default='/media')
     failed_move = Column(Boolean, default=False)
 
@@ -56,11 +57,13 @@ class _ScrapingConfigs(db.Model):
     transalte_values = Column(String, default="title,outline")
     
     cookies_javdb = Column(String, default="")
+    cookies_javlib = Column(String, default="")
 
     def serialize(self):
         return {
             'main_mode': self.main_mode,
-            'soft_link': self.soft_link,
+            'multi_scraping': self.multi_scraping,
+            'async_request': self.async_request,
             'link_type': self.link_type,
             'soft_prefix': self.soft_prefix,
             'scraping_folder': self.scraping_folder,
@@ -81,6 +84,7 @@ class _ScrapingConfigs(db.Model):
             'proxy_timeout': self.proxy_timeout,
             'proxy_retry': self.proxy_retry,
             'cookies_javdb': self.cookies_javdb,
+            'cookies_javlib': self.cookies_javlib,
         }
 
 

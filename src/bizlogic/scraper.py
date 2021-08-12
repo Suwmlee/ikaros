@@ -418,7 +418,7 @@ def core_main(file_path, scrapingnum, cnsubtag, cdnum, conf: _ScrapingConfigs):
     # 影片的路径 绝对路径
     filepath = file_path
     number = scrapingnum
-    json_data = get_data_from_json(number, conf.website_priority, conf.naming_rule)
+    json_data = get_data_from_json(number, conf.website_priority, conf.naming_rule, conf.async_request)
 
     # Return if blank dict returned (data not found)
     if not json_data:
