@@ -7,7 +7,7 @@ G_spat = re.compile(
     re.IGNORECASE)
 
 
-def get_number(debug,filepath: str) -> str:
+def get_number(filepath: str) -> str:
     # """
     # >>> from number_parser import get_number
     # >>> get_number("/Users/Guest/AV_Data_Capture/snis-829.mp4")
@@ -33,35 +33,7 @@ def get_number(debug,filepath: str) -> str:
     # """
     filepath = os.path.basename(filepath)
 
-    if debug == False:
-        try:
-            if '-' in filepath or '_' in filepath:  # 普通提取番号 主要处理包含减号-和_的番号
-                #filepath = filepath.replace("_", "-")
-                filepath = G_spat.sub("", filepath)
-                filename = str(re.sub("\[\d{4}-\d{1,2}-\d{1,2}\] - ", "", filepath))  # 去除文件名中时间
-                lower_check = filename.lower()
-                if 'fc2' in lower_check:
-                    filename = lower_check.replace('ppv', '').replace('--', '-').replace('_', '-').upper()
-                if file_number := get_number_by_dict(lower_check):
-                    return file_number
-                return str(re.search(r'\w+(-|_)\w+', filename, re.A).group())
-            else:  # 提取不含减号-的番号，FANZA CID
-                # 欧美番号匹配规则
-                oumei = re.search(r'[a-zA-Z]+\.\d{2}\.\d{2}\.\d{2}', filepath)
-                if oumei:
-                    return oumei.group()
-
-                try:
-                    return str(
-                        re.findall(r'(.+?)\.',
-                                   str(re.search('([^<>/\\\\|:""\\*\\?]+)\\.\\w+$', filepath).group()))).strip(
-                        "['']").replace('_', '-')
-                except:
-                    return re.search(r'(.+?)\.', filepath)[0]
-        except Exception as e:
-            log.error(e)
-            return
-    elif debug == True:
+    try:
         if '-' in filepath or '_' in filepath:  # 普通提取番号 主要处理包含减号-和_的番号
             #filepath = filepath.replace("_", "-")
             filepath = G_spat.sub("", filepath)
@@ -71,7 +43,11 @@ def get_number(debug,filepath: str) -> str:
                 filename = lower_check.replace('ppv', '').replace('--', '-').replace('_', '-').upper()
             if file_number := get_number_by_dict(lower_check):
                 return file_number
-            return str(re.search(r'\w+(-|_)\w+', filename, re.A).group())
+            file_number = str(re.search(r'\w+(-|_)\w+', filename, re.A).group())
+            suffix = file_number[-2:].lower()
+            if suffix == "_c" or suffix == "-c":
+                file_number = file_number[:-2]
+            return file_number
         else:  # 提取不含减号-的番号，FANZA CID
             # 欧美番号匹配规则
             oumei = re.search(r'[a-zA-Z]+\.\d{2}\.\d{2}\.\d{2}', filepath)
@@ -85,6 +61,9 @@ def get_number(debug,filepath: str) -> str:
                     "['']").replace('_', '-')
             except:
                 return re.search(r'(.+?)\.', filepath)[0]
+    except Exception as e:
+        log.error(e)
+        return
 
 G_TAKE_NUM_RULES = {
     'tokyo' : lambda x:str(re.search(r'(cz|gedo|k|n|red-|se)\d{2,4}', x, re.A).group()),

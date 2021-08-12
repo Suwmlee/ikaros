@@ -35,8 +35,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
     """ start scrape single file
     """
     # Normalized number, eg: 111xxx-222.mp4 -> xxx-222.mp4
-    debug = conf.debug_info
-    n_number = get_number(debug, file_path)
+    n_number = get_number(file_path)
     scrapingtag_cnsub = False
     scrapingtag_cdnum = 0
     try:
