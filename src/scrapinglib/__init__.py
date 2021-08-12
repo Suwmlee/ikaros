@@ -20,10 +20,11 @@ from . import dlsite
 from . import airav
 from . import carib
 from . import fc2club
+from ..utils.log import log
 
 
 def get_data_state(data: dict) -> bool:
-    """ 元数据获取失败检测
+    """ check json data
     """
     if "title" not in data or "number" not in data:
         return False
@@ -37,9 +38,13 @@ def get_data_state(data: dict) -> bool:
     return True
 
 
-def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_threading=True):
+def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_threading=False):
     """
     iterate through all services and fetch the data 
+
+    single thread is better
+    some sites have query limit
+    
     """
 
     func_mapping = {
@@ -87,16 +92,16 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
     todel = []
     for s in sources:
         if not s in func_mapping:
-            print('[!] Source Not Exist : ' + s)
+            log.info('[!] Source Not Exist : ' + s)
             todel.append(s)
     for d in todel:
-        print('[!] Remove Source : ' + s)
+        log.info('[!] Remove Source : ' + s)
         sources.remove(d)
 
     json_data = {}
 
     if c_multi_threading:
-        print('[+] Multi threading enabled')
+        log.info('[+] Multi threading enabled')
         pool = ThreadPool(processes=len(sources))
 
         # Set the priority of multi-thread crawling and join the multi-thread queue
@@ -116,22 +121,28 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
     else:
         for source in sources:
             try:
-                print('[+] Select Source: ' + source)
+                log.info('[+] Select Source: ' + source)
                 json_data = json.loads(func_mapping[source](file_number))
                 # if any service return a valid return, break
                 if get_data_state(json_data):
                     break
-            except:
-                print('[!] Source error')
+            except Exception as err:
+                log.info('[!] Source error: ' + source)
+                log.error(err)
                 continue
 
     # Return if data not found in all sources
     if not json_data:
-        print('[-]Movie Data not found!')
+        log.info('[-]Movie Data not found!')
         return
 
-    # ================================================网站规则添加结束================================================
+    fulljson = repack_json(json_data, c_naming_rule)
+    return fulljson
 
+
+def repack_json(json_data: dict, c_naming_rule: str):
+    """ repack json packet
+    """
     title = json_data.get('title')
     actor_list = str(json_data.get('actor')).strip(
         "[ ]").replace("'", '').split(',')  # 字符串转列表
