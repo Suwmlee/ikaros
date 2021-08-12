@@ -31,10 +31,10 @@ def create_app():
 
     from . import controller
     from . import model
-    from . import task
+    # from . import task
     controller.register(app)
     model.load_models()
-    task.init_task(app)
+    # task.init_task(app)
 
     db.create_all()
     with app.app_context():
