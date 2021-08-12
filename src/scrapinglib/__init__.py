@@ -65,28 +65,27 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
 
     # default fetch order list, from the beginning to the end
     sources = c_sources.split(',')
-    if not len(c_sources) > 60:
-        # if the input file name matches certain rules,
-        # move some web service to the beginning of the list
-        lo_file_number = file_number.lower()
-        if "carib" in sources and (re.match(r"^\d{6}-\d{3}", file_number)):
-            sources.insert(0, sources.pop(sources.index("carib")))
-        elif re.match(r"^\d{5,}", file_number) or "heyzo" in lo_file_number:
-            if "javdb" in sources:
-                sources.insert(0, sources.pop(sources.index("javdb")))
-            if "avsox" in sources:
-                sources.insert(0, sources.pop(sources.index("avsox")))
-        elif "mgstage" in sources and (re.match(r"\d+\D+", file_number) or "siro" in lo_file_number):
-            sources.insert(0, sources.pop(sources.index("mgstage")))
-        elif "fc2" in lo_file_number:
-            if "javdb" in sources:
-                sources.insert(0, sources.pop(sources.index("javdb")))
-            if "fc2" in sources:
-                sources.insert(0, sources.pop(sources.index("fc2")))
-            if "fc2club" in sources:
-                sources.insert(0, sources.pop(sources.index("fc2club")))
-        elif "dlsite" in sources and ("rj" in lo_file_number or "vj" in lo_file_number):
-            sources.insert(0, sources.pop(sources.index("dlsite")))
+    # if the input file name matches certain rules,
+    # move some web service to the beginning of the list
+    lo_file_number = file_number.lower()
+    if "carib" in sources and (re.match(r"^\d{6}-\d{3}", file_number)):
+        sources.insert(0, sources.pop(sources.index("carib")))
+    elif re.match(r"^\d{5,}", file_number) or "heyzo" in lo_file_number:
+        if "javdb" in sources:
+            sources.insert(0, sources.pop(sources.index("javdb")))
+        if "avsox" in sources:
+            sources.insert(0, sources.pop(sources.index("avsox")))
+    elif "mgstage" in sources and (re.match(r"\d+\D+", file_number) or "siro" in lo_file_number):
+        sources.insert(0, sources.pop(sources.index("mgstage")))
+    elif "fc2" in lo_file_number:
+        if "javdb" in sources:
+            sources.insert(0, sources.pop(sources.index("javdb")))
+        if "fc2" in sources:
+            sources.insert(0, sources.pop(sources.index("fc2")))
+        if "fc2club" in sources:
+            sources.insert(0, sources.pop(sources.index("fc2club")))
+    elif "dlsite" in sources and ("rj" in lo_file_number or "vj" in lo_file_number):
+        sources.insert(0, sources.pop(sources.index("dlsite")))
 
     # check sources in func_mapping
     todel = []
@@ -109,12 +108,13 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
             pool.apply_async(func_mapping[source], (file_number,))
 
         # Get multi-threaded crawling response
+        # !!! Still follow sources sort not the first response
         for source in sources:
-            print('[-] Check', source)
-            json_data = json.loads(pool.apply_async(
-                func_mapping[source], (file_number,)).get())
+            log.info('[-] Check', source)
+            json_data = json.loads(pool.apply_async(func_mapping[source], (file_number,)).get())
             # if any service return a valid return, break
             if get_data_state(json_data):
+                log.info('[-] Matched [{}] in source [{}]'.format(file_number, source))
                 break
         pool.close()
         pool.terminate()
@@ -125,6 +125,7 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
                 json_data = json.loads(func_mapping[source](file_number))
                 # if any service return a valid return, break
                 if get_data_state(json_data):
+                    log.info('[-] Matched [{}] in source [{}]'.format(file_number, source))
                     break
             except Exception as err:
                 log.info('[!] Source error: ' + source)

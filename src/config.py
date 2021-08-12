@@ -6,7 +6,7 @@ class Config:
     DEBUG = False
     SECRET_KEY = 'secret!'
     SCHEDULER_API_ENABLED = True
-    LOGGING_FORMAT = '%(asctime)s - %(name)s - %(message)s'
+    LOGGING_FORMAT = '[%(asctime)s] %(levelname)s : %(message)s'
     LOGGING_LOCATION = 'database/web.log'
     LOGGING_LEVEL = logging.INFO
     VERSION = '0.6.1'

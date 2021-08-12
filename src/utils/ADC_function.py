@@ -49,7 +49,7 @@ def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None)
             log.info("[-]Proxy error! Please check your Proxy")
             return
         except Exception as e:
-            log.info("[-]Connect retry {}/{}".format(i + 1, configProxy.retry))
+            log.info("[-]Connect retry {}/{} : {}".format(i + 1, configProxy.retry, url))
             log.error(e)
     log.info('[-]Connect Failed! Please check your Proxy or Network!')
 
@@ -74,7 +74,7 @@ def post_html(url: str, query: dict, headers: dict = None) -> requests.Response:
                     url, data=query, headers=headers, timeout=configProxy.timeout)
             return result
         except Exception as e:
-            log.info("[-]Connect retry {}/{}".format(i + 1, configProxy.retry))
+            log.info("[-]Connect retry {}/{} : {}".format(i + 1, configProxy.retry, url))
             log.error(e)
     log.info("[-]Connect Failed! Please check your Proxy or Network!")
 

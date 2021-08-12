@@ -180,8 +180,7 @@ def main(number):
         except:
             return main_uncensored(number)
     except Exception as e:
-        if scrapingConfService.getSetting().debug_info:
-            print(e)
+        log.error(e)
         data = {
             "title": "",
         }

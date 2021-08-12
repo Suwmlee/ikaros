@@ -19,8 +19,7 @@ def main(number: str) -> json:
         if not soup.select_one("#moviepages > div > div:nth-child(1) > div.movie-info.section"):
             raise ValueError("page info not found")
     except Exception as e:
-        if scrapingConfService.getSetting().debug_info:
-            print(e)
+        log.error(e)
         dic = {"title": ""}
         return json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'))
     dic = {

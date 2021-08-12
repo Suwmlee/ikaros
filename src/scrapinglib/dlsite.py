@@ -153,8 +153,7 @@ def main(number):
         js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
         return js
     except Exception as e:
-        if scrapingConfService.getSetting().debug_info:
-            print(e)
+        log.error(e)
         data = {
             "title": "",
         }

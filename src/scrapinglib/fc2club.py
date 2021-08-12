@@ -103,8 +103,7 @@ def main(number):
             'series': '',
         }
     except Exception as e:
-        if ADC_function.scrapingConfService.getSetting().debug_info:
-            print(e)
+        ADC_function.log.error(e)
         dic = {"title": ""}
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js

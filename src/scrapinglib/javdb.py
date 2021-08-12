@@ -5,7 +5,8 @@ from lxml import etree
 import json
 import random
 from bs4 import BeautifulSoup
-from ..utils.ADC_function import *
+from ..utils.log import log
+from ..utils.ADC_function import load_javdb_cookies, get_html, translateTag_to_sc
 from . import airav
 # import sys
 # import io
@@ -209,8 +210,10 @@ def getSeries(a):
     result2 = str(html.xpath('//strong[contains(text(),"系列")]/../span/a/text()')).strip(" ['']")
     return str(result1 + result2).strip('+').replace("', '", '').replace('"', '')
 
-def main(number):
-    javdb_site = random.choice(["javdb9", "javdb30"])
+def main(number: str):
+    # javdb_site = random.choice(["javdb9", "javdb30"])
+    # use proxy first
+    javdb_site = "javdb"
     try:
         # if re.search(r'[a-zA-Z]+\.\d{2}\.\d{2}\.\d{2}', number).group():
         #     pass
@@ -296,8 +299,7 @@ def main(number):
 
         }
     except Exception as e:
-        if scrapingConfService.getSetting().debug_info:
-            print(e)
+        log.error(e)
         dic = {"title": ""}
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
