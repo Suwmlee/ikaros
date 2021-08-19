@@ -10,7 +10,7 @@ from .manager import movie_lists
 from .rename import renamebyreg
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
-from ..utils.filehelper import video_type, ext_type, cleanfilebysuffix, cleanfolderwithoutsuffix, hardlink_force, symlink_force
+from ..utils.filehelper import video_type, ext_type, cleanfolderwithoutsuffix, hardlink_force, symlink_force
 from ..utils.log import log
 
 
@@ -38,6 +38,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
 
     try:
         movie_list = movie_lists(src_folder, re.split("[,，]", escape_folders))
+        dest_list = movie_lists(dest_folder, "")
 
         count = 0
         total = str(len(movie_list))
@@ -50,8 +51,6 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
         # 清理目标目录下的文件：视频 字幕
         if not os.path.exists(dest_folder):
             os.makedirs(dest_folder)
-        clean_type = video_type + ext_type
-        cleanfilebysuffix(dest_folder, clean_type)
 
         for movie_path in movie_list:
             count += 1
@@ -88,15 +87,27 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
 
-            log.info("[-] create link from [{}] to [{}]".format(link_path, newpath))
-            if linktype == 0:
-                symlink_force(link_path, newpath)
+            # TODO  验证是否能检测到 软/硬链接
+            if not os.path.exists(newpath):
+                log.info("[-] create link from [{}] to [{}]".format(link_path, newpath))
+                if linktype == 0:
+                    symlink_force(link_path, newpath)
+                else:
+                    hardlink_force(link_path, newpath)
             else:
-                hardlink_force(link_path, newpath)
+                log.info("[!]Already done: [{}]".format(movie_path))
             basename = os.path.splitext(name)[0]
             copysub(filefolder, newfolder, basename)
-            log.info("[-] transfer finished [{}]".format(movie_path))
+
+            if newpath in dest_list:
+                dest_list.remove(newpath)
+
+            log.info("[-] transfered [{}]".format(movie_path))
             transrecordService.update(movie_path, link_path, newpath)
+
+        # 与源内容无匹配
+        for torm in dest_list:
+            os.remove(torm)
 
         cleanfolderwithoutsuffix(dest_folder, video_type)
         # 重命名
