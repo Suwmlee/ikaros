@@ -76,16 +76,16 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
             flag_done = False
             newpath = os.path.join(dest_folder, midfolder, name)
             if os.path.exists(newpath):
-                # TODO  验证是否能检测到 软/硬链接
-                # os.path.exists 文件存在
-                # 判断是否是软链接，软链接指向的地址，硬链接，指向的地址
-                realpath = os.readlink(newpath)
-                if realpath == link_path:
+                # https://stackoverflow.com/questions/41941401/how-to-find-out-if-a-folder-is-a-hard-link-and-get-its-real-path
+                if os.path.samefile(link_path, newpath):
                     flag_done = True
-                    log.info("[!] already exists")
+                    log.info("[!] same file already exists")
+                elif os.path.islink(newpath) and os.readlink(newpath) == link_path :
+                    flag_done = True
+                    log.info("[!] link file already exists")
                 else:
-                    log.info("[-] clean wrong link")
                     os.remove(newpath)
+                    log.info("[-] clean wrong link")
             (newfolder, tname) = os.path.split(newpath)
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
@@ -107,7 +107,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
 
         # 与源内容无匹配
         for torm in dest_list:
-            log.info("[!] Clean : [{}]".format(torm))
+            log.info("[!] clean extra file: [{}]".format(torm))
             os.remove(torm)
 
         cleanfolderwithoutsuffix(dest_folder, video_type)
