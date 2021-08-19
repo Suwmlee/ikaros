@@ -74,7 +74,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
     log.info("[*]======================================================")
 
 
-def start():
+def start_all(folder=''):
     """ 启动入口
     """
 
@@ -86,6 +86,8 @@ def start():
     conf = scrapingConfService.getSetting()
     CleanFolder(conf.failed_folder)
 
+    if folder == '':
+        folder = conf.scraping_folder
     movie_list = movie_lists(conf.scraping_folder, re.split("[,，]", conf.escape_folders))
 
     count = 0

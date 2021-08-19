@@ -43,6 +43,24 @@ def version():
 # action
 
 
+@web.route("/api/scraping", methods=['GET'])
+def scraping_single():
+    """ for client
+    """
+    try:
+        scraping_path = request.args.get('path')
+        if scraping_path and os.path.exists(scraping_path):
+            if os.path.isdir(scraping_path):
+                manager.start_all(scraping_path)
+            else:
+                manager.start_single(scraping_path)
+            return Response(status=200)
+        return Response(status=404)
+    except Exception as err:
+        log.error(err)
+        return Response(status=500)
+
+
 @web.route("/api/scraping", methods=['POST'])
 def start_scraping():
     try:
