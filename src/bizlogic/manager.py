@@ -104,3 +104,21 @@ def start():
     log.info("[+]All finished!!!")
 
     taskService.updateTaskStatus(1, 'scrape')
+
+
+def start_single(movie_path: str):
+    """ single movie
+    """
+    task = taskService.getTask('scrape')
+    if task.status == 2:
+        return
+    taskService.updateTaskStatus(2, 'scrape')
+
+    log.info("[+]Single start!!!")
+    if os.path.exists(movie_path):
+        conf = scrapingConfService.getSetting()
+        create_data_and_move(movie_path, conf)
+
+    log.info("[+]Single finished!!!")
+
+    taskService.updateTaskStatus(1, 'scrape')

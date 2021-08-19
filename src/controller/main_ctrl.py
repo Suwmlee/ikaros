@@ -46,8 +46,11 @@ def version():
 @web.route("/api/scraping", methods=['POST'])
 def start_scraping():
     try:
-        # executor.submit(manager.start)
-        manager.start()
+        content = request.get_json()
+        if content and 'srcpath' in content:
+            manager.start_single(content['srcpath'])
+        else:
+            manager.start_all()
         return Response(status=200)
     except Exception as err:
         log.error(err)
