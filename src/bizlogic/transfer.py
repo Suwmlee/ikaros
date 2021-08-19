@@ -73,29 +73,29 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
                     midfolder = midfolder.replace(literal, '')
                     log.info("[-] handling filterliterals: " + literal)
             # 目的地址
+            flag_done = False
             newpath = os.path.join(dest_folder, midfolder, name)
             if os.path.exists(newpath):
-                realpath = os.path.realpath(newpath)
+                # TODO  验证是否能检测到 软/硬链接
+                # os.path.exists 文件存在
+                # 判断是否是软链接，软链接指向的地址，硬链接，指向的地址
+                realpath = os.readlink(newpath)
                 if realpath == link_path:
+                    flag_done = True
                     log.info("[!] already exists")
-                    transrecordService.update(movie_path, link_path, newpath)
-                    continue
                 else:
-                    log.info("[-] clean link")
+                    log.info("[-] clean wrong link")
                     os.remove(newpath)
             (newfolder, tname) = os.path.split(newpath)
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
 
-            # TODO  验证是否能检测到 软/硬链接
-            if not os.path.exists(newpath):
+            if not flag_done:
                 log.info("[-] create link from [{}] to [{}]".format(link_path, newpath))
                 if linktype == 0:
                     symlink_force(link_path, newpath)
                 else:
                     hardlink_force(link_path, newpath)
-            else:
-                log.info("[!]Already done: [{}]".format(movie_path))
             basename = os.path.splitext(name)[0]
             copysub(filefolder, newfolder, basename)
 
@@ -107,6 +107,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
 
         # 与源内容无匹配
         for torm in dest_list:
+            log.info("[!] Clean : [{}]".format(torm))
             os.remove(torm)
 
         cleanfolderwithoutsuffix(dest_folder, video_type)
