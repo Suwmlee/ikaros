@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import logging
 import os
 from flask import request, Response, current_app
 
@@ -39,6 +40,32 @@ def version():
     except Exception as err:
         log.error(err)
         return Response(status=500)
+
+
+@web.route("/api/loglevel", methods=['PUT'])
+def setloglevel():
+    """
+CRITICAL = 50
+FATAL = CRITICAL
+ERROR = 40
+WARNING = 30
+WARN = WARNING
+INFO = 20
+DEBUG = 10
+NOTSET = 0
+    """
+    try:
+        content = request.get_json()
+        if content and 'level' in content:
+            level = int(content.get('level'))
+            current_app.logger.setLevel(level)
+        else:
+            current_app.logger.setLevel(logging.INFO)
+        return Response(status=200)
+    except Exception as err:
+        log.error(err)
+        return Response(status=500)
+
 
 # action
 
