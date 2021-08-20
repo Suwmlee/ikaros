@@ -2,6 +2,7 @@
 '''
 '''
 import os
+import pathlib
 import stat
 import re
 import shutil
@@ -75,23 +76,22 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
             # 目的地址
             flag_done = False
             newpath = os.path.join(dest_folder, midfolder, name)
-            if os.path.exists(newpath):
-                # https://stackoverflow.com/questions/41941401/how-to-find-out-if-a-folder-is-a-hard-link-and-get-its-real-path
-                if os.path.samefile(link_path, newpath):
-                    flag_done = True
-                    log.info("[!] same file already exists")
-                elif os.path.islink(newpath) and os.readlink(newpath) == link_path :
-                    flag_done = True
-                    log.info("[!] link file already exists")
-                else:
-                    os.remove(newpath)
-                    log.info("[-] clean wrong link")
+            # https://stackoverflow.com/questions/41941401/how-to-find-out-if-a-folder-is-a-hard-link-and-get-its-real-path
+            if os.path.exists(newpath) and os.path.samefile(link_path, newpath):
+                flag_done = True
+                log.debug("[!] same file already exists")
+            elif pathlib.Path(newpath).is_symlink() and os.readlink(newpath) == link_path :
+                flag_done = True
+                log.debug("[!] link file already exists")
+            else:
+                os.unlink(newpath)
+                log.debug("[-] clean wrong link")
             (newfolder, tname) = os.path.split(newpath)
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
 
             if not flag_done:
-                log.info("[-] create link from [{}] to [{}]".format(link_path, newpath))
+                log.debug("[-] create link from [{}] to [{}]".format(link_path, newpath))
                 if linktype == 0:
                     symlink_force(link_path, newpath)
                 else:

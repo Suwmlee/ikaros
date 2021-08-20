@@ -2,6 +2,7 @@
 '''
 '''
 import os
+import pathlib
 import re
 import shutil
 import requests
@@ -347,16 +348,13 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
             src_folder = settings.scraping_folder
             midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
             soft_path = os.path.join(soft_prefix, midfolder, name)
-            if os.path.exists(newpath):
-                realpath = os.path.realpath(newpath)
-                if realpath == soft_path:
-                    log.info("[-]already exists")
-                else:
-                    os.remove(newpath)
-            (newfolder, tname) = os.path.split(newpath)
-            if not os.path.exists(newfolder):
-                os.makedirs(newfolder)
-            symlink_force(soft_path, newpath)
+            if pathlib.Path(newpath).is_symlink() and os.readlink(newpath) == soft_path:
+                log.debug("[-] already exists")
+            else:
+                (newfolder, tname) = os.path.split(newpath)
+                if not os.path.exists(newfolder):
+                    os.makedirs(newfolder)
+                symlink_force(soft_path, newpath)
         elif link_type == 2:
             hardlink_force(filepath, newpath)
         else:
@@ -365,7 +363,7 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
         for subname in ext_type:
             if os.path.exists(filepath.replace(houzhui, subname)):
                 os.rename(filepath.replace(houzhui, subname), path + '/' + prefilename + subname)
-                log.info('[+]Sub moved!')
+                log.debug('[+]Sub moved!')
         return True, newpath
     except FileExistsError:
         log.error('[-]File Exists! Please check your movie!')
