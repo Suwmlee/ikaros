@@ -70,19 +70,41 @@ NOTSET = 0
 # action
 
 
-@web.route("/api/scraping", methods=['GET'])
+@web.route("/api/client", methods=['GET'])
 def scraping_single():
     """ for client
     """
     try:
-        scraping_path = request.args.get('path')
-        if scraping_path and os.path.exists(scraping_path):
-            if os.path.isdir(scraping_path):
-                manager.start_all(scraping_path)
+        client_path = request.args.get('path')
+        # TODO
+        # 1. convert path to real path for flask
+        # tr    /volume1/Media/Movies
+        # flask /media/Movies
+        real_path = str(client_path).replace("/volume1/Media","/media")
+        if not os.path.exists(real_path):
+            return Response(status=404)
+        # 2. select scrape or transfer
+        scrapingFolder = ['ACG/Collection','JAV']
+        transferFolder = ['Movies','Documentry']
+        flag_scraping = False
+        flag_transfer = False
+        for sc in scrapingFolder:
+            if sc in real_path:
+                flag_scraping = True
+                break
+        for sc in transferFolder:
+            if sc in real_path:
+                flag_transfer = True
+                break
+        # 3. run
+        if flag_scraping:
+            if os.path.isdir(real_path):
+                manager.start_all(real_path)
             else:
-                manager.start_single(scraping_path)
-            return Response(status=200)
-        return Response(status=404)
+                manager.start_single(real_path)
+        # TODO run transfer, which one?
+        # TODO emby API scan libraray
+        return Response(status=200)
     except Exception as err:
         log.error(err)
         return Response(status=500)
