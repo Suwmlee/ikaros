@@ -83,9 +83,6 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
             elif pathlib.Path(newpath).is_symlink() and os.readlink(newpath) == link_path :
                 flag_done = True
                 log.debug("[!] link file already exists")
-            else:
-                os.unlink(newpath)
-                log.debug("[-] clean wrong link")
             (newfolder, tname) = os.path.split(newpath)
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
@@ -118,10 +115,8 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
             renamebyreg(dest_folder, reg, reg2, renameprefix, False)
 
         log.info("transfer finished")
-    except:
-        import traceback
-        err = traceback.format_exc()
-        log.error(err)
+    except Exception as e:
+        log.error(e)
 
     taskService.updateTaskStatus(1, 'transfer')
 
