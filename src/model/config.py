@@ -19,8 +19,6 @@ class _ScrapingConfigs(db.Model):
 
     id = Column(Integer, primary_key=True)
     main_mode = Column(Integer, default=1)
-    debug_info = Column(Boolean, default=False)
-    auto_exit = Column(Boolean, default=True)
     multi_scraping = Column(Boolean, default=False, comment="Multiple file scraping at the same time")
     async_request = Column(Boolean, default=False, comment="Scrape a movie asynchronously")
 
@@ -97,6 +95,7 @@ class _TransferConfigs(db.Model):
     linktype = Column(Integer, default=0)
     output_folder = Column(String, default='/media/output')
     escape_folder = Column(String, default='Sample,sample')
+    refresh_url = Column(String, default='')
     mark = Column(String, default='备注')
 
     def serialize(self):
@@ -107,5 +106,6 @@ class _TransferConfigs(db.Model):
             'soft_prefix': self.soft_prefix,
             'output_folder': self.output_folder,
             'escape_folder': self.escape_folder,
+            'refresh_url': self.refresh_url,
             'mark': self.mark
         }

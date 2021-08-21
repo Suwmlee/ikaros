@@ -27,7 +27,7 @@ def create_app():
 
     db.app = app
     db.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, render_as_batch=True)
 
     from . import controller
     from . import model
@@ -41,7 +41,8 @@ def create_app():
         try:
             print("Upgrade db")
             flask_migrate.upgrade()
-        except:
+        except Exception as e:
+            print(e)
             print("Fix alembic version")
             flask_migrate.stamp()
 
