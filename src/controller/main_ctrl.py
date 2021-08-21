@@ -4,6 +4,7 @@ import json
 import logging
 import os
 from flask import request, Response, current_app
+import requests
 
 from . import web
 from ..bizlogic import manager
@@ -130,6 +131,11 @@ def start_transfer():
         content = request.get_json()
         transfer.transfer(content['source_folder'], content['output_folder'], content['linktype'],
                           content['soft_prefix'], content['escape_folder'], content['renameflag'], content['renameprefix'])
+        
+        if content.get('refresh_url'):
+            refresh_url = content.get('refresh_url')
+            requests.post(refresh_url)
+
         return Response(status=200)
     except Exception as err:
         log.error(err)
