@@ -115,8 +115,10 @@ def scraping_single():
 def start_scraping():
     try:
         content = request.get_json()
-        if content and 'srcpath' in content:
-            manager.start_single(content['srcpath'])
+        if content and content.get('srcpath'):
+            filepath = content.get('srcpath')
+            if os.path.exists(filepath) and os.path.isfile(filepath):
+                manager.start_single(filepath)
         else:
             manager.start_all()
         return Response(status=200)

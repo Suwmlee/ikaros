@@ -3,6 +3,7 @@
 '''
 import os
 import re
+import requests
 
 from ..service.configservice import scrapingConfService, _ScrapingConfigs
 from ..service.recordservice import scrapingrecordService
@@ -104,6 +105,10 @@ def start_all(folder=''):
         create_data_and_move(movie_path, conf)
         count = count + 1
 
+    if conf.refresh_url:
+        log.info("[+]Refresh MediaServer")
+        requests.post(conf.refresh_url)
+
     log.info("[+]All finished!!!")
 
     taskService.updateTaskStatus(1, 'scrape')
@@ -118,9 +123,12 @@ def start_single(movie_path: str):
     taskService.updateTaskStatus(2, 'scrape')
 
     log.info("[+]Single start!!!")
-    if os.path.exists(movie_path):
+    if os.path.exists(movie_path) and os.path.isfile(movie_path):
         conf = scrapingConfService.getSetting()
         create_data_and_move(movie_path, conf)
+        if conf.refresh_url:
+            log.info("[+]Refresh MediaServer")
+            requests.post(conf.refresh_url)
 
     log.info("[+]Single finished!!!")
 

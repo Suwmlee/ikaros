@@ -56,6 +56,7 @@ class _ScrapingConfigs(db.Model):
     
     cookies_javdb = Column(String, default="")
     cookies_javlib = Column(String, default="")
+    refresh_url = Column(String, default='')
 
     def serialize(self):
         return {
@@ -83,6 +84,7 @@ class _ScrapingConfigs(db.Model):
             'proxy_retry': self.proxy_retry,
             'cookies_javdb': self.cookies_javdb,
             'cookies_javlib': self.cookies_javlib,
+            'refresh_url': self.refresh_url,
         }
 
 
