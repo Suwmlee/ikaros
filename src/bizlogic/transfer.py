@@ -39,7 +39,6 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
 
     try:
         movie_list = movie_lists(src_folder, re.split("[,，]", escape_folders))
-        dest_list = movie_lists(dest_folder, "")
 
         count = 0
         total = str(len(movie_list))
@@ -52,6 +51,8 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
         # 清理目标目录下的文件：视频 字幕
         if not os.path.exists(dest_folder):
             os.makedirs(dest_folder)
+
+        dest_list = movie_lists(dest_folder, "")
 
         for movie_path in movie_list:
             count += 1
