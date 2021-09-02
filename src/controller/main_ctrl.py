@@ -39,10 +39,13 @@ def version():
         core_num = current_app.config['VERSION']
         web_sha = core_num
         localPath = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(localPath,"..","..", "web", 'version.txt'), encoding='utf-8') as f:
-            web_sha = f.read()
-            f.close()
-        version_info = "web_" + web_sha[:7] + "  core_" + core_num
+        webpath = os.path.join(localPath,"..","..", "web", 'version.txt')
+        if os.path.exists(webpath):
+            with open(webpath, encoding='utf-8') as f:
+                web_sha = f.read()
+                web_sha = web_sha[:7]
+                f.close()
+        version_info = "web_" + web_sha + "  core_" + core_num
         return version_info
     except Exception as err:
         log.error(err)
