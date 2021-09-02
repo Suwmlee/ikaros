@@ -38,7 +38,7 @@ def version():
         core_num = current_app.config['VERSION']
         version_info = "core_" + core_num
         localPath = os.path.dirname(os.path.abspath(__file__))
-        webpath = os.path.join(localPath,"..","..", "web", 'version.txt')
+        webpath = os.path.join(localPath,"..","..", "web", "static", 'version.txt')
         if os.path.exists(webpath):
             with open(webpath, encoding='utf-8') as f:
                 web_sha = f.read()
