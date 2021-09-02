@@ -36,8 +36,14 @@ def intro():
 @web.route("/api/version", methods=['GET'])
 def version():
     try:
-        num = current_app.config['VERSION']
-        return num
+        core_num = current_app.config['VERSION']
+        web_sha = core_num
+        localPath = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(localPath,"..","..", "web", 'version.txt'), encoding='utf-8') as f:
+            web_sha = f.read()
+            f.close()
+        version_info = "web_" + web_sha[:7] + "  core_" + core_num
+        return version_info
     except Exception as err:
         log.error(err)
         return Response(status=500)
