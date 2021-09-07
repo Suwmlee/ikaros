@@ -88,23 +88,18 @@ wget "http://localhost:12346/api/client?path=$TR_DOWNLOADS"
     """
     try:
         client_path = request.args.get('path')
-        print(client_path)
-        # TODO
+        log.info("start auto conf: "+client_path)
         # 1. convert path to real path for flask
-        # tr    /volume1/Media/Movies
-        # flask /media/Movies
         conf = autoConfigService.getSetting()
-
         real_path = str(client_path).replace(conf.original, conf.prefixed)
-        # if not os.path.exists(real_path):
-            # return Response(status=404)
-        print(real_path)
+        if not os.path.exists(real_path):
+            return Response(status=403)
+        log.info(real_path)
         # 2. select scrape or transfer
         scrapingFolders = conf.scrapingfolders.split(';')
         transferFolders = conf.transferfolders.split(';')
         flag_scraping = False
         flag_transfer = False
-        # check path in folder
         for sc in scrapingFolders:
             if real_path.startswith(sc):
                 flag_scraping = True
@@ -115,7 +110,7 @@ wget "http://localhost:12346/api/client?path=$TR_DOWNLOADS"
                 break
         # 3. run
         if flag_scraping:
-            print("jav scraper")
+            log.info("jav scraper")
             if os.path.isdir(real_path):
                 manager.start_all(real_path)
             else:
@@ -124,15 +119,9 @@ wget "http://localhost:12346/api/client?path=$TR_DOWNLOADS"
             confs = transConfigService.getConfiglist()
             for conf in confs:
                 if real_path.startswith(conf.source_folder):
-                    print("transfer")
+                    log.info("transfer")
                     transfer.transfer(conf.source_folder, conf.output_folder, conf.linktype,
                           conf.soft_prefix, conf.escape_folder, conf.renameflag, conf.renameprefix, real_path)
-
-        # TODO  4. emby API scan libraray ? auto scan ?
-        # https://emby.media/community/index.php?/topic/50862-trigger-a-library-rescan-via-cmd-line
-        # https://emby.media/community/index.php?/topic/67593-update-specific-library-sub-folder/
-        # https://emby.media/community/index.php?/topic/77770-204-on-calls-to-librarymediaupdated/
-        # emby_lib_url = "http://localhost:8096/emby/Library/Media/Updated?api_key=YYYY"
 
         return Response(status=200)
     except Exception as err:
