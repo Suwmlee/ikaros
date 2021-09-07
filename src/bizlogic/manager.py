@@ -90,7 +90,7 @@ def start_all(folder=''):
 
     if folder == '':
         folder = conf.scraping_folder
-    movie_list = movie_lists(conf.scraping_folder, re.split("[,，]", conf.escape_folders))
+    movie_list = movie_lists(folder, re.split("[,，]", conf.escape_folders))
 
     count = 0
     total = str(len(movie_list))
