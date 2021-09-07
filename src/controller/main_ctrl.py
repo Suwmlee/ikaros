@@ -80,37 +80,60 @@ NOTSET = 0
 @web.route("/api/client", methods=['GET'])
 def scraping_single():
     """ for client
+
+#!/bin/bash
+TR_DOWNLOADS="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
+wget "http://localhost:12346/api/client?path=$TR_DOWNLOADS"
+
     """
     try:
         client_path = request.args.get('path')
+        print(client_path)
         # TODO
         # 1. convert path to real path for flask
         # tr    /volume1/Media/Movies
         # flask /media/Movies
-        real_path = str(client_path).replace("/volume1/Media","/media")
-        if not os.path.exists(real_path):
-            return Response(status=404)
+        conf = autoConfigService.getSetting()
+
+        real_path = str(client_path).replace(conf.original, conf.prefixed)
+        # if not os.path.exists(real_path):
+            # return Response(status=404)
+        print(real_path)
         # 2. select scrape or transfer
-        scrapingFolder = ['ACG/Collection','JAV']
-        transferFolder = ['Movies','Documentry']
+        scrapingFolders = conf.scrapingfolders.split(';')
+        transferFolders = conf.transferfolders.split(';')
         flag_scraping = False
         flag_transfer = False
-        for sc in scrapingFolder:
-            if sc in real_path:
+        # check path in folder
+        for sc in scrapingFolders:
+            if real_path.startswith(sc):
                 flag_scraping = True
                 break
-        for sc in transferFolder:
-            if sc in real_path:
+        for sc in transferFolders:
+            if real_path.startswith(sc):
                 flag_transfer = True
                 break
         # 3. run
         if flag_scraping:
+            print("jav scraper")
             if os.path.isdir(real_path):
                 manager.start_all(real_path)
             else:
                 manager.start_single(real_path)
-        # TODO run transfer, which one?
-        # TODO emby API scan libraray
+        if flag_transfer:
+            confs = transConfigService.getConfiglist()
+            for conf in confs:
+                if real_path.startswith(conf.source_folder):
+                    print("transfer")
+                    transfer.transfer(conf.source_folder, conf.output_folder, conf.linktype,
+                          conf.soft_prefix, conf.escape_folder, conf.renameflag, conf.renameprefix, real_path)
+
+        # TODO  4. emby API scan libraray ? auto scan ?
+        # https://emby.media/community/index.php?/topic/50862-trigger-a-library-rescan-via-cmd-line
+        # https://emby.media/community/index.php?/topic/67593-update-specific-library-sub-folder/
+        # https://emby.media/community/index.php?/topic/77770-204-on-calls-to-librarymediaupdated/
+        # emby_lib_url = "http://localhost:8096/emby/Library/Media/Updated?api_key=YYYY"
+
         return Response(status=200)
     except Exception as err:
         log.error(err)

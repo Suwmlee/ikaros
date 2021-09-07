@@ -30,7 +30,7 @@ def copysub(src_folder, destfolder, filter):
                      stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH)
 
 
-def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renameflag=False, renameprefix='S01E'):
+def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renameflag=False, renameprefix='S01E', single=''):
 
     task = taskService.getTask('transfer')
     if task.status == 2:
@@ -38,7 +38,15 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
     taskService.updateTaskStatus(2, 'transfer')
 
     try:
-        movie_list = movie_lists(src_folder, re.split("[,，]", escape_folders))
+        movie_list = []
+        if single == '':
+            movie_list = movie_lists(src_folder, re.split("[,，]", escape_folders))
+        else:
+            if os.path.exists(single):
+                if os.path.isdir(single):
+                    movie_list = movie_lists(single, re.split("[,，]", escape_folders))
+                else:
+                    movie_list.append[single]
 
         count = 0
         total = str(len(movie_list))
