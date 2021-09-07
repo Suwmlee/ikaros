@@ -111,3 +111,24 @@ class _TransferConfigs(db.Model):
             'refresh_url': self.refresh_url,
             'mark': self.mark
         }
+
+
+class _AutoConfigs(db.Model):
+    __tablename__ = 'autoconfigs'
+
+    id = Column(Integer, primary_key=True)
+    original = Column(String, default="", comment="需要替换的前缀")
+    prefixed = Column(String, default="", comment="前缀")
+    scrapingfolders = Column(String, default="", comment="以;间隔")
+    transferfolders = Column(String, default="", comment="以;间隔")
+    mark = Column(String, default='auto')
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'original': self.original,
+            'prefixed': self.prefixed,
+            'scrapingfolders': self.scrapingfolders,
+            'transferfolders': self.transferfolders,
+            'mark': self.mark
+        }

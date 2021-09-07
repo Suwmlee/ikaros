@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ''' 刮削配置
 '''
-from ..model.config import _ScrapingConfigs, _TransferConfigs
+from ..model.config import _ScrapingConfigs, _TransferConfigs, _AutoConfigs
 from .. import db
 
 
@@ -119,5 +119,32 @@ class ProxyConfig():
         return proxies
 
 
+class AutoConfService():
+    """ 自动化配置
+    """
+    def getSetting(self):
+        setting = _AutoConfigs.query.filter_by(id=1).first()
+        if not setting:
+            setting = _AutoConfigs()
+            db.session.add(setting)
+            db.session.commit()
+        return setting
+
+    def updateSetting(self, content):
+        changed = False
+        setting = self.getSetting()
+        for singlekey in content.keys():
+            if hasattr(setting, singlekey):
+                value = getattr(setting, singlekey)
+                newvalue = content.get(singlekey)
+                if value != newvalue:
+                    setattr(setting, singlekey, newvalue)
+                    changed = True
+        if changed:
+            db.session.commit()
+        return True
+
+
 scrapingConfService = ScrapingConfService()
 transConfigService = TransConfService()
+autoConfigService = AutoConfService()
