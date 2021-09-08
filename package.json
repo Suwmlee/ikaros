@@ -49,6 +49,7 @@
         "@semantic-release/git",
         {
           "assets": [
+            "src/config.py",
             "CHANGELOG.md"
           ]
         }
