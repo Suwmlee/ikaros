@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/Suwmlee/ikaros/compare/v1.0.3...v1.0.4) (2021-09-08)
+
+
+### Bug Fixes
+
+* rename flag in auto ([52c099b](https://github.com/Suwmlee/ikaros/commit/52c099b8bfd46939303599d5e5211f976d702aa0))
+
 ## [1.0.3](https://github.com/Suwmlee/ikaros/compare/v1.0.2...v1.0.3) (2021-09-08)
 
 
