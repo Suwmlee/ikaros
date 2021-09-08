@@ -79,7 +79,7 @@ NOTSET = 0
 
 
 @web.route("/api/client", methods=['GET'])
-def scraping_single():
+def client_auto():
     """ for client
 
 #!/bin/bash
@@ -91,6 +91,18 @@ wget "http://localhost:12346/api/client?path=$TR_DOWNLOADS"
         client_path = request.args.get('path')
         log.info("start auto conf: "+client_path)
         automation.start(client_path)
+        return Response(status=200)
+    except Exception as err:
+        log.error(err)
+        return Response(status=500)
+
+
+@web.route("/api/client/clean", methods=['GET'])
+def client_clean():
+    """ clean client task
+    """
+    try:
+        automation.clean()
         return Response(status=200)
     except Exception as err:
         log.error(err)

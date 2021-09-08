@@ -85,3 +85,11 @@ def run_task(client_path: str):
                 log.info("transfer")
                 transfer(conf.source_folder, conf.output_folder, conf.linktype,
                          conf.soft_prefix, conf.escape_folder, conf.renameflag, conf.renameprefix, real_path)
+
+
+def clean():
+    """ clean all task
+    """
+    tasks = autoTaskService.getTasks()
+    for single in tasks:
+        autoTaskService.deleteTask(single.id)
