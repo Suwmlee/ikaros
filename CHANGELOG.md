@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/Suwmlee/ikaros/compare/v1.0.2...v1.0.3) (2021-09-08)
+
+
+### Bug Fixes
+
+* config ver regex ([170a12b](https://github.com/Suwmlee/ikaros/commit/170a12b97053042be0ffad84b9d0d1b0edc93c35))
+
 ## [1.0.2](https://github.com/Suwmlee/ikaros/compare/v1.0.1...v1.0.2) (2021-09-08)
 
 
