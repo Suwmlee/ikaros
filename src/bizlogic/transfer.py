@@ -39,14 +39,17 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
 
     try:
         movie_list = []
+        cleanflag = True
+
         if single == '':
             movie_list = movie_lists(src_folder, re.split("[,，]", escape_folders))
         else:
             if os.path.exists(single):
+                cleanflag = False
                 if os.path.isdir(single):
                     movie_list = movie_lists(single, re.split("[,，]", escape_folders))
                 else:
-                    movie_list.append[single]
+                    movie_list.append(single)
 
         count = 0
         total = str(len(movie_list))
@@ -60,7 +63,10 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
         if not os.path.exists(dest_folder):
             os.makedirs(dest_folder)
 
-        dest_list = movie_lists(dest_folder, "")
+        if cleanflag:
+            dest_list = movie_lists(dest_folder, "")
+        else:
+            dest_list = []
 
         for movie_path in movie_list:
             count += 1
