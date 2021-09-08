@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/Suwmlee/ikaros/compare/v1.0.4...v1.0.5) (2021-09-08)
+
+
+### Bug Fixes
+
+* **auto:** clean file ([8fc72c6](https://github.com/Suwmlee/ikaros/commit/8fc72c6b4171c55d1d20705a5231f7791ffef790))
+
 ## [1.0.4](https://github.com/Suwmlee/ikaros/compare/v1.0.3...v1.0.4) (2021-09-08)
 
 
