@@ -45,17 +45,32 @@ class TaskService():
 
 class AutoTaskService():
 
+    def init(self, path):
+        task = _AutoTask(path)
+        db.session.add(task)
+        db.session.commit()
+        return task
+
     def getTasks(self):
         return _AutoTask.query.all()
+
+    def getFirst(self):
+        return _AutoTask.query.first()
 
     def getRunning(self):
         return _AutoTask.query.filter_by(status=1).first()
 
     def getPath(self, path):
-        return _AutoTask.query.filter_by(status=1).first()
+        return _AutoTask.query.filter_by(path=path).first()
 
     def commit(self):
         db.session.commit()
+
+    def deleteTask(self, cid):
+        task = _AutoTask.query.filter_by(id=cid).first()
+        if task:
+            db.session.delete(task)
+            db.session.commit()
 
 
 taskService = TaskService()
