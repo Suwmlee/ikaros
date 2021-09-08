@@ -30,7 +30,7 @@
               "files": [
                 "src/config.py"
               ],
-              "from": "VERSION = '*'",
+              "from": "VERSION = '.*'",
               "to": "VERSION = '${nextRelease.version}'",
               "results": [
                 {
