@@ -59,7 +59,7 @@ def run_task(client_path: str):
     real_path = str(client_path).replace(conf.original, conf.prefixed)
     if not os.path.exists(real_path):
         return
-    log.info(real_path)
+    log.info("任务详情: 实际路径[{}]".format(real_path))
     # 2. select scrape or transfer
     scrapingFolders = conf.scrapingfolders.split(';')
     transferFolders = conf.transferfolders.split(';')
@@ -75,7 +75,7 @@ def run_task(client_path: str):
             break
     # 3. run
     if flag_scraping:
-        log.info("jav scraper")
+        log.info("任务详情: JAV")
         if os.path.isdir(real_path):
             start_all(real_path)
         else:
@@ -84,7 +84,7 @@ def run_task(client_path: str):
         confs = transConfigService.getConfiglist()
         for conf in confs:
             if real_path.startswith(conf.source_folder):
-                log.info("transfer")
+                log.info("任务详情: 转移")
                 transfer(conf.source_folder, conf.output_folder, conf.linktype,
                          conf.soft_prefix, conf.escape_folder, conf.renameflag, conf.renameprefix, real_path)
 
