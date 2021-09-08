@@ -76,22 +76,6 @@ class ScrapingRecordService():
             record.updatetime = datetime.datetime.now()
             db.session.commit()
 
-    def update(self, path, sname, newpath, flag, linktype):
-        info = self.queryByPath(path)
-        if info:
-            if flag:
-                (filefolder, newname) = os.path.split(newpath)
-                info.status = 1
-                info.destname = newname
-                info.destpath = newpath
-                info.linktype = linktype
-            else:
-                info.status = 2
-            info.scrapingname = sname
-            info.updatetime = datetime.datetime.now()
-            db.session.commit()
-        return info
-
     def commit(self):
         db.session.commit()
 

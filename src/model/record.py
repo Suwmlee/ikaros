@@ -11,6 +11,7 @@ class _ScrapingRecords(db.Model):
             1   已刮削
             2   失败
             3   忽略
+            4   进行中
     """
     __tablename__ = 'scrapingrecords'
 

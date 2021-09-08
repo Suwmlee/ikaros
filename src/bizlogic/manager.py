@@ -4,6 +4,7 @@
 import os
 import re
 import requests
+import datetime
 
 from ..service.configservice import scrapingConfService, _ScrapingConfigs
 from ..service.recordservice import scrapingrecordService
@@ -42,7 +43,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
     try:
         movie_info = scrapingrecordService.queryByPath(file_path)
         # 查看单个文件刮削状态
-        if not movie_info or (movie_info.status != 1 and movie_info.status != 3):
+        if not movie_info or (movie_info.status != 1 and movie_info.status != 3 and movie_info.status != 4):
             movie_info = scrapingrecordService.add(file_path)
             # 查询是否已经存在刮削目录 & 不能在同一目录下
             if movie_info.destpath != '':
@@ -64,8 +65,21 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
             if movie_info.cdnum:
                 scrapingtag_cdnum = movie_info.cdnum
             log.info("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
+            movie_info.status = 4
+            movie_info.scrapingname = n_number
+            movie_info.updatetime = datetime.datetime.now()
+            scrapingrecordService.commit()
             (flag, new_path) = core_main(file_path, n_number, scrapingtag_cnsub, scrapingtag_cdnum, conf)
-            movie_info = scrapingrecordService.update(file_path, n_number, new_path, flag, conf.link_type)
+            if flag:
+                movie_info.status = 1
+                (filefolder, newname) = os.path.split(new_path)
+                movie_info.destname = newname
+                movie_info.destpath = new_path
+                movie_info.linktype = conf.link_type
+            else:
+                movie_info.status = 2
+            movie_info.updatetime = datetime.datetime.now()
+            scrapingrecordService.commit()
         else:
             # use cleandb function checking record
             log.info("[!]Already done: [{}]".format(file_path))
