@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ''' task
 '''
-from ..model.task import _Task
+from ..model.task import _Task, _AutoTask
 from .. import db
 
 
@@ -34,7 +34,6 @@ class TaskService():
             task.total = num
             db.session.commit()
 
-
     def updateTaskFinished(self, num, taskname):
         """ Update finished num
         """
@@ -44,4 +43,20 @@ class TaskService():
             db.session.commit()
 
 
+class AutoTaskService():
+
+    def getTasks(self):
+        return _AutoTask.query.all()
+
+    def getRunning(self):
+        return _AutoTask.query.filter_by(status=1).first()
+
+    def getPath(self, path):
+        return _AutoTask.query.filter_by(status=1).first()
+
+    def commit(self):
+        db.session.commit()
+
+
 taskService = TaskService()
+autoTaskService = AutoTaskService()
