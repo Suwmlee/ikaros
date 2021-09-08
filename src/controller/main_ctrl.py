@@ -10,6 +10,7 @@ from . import web
 from ..bizlogic import manager
 from ..bizlogic import transfer
 from ..bizlogic import rename
+from ..bizlogic import automation
 from ..service.recordservice import scrapingrecordService, transrecordService
 from ..service.configservice import scrapingConfService, transConfigService, autoConfigService
 from ..service.taskservice import taskService
@@ -89,40 +90,7 @@ wget "http://localhost:12346/api/client?path=$TR_DOWNLOADS"
     try:
         client_path = request.args.get('path')
         log.info("start auto conf: "+client_path)
-        # 1. convert path to real path for flask
-        conf = autoConfigService.getSetting()
-        real_path = str(client_path).replace(conf.original, conf.prefixed)
-        if not os.path.exists(real_path):
-            return Response(status=403)
-        log.info(real_path)
-        # 2. select scrape or transfer
-        scrapingFolders = conf.scrapingfolders.split(';')
-        transferFolders = conf.transferfolders.split(';')
-        flag_scraping = False
-        flag_transfer = False
-        for sc in scrapingFolders:
-            if real_path.startswith(sc):
-                flag_scraping = True
-                break
-        for sc in transferFolders:
-            if real_path.startswith(sc):
-                flag_transfer = True
-                break
-        # 3. run
-        if flag_scraping:
-            log.info("jav scraper")
-            if os.path.isdir(real_path):
-                manager.start_all(real_path)
-            else:
-                manager.start_single(real_path)
-        if flag_transfer:
-            confs = transConfigService.getConfiglist()
-            for conf in confs:
-                if real_path.startswith(conf.source_folder):
-                    log.info("transfer")
-                    transfer.transfer(conf.source_folder, conf.output_folder, conf.linktype,
-                          conf.soft_prefix, conf.escape_folder, conf.renameflag, conf.renameprefix, real_path)
-
+        automation.start(client_path)
         return Response(status=200)
     except Exception as err:
         log.error(err)
