@@ -23,10 +23,32 @@
       "@semantic-release/release-notes-generator",
       "@semantic-release/changelog",
       [
+        "@google/semantic-release-replace-plugin",
+        {
+          "replacements": [
+            {
+              "files": [
+                "src/config.py"
+              ],
+              "from": "VERSION = '*'",
+              "to": "VERSION = '${nextRelease.version}'",
+              "results": [
+                {
+                  "file": "src/config.py",
+                  "hasChanged": true,
+                  "numMatches": 1,
+                  "numReplacements": 1
+                }
+              ],
+              "countMatches": true
+            }
+          ]
+        }
+      ],
+      [
         "@semantic-release/git",
         {
           "assets": [
-            "gradle.properties",
             "CHANGELOG.md"
           ]
         }
