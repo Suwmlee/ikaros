@@ -1,3 +1,11 @@
+## [1.0.2](https://github.com/Suwmlee/ikaros/compare/v1.0.1...v1.0.2) (2021-09-08)
+
+
+### Bug Fixes
+
+* action commit file ([b7df73c](https://github.com/Suwmlee/ikaros/commit/b7df73cb7821f39689f1ad10d86d5859f63a1825))
+* update package ([954fd91](https://github.com/Suwmlee/ikaros/commit/954fd912155fe4d459bf3e53573f47086757efd7))
+
 ## [1.0.1](https://github.com/Suwmlee/ikaros/compare/v1.0.0...v1.0.1) (2021-09-08)
 
 
