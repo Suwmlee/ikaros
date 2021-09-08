@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@google/semantic-release-replace-plugin": "^1.0.2",
+    "@google/semantic-release-replace-plugin": "github:google/semantic-release-replace-plugin",
     "@semantic-release/changelog": "github:semantic-release/changelog",
     "@semantic-release/git": "github:semantic-release/git",
     "is-ci": "^3.0.0",
