@@ -1,14 +1,17 @@
 name: Release
-on:
-  push:
-    tags:
-      - "*"
+on: [push]
 jobs:
   buildDocker:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -31,3 +34,8 @@ jobs:
           push: true
           tags: |
             suwmlee/ikaros:latest
+      
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
