@@ -14,14 +14,15 @@ def start(client_path: str):
     """
     task = autoTaskService.getPath(client_path)
     if task:
-        log.info("已经存在任务")
+        log.info("自动任务: 已经存在任务")
         return 200
     else:
+        log.info("自动任务: 加入队列[{}]".format(client_path))
         task = autoTaskService.init(client_path)
 
     runningTask = autoTaskService.getRunning()
     if runningTask:
-        log.info("正在执行其他任务")
+        log.info("自动任务: 正在执行其他任务")
     else:
         task_loop()
 
@@ -38,13 +39,14 @@ def task_loop():
 
         task = autoTaskService.getFirst()
         if task:
-            log.info("任务循环队列: " + task.path)
+            log.info("任务循环队列: 开始[{}]".format(task.path))
             task.status = 1
             autoTaskService.commit()
             try:
                 run_task(task.path)
             except Exception as e:
                 log.error(e)
+            log.info("任务循环队列: 完成[{}]".format(task.path))
             autoTaskService.deleteTask(task.id)
         else:
             log.info("任务循环队列: 无新任务")

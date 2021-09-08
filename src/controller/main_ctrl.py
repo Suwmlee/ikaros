@@ -89,7 +89,6 @@ wget "http://localhost:12346/api/client?path=$TR_DOWNLOADS"
     """
     try:
         client_path = request.args.get('path')
-        log.info("start auto conf: "+client_path)
         automation.start(client_path)
         return Response(status=200)
     except Exception as err:
