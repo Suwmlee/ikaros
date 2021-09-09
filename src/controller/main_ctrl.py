@@ -50,8 +50,8 @@ def version():
         return Response(status=500)
 
 
-@web.route("/api/loglevel", methods=['PUT'])
-def setloglevel():
+@web.route("/api/loglevel", methods=['GET', 'PUT'])
+def loglevel():
     """
 CRITICAL = 50
 FATAL = CRITICAL
@@ -63,13 +63,18 @@ DEBUG = 10
 NOTSET = 0
     """
     try:
-        content = request.get_json()
-        if content and 'level' in content:
-            level = int(content.get('level'))
-            current_app.logger.setLevel(level)
-        else:
-            current_app.logger.setLevel(logging.INFO)
-        return Response(status=200)
+        if request.method == 'GET':
+            level = current_app.logger.level
+            ret = {'loglevel': level}
+            return json.dumps(ret)
+        if request.method == 'PUT':
+            content = request.get_json()
+            if content and 'loglevel' in content:
+                level = int(content.get('loglevel'))
+                current_app.logger.setLevel(level)
+            else:
+                current_app.logger.setLevel(logging.INFO)
+            return Response(status=200)
     except Exception as err:
         log.error(err)
         return Response(status=500)
