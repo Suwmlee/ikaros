@@ -82,12 +82,16 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
                 src_folder, '').lstrip("\\").lstrip("/")
             # 链接的源地址
             link_path = os.path.join(prefix, midfolder, name)
-            # 过滤 midfolder 内特殊内容
-            filterliterals = ["加长版.","4K修复版."]
-            for literal in filterliterals:
-                if literal in midfolder:
-                    midfolder = midfolder.replace(literal, '')
-                    log.info("[-] handling filterliterals: " + literal)
+            # 处理 midfolder 内特殊内容
+            # CMCT组视频文件命名比文件夹命名更好
+            if 'CMCT' in midfolder and 'CMCT' in name:
+                cmovies = movie_lists(filefolder, re.split("[,，]", escape_folders))
+                if len(cmovies) == 1:
+                    # 只针对单一视频，合集容易出错
+                    (sname, ext) = os.path.splitext(name)
+                    pdir = os.path.basename(filefolder)
+                    midfolder = midfolder.replace(pdir, sname)
+                    log.info("[-] handling midfolder [{}] ".format(midfolder))
             # 目的地址
             flag_done = False
             newpath = os.path.join(dest_folder, midfolder, name)
