@@ -1,3 +1,11 @@
+# [1.1.0](https://github.com/Suwmlee/ikaros/compare/v1.0.5...v1.1.0) (2021-09-09)
+
+
+### Features
+
+* **auto:** wait normal task end ([96a7fa7](https://github.com/Suwmlee/ikaros/commit/96a7fa76984514bf17ff15a432be1b4899e121a7))
+* **transfer:** rename mid folder ([b8f4bca](https://github.com/Suwmlee/ikaros/commit/b8f4bcaa98eefc659fa41002561e3acd8ecb2dd4))
+
 ## [1.0.5](https://github.com/Suwmlee/ikaros/compare/v1.0.4...v1.0.5) (2021-09-08)
 
 
