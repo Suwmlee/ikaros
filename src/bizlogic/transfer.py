@@ -118,7 +118,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
             if newpath in dest_list:
                 dest_list.remove(newpath)
 
-            log.info("[-] transfered [{}]".format(movie_path))
+            log.info("[-] transfered [{}]".format(newpath))
             transrecordService.update(movie_path, link_path, newpath)
 
         # 与源内容无匹配
