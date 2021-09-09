@@ -1,3 +1,11 @@
+## [1.2.1](https://github.com/Suwmlee/ikaros/compare/v1.2.0...v1.2.1) (2021-09-09)
+
+
+### Bug Fixes
+
+* auto transfer break ([3f36a6a](https://github.com/Suwmlee/ikaros/commit/3f36a6a23ca3be345f4e7ab2776568ce9449d1ab))
+* scan file permission ([ae91ebd](https://github.com/Suwmlee/ikaros/commit/ae91ebd273c9bbe4a8c824d480d6f236b8426e70))
+
 # [1.2.0](https://github.com/Suwmlee/ikaros/compare/v1.1.0...v1.2.0) (2021-09-09)
 
 
