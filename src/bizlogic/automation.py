@@ -49,6 +49,7 @@ def task_loop():
                 # 在已经有任务要进行情况下
                 # 其他任务会加入队列，当前任务等待手动任务完成
                 while taskService.haveRunningTask():
+                    log.info("任务循环队列: 等待手动任务结束")
                     time.sleep(5)
 
                 run_task(task.path)

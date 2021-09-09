@@ -46,7 +46,7 @@ def cleanfilebysuffix(folder, suffix):
         if os.path.isdir(f):
             cleanfilebysuffix(f, suffix)
         elif os.path.splitext(f)[1].lower() in suffix:
-            log.info("clean file by suffix ")
+            log.info("clean file by suffix [{}]".format(f))
             os.remove(f)
 
 
@@ -62,7 +62,7 @@ def cleanfolderwithoutsuffix(folder, suffix):
             if hastag:
                 hassuffix = True
             else:
-                log.info("clean empty media folder")
+                log.info("clean empty media folder [{}]".format(f))
                 shutil.rmtree(f)
         elif os.path.splitext(f)[1].lower() in suffix:
             hassuffix = True
@@ -82,6 +82,7 @@ def cleanfolderbyfilter(folder, filter):
             cleanAll = False
         else:
             if filter in file:
+                log.info("clean folder by filter [{}]".format(f))
                 os.remove(f)
             else:
                 cleanAll = False
@@ -100,6 +101,7 @@ def cleanscrapingfile(folder, filter):
         if not os.path.isdir(f):
             for s in filters:
                 if s in file:
+                    log.info("clean scraping file [{}]".format(f))
                     os.remove(f)
 
 
