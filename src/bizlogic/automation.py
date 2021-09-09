@@ -2,11 +2,12 @@
 '''
 '''
 import os
-
+import time
 import requests
+
 from src.utils.log import log
 from ..service.configservice import transConfigService, autoConfigService
-from ..service.taskservice import autoTaskService
+from ..service.taskservice import autoTaskService, taskService
 from .manager import start_all, start_single
 from .transfer import transfer
 
@@ -45,6 +46,11 @@ def task_loop():
             task.status = 1
             autoTaskService.commit()
             try:
+                # 在已经有任务要进行情况下
+                # 其他任务会加入队列，当前任务等待手动任务完成
+                while taskService.haveRunningTask():
+                    time.sleep(5)
+
                 run_task(task.path)
             except Exception as e:
                 log.error(e)

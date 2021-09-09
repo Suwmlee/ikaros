@@ -15,6 +15,12 @@ class TaskService():
             db.session.commit()
         return task
 
+    def haveRunningTask(self):
+        ntask = _Task.query.filter_by(status=2).first()
+        if ntask:
+            return True
+        return False
+
     def updateTaskStatus(self, status, taskname):
         """ status
             0: wait
