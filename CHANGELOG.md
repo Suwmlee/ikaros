@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/Suwmlee/ikaros/compare/v1.1.0...v1.2.0) (2021-09-09)
+
+
+### Features
+
+* **api:** update loglvl api ([1651847](https://github.com/Suwmlee/ikaros/commit/1651847368207778c659a18d5793e9c7caf1d3ef))
+
 # [1.1.0](https://github.com/Suwmlee/ikaros/compare/v1.0.5...v1.1.0) (2021-09-09)
 
 
