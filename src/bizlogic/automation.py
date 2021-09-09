@@ -98,7 +98,7 @@ def run_task(client_path: str):
                          conf.soft_prefix, conf.escape_folder, False, '', real_path)
                 if conf.refresh_url:
                     requests.post(conf.refresh_url)
-                    break
+                break
 
 
 def clean():
