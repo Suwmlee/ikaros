@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/Suwmlee/ikaros/compare/v1.2.1...v1.3.0) (2021-09-10)
+
+
+### Features
+
+* **transfer:** add clean option ([761bab7](https://github.com/Suwmlee/ikaros/commit/761bab74ebda70e77e302830b8723e8fa784e154))
+
 ## [1.2.1](https://github.com/Suwmlee/ikaros/compare/v1.2.0...v1.2.1) (2021-09-09)
 
 
