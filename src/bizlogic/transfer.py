@@ -30,7 +30,8 @@ def copysub(src_folder, destfolder, filter):
                      stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH)
 
 
-def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renameflag=False, renameprefix='S01E', single=''):
+def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, 
+             renameflag=False, renameprefix='S01E', cleanflag = True, single=''):
 
     task = taskService.getTask('transfer')
     if task.status == 2:
@@ -39,7 +40,6 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, renamefl
 
     try:
         movie_list = []
-        cleanflag = True
 
         if single == '':
             movie_list = movie_lists(src_folder, re.split("[,，]", escape_folders))

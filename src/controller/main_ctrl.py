@@ -134,8 +134,9 @@ def start_transfer():
     try:
         content = request.get_json()
         transfer.transfer(content['source_folder'], content['output_folder'], content['linktype'],
-                          content['soft_prefix'], content['escape_folder'], content['renameflag'], content['renameprefix'])
-        
+                          content['soft_prefix'], content['escape_folder'], content['renameflag'], 
+                          content['renameprefix'], content['cleanflag'])
+
         if content.get('refresh_url'):
             refresh_url = content.get('refresh_url')
             requests.post(refresh_url)

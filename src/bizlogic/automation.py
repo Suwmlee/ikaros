@@ -95,7 +95,7 @@ def run_task(client_path: str):
             if real_path.startswith(conf.source_folder):
                 log.info("任务详情: 转移")
                 transfer(conf.source_folder, conf.output_folder, conf.linktype,
-                         conf.soft_prefix, conf.escape_folder, False, '', real_path)
+                         conf.soft_prefix, conf.escape_folder, False, '', False, real_path)
                 if conf.refresh_url:
                     requests.post(conf.refresh_url)
                 break
