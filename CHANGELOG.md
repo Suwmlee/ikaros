@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/Suwmlee/ikaros/compare/v1.4.0...v1.4.1) (2021-09-18)
+
+
+### Bug Fixes
+
+* **transfer:**  strip special characters ([8cb7f82](https://github.com/Suwmlee/ikaros/commit/8cb7f821dcaed2a97ac25b2716c01dd207e0ebe4))
+
 # [1.4.0](https://github.com/Suwmlee/ikaros/compare/v1.3.0...v1.4.0) (2021-09-18)
 
 
