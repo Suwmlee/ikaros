@@ -110,7 +110,7 @@ def start_all(folder=''):
     total = str(len(movie_list))
     taskService.updateTaskFinished(0, 'scrape')
     taskService.updateTaskTotal(total, 'scrape')
-    log.info('[+]Find  ' + total+'  movies')
+    log.debug('[+]Find  ' + total+'  movies')
 
     for movie_path in movie_list:
         taskService.updateTaskFinished(count, 'scrape')
@@ -123,7 +123,7 @@ def start_all(folder=''):
         log.info("[+]Refresh MediaServer")
         requests.post(conf.refresh_url)
 
-    log.info("[+]All finished!!!")
+    log.info("[+] All scraping finished!!!")
 
     taskService.updateTaskStatus(1, 'scrape')
 

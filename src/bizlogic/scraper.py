@@ -128,16 +128,16 @@ def download_file_with_filename(url, filename, path):
                 return True
         except requests.exceptions.RequestException:
             i += 1
-            log.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
+            log.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
         except requests.exceptions.ConnectionError:
             i += 1
-            log.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
+            log.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
         except requests.exceptions.ProxyError:
             i += 1
-            log.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
+            log.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
         except requests.exceptions.ConnectTimeout:
             i += 1
-            log.info('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
+            log.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
     log.info('[-]Connect Failed! Please check your Proxy or Network!')
     return False
 
@@ -147,7 +147,7 @@ def download_poster(path, prefilename, cover_small_url):
     """
     postername = prefilename + '-poster.jpg'
     if download_file_with_filename(cover_small_url, postername, path):
-        log.info('[+]Poster Downloaded! ' + path + '/' + postername)
+        log.debug('[+]Poster Downloaded! ' + path + '/' + postername)
         return True
     else:
         log.info('[+]Download Poster Failed! ' + path + '/' + postername)
@@ -159,7 +159,7 @@ def download_cover(cover_url, prefilename, path):
     """
     fanartname = prefilename + '-fanart.jpg'
     if download_file_with_filename(cover_url, fanartname, path):
-        log.info('[+]Cover Downloaded! ' + path + '/' + fanartname)
+        log.debug('[+]Cover Downloaded! ' + path + '/' + fanartname)
         shutil.copyfile(path + '/' + fanartname, path + '/' + prefilename + '-thumb.jpg')
         return True
     else:
@@ -172,7 +172,7 @@ def download_extrafanart(urls, path, extrafanart_folder):
     path = path + '/' + extrafanart_folder
     for url in urls:
         if download_file_with_filename(url, 'extrafanart-' + str(j)+'.jpg', path):
-            log.info('[+]Extrafanart Downloaded! ' + path + '/extrafanart-' + str(j) + '.jpg')
+            log.debug('[+]Extrafanart Downloaded! ' + path + '/extrafanart-' + str(j) + '.jpg')
             j += 1
         else:
             log.info('[+]Download Extrafanart Failed! ' + path + '/extrafanart-' + str(j) + '.jpg')
@@ -264,14 +264,14 @@ def crop_poster(imagecut, path, prefilename):
             h = img.height
             img2 = img.crop((w / 1.9, 0, w, h))
             img2.save(path + '/' + prefilename + '-poster.jpg')
-            log.info('[+]Image Cutted!     ' + path + '/' + prefilename + '-poster.jpg')
+            log.debug('[+]Image Cutted!     ' + path + '/' + prefilename + '-poster.jpg')
         except:
             log.info('[-]Cover cut failed!')
     elif imagecut == 0: 
         # 复制封面
         shutil.copyfile(path + '/' + prefilename + '-fanart.jpg',
                         path + '/' + prefilename + '-poster.jpg')
-        log.info('[+]Image Copyed!     ' + path + '/' + prefilename + '-poster.jpg')
+        log.debug('[+]Image Copyed!     ' + path + '/' + prefilename + '-poster.jpg')
 
 
 def add_mark(pics, chs_tag, leak_tag, uncensored_tag, count, size):
@@ -294,7 +294,7 @@ def add_mark(pics, chs_tag, leak_tag, uncensored_tag, count, size):
         return
     for pic in pics:
         add_mark_thread(pic, chs_tag, leak_tag, uncensored_tag, count, size)
-        log.info('[+]Image Add Mark:   ' + mark_type.strip(','))
+        log.debug('[+]Image Add Mark:   ' + mark_type.strip(','))
 
 
 def add_mark_thread(pic_path, chs_tag, leak_tag, uncensored_tag, count, size):

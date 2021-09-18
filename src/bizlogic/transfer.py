@@ -39,7 +39,7 @@ def auto_transfer(real_path: str):
     confs = transConfigService.getConfiglist()
     for conf in confs:
         if real_path.startswith(conf.source_folder):
-            log.info("任务详情: 转移")
+            log.debug("任务详情: 转移")
             transfer(conf.source_folder, conf.output_folder,
                      conf.linktype, conf.soft_prefix,
                      conf.escape_folder, real_path,
@@ -94,7 +94,7 @@ def transfer(src_folder, dest_folder,
         count = 0
         total = str(len(movie_list))
         taskService.updateTaskTotal(total, 'transfer')
-        log.info('[+]Find  ' + total+'  movies')
+        log.debug('[+]Find  ' + total+'  movies')
 
         # 硬链接直接使用源目录
         if linktype == 1:
@@ -111,8 +111,8 @@ def transfer(src_folder, dest_folder,
         for movie_path in movie_list:
             count += 1
             taskService.updateTaskFinished(count, 'transfer')
-            log.info('[!] - ' + str(count) + '/' + total + ' -')
-            log.info("[+] start check [{}] ".format(movie_path))
+            log.debug('[!] - ' + str(count) + '/' + total + ' -')
+            log.debug("[+] start check [{}] ".format(movie_path))
             movie_info = transrecordService.queryByPath(movie_path)
             if not movie_info:
                 movie_info = transrecordService.add(movie_path)
@@ -130,13 +130,14 @@ def transfer(src_folder, dest_folder,
                     (sname, ext) = os.path.splitext(name)
                     pdir = os.path.basename(filefolder)
                     midfolder = midfolder.replace(pdir, sname)
-                    log.info("[-] handling midfolder [{}] ".format(midfolder))
+                    log.debug("[-] handling midfolder [{}] ".format(midfolder))
             # 替换中文
             if replace_CJK_tag:
                 tempmid = midfolder
                 tempmid = replace_CJK(tempmid)
                 tempmid = re.sub(r'(\W)\1+', r'\1', tempmid).strip('.')
                 if len(tempmid) > 8:
+                    log.debug("[-] replace CJK [{}] ".format(tempmid))
                     midfolder = tempmid
 
             # 目的地址

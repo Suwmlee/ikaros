@@ -24,7 +24,7 @@ def start(client_path: str):
 
     runningTask = autoTaskService.getRunning()
     if runningTask:
-        log.info("自动任务: 正在执行其他任务")
+        log.debug("自动任务: 正在执行其他任务")
     else:
         task_loop()
 
@@ -36,7 +36,7 @@ def task_loop():
     while running:
         runningTask = autoTaskService.getRunning()
         if runningTask:
-            log.info("任务循环队列: 正在执行其他任务")
+            log.debug("任务循环队列: 正在执行其他任务")
             break
 
         task = autoTaskService.getFirst()
@@ -48,7 +48,7 @@ def task_loop():
                 # 在已经有任务要进行情况下
                 # 其他任务会加入队列，当前任务等待手动任务完成
                 while taskService.haveRunningTask():
-                    log.info("任务循环队列: 等待手动任务结束")
+                    log.debug("任务循环队列: 等待手动任务结束")
                     time.sleep(5)
 
                 run_task(task.path)
@@ -67,7 +67,7 @@ def run_task(client_path: str):
     real_path = str(client_path).replace(conf.original, conf.prefixed)
     if not os.path.exists(real_path):
         return
-    log.info("任务详情: 实际路径[{}]".format(real_path))
+    log.debug("任务详情: 实际路径[{}]".format(real_path))
     # 2. select scrape or transfer
     scrapingFolders = conf.scrapingfolders.split(';')
     transferFolders = conf.transferfolders.split(';')
@@ -83,7 +83,7 @@ def run_task(client_path: str):
             break
     # 3. run
     if flag_scraping:
-        log.info("任务详情: JAV")
+        log.debug("任务详情: JAV")
         if os.path.isdir(real_path):
             start_all(real_path)
         else:

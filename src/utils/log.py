@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-from .. import app
+try:
+    from .. import app
+except:
+    app = None
 
 
 class log():
