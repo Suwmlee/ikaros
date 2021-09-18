@@ -97,6 +97,8 @@ class _TransferConfigs(db.Model):
     linktype = Column(Integer, default=0)
     output_folder = Column(String, default='/media/output')
     escape_folder = Column(String, default='Sample,sample')
+    clean_others = Column(Boolean, default=False)
+    replace_CJK = Column(Boolean, default=False)
     refresh_url = Column(String, default='')
     mark = Column(String, default='备注')
 
@@ -108,6 +110,8 @@ class _TransferConfigs(db.Model):
             'soft_prefix': self.soft_prefix,
             'output_folder': self.output_folder,
             'escape_folder': self.escape_folder,
+            'clean_others': self.clean_others,
+            'replace_CJK': self.replace_CJK,
             'refresh_url': self.refresh_url,
             'mark': self.mark
         }

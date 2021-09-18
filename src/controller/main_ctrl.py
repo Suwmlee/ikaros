@@ -133,14 +133,12 @@ def start_scraping():
 def start_transfer():
     try:
         content = request.get_json()
-        transfer.transfer(content['source_folder'], content['output_folder'], content['linktype'],
-                          content['soft_prefix'], content['escape_folder'], content['renameflag'], 
-                          content['renameprefix'], content['cleanflag'])
-
-        if content.get('refresh_url'):
-            refresh_url = content.get('refresh_url')
-            requests.post(refresh_url)
-
+        transfer.ctrl_transfer(content['source_folder'], content['output_folder'], 
+                               content['linktype'], content['soft_prefix'], 
+                               content['escape_folder'],
+                               content['renameflag'], content['renameprefix'],
+                               content['clean_others'], content['replace_CJK'],
+                               content.get('refresh_url'))
         return Response(status=200)
     except Exception as err:
         log.error(err)

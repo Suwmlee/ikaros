@@ -6,12 +6,15 @@ import pathlib
 import stat
 import re
 import shutil
+import requests
 
 from .manager import movie_lists
 from .rename import renamebyreg
+from ..service.configservice import transConfigService
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
-from ..utils.filehelper import video_type, ext_type, cleanfolderwithoutsuffix, hardlink_force, symlink_force
+from ..utils.filehelper import video_type, ext_type, cleanfolderwithoutsuffix,\
+     hardlink_force, symlink_force, replace_CJK
 from ..utils.log import log
 
 
@@ -23,15 +26,52 @@ def copysub(src_folder, destfolder, filter):
         (path, ext) = os.path.splitext(item)
         if ext.lower() in ext_type and filter in item:
             src_file = os.path.join(src_folder, item)
-            log.info("[-] - copy sub  " + src_file)
+            log.debug("[-] - copy sub  " + src_file)
             dest = shutil.copy(src_file, destfolder)
             # modify permission
             os.chmod(dest, stat.S_IRWXU | stat.S_IRGRP |
                      stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH)
 
 
-def transfer(src_folder, dest_folder, linktype, prefix, escape_folders, 
-             renameflag=False, renameprefix='S01E', cleanflag = True, single=''):
+def auto_transfer(real_path: str):
+    """ 自动转移
+    """
+    confs = transConfigService.getConfiglist()
+    for conf in confs:
+        if real_path.startswith(conf.source_folder):
+            log.info("任务详情: 转移")
+            transfer(conf.source_folder, conf.output_folder,
+                     conf.linktype, conf.soft_prefix,
+                     conf.escape_folder, real_path,
+                     False, conf.replace_CJK)
+            if conf.refresh_url:
+                requests.post(conf.refresh_url)
+            break
+
+
+def ctrl_transfer(src_folder, dest_folder, 
+                linktype, prefix, escape_folders,
+                renameflag, renameprefix,
+                clean_others,
+                replace_CJK,
+                refresh_url):
+    transfer(src_folder, dest_folder, linktype, prefix,
+            escape_folders, '', 
+            clean_others, replace_CJK,
+            renameflag, renameprefix)
+    if refresh_url:
+        requests.post(refresh_url)
+
+
+def transfer(src_folder, dest_folder, 
+             linktype, prefix,
+             escape_folders, top_files='',
+             clean_others_tag = True,
+             replace_CJK_tag= False,
+             renameflag= False, renameprefix='S01E'
+             ):
+    """ 如果 top_files 有值，则使用 top_files 过滤文件且不清理其他文件
+    """
 
     task = taskService.getTask('transfer')
     if task.status == 2:
@@ -41,15 +81,15 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders,
     try:
         movie_list = []
 
-        if single == '':
+        if top_files == '':
             movie_list = movie_lists(src_folder, re.split("[,，]", escape_folders))
         else:
-            if os.path.exists(single):
-                cleanflag = False
-                if os.path.isdir(single):
-                    movie_list = movie_lists(single, re.split("[,，]", escape_folders))
+            if os.path.exists(top_files):
+                clean_others_tag = False
+                if os.path.isdir(top_files):
+                    movie_list = movie_lists(top_files, re.split("[,，]", escape_folders))
                 else:
-                    movie_list.append(single)
+                    movie_list.append(top_files)
 
         count = 0
         total = str(len(movie_list))
@@ -63,7 +103,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders,
         if not os.path.exists(dest_folder):
             os.makedirs(dest_folder)
 
-        if cleanflag:
+        if clean_others_tag:
             dest_list = movie_lists(dest_folder, "")
         else:
             dest_list = []
@@ -78,8 +118,7 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders,
                 movie_info = transrecordService.add(movie_path)
 
             (filefolder, name) = os.path.split(movie_path)
-            midfolder = filefolder.replace(
-                src_folder, '').lstrip("\\").lstrip("/")
+            midfolder = str(filefolder).replace(src_folder, '').lstrip("\\").lstrip("/")
             # 链接的源地址
             link_path = os.path.join(prefix, midfolder, name)
             # 处理 midfolder 内特殊内容
@@ -92,6 +131,14 @@ def transfer(src_folder, dest_folder, linktype, prefix, escape_folders,
                     pdir = os.path.basename(filefolder)
                     midfolder = midfolder.replace(pdir, sname)
                     log.info("[-] handling midfolder [{}] ".format(midfolder))
+            # 替换中文
+            if replace_CJK_tag:
+                tempmid = midfolder
+                tempmid = replace_CJK(tempmid)
+                tempmid = re.sub(r'(\W)\1+', r'\1', tempmid).strip('.')
+                if len(tempmid) > 8:
+                    midfolder = tempmid
+
             # 目的地址
             flag_done = False
             newpath = os.path.join(dest_folder, midfolder, name)

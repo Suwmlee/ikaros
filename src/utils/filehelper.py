@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import re
 import errno
 import shutil
 from .log import log
@@ -130,3 +131,17 @@ def hardlink_force(srcpath, dstpath):
             os.link(srcpath, dstpath)
         else:
             raise e
+
+
+def replace_CJK(base: str):
+    """ try to replace CJK or brackets
+
+    eg: 你好  [4k修复] (实例1)
+    """
+    tmp = base
+    for n in re.findall(r'[\(\[\（](.*?)[\)\]\）]', base):
+        if re.findall(r'[\u4e00-\u9fff]+', n):
+            cop = re.compile("[\(\[\（]" + n + "[\)\]\）]")
+            tmp = cop.sub('', tmp)
+    tmp = re.sub(r'[\u4e00-\u9fff]+', '', tmp)
+    return tmp

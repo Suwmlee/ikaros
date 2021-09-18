@@ -3,13 +3,12 @@
 '''
 import os
 import time
-import requests
 
 from src.utils.log import log
-from ..service.configservice import transConfigService, autoConfigService
+from ..service.configservice import autoConfigService
 from ..service.taskservice import autoTaskService, taskService
 from .manager import start_all, start_single
-from .transfer import transfer
+from .transfer import auto_transfer
 
 
 def start(client_path: str):
@@ -90,15 +89,7 @@ def run_task(client_path: str):
         else:
             start_single(real_path)
     if flag_transfer:
-        confs = transConfigService.getConfiglist()
-        for conf in confs:
-            if real_path.startswith(conf.source_folder):
-                log.info("任务详情: 转移")
-                transfer(conf.source_folder, conf.output_folder, conf.linktype,
-                         conf.soft_prefix, conf.escape_folder, False, '', False, real_path)
-                if conf.refresh_url:
-                    requests.post(conf.refresh_url)
-                break
+        auto_transfer(real_path)
 
 
 def clean():
