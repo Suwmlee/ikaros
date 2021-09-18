@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/Suwmlee/ikaros/compare/v1.3.0...v1.4.0) (2021-09-18)
+
+
+### Features
+
+* **transfer:**  replace CJK in folder name ([881ff9f](https://github.com/Suwmlee/ikaros/commit/881ff9fc0f5a995e4ccea47773ed12cb66330df0))
+
 # [1.3.0](https://github.com/Suwmlee/ikaros/compare/v1.2.1...v1.3.0) (2021-09-10)
 
 
