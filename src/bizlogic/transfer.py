@@ -135,7 +135,7 @@ def transfer(src_folder, dest_folder,
             if replace_CJK_tag:
                 tempmid = midfolder
                 tempmid = replace_CJK(tempmid)
-                tempmid = re.sub(r'(\W)\1+', r'\1', tempmid).strip('.')
+                tempmid = re.sub(r'(\W)\1+', r'\1', tempmid).strip('!?@#$.:：【[(（）)]】')
                 if len(tempmid) > 8:
                     log.debug("[-] replace CJK [{}] ".format(tempmid))
                     midfolder = tempmid
