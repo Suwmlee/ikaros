@@ -29,7 +29,7 @@ def CreatFolder(foldername):
 
 
 def CleanFolder(foldername):
-    """ rm and create folder
+    """ 删除并重新创建文件夹
     """
     try:
         shutil.rmtree(foldername)
@@ -39,7 +39,7 @@ def CleanFolder(foldername):
 
 
 def cleanfilebysuffix(folder, suffix):
-    """ 清理指定目录下所有匹配格式文件
+    """ 删除匹配后缀的文件
     """
     dirs = os.listdir(folder)
     for file in dirs:
@@ -51,8 +51,49 @@ def cleanfilebysuffix(folder, suffix):
             os.remove(f)
 
 
+def cleanbyNameSuffix(folder, basename, suffix):
+    """ 根据名称和后缀删除文件
+    """
+    dirs = os.listdir(folder)
+    for file in dirs:
+        f = os.path.join(folder, file)
+        fname, fsuffix = os.path.splitext(f)
+        if os.path.isdir(f):
+            cleanbyNameSuffix(f, basename, suffix)
+        elif fsuffix.lower() in suffix and fname.startswith(basename):
+            log.debug("clean by name & suffix [{}]".format(f))
+            os.remove(f)
+
+
+def cleanExtraMedia(folder):
+    """ 删除多余的媒体文件(没有匹配的视频文件)
+    """
+    dirs = os.listdir(folder)
+    vlists = []
+    for vf in dirs:
+        if os.path.splitext(vf)[1].lower() in video_type:
+            fname, fsuffix = os.path.splitext(vf)
+            vlists.append(fname)
+    for file in dirs:
+        f = os.path.join(folder, file)
+        if os.path.isdir(f) and file != "extrafanart":
+            cleanExtraMedia(f)
+        else:
+            cleanflag = True
+            if file == "fanart.jpg" or file == "poster.jpg":
+                cleanflag = False
+            else:
+                for s in vlists:
+                    if file.startswith(s):
+                        cleanflag = False
+                        break
+            if cleanflag:
+                log.debug("clean extra media file [{}]".format(f))
+                os.remove(file)
+
+
 def cleanfolderwithoutsuffix(folder, suffix):
-    """ 清理目录下无匹配文件的目录
+    """ 删除内部无匹配后缀的文件的目录
     """
     hassuffix = False
     dirs = os.listdir(folder)
@@ -71,9 +112,9 @@ def cleanfolderwithoutsuffix(folder, suffix):
 
 
 def cleanfolderbyfilter(folder, filter):
-    """ clean folder by filter
+    """ 根据过滤名删除文件
     
-    if all files removed, rm folder
+    如果目录下所有文件都被删除，将删除文件夹
     """
     cleanAll = True
     dirs = os.listdir(folder)
@@ -92,18 +133,15 @@ def cleanfolderbyfilter(folder, filter):
 
 
 def cleanscrapingfile(folder, filter):
-    """ clean scraping file
+    """ 根据过滤名删除刮削文件
     """
-    filters = [filter + '.', filter + '-fanart.', filter + '-poster.', filter + '-thumb.']
-
     dirs = os.listdir(folder)
     for file in dirs:
         f = os.path.join(folder, file)
         if not os.path.isdir(f):
-            for s in filters:
-                if s in file:
-                    log.info("clean scraping file [{}]".format(f))
-                    os.remove(f)
+            if file.startswith(filter):
+                log.info("clean scraping file [{}]".format(f))
+                os.remove(f)
 
 
 def symlink_force(srcpath, dstpath):

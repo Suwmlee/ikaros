@@ -14,7 +14,7 @@ from ..service.configservice import transConfigService
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
 from ..utils.filehelper import video_type, ext_type, cleanfolderwithoutsuffix,\
-     hardlink_force, symlink_force, replace_CJK
+     hardlink_force, symlink_force, replace_CJK, cleanbyNameSuffix, cleanExtraMedia
 from ..utils.log import log
 
 
@@ -24,7 +24,7 @@ def copysub(src_folder, destfolder, filter):
     dirs = os.listdir(src_folder)
     for item in dirs:
         (path, ext) = os.path.splitext(item)
-        if ext.lower() in ext_type and filter in item:
+        if ext.lower() in ext_type and path.startswith(filter):
             src_file = os.path.join(src_folder, item)
             log.debug("[-] - copy sub  " + src_file)
             dest = shutil.copy(src_file, destfolder)
@@ -117,17 +117,17 @@ def transfer(src_folder, dest_folder,
             if not movie_info:
                 movie_info = transrecordService.add(movie_path)
 
-            (filefolder, name) = os.path.split(movie_path)
+            (filefolder, newname) = os.path.split(movie_path)
             midfolder = str(filefolder).replace(src_folder, '').lstrip("\\").lstrip("/")
             # 链接的源地址
-            link_path = os.path.join(prefix, midfolder, name)
+            link_path = os.path.join(prefix, midfolder, newname)
             # 处理 midfolder 内特殊内容
             # CMCT组视频文件命名比文件夹命名更好
-            if 'CMCT' in midfolder and 'CMCT' in name:
+            if 'CMCT' in midfolder and 'CMCT' in newname:
                 cmovies = movie_lists(filefolder, re.split("[,，]", escape_folders))
                 if len(cmovies) == 1:
                     # 只针对单一视频，合集容易出错
-                    (sname, ext) = os.path.splitext(name)
+                    (sname, ext) = os.path.splitext(newname)
                     pdir = os.path.basename(filefolder)
                     midfolder = midfolder.replace(pdir, sname)
                     log.debug("[-] handling midfolder [{}] ".format(midfolder))
@@ -140,9 +140,8 @@ def transfer(src_folder, dest_folder,
                     log.debug("[-] replace CJK [{}] ".format(tempmid))
                     midfolder = tempmid
 
-            # 目的地址
             flag_done = False
-            newpath = os.path.join(dest_folder, midfolder, name)
+            newpath = os.path.join(dest_folder, midfolder, newname)
             # https://stackoverflow.com/questions/41941401/how-to-find-out-if-a-folder-is-a-hard-link-and-get-its-real-path
             if os.path.exists(newpath) and os.path.samefile(link_path, newpath):
                 flag_done = True
@@ -153,15 +152,16 @@ def transfer(src_folder, dest_folder,
             (newfolder, tname) = os.path.split(newpath)
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
-
             if not flag_done:
                 log.debug("[-] create link from [{}] to [{}]".format(link_path, newpath))
                 if linktype == 0:
                     symlink_force(link_path, newpath)
                 else:
                     hardlink_force(link_path, newpath)
-            basename = os.path.splitext(name)[0]
-            copysub(filefolder, newfolder, basename)
+
+            nname = os.path.splitext(newname)[0]
+            cleanbyNameSuffix(filefolder, nname, ext_type)
+            copysub(filefolder, newfolder, nname)
 
             if newpath in dest_list:
                 dest_list.remove(newpath)
@@ -169,12 +169,12 @@ def transfer(src_folder, dest_folder,
             log.info("[-] transfered [{}]".format(newpath))
             transrecordService.update(movie_path, link_path, newpath)
 
-        # 与源内容无匹配
-        for torm in dest_list:
-            log.info("[!] clean extra file: [{}]".format(torm))
-            os.remove(torm)
-
-        cleanfolderwithoutsuffix(dest_folder, video_type)
+        if clean_others_tag:
+            for torm in dest_list:
+                log.info("[!] clean extra file: [{}]".format(torm))
+                os.remove(torm)
+            cleanExtraMedia(dest_folder)
+            cleanfolderwithoutsuffix(dest_folder, video_type)
         # 重命名
         if renameflag:
             reg = '[\[第 ][0-9.svidevoa\(\)]*[\]話话集 ]'
