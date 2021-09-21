@@ -160,7 +160,7 @@ def transfer(src_folder, dest_folder,
                     hardlink_force(link_path, newpath)
 
             nname = os.path.splitext(newname)[0]
-            cleanbyNameSuffix(filefolder, nname, ext_type)
+            cleanbyNameSuffix(newfolder, nname, ext_type)
             copysub(filefolder, newfolder, nname)
 
             if newpath in dest_list:

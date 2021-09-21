@@ -57,7 +57,7 @@ def cleanbyNameSuffix(folder, basename, suffix):
     dirs = os.listdir(folder)
     for file in dirs:
         f = os.path.join(folder, file)
-        fname, fsuffix = os.path.splitext(f)
+        fname, fsuffix = os.path.splitext(file)
         if os.path.isdir(f):
             cleanbyNameSuffix(f, basename, suffix)
         elif fsuffix.lower() in suffix and fname.startswith(basename):
