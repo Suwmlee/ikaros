@@ -89,7 +89,7 @@ def cleanExtraMedia(folder):
                         break
             if cleanflag:
                 log.debug("clean extra media file [{}]".format(f))
-                os.remove(file)
+                os.remove(f)
 
 
 def cleanfolderwithoutsuffix(folder, suffix):
