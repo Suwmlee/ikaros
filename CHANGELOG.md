@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/Suwmlee/ikaros/compare/v1.5.1...v1.5.2) (2021-09-21)
+
+
+### Bug Fixes
+
+* clean sub file ([a1616a9](https://github.com/Suwmlee/ikaros/commit/a1616a9a9dc4dd32b71e78251f34888dcf34d7c6))
+
 ## [1.5.1](https://github.com/Suwmlee/ikaros/compare/v1.5.0...v1.5.1) (2021-09-21)
 
 
