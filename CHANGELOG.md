@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/Suwmlee/ikaros/compare/v1.5.0...v1.5.1) (2021-09-21)
+
+
+### Bug Fixes
+
+* remove file path ([d8f95b4](https://github.com/Suwmlee/ikaros/commit/d8f95b46a8792ae4a7ceb3079e1d44a4009278c9))
+
 # [1.5.0](https://github.com/Suwmlee/ikaros/compare/v1.4.1...v1.5.0) (2021-09-21)
 
 
