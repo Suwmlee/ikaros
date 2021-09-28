@@ -174,6 +174,9 @@ def transfer(src_folder, dest_folder,
             link_path = os.path.join(prefix, currentfile.midfolder, currentfile.filename)
             # 处理 midfolder 内特殊内容
             # CMCT组视频文件命名比文件夹命名更好
+            # TODO 可延申过滤剧集，S01 S02，只过滤 topfolder下的文件， seoondfolder = ''
+            # 得到剧集后，修改 secondfolder 为季度
+            # 与之后的 renameflag 配合 ？？
             if 'CMCT' in currentfile.topfolder:
                 matches = [x for x in todoFiles if x.topfolder == currentfile.topfolder]
                 if len(matches) > 0:
@@ -191,12 +194,17 @@ def transfer(src_folder, dest_folder,
                     log.debug("[-] replace CJK [{}] ".format(tempmid))
                     currentfile.topfolder = tempmid
             # 检测是否是特殊的导评/花絮内容
+            # TODO 更多关于花絮的规则
             if currentfile.name == "导演访谈":
                 if currentfile.secondfolder == '' and currentfile.topfolder != '.':
                     currentfile.secondfolder = "extras"
 
             flag_done = False
-            newpath = os.path.join(dest_folder, currentfile.fixmidfolder(), currentfile.name + currentfile.ext)
+            if currentfile.topfolder == '.':
+                newpath = os.path.join(dest_folder, currentfile.name + currentfile.ext)
+            else:
+                newpath = os.path.join(dest_folder, currentfile.fixmidfolder(), currentfile.name + currentfile.ext)
+            currentfile.finalpath = newpath
             # https://stackoverflow.com/questions/41941401/how-to-find-out-if-a-folder-is-a-hard-link-and-get-its-real-path
             if os.path.exists(newpath) and os.path.samefile(link_path, newpath):
                 flag_done = True
@@ -214,7 +222,8 @@ def transfer(src_folder, dest_folder,
                 else:
                     hardlink_force(link_path, newpath)
 
-            nname = os.path.splitext(newname)[0]
+            # TODO 未更新的文件名，若更新后，则需要修正
+            nname = os.path.splitext(currentfile.filename)[0]
             cleanbyNameSuffix(newfolder, nname, ext_type)
             copysub(filefolder, newfolder, nname)
 
@@ -222,7 +231,7 @@ def transfer(src_folder, dest_folder,
                 dest_list.remove(newpath)
 
             log.info("[-] transfered [{}]".format(newpath))
-            transrecordService.update(movie_path, link_path, newpath)
+            transrecordService.update(currentfile.realpath, link_path, newpath)
 
         if clean_others_tag:
             for torm in dest_list:
