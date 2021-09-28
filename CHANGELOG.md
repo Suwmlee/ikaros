@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/Suwmlee/ikaros/compare/v1.5.2...v1.6.0) (2021-09-28)
+
+
+### Features
+
+* **transfer:** detect extra file ([ed7ea17](https://github.com/Suwmlee/ikaros/commit/ed7ea1716f7f01952f9ee78fd52e413eea4b061a))
+
 ## [1.5.2](https://github.com/Suwmlee/ikaros/compare/v1.5.1...v1.5.2) (2021-09-21)
 
 
