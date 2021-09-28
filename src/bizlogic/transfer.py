@@ -54,8 +54,11 @@ class FileInfo():
     def fixmidfolder(self):
         temp = self.folders
         temp[0] = self.topfolder
-        if len(temp) > 1:
-            temp[1] = self.secondfolder
+        if self.secondfolder != '':
+            if len(temp) > 1:
+                temp[1] = self.secondfolder
+            else:
+                temp.append(self.secondfolder)
         return os.path.join(*temp)
 
 
@@ -171,22 +174,26 @@ def transfer(src_folder, dest_folder,
             link_path = os.path.join(prefix, currentfile.midfolder, currentfile.filename)
             # 处理 midfolder 内特殊内容
             # CMCT组视频文件命名比文件夹命名更好
-            if 'CMCT' in midfolder and 'CMCT' in newname:
-                cmovies = movie_lists(filefolder, re.split("[,，]", escape_folders))
-                if len(cmovies) == 1:
-                    # 只针对单一视频，合集容易出错
-                    (sname, ext) = os.path.splitext(newname)
-                    pdir = os.path.basename(filefolder)
-                    midfolder = midfolder.replace(pdir, sname)
+            if 'CMCT' in currentfile.topfolder:
+                matches = [x for x in todoFiles if x.topfolder == currentfile.topfolder]
+                if len(matches) > 0:
+                    namingfiles = [x for x in matches if 'CMCT' in x.name]
+                    if len(namingfiles) == 1:
+                        for m in matches:
+                            m.topfolder = namingfiles[0].name
                     log.debug("[-] handling midfolder [{}] ".format(midfolder))
             # 替换中文
             if replace_CJK_tag:
-                tempmid = midfolder
+                tempmid = currentfile.topfolder
                 tempmid = replace_CJK(tempmid)
-                tempmid = re.sub(r'(\W)\1+', r'\1', tempmid).strip('!?@#$.:：【[(（）)]】')
+                tempmid = re.sub(r'(\W)\1+', r'\1', tempmid).strip(' !?@#$.:：【[(（）)]】')
                 if len(tempmid) > 8:
                     log.debug("[-] replace CJK [{}] ".format(tempmid))
-                    midfolder = tempmid
+                    currentfile.topfolder = tempmid
+            # 检测是否是特殊的导评/花絮内容
+            if currentfile.name == "导演访谈":
+                if currentfile.secondfolder == '' and currentfile.topfolder != '.':
+                    currentfile.secondfolder = "extras"
 
             flag_done = False
             newpath = os.path.join(dest_folder, currentfile.fixmidfolder(), currentfile.name + currentfile.ext)
