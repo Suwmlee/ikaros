@@ -18,6 +18,47 @@ from ..utils.filehelper import video_type, ext_type, cleanfolderwithoutsuffix,\
 from ..utils.log import log
 
 
+class FileInfo():
+
+    realpath = ''
+    folders = []
+    filename = ''
+
+    midfolder = ''
+    topfolder = ''
+    secondfolder = ''
+    name = ''
+    ext = ''
+
+    fixedtop = False
+    done = False
+    finalpath = ''
+
+    def __init__(self, filepath):
+        self.realpath = filepath
+
+    def updatemidfolder(self, mid):
+        self.midfolder = mid
+        folders =  os.path.normpath(mid).split(os.path.sep)
+        self.folders = folders
+        self.topfolder = folders[0]
+        if len(folders) > 1:
+            self.secondfolder = folders[1]
+
+    def updatename(self, filename):
+        self.filename = filename
+        (name, ext) = os.path.splitext(filename)
+        self.name = name
+        self.ext = ext
+
+    def fixmidfolder(self):
+        temp = self.folders
+        temp[0] = self.topfolder
+        if len(temp) > 1:
+            temp[1] = self.secondfolder
+        return os.path.join(*temp)
+
+
 def copysub(src_folder, destfolder, filter):
     """ copy subtitle
     """
@@ -108,19 +149,26 @@ def transfer(src_folder, dest_folder,
         else:
             dest_list = []
 
+        todoFiles = []
         for movie_path in movie_list:
+            (filefolder, newname) = os.path.split(movie_path)
+            midfolder = str(filefolder).replace(src_folder, '').lstrip("\\").lstrip("/")
+            fi = FileInfo(movie_path)
+            fi.updatemidfolder(midfolder)
+            fi.updatename(newname)
+            todoFiles.append(fi)
+
+        for currentfile in todoFiles:
             count += 1
             taskService.updateTaskFinished(count, 'transfer')
             log.debug('[!] - ' + str(count) + '/' + total + ' -')
-            log.debug("[+] start check [{}] ".format(movie_path))
-            movie_info = transrecordService.queryByPath(movie_path)
+            log.debug("[+] start check [{}] ".format(currentfile.realpath))
+            movie_info = transrecordService.queryByPath(currentfile.realpath)
             if not movie_info:
-                movie_info = transrecordService.add(movie_path)
+                movie_info = transrecordService.add(currentfile.realpath)
 
-            (filefolder, newname) = os.path.split(movie_path)
-            midfolder = str(filefolder).replace(src_folder, '').lstrip("\\").lstrip("/")
             # 链接的源地址
-            link_path = os.path.join(prefix, midfolder, newname)
+            link_path = os.path.join(prefix, currentfile.midfolder, currentfile.filename)
             # 处理 midfolder 内特殊内容
             # CMCT组视频文件命名比文件夹命名更好
             if 'CMCT' in midfolder and 'CMCT' in newname:
@@ -141,7 +189,7 @@ def transfer(src_folder, dest_folder,
                     midfolder = tempmid
 
             flag_done = False
-            newpath = os.path.join(dest_folder, midfolder, newname)
+            newpath = os.path.join(dest_folder, currentfile.fixmidfolder(), currentfile.name + currentfile.ext)
             # https://stackoverflow.com/questions/41941401/how-to-find-out-if-a-folder-is-a-hard-link-and-get-its-real-path
             if os.path.exists(newpath) and os.path.samefile(link_path, newpath):
                 flag_done = True
