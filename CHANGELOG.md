@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/Suwmlee/ikaros/compare/v1.6.0...v1.6.1) (2021-09-28)
+
+
+### Bug Fixes
+
+* midfolder err ([33e3818](https://github.com/Suwmlee/ikaros/commit/33e3818af3fe80d1948c6d742fe2c510a11170d0))
+
 # [1.6.0](https://github.com/Suwmlee/ikaros/compare/v1.5.2...v1.6.0) (2021-09-28)
 
 
