@@ -190,7 +190,7 @@ def transfer(src_folder, dest_folder,
                 tempmid = currentfile.topfolder
                 tempmid = replace_CJK(tempmid)
                 tempmid = re.sub(r'(\W)\1+', r'\1', tempmid).strip(' !?@#$.:：【[(（）)]】')
-                if len(tempmid) > 8:
+                if len(tempmid) > 18:
                     log.debug("[-] replace CJK [{}] ".format(tempmid))
                     currentfile.topfolder = tempmid
             # 检测是否是特殊的导评/花絮内容

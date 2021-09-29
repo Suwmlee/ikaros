@@ -172,14 +172,18 @@ def hardlink_force(srcpath, dstpath):
 
 
 def replace_CJK(base: str):
-    """ try to replace CJK or brackets
+    """ 尝试替换 CJK 字符
+    https://stackoverflow.com/questions/1366068/whats-the-complete-range-for-chinese-characters-in-unicode
+    
+    https://www.unicode.org/charts/charindex.html
 
     eg: 你好  [4k修复] (实例1)
     """
     tmp = base
-    for n in re.findall(r'[\(\[\（](.*?)[\)\]\）]', base):
-        if re.findall(r'[\u4e00-\u9fff]+', n):
+    for n in re.findall('[\(\[\（](.*?)[\)\]\）]', base):
+        if re.findall('[\u3000-\u33FF\u4e00-\u9fff]+', n):
             cop = re.compile("[\(\[\（]" + n + "[\)\]\）]")
             tmp = cop.sub('', tmp)
-    tmp = re.sub(r'[\u4e00-\u9fff]+', '', tmp)
+    tmp = re.sub('[\u3000-\u33FF\u4e00-\u9fff]+', '', tmp)
+
     return tmp
