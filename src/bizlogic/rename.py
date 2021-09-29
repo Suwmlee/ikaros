@@ -102,7 +102,7 @@ def regexfilter(basename):
     True
     """
     reg = "[\[第 ][0-9.videvoa\(\)]*[\]話话集 ]"
-    nameresult = filtername(basename, reg) 
+    nameresult = filtername(basename, reg)
     if not nameresult or len(nameresult) == 0:
         reg2 = "\.e[0-9videvoa\(\)]{1,}[.]"
         nameresult = filtername(basename, reg2)
@@ -123,7 +123,11 @@ def renamebyreg(root, reg, prefix, preview: bool = True):
     for name in tvs:
         dirname, basename = os.path.split(name)
         log.info("开始替换: " + basename)
-        originep = regexfilter(basename)
+        if reg == '':
+            originep = regexfilter(basename)
+        else:
+            results = filtername(basename, reg)
+            originep = results[0]
         if originep:
             # log.info("提取剧集标签 "+nameresult)
             epresult = extractep(originep)
@@ -152,7 +156,6 @@ def renamebyreg(root, reg, prefix, preview: bool = True):
     return ret
 
 
-if __name__ == "__main__":
-
-    """
-    """
+# if __name__ == "__main__":
+#     import doctest
+#     doctest.testmod(verbose=True)
