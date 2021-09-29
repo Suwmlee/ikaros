@@ -161,7 +161,7 @@ def previewrename():
     try:
         content = request.get_json()
         ret = rename.renamebyreg(
-            content['source_folder'], content['reg'], content['reg2'], content['prefix'], True)
+            content['source_folder'], content['reg'], content['prefix'], True)
         return json.dumps(ret)
     except Exception as err:
         log.error(err)
@@ -173,7 +173,7 @@ def renamebyreg():
     try:
         content = request.get_json()
         ret = rename.renamebyreg(
-            content['source_folder'], content['reg'], content['reg2'], content['prefix'], False)
+            content['source_folder'], content['reg'], content['prefix'], False)
         return json.dumps(ret)
     except Exception as err:
         log.error(err)
