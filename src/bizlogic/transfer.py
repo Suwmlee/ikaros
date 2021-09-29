@@ -222,9 +222,10 @@ def transfer(src_folder, dest_folder,
                 else:
                     hardlink_force(link_path, newpath)
 
-            # TODO 未更新的文件名，若更新后，则需要修正
+            # 使用最终的文件名
+            cleanbyNameSuffix(newfolder, currentfile.name, ext_type)
+            # TODO 原始的文件名，如果更改文件名，则需要更新此方法
             nname = os.path.splitext(currentfile.filename)[0]
-            cleanbyNameSuffix(newfolder, nname, ext_type)
             copysub(filefolder, newfolder, nname)
 
             if newpath in dest_list:
@@ -239,11 +240,11 @@ def transfer(src_folder, dest_folder,
                 os.remove(torm)
             cleanExtraMedia(dest_folder)
             cleanfolderwithoutsuffix(dest_folder, video_type)
-        # 重命名
+
+        # TODO 剧集重命名
+        # 只针对顶层目录，适用范围较低
         if renameflag:
-            reg = '[\[第 ][0-9.svidevoa\(\)]*[\]話话集 ]'
-            reg2 = "\.e[0-9videvoa\(\)]{1,}[.]"
-            renamebyreg(dest_folder, reg, reg2, renameprefix, False)
+            renamebyreg(dest_folder, '', renameprefix, False)
 
         log.info("transfer finished")
     except Exception as e:
