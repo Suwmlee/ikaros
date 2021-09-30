@@ -64,8 +64,9 @@ def task_loop():
 def run_task(client_path: str):
     # 1. convert path to real path for flask
     conf = autoConfigService.getSetting()
-    real_path = str(client_path).replace(conf.original, conf.prefixed)
+    real_path = client_path.replace(conf.original, conf.prefixed)
     if not os.path.exists(real_path):
+        log.debug("任务详情: 不存在路径[{}]".format(real_path))
         return
     log.debug("任务详情: 实际路径[{}]".format(real_path))
     # 2. select scrape or transfer
