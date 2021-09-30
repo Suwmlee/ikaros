@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/Suwmlee/ikaros/compare/v1.6.1...v1.6.2) (2021-09-30)
+
+
+### Bug Fixes
+
+* '+' in url path ([7f5cbf2](https://github.com/Suwmlee/ikaros/commit/7f5cbf21aec786e57c5fc8ec91334facba579fee))
+
 ## [1.6.1](https://github.com/Suwmlee/ikaros/compare/v1.6.0...v1.6.1) (2021-09-28)
 
 
