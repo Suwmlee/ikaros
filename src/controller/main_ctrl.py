@@ -4,7 +4,6 @@ import json
 import logging
 import os
 from flask import request, Response, current_app
-import requests
 
 from . import web
 from ..bizlogic import manager
@@ -83,19 +82,23 @@ NOTSET = 0
 # action
 
 
-@web.route("/api/client", methods=['GET'])
+@web.route("/api/client", methods=['POST'])
 def client_auto():
     """ for client
 
 #!/bin/bash
 TR_DOWNLOADS="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
-Fix_Name="${TR_DOWNLOADS//+/$'%2b'}"
-wget "http://localhost:12346/api/client?path=$Fix_Name"
-
+curl -XPOST http://192.168.1.233:12346/api/client -H 'Content-Type: application/json' \
+--data @<(cat <<EOF
+{"path":"$TR_DOWNLOADS"}
+EOF
+)
     """
     try:
-        client_path = request.args.get('path')
-        automation.start(client_path)
+        content = request.get_json()
+        if content.get('path'):
+            client_path = content.get('path')
+            automation.start(client_path)
         return Response(status=200)
     except Exception as err:
         log.error(err)
