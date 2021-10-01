@@ -1,3 +1,10 @@
+## [1.6.3](https://github.com/Suwmlee/ikaros/compare/v1.6.2...v1.6.3) (2021-10-01)
+
+
+### Bug Fixes
+
+* path not exists ([980610c](https://github.com/Suwmlee/ikaros/commit/980610cb4104d87733f9f485e783c443c6225315))
+
 ## [1.6.2](https://github.com/Suwmlee/ikaros/compare/v1.6.1...v1.6.2) (2021-09-30)
 
 
