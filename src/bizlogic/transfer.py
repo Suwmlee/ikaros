@@ -21,8 +21,9 @@ from ..utils.log import log
 class FileInfo():
 
     realpath = ''
+    realfolder = ''
+    realname = ''
     folders = []
-    filename = ''
 
     midfolder = ''
     topfolder = ''
@@ -30,12 +31,17 @@ class FileInfo():
     name = ''
     ext = ''
 
-    fixedtop = False
-    done = False
     finalpath = ''
+    finalfolder = ''
 
     def __init__(self, filepath):
         self.realpath = filepath
+        (filefolder, filename) = os.path.split(filepath)
+        self.realfolder = filefolder
+        self.realname = filename
+        (name, ext) = os.path.splitext(filename)
+        self.name = name
+        self.ext = ext
 
     def updatemidfolder(self, mid):
         self.midfolder = mid
@@ -44,12 +50,6 @@ class FileInfo():
         self.topfolder = folders[0]
         if len(folders) > 1:
             self.secondfolder = folders[1]
-
-    def updatename(self, filename):
-        self.filename = filename
-        (name, ext) = os.path.splitext(filename)
-        self.name = name
-        self.ext = ext
 
     def fixmidfolder(self):
         temp = self.folders
@@ -60,6 +60,11 @@ class FileInfo():
             else:
                 temp.append(self.secondfolder)
         return os.path.join(*temp)
+    
+    def updatefinalpath(self, path):
+        self.finalpath = path
+        (newfolder, tname) = os.path.split(path)
+        self.finalfolder = newfolder
 
 
 def copysub(src_folder, destfolder, filter):
@@ -154,11 +159,9 @@ def transfer(src_folder, dest_folder,
 
         todoFiles = []
         for movie_path in movie_list:
-            (filefolder, newname) = os.path.split(movie_path)
-            midfolder = str(filefolder).replace(src_folder, '').lstrip("\\").lstrip("/")
             fi = FileInfo(movie_path)
+            midfolder = fi.realfolder.replace(src_folder, '').lstrip("\\").lstrip("/")
             fi.updatemidfolder(midfolder)
-            fi.updatename(newname)
             todoFiles.append(fi)
 
         for currentfile in todoFiles:
@@ -170,8 +173,8 @@ def transfer(src_folder, dest_folder,
             if not movie_info:
                 movie_info = transrecordService.add(currentfile.realpath)
 
-            # 链接的源地址
-            link_path = os.path.join(prefix, currentfile.midfolder, currentfile.filename)
+            # 修正后给链接使用的源地址
+            link_path = os.path.join(prefix, currentfile.midfolder, currentfile.realname)
             # 处理 midfolder 内特殊内容
             # CMCT组视频文件命名比文件夹命名更好
             # TODO 可延申过滤剧集，S01 S02，只过滤 topfolder下的文件， seoondfolder = ''
@@ -204,7 +207,8 @@ def transfer(src_folder, dest_folder,
                 newpath = os.path.join(dest_folder, currentfile.name + currentfile.ext)
             else:
                 newpath = os.path.join(dest_folder, currentfile.fixmidfolder(), currentfile.name + currentfile.ext)
-            currentfile.finalpath = newpath
+            currentfile.updatefinalpath(newpath)
+            newfolder = currentfile.finalfolder
             # https://stackoverflow.com/questions/41941401/how-to-find-out-if-a-folder-is-a-hard-link-and-get-its-real-path
             if os.path.exists(newpath) and os.path.samefile(link_path, newpath):
                 flag_done = True
@@ -212,7 +216,6 @@ def transfer(src_folder, dest_folder,
             elif pathlib.Path(newpath).is_symlink() and os.readlink(newpath) == link_path :
                 flag_done = True
                 log.debug("[!] link file already exists")
-            (newfolder, tname) = os.path.split(newpath)
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
             if not flag_done:
@@ -223,10 +226,10 @@ def transfer(src_folder, dest_folder,
                     hardlink_force(link_path, newpath)
 
             # 使用最终的文件名
-            cleanbyNameSuffix(newfolder, currentfile.name, ext_type)
+            cleanbyNameSuffix(currentfile.finalfolder, currentfile.name, ext_type)
             # TODO 原始的文件名，如果更改文件名，则需要更新此方法
-            nname = os.path.splitext(currentfile.filename)[0]
-            copysub(filefolder, newfolder, nname)
+            nname = os.path.splitext(currentfile.realname)[0]
+            copysub(currentfile.realfolder, currentfile.finalfolder, nname)
 
             if newpath in dest_list:
                 dest_list.remove(newpath)
