@@ -1,3 +1,10 @@
+## [1.6.4](https://github.com/Suwmlee/ikaros/compare/v1.6.3...v1.6.4) (2021-10-02)
+
+
+### Bug Fixes
+
+* wrong filefolder ([30e6971](https://github.com/Suwmlee/ikaros/commit/30e6971dd0f30cf9e0f1630cacb5f3f53cd05926))
+
 ## [1.6.3](https://github.com/Suwmlee/ikaros/compare/v1.6.2...v1.6.3) (2021-10-01)
 
 
