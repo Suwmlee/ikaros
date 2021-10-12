@@ -1,4 +1,4 @@
-FROM python:slim
+FROM python:3.9-slim
 LABEL git="https://github.com/Suwmlee/ikaros"
 
 ENV FLASK_APP=app.py
