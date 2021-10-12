@@ -169,13 +169,13 @@ def transfer(src_folder, dest_folder,
             taskService.updateTaskFinished(count, 'transfer')
             log.debug('[!] - ' + str(count) + '/' + total + ' -')
             log.debug("[+] start check [{}] ".format(currentfile.realpath))
-            movie_info = transrecordService.queryByPath(currentfile.realpath)
-            if not movie_info:
-                movie_info = transrecordService.add(currentfile.realpath)
+            transrecordService.add(currentfile.realpath)
 
             # 修正后给链接使用的源地址
             link_path = os.path.join(prefix, currentfile.midfolder, currentfile.realname)
             # 处理 midfolder 内特殊内容
+            # TODO 给单视频文件创建文件夹
+
             # CMCT组视频文件命名比文件夹命名更好
             # TODO 可延申过滤剧集，S01 S02，只过滤 topfolder下的文件， seoondfolder = ''
             # 得到剧集后，修改 secondfolder 为季度
@@ -245,7 +245,7 @@ def transfer(src_folder, dest_folder,
             cleanfolderwithoutsuffix(dest_folder, video_type)
 
         # TODO 剧集重命名
-        # 只针对顶层目录，适用范围较低
+        # 目前只针对顶层目录，适用范围较低
         if renameflag:
             renamebyreg(dest_folder, '', renameprefix, False)
 
