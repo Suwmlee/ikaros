@@ -1,3 +1,15 @@
+# [1.7.0](https://github.com/Suwmlee/ikaros/compare/v1.6.4...v1.7.0) (2021-10-14)
+
+
+### Bug Fixes
+
+* remove '[' ([dc07986](https://github.com/Suwmlee/ikaros/commit/dc07986b1f5bab586011a405585671ef9e2c206c))
+
+
+### Features
+
+* **transfer:** auto detect season episode number ([921a198](https://github.com/Suwmlee/ikaros/commit/921a1981ce75d89e0be6403851e23f8b2785c98a))
+
 ## [1.6.4](https://github.com/Suwmlee/ikaros/compare/v1.6.3...v1.6.4) (2021-10-02)
 
 
