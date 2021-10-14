@@ -215,10 +215,15 @@ def transfer(src_folder, dest_folder,
                     log.debug("[-] handling cmct midfolder [{}] ".format(midfolder))
             # topfolder 替换中文
             if replace_CJK_tag:
+                minlen = 27
                 tempmid = currentfile.topfolder
                 tempmid = replace_CJK(tempmid)
-                tempmid = re.sub(r'(\W)\1+', r'\1', tempmid).strip(' !?@#$.:：(（）)')
-                if len(tempmid) > 18:
+                tempmid = re.sub(r'(\W)\1+', r'\1', tempmid).lstrip(' !?@#$.:：]）)').rstrip(' !?@#$.:：[(（')
+                grouptags = ['cmct', 'wiki', 'frds']
+                for gt in grouptags:
+                    if gt in tempmid.lower():
+                        minlen += 4
+                if len(tempmid) > minlen:
                     log.debug("[-] replace CJK [{}] ".format(tempmid))
                     currentfile.topfolder = tempmid
             # 修正剧集命名
