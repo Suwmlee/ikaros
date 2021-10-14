@@ -240,27 +240,23 @@ def transfer(src_folder, dest_folder,
                         # 检测视频上级目录是否有 season 标记
                         # 上级目录可能是 top 或 second 甚至更底层目录
                         dirfolder = currentfile.folders[len(currentfile.folders)-1]
-                        seasonnum = findseason(dirfolder)
-                        if not seasonnum:
-                            # 如果存在大量重复 epnum
-                            # 如果有明确的 seasonnum 则可能是多版本，可继续
-                            # 如果检测不到 seasonnum 可能是多季？
-                            # eg: Code Geass
-                            # dupelist = []
-                            # isdupe = False
-                            # for m in matches:
-                            #     if m.epnum in dupelist:
-                            #         isdupe = True
-                            #         break
-                            #     dupelist.append(m.epnum)
-                            seasonnum = 1
-
                         # 根据 season 标记 更新 secondfolder
-                        currentfile.secondfolder = "Season " + str(seasonnum)
-                        currentfile.fixepname(seasonnum)
-                        # 如果 topfolder有season 标记，则删除
-
-
+                        seasonnum = findseason(dirfolder)
+                        if seasonnum:
+                            currentfile.secondfolder = "Season " + str(seasonnum)
+                            currentfile.fixepname(seasonnum)
+                        else:
+                            # 如果存在大量重复 epnum
+                            # 如果检测不到 seasonnum 可能是多季？
+                            if currentfile.secondfolder == '':
+                                seasonnum = 1
+                                currentfile.secondfolder = "Season " + str(seasonnum)
+                                currentfile.fixepname(seasonnum)
+                            else:
+                                if '花絮' in dirfolder and currentfile.topfolder != '.':
+                                    currentfile.secondfolder = "extras"
+                                    seasonnum = 0
+                                    currentfile.fixepname(seasonnum)
             # 检测是否是特殊的导评/花絮内容
             # TODO 更多关于花絮的规则
             if currentfile.name == "导演访谈":
