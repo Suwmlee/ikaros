@@ -177,9 +177,8 @@ def renamebyreg(root, reg, prefix, preview: bool = True):
                     renum = "[" + prefix + epresult + "]"
                 else:
                     renum = " " + prefix + epresult + " "
-                log.debug("替换内容：" + renum)
                 newname = basename.replace(originep, renum)
-                log.info("替换后:   {}".format(newname))
+                log.info("修正后:   {}".format(newname))
 
                 if not preview:
                     newfull = os.path.join(dirname, newname)
