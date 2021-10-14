@@ -103,10 +103,20 @@ def regexfilter(basename):
     '[01]'
     >>> regexfilter("[raws][Code Geass Lelouch of the Rebellion R2][15][BDRIP][Hi10P FLAC][1920X1080]")
     '[15]'
-
+    >>> regexfilter("[raws][High School Of The Dead][01][BDRIP][HEVC Main10P FLAC][1920X1080]")
+    '[01]'
+    >>> regexfilter("[Studio] Steins;Gate 0 [01][Ma10p_1080p][x265_flac]")
+    '[01]'
+    >>> regexfilter("Steins;Gate 2011 EP01 [BluRay 1920x1080p 23.976fps x264-Hi10P FLAC]")
+    ' EP01 '
+    >>> regexfilter("Fate Stay Night [Unlimited Blade Works] 2014 - EP01 [BD 1920x1080 AVC-yuv444p10 FLAC PGSx2 Chap]")
+    ' EP01 '
+    >>> regexfilter("Fate Zero EP01 [BluRay 1920x1080p 23.976fps x264-Hi10P FLAC PGSx2]")
+    ' EP01 '
+    
     >>> regexfilter("Shadow.2021.E11.WEB-DL.4k.H265.60fps.AAC.2Audio")
     '.E11.'
-    >>> regexfilter("Shadow.2021 E11 WEB-DL.4k.H265.60fps.AAC.2Audio")
+    >>> regexfilter("Shadow 2021 E11 WEB-DL 4k H265 AAC 2Audio")
     ' E11 '
     >>> regexfilter("Shadow.2021.第11集.WEB-DL.4k.H265.60fps.AAC.2Audio")
     '第11集'
@@ -116,17 +126,24 @@ def regexfilter(basename):
     '.E14(OA).'
     >>> regexfilter("S03/Person.of.Interest.EP01.2013.1080p.Blu-ray.x265.10bit.AC3")
     '.EP01.'
-    >>> regexfilter("S03/Person.of.Interest EP01 2013.1080p.Blu-ray.x265.10bit.AC3")
-    ' EP01 '
 
     >>> regexfilter("Person.of.Interest.S03E01.2013.1080p.Blu-ray.x265.10bit.AC3") is None
     True
     """
-    reg = "[\[第 ](?:e|ep)?[0-9.\(videoa\)]*[\]話话集 ]"
+    reg = "[\[第 ]\d{2}[.0-9\(videoa\)]*[\]話话集 ]"
     nameresult = filtername(basename, reg)
+    if nameresult and len(nameresult) == 1:
+        match = re.match(r'.*([1-3][0-9]{3})', nameresult[0])
+        if match:
+            reg3 = "\ ep?\d[.0-9\(videoa\)]{1,}[ ]"
+            nameresult = filtername(basename, reg3)
     if not nameresult or len(nameresult) == 0:
-        reg2 = "\.ep?[0-9\(videoa\)]{1,}[.]"
+        reg2 = "\.ep?\d[0-9\(videoa\)]{1,}[.]"
         nameresult = filtername(basename, reg2)
+    if nameresult and len(nameresult) == 1:
+        return nameresult[0]
+    reg3 = "\ ep?\d[.0-9\(videoa\)]{1,}[ ]"
+    nameresult = filtername(basename, reg3)
     if nameresult and len(nameresult) == 1:
         return nameresult[0]
     return None
