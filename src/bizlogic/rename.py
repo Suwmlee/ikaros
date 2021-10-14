@@ -106,24 +106,28 @@ def regexfilter(basename):
 
     >>> regexfilter("Shadow.2021.E11.WEB-DL.4k.H265.60fps.AAC.2Audio")
     '.E11.'
+    >>> regexfilter("Shadow.2021 E11 WEB-DL.4k.H265.60fps.AAC.2Audio")
+    ' E11 '
     >>> regexfilter("Shadow.2021.第11集.WEB-DL.4k.H265.60fps.AAC.2Audio")
     '第11集'
     >>> regexfilter("Shadow.2021.E13v2.WEB-DL.4k.H265.60fps.AAC.2Audio")
     '.E13v2.'
-    >>> regexfilter("Shadow.2021.E14(0A).WEB-DL.4k.H265.60fps.AAC.2Audio")
-    '.E14(0A).'
+    >>> regexfilter("Shadow.2021.E14(OA).WEB-DL.4k.H265.60fps.AAC.2Audio")
+    '.E14(OA).'
+    >>> regexfilter("S03/Person.of.Interest.EP01.2013.1080p.Blu-ray.x265.10bit.AC3")
+    '.EP01.'
+    >>> regexfilter("S03/Person.of.Interest EP01 2013.1080p.Blu-ray.x265.10bit.AC3")
+    ' EP01 '
 
-    >>> regexfilter("S03/Person.of.Interest.EP01.2013.1080p.Blu-ray.x265.10bit.AC3") is None
-    True
     >>> regexfilter("Person.of.Interest.S03E01.2013.1080p.Blu-ray.x265.10bit.AC3") is None
     True
     """
-    reg = "[\[第 ][0-9.videvoa\(\)]*[\]話话集 ]"
+    reg = "[\[第 ](?:e|ep)?[0-9.\(videoa\)]*[\]話话集 ]"
     nameresult = filtername(basename, reg)
     if not nameresult or len(nameresult) == 0:
-        reg2 = "\.e[0-9videvoa\(\)]{1,}[.]"
+        reg2 = "\.ep?[0-9\(videoa\)]{1,}[.]"
         nameresult = filtername(basename, reg2)
-    if nameresult:
+    if nameresult and len(nameresult) == 1:
         return nameresult[0]
     return None
 
