@@ -1,3 +1,11 @@
+## [1.7.1](https://github.com/Suwmlee/ikaros/compare/v1.7.0...v1.7.1) (2021-10-14)
+
+
+### Bug Fixes
+
+* replace CJK ([d85749f](https://github.com/Suwmlee/ikaros/commit/d85749faf5fecbc4d9a74371a2a2e75271db4998)), closes [#2](https://github.com/Suwmlee/ikaros/issues/2)
+* startwith S0X-S0X ([63205c6](https://github.com/Suwmlee/ikaros/commit/63205c6a880ef4baca94593364af4ebe0346a1ba))
+
 # [1.7.0](https://github.com/Suwmlee/ikaros/compare/v1.6.4...v1.7.0) (2021-10-14)
 
 
