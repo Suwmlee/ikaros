@@ -13,7 +13,7 @@ from .rename import extractep, findseason, regexfilter
 from ..service.configservice import transConfigService
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
-from ..utils.filehelper import video_type, ext_type, cleanfolderwithoutsuffix,\
+from ..utils.filehelper import replace_regex, video_type, ext_type, cleanfolderwithoutsuffix,\
      hardlink_force, symlink_force, replace_CJK, cleanbyNameSuffix, cleanExtraMedia
 from ..utils.log import log
 
@@ -218,7 +218,7 @@ def transfer(src_folder, dest_folder,
                 minlen = 27
                 tempmid = currentfile.topfolder
                 tempmid = replace_CJK(tempmid)
-                tempmid = re.sub(r'(\W)\1+', r'\1', tempmid).lstrip(' !?@#$.:：]）)').rstrip(' !?@#$.:：[(（')
+                tempmid = replace_regex(tempmid, '^s(\d{2})-s(\d{2})')
                 grouptags = ['cmct', 'wiki', 'frds']
                 for gt in grouptags:
                     if gt in tempmid.lower():

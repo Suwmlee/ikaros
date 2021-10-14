@@ -185,5 +185,12 @@ def replace_CJK(base: str):
             cop = re.compile("[\(\[\（]" + n + "[\)\]\）]")
             tmp = cop.sub('', tmp)
     tmp = re.sub('[\u3000-\u33FF\u4e00-\u9fff]+', '', tmp)
-
+    tmp = re.sub(r'(\W)\1+', r'\1', tmp).lstrip(' !?@#$.:：]）)').rstrip(' !?@#$.:：[(（')
     return tmp
+
+
+def replace_regex(base: str, regex: str):
+    cop = re.compile(regex, re.IGNORECASE | re.X | re.S)
+    base = cop.sub('', base)
+    base = re.sub(r'(\W)\1+', r'\1', base).lstrip(' !?@#$.:：]）)').rstrip(' !?@#$.:：[(（')
+    return base
