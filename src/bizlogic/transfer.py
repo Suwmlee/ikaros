@@ -9,7 +9,7 @@ import shutil
 import requests
 
 from .manager import movie_lists
-from .rename import renamebyreg
+from .rename import extractep, findseason, regexfilter
 from ..service.configservice import transConfigService
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
@@ -30,6 +30,10 @@ class FileInfo():
     secondfolder = ''
     name = ''
     ext = ''
+
+    isepisode = False
+    originep = ''
+    epnum = ''
 
     finalpath = ''
     finalfolder = ''
@@ -66,6 +70,29 @@ class FileInfo():
         (newfolder, tname) = os.path.split(path)
         self.finalfolder = newfolder
 
+    def parse(self):
+        originep = regexfilter(self.name)
+        if originep:
+            epresult = extractep(originep)
+            if epresult:
+                self.isepisode = True
+                self.originep = originep
+                self.epnum = epresult
+
+    def fixepname(self, season):
+        prefix = "S%02dE" % (season)
+        log.debug(self.originep + "   " + self.epnum)
+        if self.originep[0] == '.':
+            renum = "." + prefix + self.epnum + "."
+        elif self.originep[0] == '[':
+            renum = "[" + prefix + self.epnum + "]"
+        else:
+            renum = " " + prefix + self.epnum + " "
+        log.debug("替换内容：" + renum)
+        newname = self.name.replace(self.originep, renum)
+        self.name = newname
+        log.info("替换后:   {}".format(newname))
+
 
 def copysub(src_folder, destfolder, filter):
     """ copy subtitle
@@ -100,14 +127,14 @@ def auto_transfer(real_path: str):
 
 def ctrl_transfer(src_folder, dest_folder, 
                 linktype, prefix, escape_folders,
-                renameflag, renameprefix,
+                renameflag,
                 clean_others,
                 replace_CJK,
                 refresh_url):
     transfer(src_folder, dest_folder, linktype, prefix,
             escape_folders, '', 
             clean_others, replace_CJK,
-            renameflag, renameprefix)
+            renameflag)
     if refresh_url:
         requests.post(refresh_url)
 
@@ -117,7 +144,7 @@ def transfer(src_folder, dest_folder,
              escape_folders, top_files='',
              clean_others_tag = True,
              replace_CJK_tag= False,
-             renameflag= False, renameprefix='S01E'
+             fixseries_tag= False
              ):
     """ 如果 top_files 有值，则使用 top_files 过滤文件且不清理其他文件
     """
@@ -162,6 +189,8 @@ def transfer(src_folder, dest_folder,
             fi = FileInfo(movie_path)
             midfolder = fi.realfolder.replace(src_folder, '').lstrip("\\").lstrip("/")
             fi.updatemidfolder(midfolder)
+            if fi.topfolder != '.':
+                fi.parse()
             todoFiles.append(fi)
 
         for currentfile in todoFiles:
@@ -174,21 +203,17 @@ def transfer(src_folder, dest_folder,
             # 修正后给链接使用的源地址
             link_path = os.path.join(prefix, currentfile.midfolder, currentfile.realname)
             # 处理 midfolder 内特殊内容
-            # TODO 给单视频文件创建文件夹
-
             # CMCT组视频文件命名比文件夹命名更好
-            # TODO 可延申过滤剧集，S01 S02，只过滤 topfolder下的文件， seoondfolder = ''
-            # 得到剧集后，修改 secondfolder 为季度
-            # 与之后的 renameflag 配合 ？？
             if 'CMCT' in currentfile.topfolder:
                 matches = [x for x in todoFiles if x.topfolder == currentfile.topfolder]
                 if len(matches) > 0:
                     namingfiles = [x for x in matches if 'CMCT' in x.name]
                     if len(namingfiles) == 1:
+                        # 非剧集
                         for m in matches:
                             m.topfolder = namingfiles[0].name
-                    log.debug("[-] handling midfolder [{}] ".format(midfolder))
-            # 替换中文
+                    log.debug("[-] handling cmct midfolder [{}] ".format(midfolder))
+            # topfolder 替换中文
             if replace_CJK_tag:
                 tempmid = currentfile.topfolder
                 tempmid = replace_CJK(tempmid)
@@ -196,6 +221,41 @@ def transfer(src_folder, dest_folder,
                 if len(tempmid) > 18:
                     log.debug("[-] replace CJK [{}] ".format(tempmid))
                     currentfile.topfolder = tempmid
+            # 修正剧集命名
+            if fixseries_tag:
+                # 判断剧集标记
+                if currentfile.isepisode:
+                    log.debug("[-] fix series name")
+                    # 查询 同级目录下所有视频
+                    matches = [x for x in todoFiles if x.folders == currentfile.folders]
+                    if len(matches) > 0:
+                        # 检查剧集编号，超过2个且不同，连续？才继续处理
+                        # 自动推送只有单文件
+
+                        # 检测视频上级目录是否有 season 标记
+                        # 上级目录可能是 top 或 second 甚至更底层目录
+                        dirfolder = currentfile.folders[len(currentfile.folders)-1]
+                        seasonnum = findseason(dirfolder)
+                        if not seasonnum:
+                            # 如果存在大量重复 epnum
+                            # 如果有明确的 seasonnum 则可能是多版本，可继续
+                            # 如果检测不到 seasonnum 可能是多季？
+                            # eg: Code Geass
+                            # dupelist = []
+                            # isdupe = False
+                            # for m in matches:
+                            #     if m.epnum in dupelist:
+                            #         isdupe = True
+                            #         break
+                            #     dupelist.append(m.epnum)
+                            seasonnum = 1
+
+                        # 根据 season 标记 更新 secondfolder
+                        currentfile.secondfolder = "Season " + str(seasonnum)
+                        currentfile.fixepname(seasonnum)
+                        # 如果 topfolder有season 标记，则删除
+
+
             # 检测是否是特殊的导评/花絮内容
             # TODO 更多关于花絮的规则
             if currentfile.name == "导演访谈":
@@ -243,11 +303,6 @@ def transfer(src_folder, dest_folder,
                 os.remove(torm)
             cleanExtraMedia(dest_folder)
             cleanfolderwithoutsuffix(dest_folder, video_type)
-
-        # TODO 剧集重命名
-        # 目前只针对顶层目录，适用范围较低
-        if renameflag:
-            renamebyreg(dest_folder, '', renameprefix, False)
 
         log.info("transfer finished")
     except Exception as e:

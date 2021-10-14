@@ -140,7 +140,7 @@ def start_transfer():
         transfer.ctrl_transfer(content['source_folder'], content['output_folder'], 
                                content['linktype'], content['soft_prefix'], 
                                content['escape_folder'],
-                               content['renameflag'], content['renameprefix'],
+                               content['renameflag'],
                                content['clean_others'], content['replace_CJK'],
                                content.get('refresh_url'))
         return Response(status=200)

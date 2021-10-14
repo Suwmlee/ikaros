@@ -65,6 +65,23 @@ def rename(root, base, newfix):
             log.info("rename [{}] to [{}]".format(name, newfull))
 
 
+def findseason(filename:str):
+    """
+    >>> findseason("Fights.Break.Sphere.2018.S02.WEB-DL.1080p.H264.AAC-TJUPT")
+    2
+    >>> findseason("疑犯追踪S01-S05.Person.of.Interest.2011-2016.1080p.Blu-ray.x265.AC3￡cXcY@FRDS") is None
+    True
+    >>> findseason("Yes.Prime.Minister.COMPLETE.PACK.DVD.x264-P2P") is None
+    True
+    """
+    regx = "(?:s|season)(\d{2})"
+    nameresult = filtername(filename, regx) 
+    if nameresult and len(nameresult) == 1:
+        strnum = nameresult[0]
+        return int(strnum)
+    return None
+
+
 def regexfilter(basename):
     """ 正则匹配
 
