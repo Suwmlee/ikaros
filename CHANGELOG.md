@@ -1,3 +1,11 @@
+## [1.7.2](https://github.com/Suwmlee/ikaros/compare/v1.7.1...v1.7.2) (2021-10-14)
+
+
+### Bug Fixes
+
+* season episode regex ([0569d1d](https://github.com/Suwmlee/ikaros/commit/0569d1deea4670d3c8fc740ba01bacce8afc1c27))
+* transfer extra folder ([79fc9a2](https://github.com/Suwmlee/ikaros/commit/79fc9a287cece31081980934ba99a1dc8b0907d8)), closes [#4](https://github.com/Suwmlee/ikaros/issues/4)
+
 ## [1.7.1](https://github.com/Suwmlee/ikaros/compare/v1.7.0...v1.7.1) (2021-10-14)
 
 
