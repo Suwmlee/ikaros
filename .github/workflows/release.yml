@@ -38,5 +38,4 @@ jobs:
           file: ./.docker/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: |
-            suwmlee/ikaros:latest
+          tags: suwmlee/ikaros:latest,suwmlee/ikaros:${{ env.RELEASE_VERSION }}

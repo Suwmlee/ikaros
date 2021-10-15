@@ -9,6 +9,7 @@
   "devDependencies": {
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
+    "@semantic-release/exec": "^6.0.1",
     "commitlint": "^12.1.4",
     "pinst": "^2.1.6"
   },
@@ -52,6 +53,12 @@
             "src/config.py",
             "CHANGELOG.md"
           ]
+        }
+      ],
+      [
+        "@semantic-release/exec",
+        {
+          "publishCmd": "echo 'RELEASE_VERSION=${nextRelease.version}' >> $GITHUB_ENV"
         }
       ],
       "@semantic-release/github"
