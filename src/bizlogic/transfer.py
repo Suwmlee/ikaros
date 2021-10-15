@@ -180,7 +180,7 @@ def transfer(src_folder, dest_folder,
             os.makedirs(dest_folder)
 
         if clean_others_tag:
-            dest_list = movie_lists(dest_folder, "")
+            dest_list = movie_lists(dest_folder, [])
         else:
             dest_list = []
 
