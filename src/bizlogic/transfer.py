@@ -208,7 +208,9 @@ def transfer(src_folder, dest_folder,
             # CMCT组视频文件命名比文件夹命名更好
             if 'CMCT' in currentfile.topfolder:
                 matches = [x for x in todoFiles if x.topfolder == currentfile.topfolder]
-                if len(matches) > 0:
+                # 检测是否有剧集标记
+                epfiles = [x for x in matches if x.isepisode]
+                if len(matches) > 0 and len(epfiles) == 0:
                     namingfiles = [x for x in matches if 'CMCT' in x.name]
                     if len(namingfiles) == 1:
                         # 非剧集
@@ -240,7 +242,7 @@ def transfer(src_folder, dest_folder,
                         # 自动推送只有单文件
 
                         # 检测视频上级目录是否有 season 标记
-                        # 上级目录可能是 top 或 second 甚至更底层目录
+                        # 上级目录可能是 top 或 second 甚至更低层目录
                         dirfolder = currentfile.folders[len(currentfile.folders)-1]
                         # 根据 season 标记 更新 secondfolder
                         seasonnum = matchSeason(dirfolder)
