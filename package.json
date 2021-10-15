@@ -1,15 +1,15 @@
 {
   "dependencies": {
-    "@google/semantic-release-replace-plugin": "github:google/semantic-release-replace-plugin",
-    "@semantic-release/changelog": "github:semantic-release/changelog",
-    "@semantic-release/git": "github:semantic-release/git",
+    "@google/semantic-release-replace-plugin": "^1.0.2",
+    "@semantic-release/changelog": "^5.0.1",
+    "@semantic-release/exec": "^5.0.0",
+    "@semantic-release/git": "^9.0.0",
     "is-ci": "^3.0.0",
     "semantic-release": "^17.4.3"
   },
   "devDependencies": {
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
-    "@semantic-release/exec": "^6.0.1",
     "commitlint": "^12.1.4",
     "pinst": "^2.1.6"
   },
@@ -47,18 +47,18 @@
         }
       ],
       [
+        "@semantic-release/exec",
+        {
+          "publishCmd": "echo 'RELEASE_VERSION=${nextRelease.version}' >> $GITHUB_ENV"
+        }
+      ],
+      [
         "@semantic-release/git",
         {
           "assets": [
             "src/config.py",
             "CHANGELOG.md"
           ]
-        }
-      ],
-      [
-        "@semantic-release/exec",
-        {
-          "publishCmd": "echo 'RELEASE_VERSION=${nextRelease.version}' >> $GITHUB_ENV"
         }
       ],
       "@semantic-release/github"
