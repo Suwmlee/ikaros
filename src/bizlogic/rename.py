@@ -16,8 +16,8 @@ def file_lists(root):
     return total
 
 
-def filtername(basename, reg):
-    """ 正则过滤
+def regexMatch(basename, reg):
+    """ 正则匹配
     """
     prog = re.compile(reg, re.IGNORECASE | re.X | re.S)
     result = prog.findall(basename)
@@ -65,7 +65,7 @@ def rename(root, base, newfix):
             log.info("rename [{}] to [{}]".format(name, newfull))
 
 
-def findseason(filename:str):
+def matchSeason(filename:str):
     """
     >>> findseason("Fights.Break.Sphere.2018.S02.WEB-DL.1080p.H264.AAC-TJUPT")
     2
@@ -75,15 +75,15 @@ def findseason(filename:str):
     True
     """
     regx = "(?:s|season)(\d{2})"
-    nameresult = filtername(filename, regx) 
+    nameresult = regexMatch(filename, regx) 
     if nameresult and len(nameresult) == 1:
         strnum = nameresult[0]
         return int(strnum)
     return None
 
 
-def regexfilter(basename):
-    """ 正则匹配
+def matchEpPart(basename):
+    """ 正则匹配单集编号
 
     >>> regexfilter("生徒会役員共＊ 09 (BDrip 1920x1080 HEVC-YUV420P10 FLAC)")
     ' 09 '
@@ -130,22 +130,17 @@ def regexfilter(basename):
     >>> regexfilter("Person.of.Interest.S03E01.2013.1080p.Blu-ray.x265.10bit.AC3") is None
     True
     """
-    reg = "[\[第 ]\d{2}[.0-9\(videoa\)]*[\]話话集 ]"
-    nameresult = filtername(basename, reg)
-    if nameresult and len(nameresult) == 1:
-        match = re.match(r'.*([1-3][0-9]{3})', nameresult[0])
-        if match:
-            reg3 = "\ ep?\d[.0-9\(videoa\)]{1,}[ ]"
-            nameresult = filtername(basename, reg3)
-    if not nameresult or len(nameresult) == 0:
-        reg2 = "\.ep?\d[0-9\(videoa\)]{1,}[.]"
-        nameresult = filtername(basename, reg2)
-    if nameresult and len(nameresult) == 1:
-        return nameresult[0]
-    reg3 = "\ ep?\d[.0-9\(videoa\)]{1,}[ ]"
-    nameresult = filtername(basename, reg3)
-    if nameresult and len(nameresult) == 1:
-        return nameresult[0]
+    regexs = [
+        "第\d*[話话集]",
+        "\[(?:e|ep)?[0-9.\(videoa\)]*\]",
+        "[ ]ep?[0-9.\(videoa\)]*[ ]",
+        "[.]ep?[0-9\(videoa\)]*[.]",
+        "[ ]\d{2,3}(?:\.\d|v\d)?[\(videoa\)]*[ ]"
+    ]
+    for regex in regexs:
+        results = regexMatch(basename, regex)
+        if results and len(results) == 1:
+            return results[0]
     return None
 
 
@@ -162,9 +157,9 @@ def renamebyreg(root, reg, prefix, preview: bool = True):
         dirname, basename = os.path.split(name)
         log.info("开始替换: " + basename)
         if reg == '':
-            originep = regexfilter(basename)
+            originep = matchEpPart(basename)
         else:
-            results = filtername(basename, reg)
+            results = regexMatch(basename, reg)
             originep = results[0]
         if originep:
             # log.info("提取剧集标签 "+nameresult)

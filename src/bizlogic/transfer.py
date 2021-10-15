@@ -9,7 +9,7 @@ import shutil
 import requests
 
 from .manager import movie_lists
-from .rename import extractep, findseason, regexfilter
+from .rename import extractep, matchSeason, matchEpPart
 from ..service.configservice import transConfigService
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
@@ -71,7 +71,7 @@ class FileInfo():
         self.finalfolder = newfolder
 
     def parse(self):
-        originep = regexfilter(self.name)
+        originep = matchEpPart(self.name)
         if originep:
             epresult = extractep(originep)
             if epresult:
@@ -222,7 +222,7 @@ def transfer(src_folder, dest_folder,
                 grouptags = ['cmct', 'wiki', 'frds']
                 for gt in grouptags:
                     if gt in tempmid.lower():
-                        minlen += 4
+                        minlen += len(gt)
                 if len(tempmid) > minlen:
                     log.debug("[-] replace CJK [{}] ".format(tempmid))
                     currentfile.topfolder = tempmid
@@ -241,7 +241,7 @@ def transfer(src_folder, dest_folder,
                         # 上级目录可能是 top 或 second 甚至更底层目录
                         dirfolder = currentfile.folders[len(currentfile.folders)-1]
                         # 根据 season 标记 更新 secondfolder
-                        seasonnum = findseason(dirfolder)
+                        seasonnum = matchSeason(dirfolder)
                         if seasonnum:
                             currentfile.secondfolder = "Season " + str(seasonnum)
                             currentfile.fixepname(seasonnum)
