@@ -113,6 +113,9 @@ def start_all(folder=''):
     log.debug('[+]Find  ' + total+'  movies')
 
     for movie_path in movie_list:
+        task = taskService.getTask('scrape')
+        if task.status == 0:
+            return
         taskService.updateTaskFinished(count, 'scrape')
         percentage = str(count / int(total) * 100)[:4] + '%'
         log.info('[!] - ' + percentage + ' [' + str(count) + '/' + total + '] -')

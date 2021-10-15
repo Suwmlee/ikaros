@@ -196,6 +196,9 @@ def transfer(src_folder, dest_folder,
             todoFiles.append(fi)
 
         for currentfile in todoFiles:
+            task = taskService.getTask('transfer')
+            if task.status == 0:
+                return False
             count += 1
             taskService.updateTaskFinished(count, 'transfer')
             log.debug('[!] - ' + str(count) + '/' + total + ' -')
