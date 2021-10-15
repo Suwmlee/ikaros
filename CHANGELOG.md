@@ -1,3 +1,12 @@
+## [1.7.3](https://github.com/Suwmlee/ikaros/compare/v1.7.2...v1.7.3) (2021-10-15)
+
+
+### Bug Fixes
+
+* check series ([81b3dae](https://github.com/Suwmlee/ikaros/commit/81b3dae3d261bd5f412c8e53553a32f48b4e916f)), closes [#3](https://github.com/Suwmlee/ikaros/issues/3)
+* copy renamed subs ([4942944](https://github.com/Suwmlee/ikaros/commit/4942944d29eb0e99c581770548707dee02e232f7)), closes [#6](https://github.com/Suwmlee/ikaros/issues/6)
+* find movies ([6b74393](https://github.com/Suwmlee/ikaros/commit/6b74393f96bb0f4f4f08ed2b299f422ab1815d60)), closes [#5](https://github.com/Suwmlee/ikaros/issues/5)
+
 ## [1.7.2](https://github.com/Suwmlee/ikaros/compare/v1.7.1...v1.7.2) (2021-10-14)
 
 
