@@ -94,18 +94,20 @@ class FileInfo():
         log.info("替换后:   {}".format(newname))
 
 
-def copysub(src_folder, destfolder, filter):
+def copySubs(srcfolder, destfolder, basename, newname):
     """ copy subtitle
     """
-    dirs = os.listdir(src_folder)
+    dirs = os.listdir(srcfolder)
     for item in dirs:
         (path, ext) = os.path.splitext(item)
-        if ext.lower() in ext_type and path.startswith(filter):
-            src_file = os.path.join(src_folder, item)
+        if ext.lower() in ext_type and path.startswith(basename):
+            src_file = os.path.join(srcfolder, item)
+            newpath = path.replace(basename, newname)
             log.debug("[-] - copy sub  " + src_file)
-            dest = shutil.copy(src_file, destfolder)
+            newfile = os.path.join(destfolder, newpath + ext)
+            shutil.copyfile(src_file, newfile)
             # modify permission
-            os.chmod(dest, stat.S_IRWXU | stat.S_IRGRP |
+            os.chmod(newfile, stat.S_IRWXU | stat.S_IRGRP |
                      stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH)
 
 
@@ -288,9 +290,8 @@ def transfer(src_folder, dest_folder,
 
             # 使用最终的文件名
             cleanbyNameSuffix(currentfile.finalfolder, currentfile.name, ext_type)
-            # TODO 原始的文件名，如果更改文件名，则需要更新此方法
-            nname = os.path.splitext(currentfile.realname)[0]
-            copysub(currentfile.realfolder, currentfile.finalfolder, nname)
+            oldname = os.path.splitext(currentfile.realname)[0]
+            copySubs(currentfile.realfolder, currentfile.finalfolder, oldname, currentfile.name)
 
             if newpath in dest_list:
                 dest_list.remove(newpath)
