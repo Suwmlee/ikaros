@@ -203,6 +203,9 @@ def transfer(src_folder, dest_folder,
             taskService.updateTaskFinished(count, 'transfer')
             current_app.logger.debug('[!] - ' + str(count) + '/' + total + ' -')
             current_app.logger.debug("[+] start check [{}] ".format(currentfile.realpath))
+            # TODO: 此处查询之前转移的记录
+            # 可针对记录进行修正 season等
+            # 类似scraping操作
             transrecordService.add(currentfile.realpath)
 
             # 修正后给链接使用的源地址

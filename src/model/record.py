@@ -62,6 +62,14 @@ class _TransRecords(db.Model):
     srcpath = Column(String, default='')
     srcsize = Column(BigInteger, default=0)
     success = Column(Boolean, default=False)
+    status = Column(Integer, default=0)
+
+    topfolder = Column(String, default='')
+    secondfolder = Column(String, default='')
+    isepisode = Column(Boolean, default=False)
+    season = Column(Integer, default=0)
+    episode = Column(Integer, default=0)
+
     linkpath = Column(String, default='')
     destpath = Column(String, default='')
     updatetime = Column(DateTime, default=datetime.datetime.utcnow)
