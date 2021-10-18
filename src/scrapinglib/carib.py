@@ -20,7 +20,7 @@ def main(number: str) -> json:
         if not browser.page.select_one("#moviepages > div > div:nth-child(1) > div.movie-info.section"):
             raise ValueError("page info not found")
     except Exception as e:
-        log.error(e)
+        current_app.logger.error(e)
         dic = {"title": ""}
         return json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'))
     dic = {

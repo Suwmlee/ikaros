@@ -180,7 +180,7 @@ def main(number):
         except:
             return main_uncensored(number)
     except Exception as e:
-        log.error(e)
+        current_app.logger.error(e)
         data = {
             "title": "",
         }

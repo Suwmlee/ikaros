@@ -1,6 +1,6 @@
 import os
 import re
-from .log import log
+from flask import current_app
 
 G_spat = re.compile(
     "(^22-sht\.me|-fhd|_fhd|^fhd_|^fhd-|-hd|_hd|^hd_|^hd-|-sd|_sd|-1080p|_1080p|-720p|_720p)",
@@ -62,7 +62,7 @@ def parseNumber(filepath: str) -> str:
             except:
                 return re.search(r'(.+?)\.', filepath)[0]
     except Exception as e:
-        log.error(e)
+        current_app.logger.error(e)
         return
 
 G_TAKE_NUM_RULES = {

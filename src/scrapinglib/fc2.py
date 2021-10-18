@@ -116,7 +116,8 @@ def main(number):
             'series': '',
         }
     except Exception as e:
-        ADC_function.log.error(e)
+        from flask import current_app
+        current_app.logger.error(e)
         dic = {"title": ""}
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js

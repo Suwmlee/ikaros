@@ -10,7 +10,7 @@ from flask import request, Response, send_from_directory
 from . import web
 from ..service.recordservice import scrapingrecordService
 from ..model.record import _ScrapingRecords
-from ..utils.log import log
+from flask import current_app
 from ..utils.filehelper import cleanbySuffix
 
 
@@ -53,7 +53,7 @@ def exportExcel():
         xlsfile.save(filefolder + filename)
         return send_from_directory(filefolder, filename, as_attachment=True, cache_timeout=0)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -62,7 +62,7 @@ def openExcel(file='file.xls'):
         data = xlrd.open_workbook(file, encoding_override="utf-8")
         return data
     except Exception as e:
-        log.error(e)
+        current_app.logger.error(e)
 
 
 def allowedFormat(file='file.xls', colnameindex=0, by_index=0):
@@ -134,7 +134,7 @@ def importExcel():
         else:
             return Response(status=403)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -156,5 +156,5 @@ def cleanErrData():
                     scrapingrecordService.deleteByID(i.id)
         return Response(status=200)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)

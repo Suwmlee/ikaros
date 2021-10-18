@@ -9,7 +9,7 @@ import requests
 from PIL import Image
 
 from ..service.configservice import scrapingConfService, _ScrapingConfigs
-from ..utils.log import log
+from flask import current_app
 from ..utils.ADC_function import G_USER_AGENT, is_uncensored
 from ..utils.filehelper import ext_type, forceSymlink, forceHardlink
 from ..scrapinglib import get_data_from_json
@@ -60,7 +60,7 @@ def moveFailedFolder(filepath):
         每次刮削清空文件夹
     """
     try:
-        log.info('[-]Move to Failed folder')
+        current_app.logger.info('[-]Move to Failed folder')
         conf = scrapingConfService.getSetting()
         if conf.main_mode == 1 and (conf.link_type == 1 or conf.link_type == 2):
             (filefolder, name) = os.path.split(filepath)
@@ -113,7 +113,7 @@ def download_file_with_filename(url, filename, path):
                 proxies = configProxy.proxies()
                 r = requests.get(url, headers=headers, timeout=configProxy.timeout, proxies=proxies)
                 if r == '':
-                    log.info('[-]Movie Data not found!')
+                    current_app.logger.info('[-]Movie Data not found!')
                     return False
                 with open(os.path.join(str(path), filename), "wb") as code:
                     code.write(r.content)
@@ -121,24 +121,24 @@ def download_file_with_filename(url, filename, path):
             else:
                 r = requests.get(url, headers=headers, timeout=configProxy.timeout)
                 if r == '':
-                    log.info('[-]Movie Data not found!')
+                    current_app.logger.info('[-]Movie Data not found!')
                     return False
                 with open(os.path.join(str(path), filename), "wb") as code:
                     code.write(r.content)
                 return True
         except requests.exceptions.RequestException:
             i += 1
-            log.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
+            current_app.logger.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
         except requests.exceptions.ConnectionError:
             i += 1
-            log.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
+            current_app.logger.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
         except requests.exceptions.ProxyError:
             i += 1
-            log.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
+            current_app.logger.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
         except requests.exceptions.ConnectTimeout:
             i += 1
-            log.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
-    log.info('[-]Connect Failed! Please check your Proxy or Network!')
+            current_app.logger.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
+    current_app.logger.info('[-]Connect Failed! Please check your Proxy or Network!')
     return False
 
 
@@ -147,10 +147,10 @@ def download_poster(path, prefilename, cover_small_url):
     """
     postername = prefilename + '-poster.jpg'
     if download_file_with_filename(cover_small_url, postername, path):
-        log.debug('[+]Poster Downloaded! ' + path + '/' + postername)
+        current_app.logger.debug('[+]Poster Downloaded! ' + path + '/' + postername)
         return True
     else:
-        log.info('[+]Download Poster Failed! ' + path + '/' + postername)
+        current_app.logger.info('[+]Download Poster Failed! ' + path + '/' + postername)
         return False
 
 
@@ -159,11 +159,11 @@ def download_cover(cover_url, prefilename, path):
     """
     fanartname = prefilename + '-fanart.jpg'
     if download_file_with_filename(cover_url, fanartname, path):
-        log.debug('[+]Cover Downloaded! ' + path + '/' + fanartname)
+        current_app.logger.debug('[+]Cover Downloaded! ' + path + '/' + fanartname)
         shutil.copyfile(path + '/' + fanartname, path + '/' + prefilename + '-thumb.jpg')
         return True
     else:
-        log.info('[+]Download Cover Failed! ' + path + '/' + fanartname)
+        current_app.logger.info('[+]Download Cover Failed! ' + path + '/' + fanartname)
         return False
 
 
@@ -172,10 +172,10 @@ def download_extrafanart(urls, path, extrafanart_folder):
     path = path + '/' + extrafanart_folder
     for url in urls:
         if download_file_with_filename(url, 'extrafanart-' + str(j)+'.jpg', path):
-            log.debug('[+]Extrafanart Downloaded! ' + path + '/extrafanart-' + str(j) + '.jpg')
+            current_app.logger.debug('[+]Extrafanart Downloaded! ' + path + '/extrafanart-' + str(j) + '.jpg')
             j += 1
         else:
-            log.info('[+]Download Extrafanart Failed! ' + path + '/extrafanart-' + str(j) + '.jpg')
+            current_app.logger.info('[+]Download Extrafanart Failed! ' + path + '/extrafanart-' + str(j) + '.jpg')
     return True
 
 
@@ -241,15 +241,15 @@ def create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_
             print("  <cover>" + cover + "</cover>", file=code)
             print("  <website>" + website + "</website>", file=code)
             print("</movie>", file=code)
-            log.info("[+]Wrote!            " + path + "/" + prefilename + ".nfo")
+            current_app.logger.info("[+]Wrote!            " + path + "/" + prefilename + ".nfo")
             return True
     except IOError as e:
-        log.error("[-]Write Failed!")
-        log.error(e)
+        current_app.logger.error("[-]Write Failed!")
+        current_app.logger.error(e)
         return False
     except Exception as e1:
-        log.error("[-]Write Failed!")
-        log.error(e1)
+        current_app.logger.error("[-]Write Failed!")
+        current_app.logger.error(e1)
         return False
 
 
@@ -264,14 +264,14 @@ def crop_poster(imagecut, path, prefilename):
             h = img.height
             img2 = img.crop((w / 1.9, 0, w, h))
             img2.save(path + '/' + prefilename + '-poster.jpg')
-            log.debug('[+]Image Cutted!     ' + path + '/' + prefilename + '-poster.jpg')
+            current_app.logger.debug('[+]Image Cutted!     ' + path + '/' + prefilename + '-poster.jpg')
         except:
-            log.info('[-]Cover cut failed!')
+            current_app.logger.info('[-]Cover cut failed!')
     elif imagecut == 0: 
         # 复制封面
         shutil.copyfile(path + '/' + prefilename + '-fanart.jpg',
                         path + '/' + prefilename + '-poster.jpg')
-        log.debug('[+]Image Copyed!     ' + path + '/' + prefilename + '-poster.jpg')
+        current_app.logger.debug('[+]Image Copyed!     ' + path + '/' + prefilename + '-poster.jpg')
 
 
 def add_mark(pics, chs_tag, leak_tag, uncensored_tag, count, size):
@@ -294,7 +294,7 @@ def add_mark(pics, chs_tag, leak_tag, uncensored_tag, count, size):
         return
     for pic in pics:
         add_mark_thread(pic, chs_tag, leak_tag, uncensored_tag, count, size)
-        log.debug('[+]Image Add Mark:   ' + mark_type.strip(','))
+        current_app.logger.debug('[+]Image Add Mark:   ' + mark_type.strip(','))
 
 
 def add_mark_thread(pic_path, chs_tag, leak_tag, uncensored_tag, count, size):
@@ -349,7 +349,7 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
             midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
             soft_path = os.path.join(soft_prefix, midfolder, name)
             if pathlib.Path(newpath).is_symlink() and os.readlink(newpath) == soft_path:
-                log.debug("[-] already exists")
+                current_app.logger.debug("[-] already exists")
             else:
                 (newfolder, tname) = os.path.split(newpath)
                 if not os.path.exists(newfolder):
@@ -363,16 +363,16 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
         for subname in ext_type:
             if os.path.exists(filepath.replace(houzhui, subname)):
                 os.rename(filepath.replace(houzhui, subname), path + '/' + prefilename + subname)
-                log.debug('[+]Sub moved!')
+                current_app.logger.debug('[+]Sub moved!')
         return True, newpath
     except FileExistsError:
-        log.error('[-]File Exists! Please check your movie!')
+        current_app.logger.error('[-]File Exists! Please check your movie!')
         return False, ''
     except PermissionError:
-        log.error('[-]Error! Please run as administrator!')
+        current_app.logger.error('[-]Error! Please run as administrator!')
         return False, ''
     except OSError as oserr:
-        log.error('[-]OS Error errno ' + oserr.errno)
+        current_app.logger.error('[-]OS Error errno ' + oserr.errno)
         return False, ''
 
 
@@ -383,7 +383,7 @@ def get_part(filepath):
         if re.search('-cd\d+', filepath):
             return re.findall('-cd\d+', filepath)[0]
     except:
-        log.error("[-]failed!Please rename the filename again!")
+        current_app.logger.error("[-]failed!Please rename the filename again!")
         moveFailedFolder(filepath)
         return
 
@@ -420,7 +420,7 @@ def core_main(file_path, scrapingnum, cnsubtag, cdnum, conf: _ScrapingConfigs):
 
     # Return if blank dict returned (data not found)
     if not json_data:
-        log.info('[-]Movie Data not found!')
+        current_app.logger.info('[-]Movie Data not found!')
         moveFailedFolder(filepath)
         return False, ''
 

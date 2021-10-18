@@ -20,7 +20,7 @@ from . import xcity
 from . import dlsite
 from . import carib
 from . import fc2club
-from ..utils.log import log
+from flask import current_app
 
 
 def get_data_state(data: dict) -> bool:
@@ -101,16 +101,16 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
     todel = []
     for s in sources:
         if not s in func_mapping:
-            log.info('[!] Source Not Exist : ' + s)
+            current_app.logger.info('[!] Source Not Exist : ' + s)
             todel.append(s)
     for d in todel:
-        log.info('[!] Remove Source : ' + s)
+        current_app.logger.info('[!] Remove Source : ' + s)
         sources.remove(d)
 
     json_data = {}
 
     if c_multi_threading:
-        log.info('[+] Multi threading enabled')
+        current_app.logger.info('[+] Multi threading enabled')
         pool = ThreadPool(processes=len(sources))
 
         # Set the priority of multi-thread crawling and join the multi-thread queue
@@ -120,31 +120,31 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
         # Get multi-threaded crawling response
         # !!! Still follow sources sort not the first response
         for source in sources:
-            log.info('[-] Check', source)
+            current_app.logger.info('[-] Check', source)
             json_data = json.loads(pool.apply_async(func_mapping[source], (file_number,)).get())
             # if any service return a valid return, break
             if get_data_state(json_data):
-                log.info('[-] Matched [{}] in source [{}]'.format(file_number, source))
+                current_app.logger.info('[-] Matched [{}] in source [{}]'.format(file_number, source))
                 break
         pool.close()
         pool.terminate()
     else:
         for source in sources:
             try:
-                log.info('[+] Select Source: ' + source)
+                current_app.logger.info('[+] Select Source: ' + source)
                 json_data = json.loads(func_mapping[source](file_number))
                 # if any service return a valid return, break
                 if get_data_state(json_data):
-                    log.info('[-] Matched [{}] in source [{}]'.format(file_number, source))
+                    current_app.logger.info('[-] Matched [{}] in source [{}]'.format(file_number, source))
                     break
             except Exception as err:
-                log.info('[!] Source error: ' + source)
-                log.error(err)
+                current_app.logger.info('[!] Source error: ' + source)
+                current_app.logger.error(err)
                 continue
 
     # Return if data not found in all sources
     if not json_data:
-        log.info('[-]Movie Number not found!')
+        current_app.logger.info('[-]Movie Number not found!')
         return
 
     # ================================================网站规则添加结束================================================
@@ -183,7 +183,7 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
     actor = str(actor_list).strip("[ ]").replace("'", '').replace(" ", '')
 
     if title == '' or number == '':
-        log.info('[-]Movie Number or Title not found!')
+        current_app.logger.info('[-]Movie Number or Title not found!')
         return
 
     # if imagecut == '3':

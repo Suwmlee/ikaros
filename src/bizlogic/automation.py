@@ -4,7 +4,7 @@
 import os
 import time
 
-from src.utils.log import log
+from flask import current_app
 from ..service.configservice import autoConfigService
 from ..service.taskservice import autoTaskService, taskService
 from .manager import startScrapingAll, startScrapingSingle
@@ -16,15 +16,15 @@ def start(client_path: str):
     """
     task = autoTaskService.getPath(client_path)
     if task:
-        log.info("自动任务: 已经存在任务")
+        current_app.logger.info("自动任务: 已经存在任务")
         return 200
     else:
-        log.info("自动任务: 加入队列[{}]".format(client_path))
+        current_app.logger.info("自动任务: 加入队列[{}]".format(client_path))
         task = autoTaskService.init(client_path)
 
     runningTask = autoTaskService.getRunning()
     if runningTask:
-        log.debug("自动任务: 正在执行其他任务")
+        current_app.logger.debug("自动任务: 正在执行其他任务")
     else:
         checkTaskQueue()
 
@@ -36,28 +36,28 @@ def checkTaskQueue():
     while running:
         runningTask = autoTaskService.getRunning()
         if runningTask:
-            log.debug("任务循环队列: 正在执行其他任务")
+            current_app.logger.debug("任务循环队列: 正在执行其他任务")
             break
 
         task = autoTaskService.getFirst()
         if task:
-            log.info("任务循环队列: 开始[{}]".format(task.path))
+            current_app.logger.info("任务循环队列: 开始[{}]".format(task.path))
             task.status = 1
             autoTaskService.commit()
             try:
                 # 在已经有任务要进行情况下
                 # 其他任务会加入队列，当前任务等待手动任务完成
                 while taskService.haveRunningTask():
-                    log.debug("任务循环队列: 等待手动任务结束")
+                    current_app.logger.debug("任务循环队列: 等待手动任务结束")
                     time.sleep(5)
 
                 runTask(task.path)
             except Exception as e:
-                log.error(e)
-            log.info("任务循环队列: 完成[{}]".format(task.path))
+                current_app.logger.error(e)
+            current_app.logger.info("任务循环队列: 完成[{}]".format(task.path))
             autoTaskService.deleteTask(task.id)
         else:
-            log.info("任务循环队列: 无新任务")
+            current_app.logger.info("任务循环队列: 无新任务")
             running = False
 
 
@@ -66,9 +66,9 @@ def runTask(client_path: str):
     conf = autoConfigService.getSetting()
     real_path = client_path.replace(conf.original, conf.prefixed)
     if not os.path.exists(real_path):
-        log.debug("任务详情: 不存在路径[{}]".format(real_path))
+        current_app.logger.debug("任务详情: 不存在路径[{}]".format(real_path))
         return
-    log.debug("任务详情: 实际路径[{}]".format(real_path))
+    current_app.logger.debug("任务详情: 实际路径[{}]".format(real_path))
     # 2. select scrape or transfer
     scrapingFolders = conf.scrapingfolders.split(';')
     transferFolders = conf.transferfolders.split(';')
@@ -84,7 +84,7 @@ def runTask(client_path: str):
             break
     # 3. run
     if flag_scraping:
-        log.debug("任务详情: JAV")
+        current_app.logger.debug("任务详情: JAV")
         if os.path.isdir(real_path):
             startScrapingAll(real_path)
         else:

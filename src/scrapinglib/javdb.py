@@ -5,7 +5,6 @@ from lxml import etree
 import json
 import random
 from bs4 import BeautifulSoup
-from ..utils.log import log
 from ..utils.ADC_function import load_javdb_cookies, get_html, translateTag_to_sc
 from . import airav
 # import sys
@@ -299,7 +298,8 @@ def main(number: str):
 
         }
     except Exception as e:
-        log.error(e)
+        from flask import current_app
+        current_app.logger.error(e)
         dic = {"title": ""}
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js

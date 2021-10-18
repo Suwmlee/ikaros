@@ -121,7 +121,7 @@ def main(number):
             'series': getSeries(info),
         }
     except Exception as e:
-        log.error(e)
+        current_app.logger.error(e)
         dic = {"title": ""}
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js

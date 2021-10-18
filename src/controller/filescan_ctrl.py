@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from flask import url_for, request
 from . import web
-from ..utils.log import log
+from flask import current_app
 
 
 @web.route('/api/scan/', methods=['POST'])
@@ -16,7 +16,7 @@ def direcotry():
             media_dir = content.get('path')
         else:
             media_dir = '/'
-        log.debug(media_dir)
+        current_app.logger.debug(media_dir)
         parentdir = os.path.dirname(media_dir)
         ret = dict()
         ret['parent'] = parentdir
@@ -34,6 +34,6 @@ def direcotry():
         ret = {'error': '拒绝访问'}
         return json.dumps(ret)
     except Exception as e:
-        log.error(e)
+        current_app.logger.error(e)
         ret = {'error': str(e)}
         return json.dumps(ret)

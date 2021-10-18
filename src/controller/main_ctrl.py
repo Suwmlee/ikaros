@@ -13,7 +13,7 @@ from ..bizlogic import automation
 from ..service.recordservice import scrapingrecordService, transrecordService
 from ..service.configservice import scrapingConfService, transConfigService, autoConfigService
 from ..service.taskservice import taskService
-from ..utils.log import log
+from flask import current_app
 # from concurrent.futures import ThreadPoolExecutor
 
 # DOCS https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor
@@ -28,7 +28,7 @@ def intro():
             content = f.read()
         return content
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -45,7 +45,7 @@ def version():
                 version_info = "web_" + web_sha[:7] + "  " + version_info
         return version_info
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -75,7 +75,7 @@ NOTSET = 0
                 current_app.logger.setLevel(logging.INFO)
             return Response(status=200)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -101,7 +101,7 @@ EOF
             automation.start(client_path)
         return Response(status=200)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -113,7 +113,7 @@ def clientCleanTaskQueue():
         automation.clean()
         return Response(status=200)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -129,7 +129,7 @@ def startScraping():
             manager.startScrapingAll()
         return Response(status=200)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -145,7 +145,7 @@ def startTransfer():
                                content.get('refresh_url'))
         return Response(status=200)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -156,7 +156,7 @@ def resetAllTaskStatus():
         taskService.updateTaskStatus(0, 'scrape')
         return Response(status=200)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -168,7 +168,7 @@ def previewRename():
             content['source_folder'], content['reg'], content['prefix'], True)
         return json.dumps(ret)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -180,7 +180,7 @@ def renamebyRegex():
             content['source_folder'], content['reg'], content['prefix'], False)
         return json.dumps(ret)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -191,7 +191,7 @@ def renamebyReplace():
         ret = rename.rename(content['source_folder'], content['base'], content['newfix'])
         return json.dumps(ret)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 # scrapingconf
@@ -203,7 +203,7 @@ def getScrapingConf():
         content = scrapingConfService.getSetting().serialize()
         return json.dumps(content)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -214,7 +214,7 @@ def updateScapingConf():
         scrapingConfService.updateSetting(content)
         return Response(status=200)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 # scrapingrecords
@@ -228,7 +228,7 @@ def editScrapingData():
             content['id'], content['status'], content['scrapingname'], content['cnsubtag'], content['cdnum'])
         return Response(status=200)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -238,7 +238,7 @@ def deleteScrapingRecord(sid):
         scrapingrecordService.deleteByID(sid)
         return Response(status=200)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -279,7 +279,7 @@ def getScrapingRecord():
             ret['running'] = False
         return json.dumps(ret)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 # transconf
@@ -296,7 +296,7 @@ def getTransConfs():
             all.append(conf.serialize())
         return json.dumps(all)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -310,7 +310,7 @@ def addTransConf():
         config = transConfigService.updateConf(content)
         return json.dumps(config.serialize())
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -323,7 +323,7 @@ def updateTransConf():
         config = transConfigService.updateConf(content)
         return json.dumps(config.serialize())
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -336,7 +336,7 @@ def deleteTransConf(cid):
         transConfigService.deleteConf(iid)
         return Response(status=200)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 # transrecord
@@ -369,7 +369,7 @@ def getTransRecord():
             ret['running'] = False
         return json.dumps(ret)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -381,7 +381,7 @@ def delTransRecord():
         transrecordService.deleteRecords()
         return Response(status=200)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 # autoconf
@@ -393,7 +393,7 @@ def getAutoConf():
         content = autoConfigService.getSetting().serialize()
         return json.dumps(content)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)
 
 
@@ -404,5 +404,5 @@ def updateAutoConf():
         autoConfigService.updateSetting(content)
         return Response(status=200)
     except Exception as err:
-        log.error(err)
+        current_app.logger.error(err)
         return Response(status=500)

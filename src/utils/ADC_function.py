@@ -10,7 +10,7 @@ import uuid
 import mechanicalsoup
 from urllib.parse import urljoin
 from http.cookies import SimpleCookie
-from .log import log
+from flask import current_app
 from ..service.configservice import scrapingConfService
 
 
@@ -47,12 +47,12 @@ def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None)
             else:
                 return result.text
         except requests.exceptions.ProxyError:
-            log.info("[-]Proxy error! Please check your Proxy")
+            current_app.logger.info("[-]Proxy error! Please check your Proxy")
             return
         except Exception as e:
-            log.info("[-]Connect retry {}/{} : {}".format(i + 1, configProxy.retry, url))
-            log.error(e)
-    log.info('[-]Connect Failed! Please check your Proxy or Network!')
+            current_app.logger.info("[-]Connect retry {}/{} : {}".format(i + 1, configProxy.retry, url))
+            current_app.logger.error(e)
+    current_app.logger.info('[-]Connect Failed! Please check your Proxy or Network!')
 
 
 def post_html(url: str, query: dict, headers: dict = None) -> requests.Response:
@@ -75,9 +75,9 @@ def post_html(url: str, query: dict, headers: dict = None) -> requests.Response:
                     url, data=query, headers=headers, timeout=configProxy.timeout)
             return result
         except Exception as e:
-            log.info("[-]Connect retry {}/{} : {}".format(i + 1, configProxy.retry, url))
-            log.error(e)
-    log.info("[-]Connect Failed! Please check your Proxy or Network!")
+            current_app.logger.info("[-]Connect retry {}/{} : {}".format(i + 1, configProxy.retry, url))
+            current_app.logger.error(e)
+    current_app.logger.info("[-]Connect Failed! Please check your Proxy or Network!")
 
 
 def get_html_by_browser(url, cookies: dict = None, ua: str = None, return_type: str = None):

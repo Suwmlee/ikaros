@@ -2,7 +2,7 @@
 
 import os
 import re
-from ..utils.log import log
+from flask import current_app
 from ..utils.filehelper import video_type, ext_type
 
 
@@ -62,7 +62,7 @@ def rename(root, base, newfix):
             newname = basename.replace(base, newfix)
             newfull = os.path.join(dirname, newname)
             os.rename(name, newfull)
-            log.info("rename [{}] to [{}]".format(name, newfull))
+            current_app.logger.info("rename [{}] to [{}]".format(name, newfull))
 
 
 def matchSeason(filename:str):
@@ -155,17 +155,17 @@ def renamebyreg(root, reg, prefix, preview: bool = True):
         prefix = "S01E"
     for name in tvs:
         dirname, basename = os.path.split(name)
-        log.info("开始替换: " + basename)
+        current_app.logger.info("开始替换: " + basename)
         if reg == '':
             originep = matchEpPart(basename)
         else:
             results = regexMatch(basename, reg)
             originep = results[0]
         if originep:
-            # log.info("提取剧集标签 "+nameresult)
+            # current_app.logger.info("提取剧集标签 "+nameresult)
             epresult = extractEpNum(originep)
             if epresult != '':
-                log.debug(originep + "   "+epresult)
+                current_app.logger.debug(originep + "   "+epresult)
                 if originep[0] == '.':
                     renum = "." + prefix + epresult + "."
                 elif originep[0] == '[':
@@ -173,7 +173,7 @@ def renamebyreg(root, reg, prefix, preview: bool = True):
                 else:
                     renum = " " + prefix + epresult + " "
                 newname = basename.replace(originep, renum)
-                log.info("修正后:   {}".format(newname))
+                current_app.logger.info("修正后:   {}".format(newname))
 
                 if not preview:
                     newfull = os.path.join(dirname, newname)

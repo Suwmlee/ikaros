@@ -3,7 +3,7 @@ import os
 import re
 import errno
 import shutil
-from .log import log
+from flask import current_app
 
 video_type = ['.mp4', '.avi', '.rmvb', '.wmv',
               '.mov', '.mkv', '.flv', '.ts', '.webm', '.iso']
@@ -23,8 +23,8 @@ def creatFolder(foldername):
         try:
             os.makedirs(foldername + '/')
         except Exception as e:
-            log.info("[-]failed!can not be make Failed output folder\n[-](Please run as Administrator)")
-            log.error(e)
+            current_app.logger.info("[-]failed!can not be make Failed output folder\n[-](Please run as Administrator)")
+            current_app.logger.error(e)
             return
 
 
@@ -47,7 +47,7 @@ def cleanbySuffix(folder, suffix):
         if os.path.isdir(f):
             cleanbySuffix(f, suffix)
         elif os.path.splitext(f)[1].lower() in suffix:
-            log.info("clean file by suffix [{}]".format(f))
+            current_app.logger.info("clean file by suffix [{}]".format(f))
             os.remove(f)
 
 
@@ -61,7 +61,7 @@ def cleanbyNameSuffix(folder, basename, suffix):
         if os.path.isdir(f):
             cleanbyNameSuffix(f, basename, suffix)
         elif fsuffix.lower() in suffix and fname.startswith(basename):
-            log.debug("clean by name & suffix [{}]".format(f))
+            current_app.logger.debug("clean by name & suffix [{}]".format(f))
             os.remove(f)
 
 
@@ -88,7 +88,7 @@ def cleanExtraMedia(folder):
                         cleanflag = False
                         break
             if cleanflag:
-                log.debug("clean extra media file [{}]".format(f))
+                current_app.logger.debug("clean extra media file [{}]".format(f))
                 os.remove(f)
 
 
@@ -104,7 +104,7 @@ def cleanFolderWithoutSuffix(folder, suffix):
             if hastag:
                 hassuffix = True
             else:
-                log.info("clean empty media folder [{}]".format(f))
+                current_app.logger.info("clean empty media folder [{}]".format(f))
                 shutil.rmtree(f)
         elif os.path.splitext(f)[1].lower() in suffix:
             hassuffix = True
@@ -124,7 +124,7 @@ def cleanFolderbyFilter(folder, filter):
             cleanAll = False
         else:
             if filter in file:
-                log.info("clean folder by filter [{}]".format(f))
+                current_app.logger.info("clean folder by filter [{}]".format(f))
                 os.remove(f)
             else:
                 cleanAll = False
@@ -140,7 +140,7 @@ def cleanScrapingfile(folder, filter):
         f = os.path.join(folder, file)
         if not os.path.isdir(f):
             if file.startswith(filter):
-                log.info("clean scraping file [{}]".format(f))
+                current_app.logger.info("clean scraping file [{}]".format(f))
                 os.remove(f)
 
 

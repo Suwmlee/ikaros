@@ -15,7 +15,7 @@ from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
 from ..utils.filehelper import replaceRegex, video_type, ext_type, cleanFolderWithoutSuffix,\
      forceHardlink, forceSymlink, replaceCJK, cleanbyNameSuffix, cleanExtraMedia
-from ..utils.log import log
+from flask import current_app
 
 
 class FileInfo():
@@ -81,17 +81,17 @@ class FileInfo():
 
     def fixEpName(self, season):
         prefix = "S%02dE" % (season)
-        log.debug(self.originep + "   " + self.epnum)
+        current_app.logger.debug(self.originep + "   " + self.epnum)
         if self.originep[0] == '.':
             renum = "." + prefix + self.epnum + "."
         elif self.originep[0] == '[':
             renum = "[" + prefix + self.epnum + "]"
         else:
             renum = " " + prefix + self.epnum + " "
-        log.debug("替换内容：" + renum)
+        current_app.logger.debug("替换内容：" + renum)
         newname = self.name.replace(self.originep, renum)
         self.name = newname
-        log.info("替换后:   {}".format(newname))
+        current_app.logger.info("替换后:   {}".format(newname))
 
 
 def copySubs(srcfolder, destfolder, basename, newname):
@@ -103,7 +103,7 @@ def copySubs(srcfolder, destfolder, basename, newname):
         if ext.lower() in ext_type and path.startswith(basename):
             src_file = os.path.join(srcfolder, item)
             newpath = path.replace(basename, newname)
-            log.debug("[-] - copy sub  " + src_file)
+            current_app.logger.debug("[-] - copy sub  " + src_file)
             newfile = os.path.join(destfolder, newpath + ext)
             shutil.copyfile(src_file, newfile)
             # modify permission
@@ -117,7 +117,7 @@ def autoTransfer(real_path: str):
     confs = transConfigService.getConfiglist()
     for conf in confs:
         if real_path.startswith(conf.source_folder):
-            log.debug("任务详情: 转移")
+            current_app.logger.debug("任务详情: 转移")
             transfer(conf.source_folder, conf.output_folder,
                      conf.linktype, conf.soft_prefix,
                      conf.escape_folder, real_path,
@@ -172,7 +172,7 @@ def transfer(src_folder, dest_folder,
         count = 0
         total = str(len(movie_list))
         taskService.updateTaskTotal(total, 'transfer')
-        log.debug('[+]Find  ' + total+'  movies')
+        current_app.logger.debug('[+]Find  ' + total+'  movies')
 
         # 硬链接直接使用源目录
         if linktype == 1:
@@ -201,8 +201,8 @@ def transfer(src_folder, dest_folder,
                 return False
             count += 1
             taskService.updateTaskFinished(count, 'transfer')
-            log.debug('[!] - ' + str(count) + '/' + total + ' -')
-            log.debug("[+] start check [{}] ".format(currentfile.realpath))
+            current_app.logger.debug('[!] - ' + str(count) + '/' + total + ' -')
+            current_app.logger.debug("[+] start check [{}] ".format(currentfile.realpath))
             transrecordService.add(currentfile.realpath)
 
             # 修正后给链接使用的源地址
@@ -219,7 +219,7 @@ def transfer(src_folder, dest_folder,
                         # 非剧集
                         for m in matches:
                             m.topfolder = namingfiles[0].name
-                    log.debug("[-] handling cmct midfolder [{}] ".format(midfolder))
+                    current_app.logger.debug("[-] handling cmct midfolder [{}] ".format(midfolder))
             # topfolder 替换中文
             if replace_CJK_tag:
                 minlen = 27
@@ -232,13 +232,13 @@ def transfer(src_folder, dest_folder,
                     if gt in tempmid.lower():
                         minlen += len(gt)
                 if len(tempmid) > minlen:
-                    log.debug("[-] replace CJK [{}] ".format(tempmid))
+                    current_app.logger.debug("[-] replace CJK [{}] ".format(tempmid))
                     currentfile.topfolder = tempmid
             # 修正剧集命名
             if fixseries_tag:
                 # 判断剧集标记
                 if currentfile.isepisode:
-                    log.debug("[-] fix series name")
+                    current_app.logger.debug("[-] fix series name")
                     # 查询 同级目录下所有视频
                     matches = [x for x in todoFiles if x.folders == currentfile.folders]
                     if len(matches) > 0:
@@ -281,14 +281,14 @@ def transfer(src_folder, dest_folder,
             # https://stackoverflow.com/questions/41941401/how-to-find-out-if-a-folder-is-a-hard-link-and-get-its-real-path
             if os.path.exists(newpath) and os.path.samefile(link_path, newpath):
                 flag_done = True
-                log.debug("[!] same file already exists")
+                current_app.logger.debug("[!] same file already exists")
             elif pathlib.Path(newpath).is_symlink() and os.readlink(newpath) == link_path :
                 flag_done = True
-                log.debug("[!] link file already exists")
+                current_app.logger.debug("[!] link file already exists")
             if not os.path.exists(newfolder):
                 os.makedirs(newfolder)
             if not flag_done:
-                log.debug("[-] create link from [{}] to [{}]".format(link_path, newpath))
+                current_app.logger.debug("[-] create link from [{}] to [{}]".format(link_path, newpath))
                 if linktype == 0:
                     forceSymlink(link_path, newpath)
                 else:
@@ -302,19 +302,19 @@ def transfer(src_folder, dest_folder,
             if newpath in dest_list:
                 dest_list.remove(newpath)
 
-            log.info("[-] transfered [{}]".format(newpath))
+            current_app.logger.info("[-] transfered [{}]".format(newpath))
             transrecordService.update(currentfile.realpath, link_path, newpath)
 
         if clean_others_tag:
             for torm in dest_list:
-                log.info("[!] clean extra file: [{}]".format(torm))
+                current_app.logger.info("[!] clean extra file: [{}]".format(torm))
                 os.remove(torm)
             cleanExtraMedia(dest_folder)
             cleanFolderWithoutSuffix(dest_folder, video_type)
 
-        log.info("transfer finished")
+        current_app.logger.info("transfer finished")
     except Exception as e:
-        log.error(e)
+        current_app.logger.error(e)
 
     taskService.updateTaskStatus(1, 'transfer')
 

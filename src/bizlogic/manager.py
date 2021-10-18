@@ -10,7 +10,7 @@ from ..service.configservice import scrapingConfService, _ScrapingConfigs
 from ..service.recordservice import scrapingrecordService
 from ..service.taskservice import taskService
 from .scraper import core_main, moveFailedFolder
-from ..utils.log import log
+from flask import current_app
 from ..utils.number_parser import parseNumber
 from ..utils.filehelper import cleanScrapingfile, video_type, cleanFolder, cleanFolderbyFilter
 
@@ -64,7 +64,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
                 scrapingtag_cnsub = True
             if movie_info.cdnum:
                 scrapingtag_cdnum = movie_info.cdnum
-            log.info("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
+            current_app.logger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
             movie_info.status = 4
             movie_info.scrapingname = n_number
             movie_info.updatetime = datetime.datetime.now()
@@ -82,12 +82,12 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
             scrapingrecordService.commit()
         else:
             # use cleandb function checking record
-            log.info("[!]Already done: [{}]".format(file_path))
+            current_app.logger.info("[!]Already done: [{}]".format(file_path))
     except Exception as err:
-        log.error("[!] ERROR: [{}] ".format(file_path))
-        log.error(err)
+        current_app.logger.error("[!] ERROR: [{}] ".format(file_path))
+        current_app.logger.error(err)
         moveFailedFolder(file_path)
-    log.info("[*]======================================================")
+    current_app.logger.info("[*]======================================================")
 
 
 def startScrapingAll(folder=''):
@@ -110,7 +110,7 @@ def startScrapingAll(folder=''):
     total = str(len(movie_list))
     taskService.updateTaskFinished(0, 'scrape')
     taskService.updateTaskTotal(total, 'scrape')
-    log.debug('[+]Find  ' + total+'  movies')
+    current_app.logger.debug('[+]Find  ' + total+'  movies')
 
     for movie_path in movie_list:
         task = taskService.getTask('scrape')
@@ -118,15 +118,15 @@ def startScrapingAll(folder=''):
             return
         taskService.updateTaskFinished(count, 'scrape')
         percentage = str(count / int(total) * 100)[:4] + '%'
-        log.info('[!] - ' + percentage + ' [' + str(count) + '/' + total + '] -')
+        current_app.logger.info('[!] - ' + percentage + ' [' + str(count) + '/' + total + '] -')
         create_data_and_move(movie_path, conf)
         count = count + 1
 
     if conf.refresh_url:
-        log.info("[+]Refresh MediaServer")
+        current_app.logger.info("[+]Refresh MediaServer")
         requests.post(conf.refresh_url)
 
-    log.info("[+] All scraping finished!!!")
+    current_app.logger.info("[+] All scraping finished!!!")
 
     taskService.updateTaskStatus(1, 'scrape')
 
@@ -139,14 +139,14 @@ def startScrapingSingle(movie_path: str):
         return
     taskService.updateTaskStatus(2, 'scrape')
 
-    log.info("[+]Single start!!!")
+    current_app.logger.info("[+]Single start!!!")
     if os.path.exists(movie_path) and os.path.isfile(movie_path):
         conf = scrapingConfService.getSetting()
         create_data_and_move(movie_path, conf)
         if conf.refresh_url:
-            log.info("[+]Refresh MediaServer")
+            current_app.logger.info("[+]Refresh MediaServer")
             requests.post(conf.refresh_url)
 
-    log.info("[+]Single finished!!!")
+    current_app.logger.info("[+]Single finished!!!")
 
     taskService.updateTaskStatus(1, 'scrape')
