@@ -99,6 +99,7 @@ class _TransferConfigs(db.Model):
     escape_folder = Column(String, default='Sample,sample')
     clean_others = Column(Boolean, default=False)
     replace_CJK = Column(Boolean, default=False)
+    fix_series = Column(Boolean, default=False)
     refresh_url = Column(String, default='')
     mark = Column(String, default='备注')
 
@@ -112,6 +113,7 @@ class _TransferConfigs(db.Model):
             'escape_folder': self.escape_folder,
             'clean_others': self.clean_others,
             'replace_CJK': self.replace_CJK,
+            'fix_series' : self.fix_series,
             'refresh_url': self.refresh_url,
             'mark': self.mark
         }
