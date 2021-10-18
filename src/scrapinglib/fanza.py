@@ -285,8 +285,7 @@ def main(number):
             "source": "fanza.py",
             "series": getSeries(htmlcode),
         }
-    except Exception as e:
-        log.error(e)
+    except:
         data = {
             "title": "",
         }

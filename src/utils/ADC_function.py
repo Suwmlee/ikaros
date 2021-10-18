@@ -7,6 +7,7 @@ import pathlib
 import time
 import os
 import uuid
+import mechanicalsoup
 from urllib.parse import urljoin
 from http.cookies import SimpleCookie
 from .log import log
@@ -77,6 +78,51 @@ def post_html(url: str, query: dict, headers: dict = None) -> requests.Response:
             log.info("[-]Connect retry {}/{} : {}".format(i + 1, configProxy.retry, url))
             log.error(e)
     log.info("[-]Connect Failed! Please check your Proxy or Network!")
+
+
+def get_html_by_browser(url, cookies: dict = None, ua: str = None, return_type: str = None):
+    browser = mechanicalsoup.StatefulBrowser(user_agent=G_USER_AGENT if ua is None else ua)
+    configProxy = scrapingConfService.getProxySetting()
+    if configProxy.enable:
+        browser.session.proxies = configProxy.proxies()
+    result = browser.open(url)
+    if not result.ok:
+        return ''
+    result.encoding = "utf-8"
+    if return_type == "object":
+        return result
+    elif return_type == "content":
+        return result.content
+    elif return_type == "browser":
+        return result, browser
+    else:
+        return result.text
+
+
+def get_html_by_form(url, form_name: str = None, fields: dict = None, cookies: dict = None, ua: str = None, return_type: str = None):
+    browser = mechanicalsoup.StatefulBrowser(user_agent=G_USER_AGENT if ua is None else ua)
+    if isinstance(cookies, dict):
+        requests.utils.add_dict_to_cookiejar(browser.session.cookies, cookies)
+    configProxy = scrapingConfService.getProxySetting()
+    if configProxy.enable:
+        browser.session.proxies = configProxy.proxies()
+    result = browser.open(url)
+    if not result.ok:
+        return ''
+    form = browser.select_form() if form_name is None else browser.select_form(form_name)
+    if isinstance(fields, dict):
+        for k, v in fields.items():
+            browser[k] = v
+    response = browser.submit_selected()
+    response.encoding = "utf-8"
+    if return_type == "object":
+        return response
+    elif return_type == "content":
+        return response.content
+    elif return_type == "browser":
+        return response, browser
+    else:
+        return response.text
 
 
 def translateTag_to_sc(tag):
