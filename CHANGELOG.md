@@ -1,3 +1,15 @@
+# [1.8.0](https://github.com/Suwmlee/ikaros/compare/v1.7.4...v1.8.0) (2021-10-18)
+
+
+### Bug Fixes
+
+* refresh media server ([d4d84e9](https://github.com/Suwmlee/ikaros/commit/d4d84e9586b06937fd52a98fa8cfcbc693750e55))
+
+
+### Features
+
+* update scrapinglib ([7474d37](https://github.com/Suwmlee/ikaros/commit/7474d37f2563ee8727daeb65860acc4fff4cd17a))
+
 ## [1.7.4](https://github.com/Suwmlee/ikaros/compare/v1.7.3...v1.7.4) (2021-10-15)
 
 
