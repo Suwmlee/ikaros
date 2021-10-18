@@ -1,3 +1,10 @@
+## [1.8.2](https://github.com/Suwmlee/ikaros/compare/v1.8.1...v1.8.2) (2021-10-18)
+
+
+### Bug Fixes
+
+* copy tag ([f76f273](https://github.com/Suwmlee/ikaros/commit/f76f27330e812f845ec45fb9029c7a19e4475303))
+
 ## [1.8.1](https://github.com/Suwmlee/ikaros/compare/v1.8.0...v1.8.1) (2021-10-18)
 
 
