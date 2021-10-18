@@ -333,6 +333,7 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
     """
     houzhui = os.path.splitext(filepath)[1].replace(",", "")
     try:
+        copyTag = True
         newpath = os.path.join(path, prefilename + houzhui)
         if link_type == 1:
             (filefolder, name) = os.path.split(filepath)
@@ -351,8 +352,9 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
         elif link_type == 2:
             forceHardlink(filepath, newpath)
         else:
+            copyTag = False
             os.rename(filepath, newpath)
-        copySubsbyFilepath(filepath, newpath, False)
+        copySubsbyFilepath(filepath, newpath, copyTag)
         return True, newpath
     except FileExistsError:
         current_app.logger.error('[-]File Exists! Please check your movie!')
