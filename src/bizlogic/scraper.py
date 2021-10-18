@@ -11,7 +11,7 @@ from PIL import Image
 from ..service.configservice import scrapingConfService, _ScrapingConfigs
 from flask import current_app
 from ..utils.ADC_function import G_USER_AGENT, is_uncensored
-from ..utils.filehelper import ext_type, forceSymlink, forceHardlink
+from ..utils.filehelper import copySubsbyFilepath, forceSymlink, forceHardlink
 from ..scrapinglib import get_data_from_json
 
 
@@ -359,11 +359,7 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
             forceHardlink(filepath, newpath)
         else:
             os.rename(filepath, newpath)
-        # 字幕移动
-        for subname in ext_type:
-            if os.path.exists(filepath.replace(houzhui, subname)):
-                os.rename(filepath.replace(houzhui, subname), path + '/' + prefilename + subname)
-                current_app.logger.debug('[+]Sub moved!')
+        copySubsbyFilepath(filepath, newpath, False)
         return True, newpath
     except FileExistsError:
         current_app.logger.error('[-]File Exists! Please check your movie!')

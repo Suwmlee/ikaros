@@ -3,9 +3,7 @@
 '''
 import os
 import pathlib
-import stat
 import re
-import shutil
 
 from .manager import findAllMovies
 from .rename import extractEpNum, matchSeason, matchEpPart
@@ -13,8 +11,8 @@ from .mediaserver import refreshMediaServer
 from ..service.configservice import transConfigService
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
-from ..utils.filehelper import replaceRegex, video_type, ext_type, cleanFolderWithoutSuffix,\
-     forceHardlink, forceSymlink, replaceCJK, cleanbyNameSuffix, cleanExtraMedia
+from ..utils.filehelper import video_type, ext_type, replaceRegex, cleanFolderWithoutSuffix,\
+     forceHardlink, forceSymlink, replaceCJK, cleanbyNameSuffix, cleanExtraMedia, copySubs
 from flask import current_app
 
 
@@ -92,23 +90,6 @@ class FileInfo():
         newname = self.name.replace(self.originep, renum)
         self.name = newname
         current_app.logger.info("替换后:   {}".format(newname))
-
-
-def copySubs(srcfolder, destfolder, basename, newname):
-    """ copy subtitle
-    """
-    dirs = os.listdir(srcfolder)
-    for item in dirs:
-        (path, ext) = os.path.splitext(item)
-        if ext.lower() in ext_type and path.startswith(basename):
-            src_file = os.path.join(srcfolder, item)
-            newpath = path.replace(basename, newname)
-            current_app.logger.debug("[-] - copy sub  " + src_file)
-            newfile = os.path.join(destfolder, newpath + ext)
-            shutil.copyfile(src_file, newfile)
-            # modify permission
-            os.chmod(newfile, stat.S_IRWXU | stat.S_IRGRP |
-                     stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH)
 
 
 def autoTransfer(real_path: str):

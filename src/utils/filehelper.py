@@ -3,6 +3,7 @@ import os
 import re
 import errno
 import shutil
+import stat
 from flask import current_app
 
 video_type = ['.mp4', '.avi', '.rmvb', '.wmv',
@@ -142,6 +143,34 @@ def cleanScrapingfile(folder, filter):
             if file.startswith(filter):
                 current_app.logger.info("clean scraping file [{}]".format(f))
                 os.remove(f)
+
+
+def copySubs(srcfolder, destfolder, basename, newname, saved=True):
+    """ copy subtitle
+    """
+    dirs = os.listdir(srcfolder)
+    for item in dirs:
+        (path, ext) = os.path.splitext(item)
+        if ext.lower() in ext_type and path.startswith(basename):
+            src_file = os.path.join(srcfolder, item)
+            newpath = path.replace(basename, newname)
+            current_app.logger.debug("[-] - copy sub  " + src_file)
+            newfile = os.path.join(destfolder, newpath + ext)
+            if saved:
+                shutil.copyfile(src_file, newfile)
+            else:
+                shutil.move(src_file, newfile)
+            # modify permission
+            os.chmod(newfile, stat.S_IRWXU | stat.S_IRGRP |
+                     stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH)
+
+
+def copySubsbyFilepath(srcpath, destpath, saved=True):
+    srcfolder, srcname = os.path.split(srcpath)
+    srcbasename, srcext = os.path.splitext(srcname)
+    destfolder, destname = os.path.split(destpath)
+    destbasename, destext = os.path.splitext(destname)
+    copySubs(srcfolder, destfolder, srcbasename, destbasename, saved)
 
 
 def forceSymlink(srcpath, dstpath):
