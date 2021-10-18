@@ -122,13 +122,13 @@ def startScrapingAll(folder=''):
         create_data_and_move(movie_path, conf)
         count = count + 1
 
+    taskService.updateTaskStatus(1, 'scrape')
+
     if conf.refresh_url:
         current_app.logger.info("[+]Refresh MediaServer")
         refreshMediaServer(conf.refresh_url)
 
     current_app.logger.info("[+] All scraping finished!!!")
-
-    taskService.updateTaskStatus(1, 'scrape')
 
 
 def startScrapingSingle(movie_path: str):
@@ -143,10 +143,11 @@ def startScrapingSingle(movie_path: str):
     if os.path.exists(movie_path) and os.path.isfile(movie_path):
         conf = scrapingConfService.getSetting()
         create_data_and_move(movie_path, conf)
-        if conf.refresh_url:
-            current_app.logger.info("[+]Refresh MediaServer")
-            refreshMediaServer(conf.refresh_url)
-
-    current_app.logger.info("[+]Single finished!!!")
 
     taskService.updateTaskStatus(1, 'scrape')
+
+    if conf.refresh_url:
+        current_app.logger.info("[+]Refresh MediaServer")
+        refreshMediaServer(conf.refresh_url)
+
+    current_app.logger.info("[+]Single finished!!!")

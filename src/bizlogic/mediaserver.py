@@ -2,9 +2,11 @@
 '''
 '''
 import requests
+from flask import current_app
 
 def refreshMediaServer(url):
     try:
         requests.post(url)
-    except:
-        pass
+    except Exception as e:
+        current_app.logger.error("[!] Refresh Media Err")
+        current_app.logger.error(e)
