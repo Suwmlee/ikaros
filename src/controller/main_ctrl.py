@@ -83,7 +83,7 @@ NOTSET = 0
 
 
 @web.route("/api/client", methods=['POST'])
-def client_auto():
+def clientAutoTask():
     """ for client
 
 #!/bin/bash
@@ -106,7 +106,7 @@ EOF
 
 
 @web.route("/api/client/clean", methods=['GET'])
-def client_clean():
+def clientCleanTaskQueue():
     """ clean client task
     """
     try:
@@ -118,15 +118,15 @@ def client_clean():
 
 
 @web.route("/api/scraping", methods=['POST'])
-def start_scraping():
+def startScraping():
     try:
         content = request.get_json()
         if content and content.get('srcpath'):
             filepath = content.get('srcpath')
             if os.path.exists(filepath) and os.path.isfile(filepath):
-                manager.start_single(filepath)
+                manager.startScrapingSingle(filepath)
         else:
-            manager.start_all()
+            manager.startScrapingAll()
         return Response(status=200)
     except Exception as err:
         log.error(err)
@@ -134,10 +134,10 @@ def start_scraping():
 
 
 @web.route("/api/transfer", methods=['POST'])
-def start_transfer():
+def startTransfer():
     try:
         content = request.get_json()
-        transfer.ctrl_transfer(content['source_folder'], content['output_folder'], 
+        transfer.ctrlTransfer(content['source_folder'], content['output_folder'], 
                                content['linktype'], content['soft_prefix'], 
                                content['escape_folder'],
                                content['renameflag'],
@@ -150,7 +150,7 @@ def start_transfer():
 
 
 @web.route("/api/stopall", methods=['GET'])
-def stop_all():
+def resetAllTaskStatus():
     try:
         taskService.updateTaskStatus(0, 'transfer')
         taskService.updateTaskStatus(0, 'scrape')
@@ -161,7 +161,7 @@ def stop_all():
 
 
 @web.route("/api/previewrename", methods=['POST'])
-def previewrename():
+def previewRename():
     try:
         content = request.get_json()
         ret = rename.renamebyreg(
@@ -173,7 +173,7 @@ def previewrename():
 
 
 @web.route("/api/renamebyreg", methods=['POST'])
-def renamebyreg():
+def renamebyRegex():
     try:
         content = request.get_json()
         ret = rename.renamebyreg(
@@ -185,7 +185,7 @@ def renamebyreg():
 
 
 @web.route("/api/renamebyrep", methods=['POST'])
-def renamebyreplace():
+def renamebyReplace():
     try:
         content = request.get_json()
         ret = rename.rename(content['source_folder'], content['base'], content['newfix'])
@@ -221,7 +221,7 @@ def updateScapingConf():
 
 
 @web.route("/api/scrapingrecord", methods=['PUT'])
-def editScrapingdata():
+def editScrapingData():
     try:
         content = request.get_json()
         scrapingrecordService.editRecord(
@@ -233,7 +233,7 @@ def editScrapingdata():
 
 
 @web.route("/api/scrapingrecord/<sid>", methods=['DELETE'])
-def deletescrapingrecord(sid):
+def deleteScrapingRecord(sid):
     try:
         scrapingrecordService.deleteByID(sid)
         return Response(status=200)
@@ -243,7 +243,7 @@ def deletescrapingrecord(sid):
 
 
 @web.route("/api/scrapingrecord", methods=['GET'])
-def getscrapingrecord():
+def getScrapingRecord():
     """ 查询
     """
     try:
@@ -343,7 +343,7 @@ def deleteTransConf(cid):
 
 
 @web.route("/api/transrecord", methods=['GET'])
-def gettransrecord():
+def getTransRecord():
     """ 查询
     """
     try:
@@ -374,7 +374,7 @@ def gettransrecord():
 
 
 @web.route("/api/transrecord", methods=['DELETE'])
-def deltransrecord():
+def delTransRecord():
     """ 清理转移
     """
     try:

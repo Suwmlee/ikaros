@@ -11,11 +11,11 @@ from ..service.recordservice import scrapingrecordService
 from ..service.taskservice import taskService
 from .scraper import core_main, moveFailedFolder
 from ..utils.log import log
-from ..utils.number_parser import get_number
-from ..utils.filehelper import cleanscrapingfile, video_type, CleanFolder, cleanfolderbyfilter
+from ..utils.number_parser import parseNumber
+from ..utils.filehelper import cleanScrapingfile, video_type, cleanFolder, cleanFolderbyFilter
 
 
-def movie_lists(root, escape_folder):
+def findAllMovies(root, escape_folder):
     """ collect movies
     
     won't check link path
@@ -27,17 +27,17 @@ def movie_lists(root, escape_folder):
     for entry in dirs:
         f = os.path.join(root, entry)
         if os.path.isdir(f):
-            total += movie_lists(f, escape_folder)
+            total += findAllMovies(f, escape_folder)
         elif os.path.splitext(f)[1].lower() in video_type:
             total.append(f)
     return total
 
 
 def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
-    """ start scrape single file
+    """ scrape single file
     """
     # Normalized number, eg: 111xxx-222.mp4 -> xxx-222.mp4
-    n_number = get_number(file_path)
+    n_number = parseNumber(file_path)
     scrapingtag_cnsub = False
     scrapingtag_cdnum = 0
     try:
@@ -54,9 +54,9 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
                     filter = os.path.splitext(name)[0]
                     if movie_info.cdnum and movie_info.cdnum > 0:
                         # 如果是多集，则只清理当前文件
-                        cleanscrapingfile(folder, filter)
+                        cleanScrapingfile(folder, filter)
                     else:
-                        cleanfolderbyfilter(folder, filter)
+                        cleanFolderbyFilter(folder, filter)
             # 查询是否有额外设置
             if movie_info.scrapingname != '':
                 n_number = movie_info.scrapingname
@@ -90,7 +90,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
     log.info("[*]======================================================")
 
 
-def start_all(folder=''):
+def startScrapingAll(folder=''):
     """ 启动入口
     """
 
@@ -100,11 +100,11 @@ def start_all(folder=''):
     taskService.updateTaskStatus(2, 'scrape')
 
     conf = scrapingConfService.getSetting()
-    CleanFolder(conf.failed_folder)
+    cleanFolder(conf.failed_folder)
 
     if folder == '':
         folder = conf.scraping_folder
-    movie_list = movie_lists(folder, re.split("[,，]", conf.escape_folders))
+    movie_list = findAllMovies(folder, re.split("[,，]", conf.escape_folders))
 
     count = 0
     total = str(len(movie_list))
@@ -131,7 +131,7 @@ def start_all(folder=''):
     taskService.updateTaskStatus(1, 'scrape')
 
 
-def start_single(movie_path: str):
+def startScrapingSingle(movie_path: str):
     """ single movie
     """
     task = taskService.getTask('scrape')

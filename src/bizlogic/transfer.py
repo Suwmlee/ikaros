@@ -8,13 +8,13 @@ import re
 import shutil
 import requests
 
-from .manager import movie_lists
-from .rename import extractep, matchSeason, matchEpPart
+from .manager import findAllMovies
+from .rename import extractEpNum, matchSeason, matchEpPart
 from ..service.configservice import transConfigService
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
-from ..utils.filehelper import replace_regex, video_type, ext_type, cleanfolderwithoutsuffix,\
-     hardlink_force, symlink_force, replace_CJK, cleanbyNameSuffix, cleanExtraMedia
+from ..utils.filehelper import replaceRegex, video_type, ext_type, cleanFolderWithoutSuffix,\
+     forceHardlink, forceSymlink, replaceCJK, cleanbyNameSuffix, cleanExtraMedia
 from ..utils.log import log
 
 
@@ -47,7 +47,7 @@ class FileInfo():
         self.name = name
         self.ext = ext
 
-    def updatemidfolder(self, mid):
+    def updateMidFolder(self, mid):
         self.midfolder = mid
         folders =  os.path.normpath(mid).split(os.path.sep)
         self.folders = folders
@@ -55,7 +55,7 @@ class FileInfo():
         if len(folders) > 1:
             self.secondfolder = folders[1]
 
-    def fixmidfolder(self):
+    def fixMidFolder(self):
         temp = self.folders
         temp[0] = self.topfolder
         if self.secondfolder != '':
@@ -65,7 +65,7 @@ class FileInfo():
                 temp.append(self.secondfolder)
         return os.path.join(*temp)
     
-    def updatefinalpath(self, path):
+    def updateFinalPath(self, path):
         self.finalpath = path
         (newfolder, tname) = os.path.split(path)
         self.finalfolder = newfolder
@@ -73,13 +73,13 @@ class FileInfo():
     def parse(self):
         originep = matchEpPart(self.name)
         if originep:
-            epresult = extractep(originep)
+            epresult = extractEpNum(originep)
             if epresult:
                 self.isepisode = True
                 self.originep = originep
                 self.epnum = epresult
 
-    def fixepname(self, season):
+    def fixEpName(self, season):
         prefix = "S%02dE" % (season)
         log.debug(self.originep + "   " + self.epnum)
         if self.originep[0] == '.':
@@ -111,7 +111,7 @@ def copySubs(srcfolder, destfolder, basename, newname):
                      stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH)
 
 
-def auto_transfer(real_path: str):
+def autoTransfer(real_path: str):
     """ 自动转移
     """
     confs = transConfigService.getConfiglist()
@@ -127,7 +127,7 @@ def auto_transfer(real_path: str):
             break
 
 
-def ctrl_transfer(src_folder, dest_folder, 
+def ctrlTransfer(src_folder, dest_folder, 
                 linktype, prefix, escape_folders,
                 renameflag,
                 clean_others,
@@ -160,12 +160,12 @@ def transfer(src_folder, dest_folder,
         movie_list = []
 
         if top_files == '':
-            movie_list = movie_lists(src_folder, re.split("[,，]", escape_folders))
+            movie_list = findAllMovies(src_folder, re.split("[,，]", escape_folders))
         else:
             if os.path.exists(top_files):
                 clean_others_tag = False
                 if os.path.isdir(top_files):
-                    movie_list = movie_lists(top_files, re.split("[,，]", escape_folders))
+                    movie_list = findAllMovies(top_files, re.split("[,，]", escape_folders))
                 else:
                     movie_list.append(top_files)
 
@@ -182,7 +182,7 @@ def transfer(src_folder, dest_folder,
             os.makedirs(dest_folder)
 
         if clean_others_tag:
-            dest_list = movie_lists(dest_folder, [])
+            dest_list = findAllMovies(dest_folder, [])
         else:
             dest_list = []
 
@@ -190,7 +190,7 @@ def transfer(src_folder, dest_folder,
         for movie_path in movie_list:
             fi = FileInfo(movie_path)
             midfolder = fi.realfolder.replace(src_folder, '').lstrip("\\").lstrip("/")
-            fi.updatemidfolder(midfolder)
+            fi.updateMidFolder(midfolder)
             if fi.topfolder != '.':
                 fi.parse()
             todoFiles.append(fi)
@@ -224,9 +224,10 @@ def transfer(src_folder, dest_folder,
             if replace_CJK_tag:
                 minlen = 27
                 tempmid = currentfile.topfolder
-                tempmid = replace_CJK(tempmid)
-                tempmid = replace_regex(tempmid, '^s(\d{2})-s(\d{2})')
-                grouptags = ['cmct', 'wiki', 'frds']
+                tempmid = replaceCJK(tempmid)
+                tempmid = replaceRegex(tempmid, '^s(\d{2})-s(\d{2})')
+                # 可增加过滤词
+                grouptags = ['cmct', 'wiki', 'frds', '1080p', 'x264', 'x265']
                 for gt in grouptags:
                     if gt in tempmid.lower():
                         minlen += len(gt)
@@ -251,19 +252,19 @@ def transfer(src_folder, dest_folder,
                         seasonnum = matchSeason(dirfolder)
                         if seasonnum:
                             currentfile.secondfolder = "Season " + str(seasonnum)
-                            currentfile.fixepname(seasonnum)
+                            currentfile.fixEpName(seasonnum)
                         else:
                             # 如果存在大量重复 epnum
                             # 如果检测不到 seasonnum 可能是多季？
                             if currentfile.secondfolder == '':
                                 seasonnum = 1
                                 currentfile.secondfolder = "Season " + str(seasonnum)
-                                currentfile.fixepname(seasonnum)
+                                currentfile.fixEpName(seasonnum)
                             else:
                                 if '花絮' in dirfolder and currentfile.topfolder != '.':
                                     currentfile.secondfolder = "extras"
                                     seasonnum = 0
-                                    currentfile.fixepname(seasonnum)
+                                    currentfile.fixEpName(seasonnum)
             # 检测是否是特殊的导评/花絮内容
             # TODO 更多关于花絮的规则
             if currentfile.name == "导演访谈":
@@ -274,8 +275,8 @@ def transfer(src_folder, dest_folder,
             if currentfile.topfolder == '.':
                 newpath = os.path.join(dest_folder, currentfile.name + currentfile.ext)
             else:
-                newpath = os.path.join(dest_folder, currentfile.fixmidfolder(), currentfile.name + currentfile.ext)
-            currentfile.updatefinalpath(newpath)
+                newpath = os.path.join(dest_folder, currentfile.fixMidFolder(), currentfile.name + currentfile.ext)
+            currentfile.updateFinalPath(newpath)
             newfolder = currentfile.finalfolder
             # https://stackoverflow.com/questions/41941401/how-to-find-out-if-a-folder-is-a-hard-link-and-get-its-real-path
             if os.path.exists(newpath) and os.path.samefile(link_path, newpath):
@@ -289,9 +290,9 @@ def transfer(src_folder, dest_folder,
             if not flag_done:
                 log.debug("[-] create link from [{}] to [{}]".format(link_path, newpath))
                 if linktype == 0:
-                    symlink_force(link_path, newpath)
+                    forceSymlink(link_path, newpath)
                 else:
-                    hardlink_force(link_path, newpath)
+                    forceHardlink(link_path, newpath)
 
             # 使用最终的文件名
             cleanbyNameSuffix(currentfile.finalfolder, currentfile.name, ext_type)
@@ -309,7 +310,7 @@ def transfer(src_folder, dest_folder,
                 log.info("[!] clean extra file: [{}]".format(torm))
                 os.remove(torm)
             cleanExtraMedia(dest_folder)
-            cleanfolderwithoutsuffix(dest_folder, video_type)
+            cleanFolderWithoutSuffix(dest_folder, video_type)
 
         log.info("transfer finished")
     except Exception as e:

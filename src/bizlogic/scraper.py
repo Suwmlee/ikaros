@@ -11,11 +11,11 @@ from PIL import Image
 from ..service.configservice import scrapingConfService, _ScrapingConfigs
 from ..utils.log import log
 from ..utils.ADC_function import G_USER_AGENT, is_uncensored
-from ..utils.filehelper import ext_type, symlink_force, hardlink_force
+from ..utils.filehelper import ext_type, forceSymlink, forceHardlink
 from ..scrapinglib import get_data_from_json
 
 
-def escape_path(path, escape_literals: str):
+def escapePath(path, escape_literals: str):
     """ Remove escape literals
     """
     backslash = '\\'
@@ -24,7 +24,7 @@ def escape_path(path, escape_literals: str):
     return path
 
 
-def create_folder(json_data: dict, conf: _ScrapingConfigs):
+def createFolder(json_data: dict, conf: _ScrapingConfigs):
     """ 根据json数据创建文件夹
     """
     success_folder = conf.success_folder
@@ -42,14 +42,14 @@ def create_folder(json_data: dict, conf: _ScrapingConfigs):
 
     # path为影片+元数据所在目录
     path = success_folder + '/' + location_rule
-    path = trimrightblank(path)
+    path = trimRightBlank(path)
     if not os.path.exists(path):
-        path = escape_path(path, conf.escape_literals)
+        path = escapePath(path, conf.escape_literals)
         try:
             os.makedirs(path)
         except:
             path = success_folder + '/' + location_rule.replace('/[' + number + '] ' + title, "/number")
-            path = escape_path(path, conf.escape_literals)
+            path = escapePath(path, conf.escape_literals)
 
             os.makedirs(path)
     return path
@@ -65,12 +65,12 @@ def moveFailedFolder(filepath):
         if conf.main_mode == 1 and (conf.link_type == 1 or conf.link_type == 2):
             (filefolder, name) = os.path.split(filepath)
             newpath = os.path.join(conf.failed_folder, name)
-            hardlink_force(filepath, newpath)
+            forceHardlink(filepath, newpath)
     except:
         pass
 
 
-def get_info(json_data):
+def parseJsonInfo(json_data):
     """   返回json里的数据
     """
     title = json_data.get('title')
@@ -90,12 +90,12 @@ def get_info(json_data):
     return title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label
 
 
-def trimrightblank(s: str):
+def trimRightBlank(s: str):
     """
     Clear the blank on the right side of the folder name
     """
     if s[-1] == " ":
-        return trimrightblank(s[:-1])
+        return trimRightBlank(s[:-1])
     else:
         return s
 
@@ -180,7 +180,7 @@ def download_extrafanart(urls, path, extrafanart_folder):
 
 
 def create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
-    title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label = get_info(json_data)
+    title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label = parseJsonInfo(json_data)
     naming_rule = json_data.get('naming_rule')
     actor_list = json_data.get('actor_list')
     tags = json_data.get('tag')
@@ -354,9 +354,9 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
                 (newfolder, tname) = os.path.split(newpath)
                 if not os.path.exists(newfolder):
                     os.makedirs(newfolder)
-                symlink_force(soft_path, newpath)
+                forceSymlink(soft_path, newpath)
         elif link_type == 2:
-            hardlink_force(filepath, newpath)
+            forceHardlink(filepath, newpath)
         else:
             os.rename(filepath, newpath)
         # 字幕移动
@@ -468,7 +468,7 @@ def core_main(file_path, scrapingnum, cnsubtag, cdnum, conf: _ScrapingConfigs):
     #  3：直接刮削
     if conf.main_mode == 1:
         # 创建文件夹
-        path = create_folder(json_data, conf)
+        path = createFolder(json_data, conf)
 
         # 文件名
         prefilename = number + c_word
@@ -500,7 +500,7 @@ def core_main(file_path, scrapingnum, cnsubtag, cdnum, conf: _ScrapingConfigs):
         (flag, newpath) = paste_file_to_folder(filepath, path, prefilename, conf.link_type)
         return flag, newpath
     elif conf.main_mode == 2:
-        path = create_folder(json_data, conf)
+        path = createFolder(json_data, conf)
         prefilename = number + c_word
         if multipart_tag:
             prefilename += part

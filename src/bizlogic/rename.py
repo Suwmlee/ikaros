@@ -6,7 +6,7 @@ from ..utils.log import log
 from ..utils.filehelper import video_type, ext_type
 
 
-def file_lists(root):
+def findAllMatchedFiles(root):
     total = []
     dirs = os.listdir(root)
     for entry in dirs:
@@ -24,7 +24,7 @@ def regexMatch(basename, reg):
     return result
 
 
-def extractep(single: str):
+def extractEpNum(single: str):
     """ 提取剧集编号
     1. 头尾匹配 空格 [] 第话
     2. 剔除头尾修饰字符
@@ -55,7 +55,7 @@ def rename(root, base, newfix):
     """ 方法1
     字符替换
     """
-    tvs = file_lists(root)
+    tvs = findAllMatchedFiles(root)
     for name in tvs:
         dirname, basename = os.path.split(name)
         if base in basename:
@@ -148,7 +148,7 @@ def renamebyreg(root, reg, prefix, preview: bool = True):
     """ 方法2
     正则匹配替换
     """
-    tvs = file_lists(root)
+    tvs = findAllMatchedFiles(root)
     todolist = []
     newlist = []
     if prefix == '':
@@ -163,7 +163,7 @@ def renamebyreg(root, reg, prefix, preview: bool = True):
             originep = results[0]
         if originep:
             # log.info("提取剧集标签 "+nameresult)
-            epresult = extractep(originep)
+            epresult = extractEpNum(originep)
             if epresult != '':
                 log.debug(originep + "   "+epresult)
                 if originep[0] == '.':

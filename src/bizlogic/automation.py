@@ -7,8 +7,8 @@ import time
 from src.utils.log import log
 from ..service.configservice import autoConfigService
 from ..service.taskservice import autoTaskService, taskService
-from .manager import start_all, start_single
-from .transfer import auto_transfer
+from .manager import startScrapingAll, startScrapingSingle
+from .transfer import autoTransfer
 
 
 def start(client_path: str):
@@ -26,10 +26,10 @@ def start(client_path: str):
     if runningTask:
         log.debug("自动任务: 正在执行其他任务")
     else:
-        task_loop()
+        checkTaskQueue()
 
 
-def task_loop():
+def checkTaskQueue():
     """ 任务循环队列
     """
     running = True
@@ -51,7 +51,7 @@ def task_loop():
                     log.debug("任务循环队列: 等待手动任务结束")
                     time.sleep(5)
 
-                run_task(task.path)
+                runTask(task.path)
             except Exception as e:
                 log.error(e)
             log.info("任务循环队列: 完成[{}]".format(task.path))
@@ -61,7 +61,7 @@ def task_loop():
             running = False
 
 
-def run_task(client_path: str):
+def runTask(client_path: str):
     # 1. convert path to real path for flask
     conf = autoConfigService.getSetting()
     real_path = client_path.replace(conf.original, conf.prefixed)
@@ -86,11 +86,11 @@ def run_task(client_path: str):
     if flag_scraping:
         log.debug("任务详情: JAV")
         if os.path.isdir(real_path):
-            start_all(real_path)
+            startScrapingAll(real_path)
         else:
-            start_single(real_path)
+            startScrapingSingle(real_path)
     if flag_transfer:
-        auto_transfer(real_path)
+        autoTransfer(real_path)
 
 
 def clean():

@@ -16,7 +16,7 @@ ext_filter = ['*.ass', '*.srt', '*.sub', '*.ssa', '*.smi', '*.idx', '*.sup',
               '*.psb', '*.usf', '*.xss', '*.ssf', '*.rt', '*.lrc', '*.sbv', '*.vtt', '*.ttml']
 
 
-def CreatFolder(foldername):
+def creatFolder(foldername):
     """ 创建文件
     """
     if not os.path.exists(foldername + '/'):
@@ -28,24 +28,24 @@ def CreatFolder(foldername):
             return
 
 
-def CleanFolder(foldername):
+def cleanFolder(foldername):
     """ 删除并重新创建文件夹
     """
     try:
         shutil.rmtree(foldername)
     except:
         pass
-    CreatFolder(foldername)
+    creatFolder(foldername)
 
 
-def cleanfilebysuffix(folder, suffix):
+def cleanbySuffix(folder, suffix):
     """ 删除匹配后缀的文件
     """
     dirs = os.listdir(folder)
     for file in dirs:
         f = os.path.join(folder, file)
         if os.path.isdir(f):
-            cleanfilebysuffix(f, suffix)
+            cleanbySuffix(f, suffix)
         elif os.path.splitext(f)[1].lower() in suffix:
             log.info("clean file by suffix [{}]".format(f))
             os.remove(f)
@@ -92,7 +92,7 @@ def cleanExtraMedia(folder):
                 os.remove(f)
 
 
-def cleanfolderwithoutsuffix(folder, suffix):
+def cleanFolderWithoutSuffix(folder, suffix):
     """ 删除内部无匹配后缀的文件的目录
     """
     hassuffix = False
@@ -100,7 +100,7 @@ def cleanfolderwithoutsuffix(folder, suffix):
     for file in dirs:
         f = os.path.join(folder, file)
         if os.path.isdir(f):
-            hastag = cleanfolderwithoutsuffix(f, suffix)
+            hastag = cleanFolderWithoutSuffix(f, suffix)
             if hastag:
                 hassuffix = True
             else:
@@ -111,7 +111,7 @@ def cleanfolderwithoutsuffix(folder, suffix):
     return hassuffix
 
 
-def cleanfolderbyfilter(folder, filter):
+def cleanFolderbyFilter(folder, filter):
     """ 根据过滤名删除文件
     
     如果目录下所有文件都被删除，将删除文件夹
@@ -132,7 +132,7 @@ def cleanfolderbyfilter(folder, filter):
         shutil.rmtree(folder)
 
 
-def cleanscrapingfile(folder, filter):
+def cleanScrapingfile(folder, filter):
     """ 根据过滤名删除刮削文件
     """
     dirs = os.listdir(folder)
@@ -144,7 +144,7 @@ def cleanscrapingfile(folder, filter):
                 os.remove(f)
 
 
-def symlink_force(srcpath, dstpath):
+def forceSymlink(srcpath, dstpath):
     """ create symlink
     https://stackoverflow.com/questions/8299386/modifying-a-symlink-in-python
     """
@@ -158,7 +158,7 @@ def symlink_force(srcpath, dstpath):
             raise e
 
 
-def hardlink_force(srcpath, dstpath):
+def forceHardlink(srcpath, dstpath):
     """ create hard link
     """
     try:
@@ -171,7 +171,7 @@ def hardlink_force(srcpath, dstpath):
             raise e
 
 
-def replace_CJK(base: str):
+def replaceCJK(base: str):
     """ 尝试替换 CJK 字符
     https://stackoverflow.com/questions/1366068/whats-the-complete-range-for-chinese-characters-in-unicode
     
@@ -189,7 +189,7 @@ def replace_CJK(base: str):
     return tmp
 
 
-def replace_regex(base: str, regex: str):
+def replaceRegex(base: str, regex: str):
     cop = re.compile(regex, re.IGNORECASE | re.X | re.S)
     base = cop.sub('', base)
     base = re.sub(r'(\W)\1+', r'\1', base).lstrip(' !?@#$.:：]）)').rstrip(' !?@#$.:：[(（')

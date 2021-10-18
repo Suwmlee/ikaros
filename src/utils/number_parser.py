@@ -7,7 +7,7 @@ G_spat = re.compile(
     re.IGNORECASE)
 
 
-def get_number(filepath: str) -> str:
+def parseNumber(filepath: str) -> str:
     # """
     # >>> from number_parser import get_number
     # >>> get_number("/Users/Guest/AV_Data_Capture/snis-829.mp4")

@@ -11,11 +11,11 @@ from . import web
 from ..service.recordservice import scrapingrecordService
 from ..model.record import _ScrapingRecords
 from ..utils.log import log
-from ..utils.filehelper import cleanfilebysuffix
+from ..utils.filehelper import cleanbySuffix
 
 
 @web.route("/api/export", methods=['GET'])
-def export_excel():
+def exportExcel():
     """ 导出JAV excel
     https://skysec.top/2017/07/18/flask%E7%9A%84excel%E5%AF%BC%E5%85%A5%E4%B8%8E%E5%AF%BC%E5%87%BA/
     filename = xlwt.Workbook() 创建一个excel文件
@@ -27,7 +27,7 @@ def export_excel():
         nowtime = datetime.datetime.now()
         filename = "records-"+nowtime.strftime("%H%M%S-%m%d%Y")+".xls"
         filefolder = directory + '/database/'
-        cleanfilebysuffix(filefolder, ['.xls', '.xlsx'])
+        cleanbySuffix(filefolder, ['.xls', '.xlsx'])
         records = scrapingrecordService.queryAll()
 
         temp = _ScrapingRecords('','')
@@ -57,7 +57,7 @@ def export_excel():
         return Response(status=500)
 
 
-def open_excel(file='file.xls'):
+def openExcel(file='file.xls'):
     try:
         data = xlrd.open_workbook(file, encoding_override="utf-8")
         return data
@@ -65,14 +65,14 @@ def open_excel(file='file.xls'):
         log.error(e)
 
 
-def allowed_format(file='file.xls', colnameindex=0, by_index=0):
+def allowedFormat(file='file.xls', colnameindex=0, by_index=0):
     """
     根据索引获取Excel表格中的数据   
     参数:file：Excel文件路径    
     colnameindex：表头列名所在行的索引 
     by_index：表的索引
     """
-    data = open_excel(file)
+    data = openExcel(file)
     table = data.sheets()[by_index]
     colnames = table.row_values(colnameindex)
     if colnames[0] == "srcname" and \
@@ -87,22 +87,22 @@ def allowed_format(file='file.xls', colnameindex=0, by_index=0):
 ALLOWED_EXTENSIONS = ['xls', 'xlsx']
 
 
-def allowed_file(filename):
+def allowedFile(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
 @web.route("/api/import", methods=['POST'])
-def import_excel():
+def importExcel():
     """ 导入JAV excel
     """
     try:
         file = request.files['file']
         filename = file.filename
 
-        if file and allowed_file(filename):
+        if file and allowedFile(filename):
             file.save('import' + filename)
-            data = open_excel(file='import' + filename).sheets()[0]
+            data = openExcel(file='import' + filename).sheets()[0]
             nrows = data.nrows
             pass_num = 0
             success_num = 0
@@ -139,7 +139,7 @@ def import_excel():
 
 
 @web.route("/api/cleandb", methods=['GET'])
-def clean_empty():
+def cleanErrData():
     """ clean record file not exist
     """
     try:
