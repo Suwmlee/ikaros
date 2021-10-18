@@ -1,3 +1,10 @@
+## [1.8.1](https://github.com/Suwmlee/ikaros/compare/v1.8.0...v1.8.1) (2021-10-18)
+
+
+### Bug Fixes
+
+* copy subs ([689d838](https://github.com/Suwmlee/ikaros/commit/689d838bc58332c8865fad42491c014365c8c03b))
+
 # [1.8.0](https://github.com/Suwmlee/ikaros/compare/v1.7.4...v1.8.0) (2021-10-18)
 
 
