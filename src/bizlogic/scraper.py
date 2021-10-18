@@ -41,8 +41,7 @@ def createFolder(json_data: dict, conf: _ScrapingConfigs):
         location_rule = location_rule.replace(title, shorttitle)
 
     # path为影片+元数据所在目录
-    path = success_folder + '/' + location_rule
-    path = trimRightBlank(path)
+    path = os.path.join(success_folder, location_rule).strip()
     if not os.path.exists(path):
         path = escapePath(path, conf.escape_literals)
         try:
@@ -90,15 +89,6 @@ def parseJsonInfo(json_data):
     return title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label
 
 
-def trimRightBlank(s: str):
-    """
-    Clear the blank on the right side of the folder name
-    """
-    if s[-1] == " ":
-        return trimRightBlank(s[:-1])
-    else:
-        return s
-
 # =====================资源下载部分===========================
 
 def download_file_with_filename(url, filename, path):
@@ -115,7 +105,7 @@ def download_file_with_filename(url, filename, path):
                 if r == '':
                     current_app.logger.info('[-]Movie Data not found!')
                     return False
-                with open(os.path.join(str(path), filename), "wb") as code:
+                with open(os.path.join(path, filename), "wb") as code:
                     code.write(r.content)
                 return True
             else:
@@ -123,7 +113,7 @@ def download_file_with_filename(url, filename, path):
                 if r == '':
                     current_app.logger.info('[-]Movie Data not found!')
                     return False
-                with open(os.path.join(str(path), filename), "wb") as code:
+                with open(os.path.join(path, filename), "wb") as code:
                     code.write(r.content)
                 return True
         except requests.exceptions.RequestException:
@@ -147,10 +137,10 @@ def download_poster(path, prefilename, cover_small_url):
     """
     postername = prefilename + '-poster.jpg'
     if download_file_with_filename(cover_small_url, postername, path):
-        current_app.logger.debug('[+]Poster Downloaded! ' + path + '/' + postername)
+        current_app.logger.debug('[+]Poster Downloaded! ' + postername)
         return True
     else:
-        current_app.logger.info('[+]Download Poster Failed! ' + path + '/' + postername)
+        current_app.logger.info('[+]Download Poster Failed! ' + postername)
         return False
 
 
@@ -158,24 +148,26 @@ def download_cover(cover_url, prefilename, path):
     """ Download Cover
     """
     fanartname = prefilename + '-fanart.jpg'
+    fanartpath = os.path.join(path, fanartname)
+    thumbpath = os.path.join(path, prefilename + '-thumb.jpg')
     if download_file_with_filename(cover_url, fanartname, path):
-        current_app.logger.debug('[+]Cover Downloaded! ' + path + '/' + fanartname)
-        shutil.copyfile(path + '/' + fanartname, path + '/' + prefilename + '-thumb.jpg')
+        current_app.logger.debug('[+]Cover Downloaded! ' + fanartname)
+        shutil.copyfile(fanartpath, thumbpath)
         return True
     else:
-        current_app.logger.info('[+]Download Cover Failed! ' + path + '/' + fanartname)
+        current_app.logger.info('[+]Download Cover Failed! ' + fanartname)
         return False
 
 
 def download_extrafanart(urls, path, extrafanart_folder):
     j = 1
-    path = path + '/' + extrafanart_folder
+    path = os.path.join(path, extrafanart_folder)
     for url in urls:
         if download_file_with_filename(url, 'extrafanart-' + str(j)+'.jpg', path):
-            current_app.logger.debug('[+]Extrafanart Downloaded! ' + path + '/extrafanart-' + str(j) + '.jpg')
+            current_app.logger.debug('[+]Extrafanart Downloaded! extrafanart-' + str(j) + '.jpg')
             j += 1
         else:
-            current_app.logger.info('[+]Download Extrafanart Failed! ' + path + '/extrafanart-' + str(j) + '.jpg')
+            current_app.logger.info('[+]Download Extrafanart Failed! extrafanart-' + str(j) + '.jpg')
     return True
 
 
@@ -188,7 +180,7 @@ def create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_
         if not os.path.exists(path):
             os.makedirs(path)
 
-        with open(os.path.join(str(path), prefilename + ".nfo"), "wt", encoding='UTF-8') as code:
+        with open(os.path.join(path, prefilename + ".nfo"), "wt", encoding='UTF-8') as code:
             print('<?xml version="1.0" encoding="UTF-8" ?>', file=code)
             print("<movie>", file=code)
             print(" <title>" + naming_rule + "</title>", file=code)
@@ -256,22 +248,23 @@ def create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_
 def crop_poster(imagecut, path, prefilename):
     """ crop fanart to poster
     """
+    fanartpath = os.path.join(path, prefilename + '-fanart.jpg')
+    posterpath = os.path.join(path, prefilename + '-poster.jpg')
     if imagecut == 1:
         try:
-            img = Image.open(path + '/' + prefilename + '-fanart.jpg')
+            img = Image.open(fanartpath)
             imgSize = img.size
             w = img.width
             h = img.height
             img2 = img.crop((w / 1.9, 0, w, h))
-            img2.save(path + '/' + prefilename + '-poster.jpg')
-            current_app.logger.debug('[+]Image Cutted!     ' + path + '/' + prefilename + '-poster.jpg')
+            img2.save(posterpath)
+            current_app.logger.debug('[+]Image Cutted!     ' + posterpath)
         except:
             current_app.logger.info('[-]Cover cut failed!')
     elif imagecut == 0: 
         # 复制封面
-        shutil.copyfile(path + '/' + prefilename + '-fanart.jpg',
-                        path + '/' + prefilename + '-poster.jpg')
-        current_app.logger.debug('[+]Image Copyed!     ' + path + '/' + prefilename + '-poster.jpg')
+        shutil.copyfile(fanartpath, posterpath)
+        current_app.logger.debug('[+]Image Copyed!     ' + posterpath)
 
 
 def add_mark(pics, chs_tag, leak_tag, uncensored_tag, count, size):
@@ -340,7 +333,7 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
     """
     houzhui = os.path.splitext(filepath)[1].replace(",", "")
     try:
-        newpath = path + '/' + prefilename + houzhui
+        newpath = os.path.join(path, prefilename + houzhui)
         if link_type == 1:
             (filefolder, name) = os.path.split(filepath)
             settings = scrapingConfService.getSetting()
@@ -368,7 +361,7 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
         current_app.logger.error('[-]Error! Please run as administrator!')
         return False, ''
     except OSError as oserr:
-        current_app.logger.error('[-]OS Error errno ' + oserr.errno)
+        current_app.logger.error('[-]OS Error :' + oserr.errno)
         return False, ''
 
 
@@ -486,8 +479,8 @@ def core_main(file_path, scrapingnum, cnsubtag, cdnum, conf: _ScrapingConfigs):
 
         crop_poster(imagecut, path, prefilename)
         if conf.watermark_enable:
-            pics = [path + '/' + prefilename + '-poster.jpg',
-                    path + '/' + prefilename + '-thumb.jpg']
+            pics = [os.path.join(path, prefilename + '-poster.jpg'),
+                    os.path.join(path, prefilename + '-thumb.jpg')]
             add_mark(pics, chs_tag, leak_tag, uncensored_tag, conf.watermark_location, conf.watermark_size)
         if not create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
             moveFailedFolder(filepath)
@@ -521,8 +514,8 @@ def core_main(file_path, scrapingnum, cnsubtag, cdnum, conf: _ScrapingConfigs):
 
         crop_poster(imagecut, path, prefilename)
         if conf.watermark_enable:
-            pics = [path + '/' + prefilename + '-poster.jpg',
-                    path + '/' + prefilename + '-thumb.jpg']
+            pics = [os.path.join(path, prefilename + '-poster.jpg'),
+                    os.path.join(path, prefilename + '-thumb.jpg')]
             add_mark(pics, chs_tag, leak_tag, uncensored_tag, conf.watermark_location, conf.watermark_size)
         if not create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
             moveFailedFolder(filepath)
