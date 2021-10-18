@@ -3,13 +3,13 @@
 '''
 import os
 import re
-import requests
 import datetime
 
 from ..service.configservice import scrapingConfService, _ScrapingConfigs
 from ..service.recordservice import scrapingrecordService
 from ..service.taskservice import taskService
 from .scraper import core_main, moveFailedFolder
+from .mediaserver import refreshMediaServer
 from flask import current_app
 from ..utils.number_parser import parseNumber
 from ..utils.filehelper import cleanScrapingfile, video_type, cleanFolder, cleanFolderbyFilter
@@ -124,7 +124,7 @@ def startScrapingAll(folder=''):
 
     if conf.refresh_url:
         current_app.logger.info("[+]Refresh MediaServer")
-        requests.post(conf.refresh_url)
+        refreshMediaServer(conf.refresh_url)
 
     current_app.logger.info("[+] All scraping finished!!!")
 
@@ -145,7 +145,7 @@ def startScrapingSingle(movie_path: str):
         create_data_and_move(movie_path, conf)
         if conf.refresh_url:
             current_app.logger.info("[+]Refresh MediaServer")
-            requests.post(conf.refresh_url)
+            refreshMediaServer(conf.refresh_url)
 
     current_app.logger.info("[+]Single finished!!!")
 

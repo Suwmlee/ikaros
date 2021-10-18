@@ -6,10 +6,10 @@ import pathlib
 import stat
 import re
 import shutil
-import requests
 
 from .manager import findAllMovies
 from .rename import extractEpNum, matchSeason, matchEpPart
+from .mediaserver import refreshMediaServer
 from ..service.configservice import transConfigService
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
@@ -123,7 +123,7 @@ def autoTransfer(real_path: str):
                      conf.escape_folder, real_path,
                      False, conf.replace_CJK)
             if conf.refresh_url:
-                requests.post(conf.refresh_url)
+                refreshMediaServer(conf.refresh_url)
             break
 
 
@@ -138,7 +138,7 @@ def ctrlTransfer(src_folder, dest_folder,
             clean_others, replace_CJK,
             renameflag)
     if refresh_url:
-        requests.post(refresh_url)
+        refreshMediaServer(refresh_url)
 
 
 def transfer(src_folder, dest_folder, 
