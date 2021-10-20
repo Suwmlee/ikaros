@@ -12,8 +12,6 @@ class FileNumInfo():
     """
 
     def __init__(self, filepath: str):
-        self.filename = os.path.basename(filepath)
-        self.name = os.path.splitext(self.filename)[0]
         self.num = get_number(filepath)
 
         self.chs_tag = False
@@ -60,29 +58,8 @@ class FileNumInfo():
 
 
 def get_number(file_path: str) -> str:
-    # """
-    # >>> from number_parser import get_number
-    # >>> get_number("/Users/Guest/AV_Data_Capture/snis-829.mp4")
-    # 'snis-829'
-    # >>> get_number("/Users/Guest/AV_Data_Capture/snis-829-C.mp4")
-    # 'snis-829'
-    # >>> get_number("C:¥Users¥Guest¥snis-829.mp4")
-    # 'snis-829'
-    # >>> get_number("C:¥Users¥Guest¥snis-829-C.mp4")
-    # 'snis-829'
-    # >>> get_number("./snis-829.mp4")
-    # 'snis-829'
-    # >>> get_number("./snis-829-C.mp4")
-    # 'snis-829'
-    # >>> get_number(".¥snis-829.mp4")
-    # 'snis-829'
-    # >>> get_number(".¥snis-829-C.mp4")
-    # 'snis-829'
-    # >>> get_number("snis-829.mp4")
-    # 'snis-829'
-    # >>> get_number("snis-829-C.mp4")
-    # 'snis-829'
-    # """
+    """ 获取番号
+    """
     try:
         basename = os.path.basename(file_path)
         (filename, ext) = os.path.splitext(basename)
@@ -101,16 +78,16 @@ def get_number(file_path: str) -> str:
             return file_number.upper()
         else:  # 提取不含减号-的番号，FANZA CID
             # 欧美番号匹配规则
-            oumei = re.search(r'[a-zA-Z]+\.\d{2}\.\d{2}\.\d{2}', file_path)
+            oumei = re.search(r'[a-zA-Z]+\.\d{2}\.\d{2}\.\d{2}', basename)
             if oumei:
                 return oumei.group()
             try:
                 return str(
                     re.findall(r'(.+?)\.',
-                               str(re.search('([^<>/\\\\|:""\\*\\?]+)\\.\\w+$', file_path).group()))).strip(
+                               str(re.search('([^<>/\\\\|:""\\*\\?]+)\\.\\w+$', basename).group()))).strip(
                     "['']").replace('_', '-')
             except:
-                return str(re.search(r'(.+?)\.', file_path)[0])
+                return str(re.search(r'(.+?)\.', basename)[0])
     except Exception as e:
         current_app.logger.error(e)
         return
@@ -184,7 +161,3 @@ def get_part(filepath: str):
             return part
     except:
         return
-
-# if __name__ == "__main__":
-#     import doctest
-#     doctest.testmod(raise_on_error=True)
