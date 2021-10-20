@@ -11,7 +11,7 @@ from ..service.taskservice import taskService
 from .scraper import core_main, moveFailedFolder
 from .mediaserver import refreshMediaServer
 from flask import current_app
-from ..utils.number_parser import parseNumber
+from ..utils.number_parser import FileNumInfo
 from ..utils.filehelper import cleanScrapingfile, video_type, cleanFolder, cleanFolderbyFilter
 
 
@@ -36,11 +36,8 @@ def findAllMovies(root, escape_folder):
 def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
     """ scrape single file
     """
-    # Normalized number, eg: 111xxx-222.mp4 -> xxx-222.mp4
-    n_number = parseNumber(file_path)
-    scrapingtag_cnsub = False
-    scrapingtag_cdnum = 0
     try:
+        num_info = FileNumInfo(file_path)
         movie_info = scrapingrecordService.queryByPath(file_path)
         # 查看单个文件刮削状态
         if not movie_info or (movie_info.status != 1 and movie_info.status != 3 and movie_info.status != 4):
@@ -59,17 +56,17 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
                         cleanFolderbyFilter(folder, filter)
             # 查询是否有额外设置
             if movie_info.scrapingname != '':
-                n_number = movie_info.scrapingname
+                num_info.num = movie_info.scrapingname
             if movie_info.cnsubtag:
-                scrapingtag_cnsub = True
+                num_info.chs_tag = True
             if movie_info.cdnum:
-                scrapingtag_cdnum = movie_info.cdnum
-            current_app.logger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, n_number))
+                num_info.updateCD(movie_info.cdnum)
+            current_app.logger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, num_info.num))
             movie_info.status = 4
-            movie_info.scrapingname = n_number
+            movie_info.scrapingname = num_info.num
             movie_info.updatetime = datetime.datetime.now()
             scrapingrecordService.commit()
-            (flag, new_path) = core_main(file_path, n_number, scrapingtag_cnsub, scrapingtag_cdnum, conf)
+            (flag, new_path) = core_main(file_path, num_info, conf)
             if flag:
                 movie_info.status = 1
                 (filefolder, newname) = os.path.split(new_path)

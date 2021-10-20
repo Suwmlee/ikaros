@@ -525,18 +525,6 @@ def translate(
     return trans_result
 
 
-# ========================================================================是否为无码
-def is_uncensored(number):
-    if re.match('^\d{4,}', number) or re.match('n\d{4}', number) or 'HEYZO' in number.upper():
-        return True
-    uncensored_prefix = "S2M,BT,LAF,SMD"
-    prefix_list = uncensored_prefix.split(',')
-    for pre in prefix_list:
-        if pre.upper() in number.upper():
-            return True
-    return False
-
-
 # 从浏览器中导出网站登录验证信息的cookies，能够以会员方式打开游客无法访问到的页面
 # 示例: FC2-755670 url https://javdb9.com/v/vO8Mn
 # json 文件格式
