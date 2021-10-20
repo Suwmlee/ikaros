@@ -128,7 +128,7 @@ def download_file_with_filename(url, filename, path):
         except requests.exceptions.ConnectTimeout:
             i += 1
             current_app.logger.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
-    current_app.logger.info('[-]Connect Failed! Please check your Proxy or Network!')
+    current_app.logger.error('[-]Connect Failed! Please check your Proxy or Network!')
     return False
 
 
@@ -367,9 +367,9 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
         return False, ''
 
 
-def core_main(file_path, num_info: FileNumInfo, conf: _ScrapingConfigs):
+def core_main(filepath, num_info: FileNumInfo, conf: _ScrapingConfigs):
     """ 开始刮削
-    :param file_path    文件路径
+    :param filepath    文件路径
     :param scrapingnum  使用的番号
     :param cnsubtag     是否增加中文标记
     :param cdnum        是否增加多集标识
@@ -380,22 +380,20 @@ def core_main(file_path, num_info: FileNumInfo, conf: _ScrapingConfigs):
     --中文/无码等额外信息
     --下载封面--下载预告--下载剧照
     --裁剪出Poster--增加水印
-    --生成nfo--移动视频/字幕
+    --生成nfo
+    --移动视频/字幕
 
     """
-    # =======================================================================初始化所需变量
     chs_tag = num_info.chs_tag
     uncensored_tag = num_info.uncensored_tag
     leak_tag = num_info.leak_tag
 
-    # 影片的路径 绝对路径
-    filepath = file_path
     number = num_info.num
     json_data = get_data_from_json(number, conf.website_priority, conf.naming_rule, conf.async_request)
 
     # Return if blank dict returned (data not found)
     if not json_data:
-        current_app.logger.info('[-]Movie Data not found!')
+        current_app.logger.error('[-]Movie Data not found!')
         moveFailedFolder(filepath)
         return False, ''
 
@@ -472,5 +470,5 @@ def core_main(file_path, num_info: FileNumInfo, conf: _ScrapingConfigs):
         if not create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
             moveFailedFolder(filepath)
         
-        return True, file_path
+        return True, filepath
     return False, ''

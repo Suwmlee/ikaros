@@ -120,7 +120,7 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
         # Get multi-threaded crawling response
         # !!! Still follow sources sort not the first response
         for source in sources:
-            current_app.logger.info('[-] Check', source)
+            current_app.logger.debug('[-] Check', source)
             json_data = json.loads(pool.apply_async(func_mapping[source], (file_number,)).get())
             # if any service return a valid return, break
             if get_data_state(json_data):
@@ -131,7 +131,7 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
     else:
         for source in sources:
             try:
-                current_app.logger.info('[+] Select Source: ' + source)
+                current_app.logger.debug('[+] Select Source: ' + source)
                 json_data = json.loads(func_mapping[source](file_number))
                 # if any service return a valid return, break
                 if get_data_state(json_data):

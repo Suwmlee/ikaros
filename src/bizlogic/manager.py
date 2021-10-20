@@ -107,7 +107,8 @@ def startScrapingAll(folder=''):
     total = str(len(movie_list))
     taskService.updateTaskFinished(0, 'scrape')
     taskService.updateTaskTotal(total, 'scrape')
-    current_app.logger.debug('[+]Find  ' + total+'  movies')
+    current_app.logger.info("[*]======================================================")
+    current_app.logger.info('[+]Find  ' + total+'  movies')
 
     for movie_path in movie_list:
         task = taskService.getTask('scrape')
@@ -115,7 +116,7 @@ def startScrapingAll(folder=''):
             return
         taskService.updateTaskFinished(count, 'scrape')
         percentage = str(count / int(total) * 100)[:4] + '%'
-        current_app.logger.info('[!] - ' + percentage + ' [' + str(count) + '/' + total + '] -')
+        current_app.logger.debug('[!] - ' + percentage + ' [' + str(count) + '/' + total + '] -')
         create_data_and_move(movie_path, conf)
         count = count + 1
 
@@ -126,6 +127,7 @@ def startScrapingAll(folder=''):
         refreshMediaServer(conf.refresh_url)
 
     current_app.logger.info("[+] All scraping finished!!!")
+    current_app.logger.info("[*]======================================================")
 
 
 def startScrapingSingle(movie_path: str):
