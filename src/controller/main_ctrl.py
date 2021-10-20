@@ -20,11 +20,13 @@ from flask import current_app
 # executor = ThreadPoolExecutor(2)
 
 # Intro
+
+
 @web.route("/api/intro", methods=['GET'])
 def intro():
     try:
         localPath = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(localPath,"..","..", 'README.md'), encoding='utf-8') as f:
+        with open(os.path.join(localPath, "..", "..", 'README.md'), encoding='utf-8') as f:
             content = f.read()
         return content
     except Exception as err:
@@ -38,7 +40,8 @@ def version():
         core_num = current_app.config['VERSION']
         version_info = "core_" + core_num
         localPath = os.path.dirname(os.path.abspath(__file__))
-        webpath = os.path.join(localPath,"..","..", "web", "static", 'version.txt')
+        webpath = os.path.join(localPath, "..", "..",
+                               "web", "static", 'version.txt')
         if os.path.exists(webpath):
             with open(webpath, encoding='utf-8') as f:
                 web_sha = f.read()
@@ -137,12 +140,12 @@ def startScraping():
 def startTransfer():
     try:
         content = request.get_json()
-        transfer.ctrlTransfer(content['source_folder'], content['output_folder'], 
-                               content['linktype'], content['soft_prefix'], 
-                               content['escape_folder'],
-                               content['fix_series'],
-                               content['clean_others'], content['replace_CJK'],
-                               content.get('refresh_url'))
+        transfer.ctrlTransfer(content['source_folder'], content['output_folder'],
+                              content['linktype'], content['soft_prefix'],
+                              content['escape_folder'],
+                              content['fix_series'],
+                              content['clean_others'], content['replace_CJK'],
+                              content.get('refresh_url'))
         return Response(status=200)
     except Exception as err:
         current_app.logger.error(err)
@@ -188,7 +191,8 @@ def renamebyRegex():
 def renamebyReplace():
     try:
         content = request.get_json()
-        ret = rename.rename(content['source_folder'], content['base'], content['newfix'])
+        ret = rename.rename(content['source_folder'],
+                            content['base'], content['newfix'])
         return json.dumps(ret)
     except Exception as err:
         current_app.logger.error(err)

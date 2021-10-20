@@ -102,7 +102,7 @@ def autoTransfer(real_path: str):
             transfer(conf.source_folder, conf.output_folder,
                      conf.linktype, conf.soft_prefix,
                      conf.escape_folder, real_path,
-                     False, conf.replace_CJK)
+                     False, conf.replace_CJK, conf.fix_series)
             if conf.refresh_url:
                 refreshMediaServer(conf.refresh_url)
             break
@@ -110,19 +110,19 @@ def autoTransfer(real_path: str):
 
 def ctrlTransfer(src_folder, dest_folder, 
                 linktype, prefix, escape_folders,
-                renameflag,
+                fix_series,
                 clean_others,
                 replace_CJK,
                 refresh_url):
     transfer(src_folder, dest_folder, linktype, prefix,
             escape_folders, '', 
             clean_others, replace_CJK,
-            renameflag)
+            fix_series)
     if refresh_url:
         refreshMediaServer(refresh_url)
 
 
-def transfer(src_folder, dest_folder, 
+def transfer(src_folder, dest_folder,
              linktype, prefix,
              escape_folders, top_files='',
              clean_others_tag = True,
