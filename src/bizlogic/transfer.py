@@ -6,11 +6,11 @@ import pathlib
 import re
 
 from .manager import findAllMovies
-from .rename import extractEpNum, matchSeason, matchEpPart
 from .mediaserver import refreshMediaServer
 from ..service.configservice import transConfigService
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
+from ..utils.regex import extractEpNum, matchSeason, matchEpPart
 from ..utils.filehelper import video_type, ext_type, replaceRegex, cleanFolderWithoutSuffix,\
      forceHardlink, forceSymlink, replaceCJK, cleanbyNameSuffix, cleanExtraMedia, copySubs
 from flask import current_app
