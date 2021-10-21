@@ -5,7 +5,6 @@ import os
 import pathlib
 import re
 
-from .manager import findAllMovies
 from .mediaserver import refreshMediaServer
 from ..service.configservice import transConfigService
 from ..service.recordservice import transrecordService
@@ -92,6 +91,33 @@ class FileInfo():
         current_app.logger.info("替换后:   {}".format(newname))
 
 
+def findAllVideos(root, src_folder, escape_folder, mode=1):
+    """ find all videos
+    mode:
+    :1  返回 FileInfo 合集
+    :2  返回 realPath 合集
+    """
+    if os.path.basename(root) in escape_folder:
+        return []
+    total = []
+    dirs = os.listdir(root)
+    for entry in dirs:
+        f = os.path.join(root, entry)
+        if os.path.isdir(f):
+            total += findAllVideos(f, src_folder, escape_folder, mode)
+        elif os.path.splitext(f)[1].lower() in video_type:
+            if mode == 1:
+                fi = FileInfo(f)
+                midfolder = fi.realfolder.replace(src_folder, '').lstrip("\\").lstrip("/")
+                fi.updateMidFolder(midfolder)
+                if fi.topfolder != '.':
+                    fi.parse()
+                total.append(fi)
+            elif mode == 2:
+                total.append(f)
+    return total
+
+
 def autoTransfer(real_path: str):
     """ 自动转移
     """
@@ -141,14 +167,15 @@ def transfer(src_folder, dest_folder,
         movie_list = []
 
         if top_files == '':
-            movie_list = findAllMovies(src_folder, re.split("[,，]", escape_folders))
+            movie_list = findAllVideos(src_folder, src_folder, re.split("[,，]", escape_folders))
         else:
             if os.path.exists(top_files):
                 clean_others_tag = False
                 if os.path.isdir(top_files):
-                    movie_list = findAllMovies(top_files, re.split("[,，]", escape_folders))
+                    movie_list = findAllVideos(top_files, re.split("[,，]", escape_folders))
                 else:
-                    movie_list.append(top_files)
+                    tf = FileInfo(top_files)
+                    movie_list.append(tf)
 
         count = 0
         total = str(len(movie_list))
@@ -163,20 +190,11 @@ def transfer(src_folder, dest_folder,
             os.makedirs(dest_folder)
 
         if clean_others_tag:
-            dest_list = findAllMovies(dest_folder, [])
+            dest_list = findAllVideos(dest_folder, '', [], 2)
         else:
             dest_list = []
 
-        todoFiles = []
-        for movie_path in movie_list:
-            fi = FileInfo(movie_path)
-            midfolder = fi.realfolder.replace(src_folder, '').lstrip("\\").lstrip("/")
-            fi.updateMidFolder(midfolder)
-            if fi.topfolder != '.':
-                fi.parse()
-            todoFiles.append(fi)
-
-        for currentfile in todoFiles:
+        for currentfile in movie_list:
             task = taskService.getTask('transfer')
             if task.status == 0:
                 return False
@@ -184,76 +202,11 @@ def transfer(src_folder, dest_folder,
             taskService.updateTaskFinished(count, 'transfer')
             current_app.logger.debug('[!] - ' + str(count) + '/' + total + ' -')
             current_app.logger.debug("[+] start check [{}] ".format(currentfile.realpath))
-            # TODO: 此处查询之前转移的记录
-            # 可针对记录进行修正 season等
-            # 类似scraping操作
-            transrecordService.add(currentfile.realpath)
-
+           
             # 修正后给链接使用的源地址
             link_path = os.path.join(prefix, currentfile.midfolder, currentfile.realname)
-            # 处理 midfolder 内特殊内容
-            # CMCT组视频文件命名比文件夹命名更好
-            if 'CMCT' in currentfile.topfolder:
-                matches = [x for x in todoFiles if x.topfolder == currentfile.topfolder]
-                # 检测是否有剧集标记
-                epfiles = [x for x in matches if x.isepisode]
-                if len(matches) > 0 and len(epfiles) == 0:
-                    namingfiles = [x for x in matches if 'CMCT' in x.name]
-                    if len(namingfiles) == 1:
-                        # 非剧集
-                        for m in matches:
-                            m.topfolder = namingfiles[0].name
-                    current_app.logger.debug("[-] handling cmct midfolder [{}] ".format(midfolder))
-            # topfolder 替换中文
-            if replace_CJK_tag:
-                minlen = 27
-                tempmid = currentfile.topfolder
-                tempmid = replaceCJK(tempmid)
-                tempmid = replaceRegex(tempmid, '^s(\d{2})-s(\d{2})')
-                # 可增加过滤词
-                grouptags = ['cmct', 'wiki', 'frds', '1080p', 'x264', 'x265']
-                for gt in grouptags:
-                    if gt in tempmid.lower():
-                        minlen += len(gt)
-                if len(tempmid) > minlen:
-                    current_app.logger.debug("[-] replace CJK [{}] ".format(tempmid))
-                    currentfile.topfolder = tempmid
-            # 修正剧集命名
-            if fixseries_tag:
-                # 判断剧集标记
-                if currentfile.isepisode:
-                    current_app.logger.debug("[-] fix series name")
-                    # 查询 同级目录下所有视频
-                    matches = [x for x in todoFiles if x.folders == currentfile.folders]
-                    if len(matches) > 0:
-                        # 检查剧集编号，超过2个且不同，连续？才继续处理
-                        # 自动推送只有单文件
-
-                        # 检测视频上级目录是否有 season 标记
-                        # 上级目录可能是 top 或 second 甚至更低层目录
-                        dirfolder = currentfile.folders[len(currentfile.folders)-1]
-                        # 根据 season 标记 更新 secondfolder
-                        seasonnum = matchSeason(dirfolder)
-                        if seasonnum:
-                            currentfile.secondfolder = "Season " + str(seasonnum)
-                            currentfile.fixEpName(seasonnum)
-                        else:
-                            # 如果存在大量重复 epnum
-                            # 如果检测不到 seasonnum 可能是多季？
-                            if currentfile.secondfolder == '':
-                                seasonnum = 1
-                                currentfile.secondfolder = "Season " + str(seasonnum)
-                                currentfile.fixEpName(seasonnum)
-                            else:
-                                if '花絮' in dirfolder and currentfile.topfolder != '.':
-                                    currentfile.secondfolder = "extras"
-                                    seasonnum = 0
-                                    currentfile.fixEpName(seasonnum)
-            # 检测是否是特殊的导评/花絮内容
-            # TODO 更多关于花絮的规则
-            if currentfile.name == "导演访谈":
-                if currentfile.secondfolder == '' and currentfile.topfolder != '.':
-                    currentfile.secondfolder = "extras"
+            # 优化命名
+            naming(currentfile, movie_list, replace_CJK_tag, fixseries_tag)
 
             flag_done = False
             if currentfile.topfolder == '.':
@@ -291,7 +244,7 @@ def transfer(src_folder, dest_folder,
 
         if clean_others_tag:
             for torm in dest_list:
-                current_app.logger.info("[!] clean extra file: [{}]".format(torm))
+                current_app.logger.info("[!] remove other file: [{}]".format(torm))
                 os.remove(torm)
             cleanExtraMedia(dest_folder)
             cleanFolderWithoutSuffix(dest_folder, video_type)
@@ -303,3 +256,83 @@ def transfer(src_folder, dest_folder,
     taskService.updateTaskStatus(1, 'transfer')
 
     return True
+
+
+def naming(currentfile: FileInfo, movie_list: list, replace_CJK_tag, fixseries_tag):
+    # TODO: 此处查询之前转移的记录
+    # 可针对记录进行修正 season等
+    # 类似scraping操作
+    currentrecord = transrecordService.add(currentfile.realpath)
+    # 处理 midfolder 内特殊内容
+    # CMCT组视频文件命名比文件夹命名更好
+    if 'CMCT' in currentfile.topfolder:
+        matches = [x for x in movie_list if x.topfolder == currentfile.topfolder]
+        # 检测是否有剧集标记
+        epfiles = [x for x in matches if x.isepisode]
+        if len(matches) > 0 and len(epfiles) == 0:
+            namingfiles = [x for x in matches if 'CMCT' in x.name]
+            if len(namingfiles) == 1:
+                # 非剧集
+                for m in matches:
+                    m.topfolder = namingfiles[0].name
+            current_app.logger.debug("[-] handling cmct midfolder [{}] ".format(currentfile.midfolder))
+    # topfolder 替换中文
+    if replace_CJK_tag:
+        minlen = 27
+        tempmid = currentfile.topfolder
+        tempmid = replaceCJK(tempmid)
+        tempmid = replaceRegex(tempmid, '^s(\d{2})-s(\d{2})')
+        # TODO 可增加过滤词
+        grouptags = ['cmct', 'wiki', 'frds', '1080p', 'x264', 'x265']
+        for gt in grouptags:
+            if gt in tempmid.lower():
+                minlen += len(gt)
+        if len(tempmid) > minlen:
+            current_app.logger.debug("[-] replace CJK [{}] ".format(tempmid))
+            currentfile.topfolder = tempmid
+    # 修正剧集命名
+    if fixseries_tag:
+        # 判断剧集标记
+        if currentfile.isepisode or currentrecord.isepisode:
+            current_app.logger.debug("[-] fix series name")
+            # 检测是否有修正记录
+            if currentrecord.season and currentrecord.episode:
+                current_app.logger.debug("[-] directly use record")
+                currentfile.secondfolder = "Season " + str(currentrecord.season)
+                try:
+                    currentfile.fixEpName(currentrecord.season)
+                except:
+                    currentfile.name = "S%02dE%02d" % (currentrecord.season, currentrecord.episode)
+
+            # 查询 同级目录下所有视频
+            matches = [x for x in movie_list if x.folders == currentfile.folders]
+            if len(matches) > 0:
+                # 检查剧集编号，超过2个且不同，连续？才继续处理
+                # 自动推送只有单文件
+
+                # 检测视频上级目录是否有 season 标记
+                # 上级目录可能是 top 或 second 甚至更低层目录
+                dirfolder = currentfile.folders[len(currentfile.folders)-1]
+                # 根据 season 标记 更新 secondfolder
+                seasonnum = matchSeason(dirfolder)
+                if seasonnum:
+                    currentfile.secondfolder = "Season " + str(seasonnum)
+                    currentfile.fixEpName(seasonnum)
+                else:
+                    # 如果存在大量重复 epnum
+                    # 如果检测不到 seasonnum 可能是多季？
+                    if currentfile.secondfolder == '':
+                        seasonnum = 1
+                        currentfile.secondfolder = "Season " + str(seasonnum)
+                        currentfile.fixEpName(seasonnum)
+                    else:
+                        if '花絮' in dirfolder and currentfile.topfolder != '.':
+                            currentfile.secondfolder = "extras"
+                            seasonnum = 0
+                            currentfile.fixEpName(seasonnum)
+
+    # 检测是否是特殊的导评/花絮内容
+    # TODO 更多关于花絮的规则
+    if currentfile.name == "导演访谈":
+        if currentfile.secondfolder == '' and currentfile.topfolder != '.':
+            currentfile.secondfolder = "extras"

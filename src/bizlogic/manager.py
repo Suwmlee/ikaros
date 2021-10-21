@@ -16,9 +16,7 @@ from ..utils.filehelper import cleanScrapingfile, video_type, cleanFolder, clean
 
 
 def findAllMovies(root, escape_folder):
-    """ collect movies
-    
-    won't check link path
+    """ find all movies
     """
     if os.path.basename(root) in escape_folder:
         return []

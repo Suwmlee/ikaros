@@ -367,12 +367,10 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
         return False, ''
 
 
-def core_main(filepath, num_info: FileNumInfo, conf: _ScrapingConfigs):
+def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
     """ 开始刮削
-    :param filepath    文件路径
-    :param scrapingnum  使用的番号
-    :param cnsubtag     是否增加中文标记
-    :param cdnum        是否增加多集标识
+    :param filepath     文件路径
+    :param numinfo      番号信息
     :param conf         刮削配置
 
     番号
@@ -384,11 +382,11 @@ def core_main(filepath, num_info: FileNumInfo, conf: _ScrapingConfigs):
     --移动视频/字幕
 
     """
-    chs_tag = num_info.chs_tag
-    uncensored_tag = num_info.uncensored_tag
-    leak_tag = num_info.leak_tag
+    chs_tag = numinfo.chs_tag
+    uncensored_tag = numinfo.uncensored_tag
+    leak_tag = numinfo.leak_tag
 
-    number = num_info.num
+    number = numinfo.num
     json_data = get_data_from_json(number, conf.website_priority, conf.naming_rule, conf.async_request)
 
     # Return if blank dict returned (data not found)
@@ -415,14 +413,14 @@ def core_main(filepath, num_info: FileNumInfo, conf: _ScrapingConfigs):
         # 创建文件夹
         path = createFolder(json_data, conf)
         # 文件名
-        prefilename = num_info.fixedName()
+        prefilename = numinfo.fixedName()
 
         if imagecut == 3:
             if not download_poster(path, prefilename, json_data.get('cover_small')):
                 moveFailedFolder(filepath)
         if not download_cover(json_data.get('cover'), prefilename, path):
             moveFailedFolder(filepath)
-        if num_info.isPartOneOrSingle():
+        if numinfo.isPartOneOrSingle():
             try:
                 if conf.extrafanart_enable and json_data.get('extrafanart'):
                     download_extrafanart(json_data.get('extrafanart'), path, conf.extrafanart_folder)
@@ -442,7 +440,7 @@ def core_main(filepath, num_info: FileNumInfo, conf: _ScrapingConfigs):
         return flag, newpath
     elif conf.main_mode == 2:
         path = createFolder(json_data, conf)
-        prefilename = num_info.fixedName()
+        prefilename = numinfo.fixedName()
         (flag, newpath) = paste_file_to_folder(filepath, path, prefilename, conf.link_type)
         return flag, newpath
     elif conf.main_mode == 3:
@@ -455,7 +453,7 @@ def core_main(filepath, num_info: FileNumInfo, conf: _ScrapingConfigs):
                 moveFailedFolder(filepath)
         if not download_cover(json_data.get('cover'), prefilename, path):
             moveFailedFolder(filepath)
-        if num_info.isPartOneOrSingle():
+        if numinfo.isPartOneOrSingle():
             try:
                 if conf.extrafanart_enable and json_data.get('extrafanart'):
                     download_extrafanart(json_data.get('extrafanart'), path, conf.extrafanart_folder)

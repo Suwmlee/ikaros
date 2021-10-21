@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import re
 from flask import current_app
 from ..utils.filehelper import video_type, ext_type
 from ..utils.regex import extractEpNum, matchEpPart, regexMatch
