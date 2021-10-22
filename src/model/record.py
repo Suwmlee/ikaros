@@ -55,6 +55,11 @@ class _ScrapingRecords(db.Model):
 
 
 class _TransRecords(db.Model):
+    """ 转移记录
+    status  0   
+            1   锁定
+            2   忽略
+    """
     __tablename__ = 'transrecords'
 
     id = Column(Integer, primary_key=True)
@@ -67,8 +72,8 @@ class _TransRecords(db.Model):
     topfolder = Column(String, default='')
     secondfolder = Column(String, default='')
     isepisode = Column(Boolean, default=False)
-    season = Column(Integer, default=0)
-    episode = Column(Integer, default=0)
+    season = Column(Integer, default=-1)
+    episode = Column(Integer, default=-1)
 
     linkpath = Column(String, default='')
     destpath = Column(String, default='')
@@ -85,6 +90,10 @@ class _TransRecords(db.Model):
             'srcpath': self.srcpath,
             'srcsize': self.srcsize,
             'success': self.success,
+            'status':self.status,
+            'isepisode':self.isepisode,
+            'season':self.season,
+            'episode':self.episode,
             'linkpath': self.linkpath,
             'destpath': self.destpath,
             'updatetime': self.updatetime.strftime("%H:%M:%S %m/%d/%Y")

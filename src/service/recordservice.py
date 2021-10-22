@@ -144,12 +144,16 @@ class TransRecordService():
             return None
         return info
 
-    def update(self, path, softpath, destpath):
+    def update(self, path, softpath, destpath, isepisode, season, epnum):
         info = self.queryByPath(path)
         if info:
             info.success = True
             info.linkpath = softpath
             info.destpath = destpath
+            if isepisode:
+                info.isepisode = isepisode
+                info.season = season
+                info.episode = epnum
             info.updatetime = datetime.datetime.now()
             db.session.commit()
 
