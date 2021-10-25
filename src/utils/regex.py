@@ -86,6 +86,10 @@ def matchEpPart(basename):
     ' EP01 '
     >>> matchEpPart("Fate Zero EP01 [BluRay 1920x1080p 23.976fps x264-Hi10P FLAC PGSx2]")
     ' EP01 '
+    >>> matchEpPart("[AI-Raws&ANK-Raws] Initial D First Stage 01 (BDRip 960x720 x264 DTS-HD Hi10P)[044D7040]")
+    ' 01 '
+    >>> matchEpPart("[AI-Raws&ANK-Raws] Initial D First Stage [05] (BDRip 960x720 x264 DTS-HD Hi10P)[044D7040]")
+    '[05]'
     
     >>> matchEpPart("Shadow.2021.E11.WEB-DL.4k.H265.60fps.AAC.2Audio")
     '.E11.'
@@ -105,10 +109,10 @@ def matchEpPart(basename):
     """
     regexs = [
         "第\d*[話话集]",
-        "\[(?:e|ep)?[0-9.\(videoa\)]*\]",
         "[ ]ep?[0-9.\(videoa\)]*[ ]",
         "[.]ep?[0-9\(videoa\)]*[.]",
-        "[ ]\d{2,3}(?:\.\d|v\d)?[\(videoa\)]*[ ]"
+        "[ ]\d{2,3}(?:\.\d|v\d)?[\(videoa\)]*[ ]",
+        "\[(?:e|ep)?[0-9.v]*(?:\(oa\)|\(video\))?\]",
     ]
     for regex in regexs:
         results = regexMatch(basename, regex)
