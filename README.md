@@ -1,7 +1,7 @@
 
-# Ikaros
+# ikaros
 
-打通transmission与emby，过滤下载文件自动创建链接地址，自动刮削JAV目录，推送emby库刷新
+打通transmission与emby，过滤下载文件自动软/硬链接，自动刮削JAV目录，推送emby库刷新
 
 - 软/硬链接文件
 - 优化/批量处理文件名
@@ -9,9 +9,16 @@
 
 #### 安装
 
-本项目仅后端，需要搭配[web端](https://github.com/Suwmlee/ikaros-web)使用
+本项目仅后端，需要搭配[web端](https://github.com/Suwmlee/ikaros-web)
+可自行运行或使用编译好的文件
 
-推荐[docker](https://registry.hub.docker.com/r/suwmlee/ikaros)安装
+- 使用编译好的[web  release](https://github.com/Suwmlee/Spike/tree/release)
+  1. 将`index.html`文件放到`web/templates`
+  2. 将除`index.html`外的文件放到`web/static`
+  3. `pip install -r requirements.txt`
+  4. `python app.py`
+
+- [docker](https://registry.hub.docker.com/r/suwmlee/ikaros)(推荐)
 ```sh
 docker run -d \
   --name=ikaros \
@@ -22,9 +29,14 @@ docker run -d \
   suwmlee/ikaros:latest
 ```
 
+- 配置`transmission`下载完成运行脚本
+  - `scripts`目录下`trcomplete.sh`
+  - 在transmission配置中指定脚本路径即可
+__注意:__ 默认请求 127.0.0.1,需根据实际情况更改
+
 #### 刮削配置-软链接前缀说明
 
-推荐新人选择硬链接
+不确定可以选择硬链接
 
 |                       | 1.mkv      | 软链接配置 -->  | 软链接文件 | 实际指向地址      | 修正前缀 | 修正后实际指向地址 |
 | --------------------- | ---------- | --------------- | ---------- | ----------------- | -------- | ------------------ |
