@@ -25,6 +25,7 @@ docker run -d \
   -p 12346:12346 \
   -v /path/to/media:/media \
   -v /path/to/data:/ikaros/database \
+  -v /path/to/scripts:/ikaros/scripts \
   --restart unless-stopped \
   suwmlee/ikaros:latest
 ```
