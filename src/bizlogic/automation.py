@@ -89,8 +89,10 @@ def runTask(client_path: str):
             startScrapingAll(real_path)
         else:
             startScrapingSingle(real_path)
-    if flag_transfer:
+    elif flag_transfer:
         autoTransfer(real_path)
+    else:
+        current_app.logger.error("无匹配的目录")
 
 
 def clean():

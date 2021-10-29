@@ -175,9 +175,13 @@ def transfer(src_folder, dest_folder,
             if os.path.exists(top_files):
                 clean_others_tag = False
                 if os.path.isdir(top_files):
-                    movie_list = findAllVideos(top_files, re.split("[,，]", escape_folders))
+                    movie_list = findAllVideos(top_files, src_folder, re.split("[,，]", escape_folders))
                 else:
                     tf = FileInfo(top_files)
+                    midfolder = tf.realfolder.replace(src_folder, '').lstrip("\\").lstrip("/")
+                    tf.updateMidFolder(midfolder)
+                    if tf.topfolder != '.':
+                        tf.parse()
                     movie_list.append(tf)
 
         count = 0
@@ -311,7 +315,7 @@ def naming(currentfile: FileInfo, movie_list: list, replace_CJK_tag, fixseries_t
             if currentfile.season and currentfile.epnum:
                 current_app.logger.debug("[-] directly use record")
                 if currentfile.season == 0:
-                    currentfile.secondfolder = "extras"
+                    currentfile.secondfolder = "Specials"
                 else:
                     currentfile.secondfolder = "Season " + str(currentfile.season)
                 try:
@@ -342,7 +346,7 @@ def naming(currentfile: FileInfo, movie_list: list, replace_CJK_tag, fixseries_t
                             currentfile.fixEpName(1)
                         else:
                             if '花絮' in dirfolder and currentfile.topfolder != '.':
-                                currentfile.secondfolder = "extras"
+                                currentfile.secondfolder = "Specials"
                                 currentfile.season = 0
                                 currentfile.fixEpName(0)
 
