@@ -1,3 +1,10 @@
+## [1.8.5](https://github.com/Suwmlee/ikaros/compare/v1.8.4...v1.8.5) (2021-10-29)
+
+
+### Bug Fixes
+
+* auto transfer scan videos ([0ee8d03](https://github.com/Suwmlee/ikaros/commit/0ee8d03930f72a59fbbdc847871c83c49ad1180e))
+
 ## [1.8.4](https://github.com/Suwmlee/ikaros/compare/v1.8.3...v1.8.4) (2021-10-25)
 
 
