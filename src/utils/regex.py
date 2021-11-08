@@ -90,7 +90,7 @@ def matchEpPart(basename):
     ' 01 '
     >>> matchEpPart("[AI-Raws&ANK-Raws] Initial D First Stage [05] (BDRip 960x720 x264 DTS-HD Hi10P)[044D7040]")
     '[05]'
-    
+
     >>> matchEpPart("Shadow.2021.E11.WEB-DL.4k.H265.60fps.AAC.2Audio")
     '.E11.'
     >>> matchEpPart("Shadow 2021 E11 WEB-DL 4k H265 AAC 2Audio")
@@ -103,6 +103,8 @@ def matchEpPart(basename):
     '.E14(OA).'
     >>> matchEpPart("S03/Person.of.Interest.EP01.2013.1080p.Blu-ray.x265.10bit.AC3")
     '.EP01.'
+    >>> matchEpPart("Slam.Dunk.22.Ma10p.1080p.x265.flac")
+    '.22.'
 
     >>> matchEpPart("Person.of.Interest.S03E01.2013.1080p.Blu-ray.x265.10bit.AC3") is None
     True
@@ -110,7 +112,8 @@ def matchEpPart(basename):
     regexs = [
         "第\d*[話话集]",
         "[ ]ep?[0-9.\(videoa\)]*[ ]",
-        "[.]ep?[0-9\(videoa\)]*[.]",
+        "\.ep?[0-9\(videoa\)]*\.",
+        "\.\d{2,3}(?:\.\d|v\d)?[\(videoa\)]*\.",
         "[ ]\d{2,3}(?:\.\d|v\d)?[\(videoa\)]*[ ]",
         "\[(?:e|ep)?[0-9.v]*(?:\(oa\)|\(video\))?\]",
     ]
