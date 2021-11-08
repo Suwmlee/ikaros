@@ -1,11 +1,13 @@
 
 # ikaros
 
-打通`transmission`/`qBittorrent`与`emby`，过滤下载文件自动创建软/硬链接，自动刮削JAV目录，推送emby库刷新
+关联`transmission`/`qBittorrent`与`emby`，下载任务完成后，自动筛选文件创建软/硬链接，自动刮削JAV目录，推送emby库刷新。
 
-- 软/硬链接文件
-- 优化/批量处理文件名
+- 批量软/硬链接
+- 批量处理文件名，优化剧集命名
 - JAV刮削
+- 下载完成后脚本
+- 自动化任务
 
 #### 安装
 
@@ -30,9 +32,9 @@ docker run -d \
   suwmlee/ikaros:latest
 ```
 
-- 配置`transmission`/`qBittorrent`下载完成运行脚本
+- 配置`transmission`/`qBittorrent`下载完成脚本
   - `scripts`目录下`trcomplete.sh`/`trcomplete.sh`
-  - 在配置中指定脚本路径即可
+  - 在下载软件配置内指定脚本路径即可
 __注意:__ 默认请求 127.0.0.1,需根据实际情况更改
 
 #### 刮削配置-软链接前缀说明
