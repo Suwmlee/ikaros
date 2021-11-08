@@ -1,3 +1,10 @@
+## [1.8.6](https://github.com/Suwmlee/ikaros/compare/v1.8.5...v1.8.6) (2021-11-08)
+
+
+### Bug Fixes
+
+* match ep name ([4385336](https://github.com/Suwmlee/ikaros/commit/438533604059a655c3255a5c659a2d1ecde97317))
+
 ## [1.8.5](https://github.com/Suwmlee/ikaros/compare/v1.8.4...v1.8.5) (2021-10-29)
 
 
