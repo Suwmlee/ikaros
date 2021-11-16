@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/Suwmlee/ikaros/compare/v1.8.7...v1.9.0) (2021-11-16)
+
+
+### Features
+
+* **scrapinglib:** update mapping info ([f0b46b4](https://github.com/Suwmlee/ikaros/commit/f0b46b4b59e4a6c7622e5a509f954a3294fe61a9))
+
 ## [1.8.7](https://github.com/Suwmlee/ikaros/compare/v1.8.6...v1.8.7) (2021-11-16)
 
 
