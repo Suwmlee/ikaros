@@ -236,9 +236,13 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
     info_mapping_data = etree.parse(infoPath)
     try:
         def mappingActor(src):
+            if not src:
+                return src
             tmp = actor_mapping_data.xpath('a[contains(@keyword, $name)]/@jp', name=src)
             return tmp[0] if tmp else src
         def mappingInfo(src):
+            if not src:
+                return src
             tmp = info_mapping_data.xpath('a[contains(@keyword, $name)]/@jp', name=src)
             return tmp[0] if tmp else src
 
