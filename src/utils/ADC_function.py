@@ -10,6 +10,8 @@ import uuid
 import mechanicalsoup
 from urllib.parse import urljoin
 from http.cookies import SimpleCookie
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from flask import current_app
 from ..service.configservice import scrapingConfService
 
@@ -79,6 +81,56 @@ def post_html(url: str, query: dict, headers: dict = None) -> requests.Response:
             current_app.logger.error(e)
     current_app.logger.info("[-]Connect Failed! Please check your Proxy or Network!")
 
+G_DEFAULT_TIMEOUT = 10 # seconds
+
+class TimeoutHTTPAdapter(HTTPAdapter):
+    def __init__(self, *args, **kwargs):
+        self.timeout = G_DEFAULT_TIMEOUT
+        if "timeout" in kwargs:
+            self.timeout = kwargs["timeout"]
+            del kwargs["timeout"]
+        super().__init__(*args, **kwargs)
+    def send(self, request, **kwargs):
+        timeout = kwargs.get("timeout")
+        if timeout is None:
+            kwargs["timeout"] = self.timeout
+        return super().send(request, **kwargs)
+
+#  with keep-alive feature
+def get_html_session(url:str = None, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None):
+    configProxy = configProxy = scrapingConfService.getProxySetting()
+    session = requests.Session()
+    if isinstance(cookies, dict) and len(cookies):
+        requests.utils.add_dict_to_cookiejar(session.cookies, cookies)
+    retries = Retry(total=configProxy.retry, connect=configProxy.retry, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
+    session.mount("https://", TimeoutHTTPAdapter(max_retries=retries, timeout=configProxy.timeout))
+    session.mount("http://", TimeoutHTTPAdapter(max_retries=retries, timeout=configProxy.timeout))
+    if configProxy.enable:
+        session.proxies = configProxy.proxies()
+    headers = {"User-Agent": ua or G_USER_AGENT}
+    session.headers = headers
+    try:
+        if isinstance(url, str) and len(url):
+            result = session.get(str(url))
+        else: # 空url参数直接返回可重用session对象，无需设置return_type
+            return session
+        if not result.ok:
+            return None
+        if return_type == "object":
+            return result
+        elif return_type == "content":
+            return result.content
+        elif return_type == "session":
+            return result, session
+        else:
+            result.encoding = encoding or "utf-8"
+            return result.text
+    except requests.exceptions.ProxyError:
+        print("[-]get_html_session() Proxy error! Please check your Proxy")
+    except Exception as e:
+        print(f"[-]get_html_session() failed. {e}")
+    return None
+
 
 def get_html_by_browser(url, cookies: dict = None, ua: str = None, return_type: str = None):
     browser = mechanicalsoup.StatefulBrowser(user_agent=G_USER_AGENT if ua is None else ua)
@@ -123,6 +175,12 @@ def get_html_by_form(url, form_name: str = None, fields: dict = None, cookies: d
         return response, browser
     else:
         return response.text
+
+
+def is_japanese(s) -> bool:
+    """ 日语简单检测
+    """
+    return bool(re.search(r'[\u3040-\u309F\u30A0-\u30FF\uFF66-\uFF9F]', s, re.UNICODE))
 
 
 def translate(
