@@ -1,3 +1,10 @@
+## [1.8.7](https://github.com/Suwmlee/ikaros/compare/v1.8.6...v1.8.7) (2021-11-16)
+
+
+### Bug Fixes
+
+* **regex:** match ep ([76fa0ae](https://github.com/Suwmlee/ikaros/commit/76fa0aecf5f29a2d11f4e685e433cab91142d1dc))
+
 ## [1.8.6](https://github.com/Suwmlee/ikaros/compare/v1.8.5...v1.8.6) (2021-11-08)
 
 
