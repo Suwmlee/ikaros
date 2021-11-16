@@ -1,3 +1,11 @@
+## [1.9.1](https://github.com/Suwmlee/ikaros/compare/v1.9.0...v1.9.1) (2021-11-16)
+
+
+### Bug Fixes
+
+* makedir when actor is null ([18797a3](https://github.com/Suwmlee/ikaros/commit/18797a313f5963636eb7790fa5025fadcef538fd))
+* **scrapinglib:** unknown actor ([38d71bd](https://github.com/Suwmlee/ikaros/commit/38d71bd47378603fb7c99260a4fae3678a54e279))
+
 # [1.9.0](https://github.com/Suwmlee/ikaros/compare/v1.8.7...v1.9.0) (2021-11-16)
 
 
