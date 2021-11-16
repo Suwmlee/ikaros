@@ -5,7 +5,7 @@ from lxml import etree
 import json
 import random
 from bs4 import BeautifulSoup
-from ..utils.ADC_function import load_javdb_cookies, get_html, translateTag_to_sc
+from ..utils.ADC_function import load_javdb_cookies, get_html
 from . import airav
 # import sys
 # import io
@@ -119,23 +119,10 @@ def getTag(a):
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
         result = html.xpath('//strong[contains(text(),"類別")]/../span/a/text()')
-        total = []
-        for i in result:
-            try:
-                total.append(translateTag_to_sc(i))
-            except:
-                pass
-        return total
-
+        return result
     except:
         result = html.xpath('//strong[contains(text(),"類別")]/../span/text()')
-        total = []
-        for i in result:
-            try:
-                total.append(translateTag_to_sc(i))
-            except:
-                pass
-        return total
+        return result
 
 def getCover_small(a, index=0):
     # same issue mentioned below,

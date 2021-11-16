@@ -48,10 +48,7 @@ def getCover_fc2com(htmlcode2): #获取厂商 #
 #     return result
 def getTag_fc2com(lx):
     result = lx.xpath("//a[@class='tag tagTag']/text()")
-    tag = []
-    for i in result:
-        tag.append(ADC_function.translateTag_to_sc(i))
-    return tag
+    return result
 def getYear_fc2com(release):
     try:
         result = re.search('\d{4}',release).group()

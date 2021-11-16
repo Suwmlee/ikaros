@@ -106,7 +106,7 @@ def getTag(htmlcode):  # 获取标签
     for i in a:
         if 'onmouseout' in str(i) or '多選提交' in str(i):
             continue
-        tag.append(translateTag_to_sc(i.get_text()))
+        tag.append(i.get_text())
     return tag
 
 def getExtrafanart(htmlcode):  # 获取剧照
