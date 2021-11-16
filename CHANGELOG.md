@@ -1,3 +1,11 @@
+# [1.10.0](https://github.com/Suwmlee/ikaros/compare/v1.9.1...v1.10.0) (2021-11-16)
+
+
+### Features
+
+* **scrapinglib:** update from AVDC ([6da4acf](https://github.com/Suwmlee/ikaros/commit/6da4acfc052f65ae65fc48b6407bb83e85acbf15))
+* **scrapinglib:** update storyline ([a771c44](https://github.com/Suwmlee/ikaros/commit/a771c448e1ffb3a310e92b023211c2feff7065d8))
+
 ## [1.9.1](https://github.com/Suwmlee/ikaros/compare/v1.9.0...v1.9.1) (2021-11-16)
 
 
