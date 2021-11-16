@@ -84,7 +84,7 @@ def main(number):
         dic = {
             'title': getTitle_fc2com(htmlcode2),
             'studio': getStudio_fc2com(htmlcode2),
-            'year': getYear_fc2com(getRelease_fc2com(htmlcode2)),   
+            'year': getYear_fc2com(getRelease_fc2com(htmlcode2)),
             'outline': '',  # getOutline_fc2com(htmlcode2),
             'runtime': '',
             'director': getStudio_fc2com(htmlcode2),
@@ -103,8 +103,7 @@ def main(number):
             'series': '',
         }
     except Exception as e:
-        from flask import current_app
-        current_app.logger.error(e)
+        ADC_function.current_app.logger.error(e)
         dic = {"title": ""}
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js

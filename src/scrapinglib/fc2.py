@@ -90,10 +90,11 @@ def main(number):
             actor = '素人'
         lx = etree.fromstring(htmlcode2, etree.HTMLParser())
         cover = str(lx.xpath("//div[@class='items_article_MainitemThumb']/span/img/@src")).strip(" ['']")
+        cover = ADC_function.urljoin('https://adult.contents.fc2.com', cover)
         dic = {
             'title': lx.xpath('/html/head/title/text()')[0],
             'studio': getStudio_fc2com(htmlcode2),
-            'year': getYear_fc2com(getRelease_fc2com(htmlcode2)),   
+            'year': getYear_fc2com(getRelease_fc2com(htmlcode2)),
             'outline': '',  # getOutline_fc2com(htmlcode2),
             'runtime': str(lx.xpath("//p[@class='items_article_info']/text()")[0]),
             'director': getStudio_fc2com(htmlcode2),
@@ -113,12 +114,12 @@ def main(number):
             'series': '',
         }
     except Exception as e:
-        from flask import current_app
-        current_app.logger.error(e)
+        ADC_function.current_app.logger.error(e)
         dic = {"title": ""}
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
 
 if __name__ == '__main__':
     print(main('FC2-1787685'))
+    print(main('FC2-2086710'))
 

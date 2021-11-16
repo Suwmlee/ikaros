@@ -1,50 +1,54 @@
 import sys
 sys.path.append('../')
 import json
-from bs4 import BeautifulSoup
 from lxml import html
 import re
 from ..utils.ADC_function import *
+from .storyline import getStoryline
+
+
+G_SITE = 'https://www.caribbeancom.com'
+
 
 def main(number: str) -> json:
     try:
-        caribbytes, browser = get_html_by_browser(
-            'https://www.caribbeancom.com/moviepages/'+number+'/index.html',
-            return_type="browser")
-
-        if not caribbytes or not caribbytes.ok:
+        url = f'{G_SITE}/moviepages/{number}/index.html'
+        result, session = get_html_session(url, return_type='session')
+        htmlcode = result.content.decode('euc-jp')
+        if not result or not htmlcode or '<title>404' in htmlcode or 'class="movie-info section"' not in htmlcode:
             raise ValueError("page not found")
 
-        lx = html.fromstring(str(browser.page))
+        lx = html.fromstring(htmlcode)
+        title = get_title(lx)
 
-        if not browser.page.select_one("#moviepages > div > div:nth-child(1) > div.movie-info.section"):
-            raise ValueError("page info not found")
+        dic = {
+            'title': title,
+            'studio': '加勒比',
+            'year': get_year(lx),
+            'outline': get_outline(lx, number, title),
+            'runtime': get_runtime(lx),
+            'director': '',
+            'actor': get_actor(lx),
+            'release': get_release(lx),
+            'number': number,
+            'cover': f'{G_SITE}/moviepages/{number}/images/l_l.jpg',
+            'tag': get_tag(lx),
+            'extrafanart': get_extrafanart(lx),
+            'label': get_series(lx),
+            'imagecut': 1,
+#            'actor_photo': get_actor_photo(lx, session),
+            'website': f'{G_SITE}/moviepages/{number}/index.html',
+            'source': 'carib.py',
+            'series': get_series(lx),
+        }
+        js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )
+        return js
+
     except Exception as e:
         current_app.logger.error(e)
         dic = {"title": ""}
         return json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'))
-    dic = {
-        'title': get_title(lx),
-        'studio': '加勒比',
-        'year': get_year(lx),
-        'outline': get_outline(lx),
-        'runtime': get_runtime(lx),
-        'director': '',
-        'actor': get_actor(lx),
-        'release': get_release(lx),
-        'number': number,
-        'cover': 'https://www.caribbeancom.com/moviepages/' + number + '/images/l_l.jpg',
-        'tag': get_tag(lx),
-        'extrafanart': get_extrafanart(lx),
-        'label': get_series(lx),
-        'imagecut': 1,
-#        'actor_photo': get_actor_photo(browser),
-        'website': 'https://www.caribbeancom.com/moviepages/' + number + '/index.html',
-        'source': 'carib.py',
-        'series': get_series(lx),
-    }
-    js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )
-    return js
+
 
 def get_title(lx: html.HtmlElement) -> str:
     return str(lx.xpath("//div[@class='movie-info section']/div[@class='heading']/h1[@itemprop='name']/text()")[0]).strip()
@@ -52,8 +56,12 @@ def get_title(lx: html.HtmlElement) -> str:
 def get_year(lx: html.HtmlElement) -> str:
     return lx.xpath("//li[2]/span[@class='spec-content']/text()")[0][:4]
 
-def get_outline(lx: html.HtmlElement) -> str:
-    return lx.xpath("//div[@class='movie-info section']/p[@itemprop='description']/text()")[0].strip()
+def get_outline(lx: html.HtmlElement, number: str, title: str) -> str:
+    o = lx.xpath("//div[@class='movie-info section']/p[@itemprop='description']/text()")[0].strip()
+    g = getStoryline(number, title)
+    if len(g):
+        return g
+    return o
 
 def get_release(lx: html.HtmlElement) -> str:
     return lx.xpath("//li[2]/span[@class='spec-content']/text()")[0].replace('/','-')
@@ -88,33 +96,33 @@ def get_series(lx: html.HtmlElement) -> str:
         return ''
 
 def get_runtime(lx: html.HtmlElement) -> str:
-    return str(lx.xpath( "//span[@class='spec-content']/span[@itemprop='duration']/text()")[0]).strip()
+    return str(lx.xpath("//span[@class='spec-content']/span[@itemprop='duration']/text()")[0]).strip()
 
-def get_actor_photo(browser):
-    htmla = browser.page.select('#moviepages > div > div:nth-child(1) > div.movie-info.section > ul > li:nth-child(1) > span.spec-content > a')
+def get_actor_photo(lx, session):
+    htmla = lx.xpath("//*[@id='moviepages']/div[@class='container']/div[@class='inner-container']/div[@class='movie-info section']/ul/li[@class='movie-spec']/span[@class='spec-content']/a[@itemprop='actor']")
+    names = lx.xpath("//*[@id='moviepages']/div[@class='container']/div[@class='inner-container']/div[@class='movie-info section']/ul/li[@class='movie-spec']/span[@class='spec-content']/a[@itemprop='actor']/span[@itemprop='name']/text()")
     t = {}
-    for a in htmla:
-        if a.text.strip() == '他':
+    for name, a in zip(names, htmla):
+        if name.strip() == '他':
             continue
-        p = {a.text.strip(): a['href']}
+        p = {name.strip(): a.attrib['href']}
         t.update(p)
     o = {}
     for k, v in t.items():
         if '/search_act/' not in v:
             continue
-        r = browser.open_relative(v)
+        r = session.get(urljoin(G_SITE, v))
         if not r.ok:
             continue
-        html = browser.page.prettify()
+        html = r.text
         pos = html.find('.full-bg')
         if pos<0:
             continue
         css = html[pos:pos+100]
-        p0 = css.find('background: url(')
-        p1 = css.find('.jpg)')
-        if p0<0 or p1<0:
+        cssBGjpgs = re.findall(r'background: url\((.+\.jpg)', css, re.I)
+        if not cssBGjpgs or not len(cssBGjpgs[0]):
             continue
-        p = {k: urljoin(browser.url, css[p0+len('background: url('):p1+len('.jpg')])}
+        p = {k: urljoin(r.url, cssBGjpgs[0])}
         o.update(p)
     return o
 
