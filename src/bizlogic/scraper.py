@@ -41,7 +41,7 @@ def createFolder(json_data: dict, conf: _ScrapingConfigs):
         location_rule = location_rule.replace(title, shorttitle)
 
     # path为影片+元数据所在目录
-    path = os.path.join(success_folder, location_rule).strip()
+    path = os.path.join(success_folder, f'./{location_rule.strip()}')
     if not os.path.exists(path):
         path = escapePath(path, conf.escape_literals)
         try:
