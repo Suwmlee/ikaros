@@ -173,10 +173,10 @@ def getSeries(html):
     result2 = str(html.xpath('//strong[contains(text(),"系列")]/../span/a/text()')).strip(" ['']")
     return str(result1 + result2).strip('+').replace("', '", '').replace('"', '')
 
-def main(number: str):
+def main(number):
     # javdb更新后同一时间只能登录一个数字站，最新登录站会踢出旧的登录，因此按找到的第一个javdb*.json文件选择站点，
     # 如果无.json文件或者超过有效期，则随机选择一个站点。
-    javdb_site = "javdb"
+    javdb_site = "javdb32"
     try:
         # if re.search(r'[a-zA-Z]+\.\d{2}\.\d{2}\.\d{2}', number).group():
         #     pass
@@ -184,7 +184,8 @@ def main(number: str):
         #     number = number.upper()
         number = number.upper()
         javdb_cookies = load_javdb_cookies()
-
+        if not javdb_cookies:
+            javdb_cookies = {'over18':'1', 'theme':'auto', 'locale':'zh'}
         # 不加载过期的cookie，javdb登录界面显示为7天免登录，故假定cookie有效期为7天
         session = None
         javdb_url = 'https://' + javdb_site + '.com/search?q=' + number + '&f=all'
@@ -194,7 +195,8 @@ def main(number: str):
                 raise
             query_result = res.text
         except:
-            res, session = get_html_session(javdb_url, return_type='session')
+            # res, session = get_html_by_scraper(javdb_url, cookies=javdb_cookies, return_type='scraper')
+            res, session = get_html_session(javdb_url, cookies=javdb_cookies, return_type='scraper')
             if not res:
                 raise ValueError('page not found')
             query_result = res.text
