@@ -1,3 +1,10 @@
+## [1.10.1](https://github.com/Suwmlee/ikaros/compare/v1.10.0...v1.10.1) (2021-11-22)
+
+
+### Bug Fixes
+
+* javdb url ([7f59d46](https://github.com/Suwmlee/ikaros/commit/7f59d46d74a335c2002ebb03c994b638f829c5e6))
+
 # [1.10.0](https://github.com/Suwmlee/ikaros/compare/v1.9.1...v1.10.0) (2021-11-16)
 
 
