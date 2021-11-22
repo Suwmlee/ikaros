@@ -183,7 +183,11 @@ def create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_
         with open(os.path.join(path, prefilename + ".nfo"), "wt", encoding='UTF-8') as code:
             print('<?xml version="1.0" encoding="UTF-8" ?>', file=code)
             print("<movie>", file=code)
-            print(" <title>" + naming_rule + "</title>", file=code)
+            print("  <title>" + naming_rule + "</title>", file=code)
+            print("  <originaltitle>" + naming_rule + "</originaltitle>", file=code)
+            print("  <sorttitle>" + naming_rule + "</sorttitle>", file=code)
+            print("  <customrating>JP-18+</customrating>", file=code)
+            print("  <mpaa>JP-18+</mpaa>", file=code)
             print("  <set>", file=code)
             print("  </set>", file=code)
             print("  <studio>" + studio + "</studio>", file=code)
@@ -198,7 +202,7 @@ def create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_
             try:
                 for key in actor_list:
                     print("  <actor>", file=code)
-                    print("   <name>" + key + "</name>", file=code)
+                    print("    <name>" + key + "</name>", file=code)
                     print("  </actor>", file=code)
             except:
                 pass
@@ -230,6 +234,8 @@ def create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_
                 pass
             print("  <num>" + number + "</num>", file=code)
             print("  <premiered>" + release + "</premiered>", file=code)
+            print("  <releasedate>" + release + "</releasedate>", file=code)
+            print("  <release>" + release + "</release>", file=code)
             print("  <cover>" + cover + "</cover>", file=code)
             print("  <website>" + website + "</website>", file=code)
             print("</movie>", file=code)
