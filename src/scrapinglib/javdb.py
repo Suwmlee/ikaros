@@ -195,8 +195,7 @@ def main(number):
                 raise
             query_result = res.text
         except:
-            # res, session = get_html_by_scraper(javdb_url, cookies=javdb_cookies, return_type='scraper')
-            res, session = get_html_session(javdb_url, cookies=javdb_cookies, return_type='scraper')
+            res, session = get_html_by_scraper(javdb_url, cookies=javdb_cookies, return_type='scraper')
             if not res:
                 raise ValueError('page not found')
             query_result = res.text

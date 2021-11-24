@@ -473,6 +473,6 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
             add_mark(pics, chs_tag, leak_tag, uncensored_tag, conf.watermark_location, conf.watermark_size)
         if not create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
             moveFailedFolder(filepath)
-        
+
         return True, filepath
     return False, ''

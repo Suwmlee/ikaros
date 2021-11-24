@@ -80,8 +80,8 @@ def getStoryline_mp(args):
             storyline = getStoryline_airavwiki(number, debug)
         elif site == "airav":
             storyline = getStoryline_airav(number, debug)
-        # elif site == "avno1":
-        #     storyline = getStoryline_avno1(number, debug)
+        elif site == "avno1":
+            storyline = getStoryline_avno1(number, debug)
         elif site == "xcity":
             storyline = getStoryline_xcity(number, debug)
         elif site == "amazon":
@@ -211,31 +211,31 @@ def getStoryline_58avgo(number, debug):
     return ''
 
 
-# def getStoryline_avno1(number, debug):  #获取剧情介绍 从avno1.cc取得
-#     try:
-#         site = secrets.choice(['1768av.club','2nine.net','av999.tv','avno1.cc',
-#             'hotav.biz','iqq2.xyz','javhq.tv',
-#             'www.hdsex.cc','www.porn18.cc','www.xxx18.cc',])
-#         url = f'http://{site}/cn/search.php?kw_type=key&kw={number}'
-#         lx = fromstring(get_html_by_scraper(url))
-#         descs = lx.xpath('//div[@class="type_movie"]/div/ul/li/div/@data-description')
-#         titles = lx.xpath('//div[@class="type_movie"]/div/ul/li/div/a/h3/text()')
-#         if not descs or not len(descs):
-#             raise ValueError(f"number not found")
-#         partial_num = bool(re.match(r'\d{6}[\-_]\d{2,3}', number))
-#         for title, desc in zip(titles, descs):
-#             page_number = title[title.rfind(' ')+1:].strip()
-#             if not partial_num:
-#                 if re.match(f'^{number}$', page_number, re.I):
-#                     return desc.strip()
-#             elif re.search(number, page_number, re.I):
-#                 return desc.strip()
-#         raise ValueError(f"page number ->[{page_number}] not match")
-#     except Exception as e:
-#         if debug:
-#             print(f"[-]MP getOutline_avno1 Error: {e}, number [{number}].")
-#         pass
-#     return ''
+def getStoryline_avno1(number, debug):  #获取剧情介绍 从avno1.cc取得
+    try:
+        site = secrets.choice(['1768av.club','2nine.net','av999.tv','avno1.cc',
+            'hotav.biz','iqq2.xyz','javhq.tv',
+            'www.hdsex.cc','www.porn18.cc','www.xxx18.cc',])
+        url = f'http://{site}/cn/search.php?kw_type=key&kw={number}'
+        lx = fromstring(get_html_by_scraper(url))
+        descs = lx.xpath('//div[@class="type_movie"]/div/ul/li/div/@data-description')
+        titles = lx.xpath('//div[@class="type_movie"]/div/ul/li/div/a/h3/text()')
+        if not descs or not len(descs):
+            raise ValueError(f"number not found")
+        partial_num = bool(re.match(r'\d{6}[\-_]\d{2,3}', number))
+        for title, desc in zip(titles, descs):
+            page_number = title[title.rfind(' ')+1:].strip()
+            if not partial_num:
+                if re.match(f'^{number}$', page_number, re.I):
+                    return desc.strip()
+            elif re.search(number, page_number, re.I):
+                return desc.strip()
+        raise ValueError(f"page number ->[{page_number}] not match")
+    except Exception as e:
+        if debug:
+            print(f"[-]MP getOutline_avno1 Error: {e}, number [{number}].")
+        pass
+    return ''
 
 
 def getStoryline_avno1OLD(number, debug):  #获取剧情介绍 从avno1.cc取得

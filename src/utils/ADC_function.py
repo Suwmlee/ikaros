@@ -12,6 +12,7 @@ from urllib.parse import urljoin
 from http.cookies import SimpleCookie
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from cloudscraper import create_scraper
 from flask import current_app
 from ..service.configservice import scrapingConfService
 
@@ -176,6 +177,39 @@ def get_html_by_form(url, form_name: str = None, fields: dict = None, cookies: d
         return response, browser
     else:
         return response.text
+
+
+def get_html_by_scraper(url:str = None, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None):
+    configProxy = scrapingConfService.getProxySetting()
+    session = create_scraper(browser={'custom': ua or G_USER_AGENT,})
+    if isinstance(cookies, dict) and len(cookies):
+        requests.utils.add_dict_to_cookiejar(session.cookies, cookies)
+    retries = Retry(total=configProxy.retry, connect=configProxy.retry, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
+    session.mount("https://", TimeoutHTTPAdapter(max_retries=retries, timeout=configProxy.timeout))
+    session.mount("http://", TimeoutHTTPAdapter(max_retries=retries, timeout=configProxy.timeout))
+    if configProxy.enable:
+        session.proxies = configProxy.proxies()
+    try:
+        if isinstance(url, str) and len(url):
+            result = session.get(str(url))
+        else: # 空url参数直接返回可重用scraper对象，无需设置return_type
+            return session
+        if not result.ok:
+            return None
+        if return_type == "object":
+            return result
+        elif return_type == "content":
+            return result.content
+        elif return_type == "scraper":
+            return result, session
+        else:
+            result.encoding = encoding or "utf-8"
+            return result.text
+    except requests.exceptions.ProxyError:
+        print("[-]get_html_by_scraper() Proxy error! Please check your Proxy")
+    except Exception as e:
+        print(f"[-]get_html_by_scraper() failed. {e}")
+    return None
 
 
 def is_japanese(s) -> bool:
