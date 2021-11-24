@@ -1,3 +1,10 @@
+## [1.10.2](https://github.com/Suwmlee/ikaros/compare/v1.10.1...v1.10.2) (2021-11-24)
+
+
+### Bug Fixes
+
+* **scrapinglib:** missing module ([9206cf8](https://github.com/Suwmlee/ikaros/commit/9206cf8203d1ee65c205f7bedb7c682b1716bc9b))
+
 ## [1.10.1](https://github.com/Suwmlee/ikaros/compare/v1.10.0...v1.10.1) (2021-11-22)
 
 
