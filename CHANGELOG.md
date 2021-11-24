@@ -1,3 +1,10 @@
+## [1.10.3](https://github.com/Suwmlee/ikaros/compare/v1.10.2...v1.10.3) (2021-11-24)
+
+
+### Bug Fixes
+
+* raise exception in get html ([55efced](https://github.com/Suwmlee/ikaros/commit/55efcedb6b975ee1c6fb381ca93ff62281142e71))
+
 ## [1.10.2](https://github.com/Suwmlee/ikaros/compare/v1.10.1...v1.10.2) (2021-11-24)
 
 
