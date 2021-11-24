@@ -1,6 +1,7 @@
 import sys
 sys.path.append('../')
 import re
+import secrets
 from lxml import etree#need install
 import json
 from ..utils.ADC_function import *
