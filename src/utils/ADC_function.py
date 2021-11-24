@@ -20,34 +20,27 @@ from ..service.configservice import scrapingConfService
 G_USER_AGENT = r'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36'
 
 
-def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None):
+def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None):
     """ 网页请求核心
     """
     configProxy = scrapingConfService.getProxySetting()
-    errors = ""
 
-    if ua is None:
-        headers = {"User-Agent": G_USER_AGENT}  # noqa
-    else:
-        headers = {"User-Agent": ua}
+    headers = {"User-Agent": ua or G_USER_AGENT}  # noqa
 
     for i in range(configProxy.retry):
         try:
             if configProxy.enable:
                 proxies = configProxy.proxies()
-                result = requests.get(str(url), headers=headers, timeout=configProxy.timeout, proxies=proxies,
-                                      cookies=cookies)
+                result = requests.get(str(url), headers=headers, timeout=configProxy.timeout, proxies=proxies, cookies=cookies)
             else:
-                result = requests.get(
-                    str(url), headers=headers, timeout=configProxy.timeout, cookies=cookies)
-
-            result.encoding = "utf-8"
+                result = requests.get(str(url), headers=headers, timeout=configProxy.timeout, cookies=cookies)
 
             if return_type == "object":
                 return result
             elif return_type == "content":
                 return result.content
             else:
+                result.encoding = encoding or result.apparent_encoding
                 return result.text
         except requests.exceptions.ProxyError:
             current_app.logger.error("[-]Proxy error! Please check your Proxy")
@@ -61,7 +54,6 @@ def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None)
 
 def post_html(url: str, query: dict, headers: dict = None) -> requests.Response:
     configProxy = scrapingConfService.getProxySetting()
-    errors = ""
     headers_ua = {"User-Agent": G_USER_AGENT}
     if headers is None:
         headers = headers_ua
@@ -72,16 +64,15 @@ def post_html(url: str, query: dict, headers: dict = None) -> requests.Response:
         try:
             if configProxy.enable:
                 proxies = configProxy.proxies()
-                result = requests.post(
-                    url, data=query, proxies=proxies, headers=headers, timeout=configProxy.timeout)
+                result = requests.post(url, data=query, proxies=proxies, headers=headers, timeout=configProxy.timeout)
             else:
-                result = requests.post(
-                    url, data=query, headers=headers, timeout=configProxy.timeout)
+                result = requests.post(url, data=query, headers=headers, timeout=configProxy.timeout)
             return result
         except Exception as e:
             current_app.logger.info("[-]Connect retry {}/{} : {}".format(i + 1, configProxy.retry, url))
             current_app.logger.error(e)
     current_app.logger.info("[-]Connect Failed! Please check your Proxy or Network!")
+
 
 G_DEFAULT_TIMEOUT = 10 # seconds
 
@@ -98,9 +89,10 @@ class TimeoutHTTPAdapter(HTTPAdapter):
             kwargs["timeout"] = self.timeout
         return super().send(request, **kwargs)
 
+
 #  with keep-alive feature
 def get_html_session(url:str = None, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None):
-    configProxy = configProxy = scrapingConfService.getProxySetting()
+    configProxy = scrapingConfService.getProxySetting()
     session = requests.Session()
     if isinstance(cookies, dict) and len(cookies):
         requests.utils.add_dict_to_cookiejar(session.cookies, cookies)
@@ -128,55 +120,82 @@ def get_html_session(url:str = None, cookies: dict = None, ua: str = None, retur
             result.encoding = encoding or "utf-8"
             return result.text
     except requests.exceptions.ProxyError:
-        print("[-]get_html_session() Proxy error! Please check your Proxy")
+        current_app.logger.error("[-]get_html_session() Proxy error! Please check your Proxy")
     except Exception as e:
-        print(f"[-]get_html_session() failed. {e}")
+        current_app.logger.error(f"[-]get_html_session() failed. {e}")
     return None
 
 
-def get_html_by_browser(url, cookies: dict = None, ua: str = None, return_type: str = None):
-    browser = mechanicalsoup.StatefulBrowser(user_agent=G_USER_AGENT if ua is None else ua)
+def get_html_by_browser(url:str = None, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None, use_scraper: bool = False):
     configProxy = scrapingConfService.getProxySetting()
+    s = create_scraper(browser={'custom': ua or G_USER_AGENT,}) if use_scraper else requests.Session()
+    if isinstance(cookies, dict) and len(cookies):
+        requests.utils.add_dict_to_cookiejar(s.cookies, cookies)
+    retries = Retry(total=configProxy.retry, connect=configProxy.retry, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
+    s.mount("https://", TimeoutHTTPAdapter(max_retries=retries, timeout=configProxy.timeout))
+    s.mount("http://", TimeoutHTTPAdapter(max_retries=retries, timeout=configProxy.timeout))
     if configProxy.enable:
-        browser.session.proxies = configProxy.proxies()
-    result = browser.open(url)
-    if not result.ok:
-        return ''
-    result.encoding = "utf-8"
-    if return_type == "object":
-        return result
-    elif return_type == "content":
-        return result.content
-    elif return_type == "browser":
-        return result, browser
-    else:
-        return result.text
+        s.proxies = configProxy.proxies()
+    try:
+        browser = mechanicalsoup.StatefulBrowser(user_agent=ua or G_USER_AGENT, session=s)
+        if isinstance(url, str) and len(url):
+            result = browser.open(url)
+        else:
+            return browser
+        if not result.ok:
+            return None
+
+        if return_type == "object":
+            return result
+        elif return_type == "content":
+            return result.content
+        elif return_type == "browser":
+            return result, browser
+        else:
+            result.encoding = encoding or "utf-8"
+            return result.text
+    except requests.exceptions.ProxyError:
+        current_app.logger.error("[-]get_html_by_browser() Proxy error! Please check your Proxy")
+    except Exception as e:
+        current_app.logger.error(f'[-]get_html_by_browser() Failed! {e}')
+    return None
 
 
-def get_html_by_form(url, form_name: str = None, fields: dict = None, cookies: dict = None, ua: str = None, return_type: str = None):
-    browser = mechanicalsoup.StatefulBrowser(user_agent=G_USER_AGENT if ua is None else ua)
-    if isinstance(cookies, dict):
-        requests.utils.add_dict_to_cookiejar(browser.session.cookies, cookies)
+def get_html_by_form(url, form_select: str = None, fields: dict = None, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None):
     configProxy = scrapingConfService.getProxySetting()
+    s = requests.Session()
+    if isinstance(cookies, dict) and len(cookies):
+        requests.utils.add_dict_to_cookiejar(s.cookies, cookies)
+    retries = Retry(total=configProxy.retry, connect=configProxy.retry, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
+    s.mount("https://", TimeoutHTTPAdapter(max_retries=retries, timeout=configProxy.timeout))
+    s.mount("http://", TimeoutHTTPAdapter(max_retries=retries, timeout=configProxy.timeout))
     if configProxy.enable:
-        browser.session.proxies = configProxy.proxies()
-    result = browser.open(url)
-    if not result.ok:
-        return ''
-    form = browser.select_form() if form_name is None else browser.select_form(form_name)
-    if isinstance(fields, dict):
-        for k, v in fields.items():
-            browser[k] = v
-    response = browser.submit_selected()
-    response.encoding = "utf-8"
-    if return_type == "object":
-        return response
-    elif return_type == "content":
-        return response.content
-    elif return_type == "browser":
-        return response, browser
-    else:
-        return response.text
+        s.proxies = configProxy.proxies()
+    try:
+        browser = mechanicalsoup.StatefulBrowser(user_agent=ua or G_USER_AGENT, session=s)
+        result = browser.open(url)
+        if not result.ok:
+            return None
+        form = browser.select_form() if form_select is None else browser.select_form(form_select)
+        if isinstance(fields, dict):
+            for k, v in fields.items():
+                browser[k] = v
+        response = browser.submit_selected()
+
+        if return_type == "object":
+            return response
+        elif return_type == "content":
+            return response.content
+        elif return_type == "browser":
+            return response, browser
+        else:
+            result.encoding = encoding or "utf-8"
+            return response.text
+    except requests.exceptions.ProxyError:
+        current_app.logger.error("[-]get_html_by_form() Proxy error! Please check your Proxy")
+    except Exception as e:
+        current_app.logger.error(f'[-]get_html_by_form() Failed! {e}')
+    return None
 
 
 def get_html_by_scraper(url:str = None, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None):
@@ -206,9 +225,9 @@ def get_html_by_scraper(url:str = None, cookies: dict = None, ua: str = None, re
             result.encoding = encoding or "utf-8"
             return result.text
     except requests.exceptions.ProxyError:
-        print("[-]get_html_by_scraper() Proxy error! Please check your Proxy")
+        current_app.logger.error("[-]get_html_by_scraper() Proxy error! Please check your Proxy")
     except Exception as e:
-        print(f"[-]get_html_by_scraper() failed. {e}")
+        current_app.logger.error(f"[-]get_html_by_scraper() failed. {e}")
     return None
 
 
