@@ -1,3 +1,11 @@
+## [1.10.4](https://github.com/Suwmlee/ikaros/compare/v1.10.3...v1.10.4) (2021-11-24)
+
+
+### Bug Fixes
+
+* add cloudscraper ([ae13a43](https://github.com/Suwmlee/ikaros/commit/ae13a43c77759c05a1ff8bb7c22ebac4d35cc188))
+* request error ([e788107](https://github.com/Suwmlee/ikaros/commit/e7881070854adbce7c97a79428728a69f6435815))
+
 ## [1.10.3](https://github.com/Suwmlee/ikaros/compare/v1.10.2...v1.10.3) (2021-11-24)
 
 
