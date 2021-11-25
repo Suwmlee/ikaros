@@ -24,7 +24,7 @@ class FileInfo():
 
     midfolder = ''
     topfolder = ''
-    secondfolder = ''
+    seasonfolder = ''
     name = ''
     ext = ''
 
@@ -52,16 +52,16 @@ class FileInfo():
         self.folders = folders
         self.topfolder = folders[0]
         if len(folders) > 1:
-            self.secondfolder = folders[1]
+            self.seasonfolder = folders[1]
 
     def fixMidFolder(self):
         temp = self.folders
         temp[0] = self.topfolder
-        if self.secondfolder != '':
+        if self.seasonfolder != '':
             if len(temp) > 1:
-                temp[1] = self.secondfolder
+                temp[1] = self.seasonfolder
             else:
-                temp.append(self.secondfolder)
+                temp.append(self.seasonfolder)
         return os.path.join(*temp)
 
     def updateFinalPath(self, path):
@@ -153,7 +153,7 @@ def ctrlTransfer(src_folder, dest_folder,
 
 def transfer(src_folder, dest_folder,
              linktype, prefix,
-             escape_folders, top_files='',
+             escape_folders, specified_files='',
              clean_others_tag = True,
              replace_CJK_tag= False,
              fixseries_tag= False
@@ -169,15 +169,15 @@ def transfer(src_folder, dest_folder,
     try:
         movie_list = []
 
-        if top_files == '':
+        if specified_files == '':
             movie_list = findAllVideos(src_folder, src_folder, re.split("[,，]", escape_folders))
         else:
-            if os.path.exists(top_files):
+            if os.path.exists(specified_files):
                 clean_others_tag = False
-                if os.path.isdir(top_files):
-                    movie_list = findAllVideos(top_files, src_folder, re.split("[,，]", escape_folders))
+                if os.path.isdir(specified_files):
+                    movie_list = findAllVideos(specified_files, src_folder, re.split("[,，]", escape_folders))
                 else:
-                    tf = FileInfo(top_files)
+                    tf = FileInfo(specified_files)
                     midfolder = tf.realfolder.replace(src_folder, '').lstrip("\\").lstrip("/")
                     tf.updateMidFolder(midfolder)
                     if tf.topfolder != '.':
@@ -315,9 +315,9 @@ def naming(currentfile: FileInfo, movie_list: list, replace_CJK_tag, fixseries_t
             if currentfile.season and currentfile.epnum:
                 current_app.logger.debug("[-] directly use record")
                 if currentfile.season == 0:
-                    currentfile.secondfolder = "Specials"
+                    currentfile.seasonfolder = "Specials"
                 else:
-                    currentfile.secondfolder = "Season " + str(currentfile.season)
+                    currentfile.seasonfolder = "Season " + str(currentfile.season)
                 try:
                     currentfile.fixEpName(currentfile.season)
                 except:
@@ -331,27 +331,27 @@ def naming(currentfile: FileInfo, movie_list: list, replace_CJK_tag, fixseries_t
 
                     # 检测视频上级目录是否有 season 标记
                     dirfolder = currentfile.folders[len(currentfile.folders)-1]
-                    # 根据 season 标记 更新 secondfolder
+                    # 根据 season 标记 更新 seasonfolder
                     seasonnum = matchSeason(dirfolder)
                     if seasonnum:
                         currentfile.season = seasonnum
-                        currentfile.secondfolder = "Season " + str(seasonnum)
+                        currentfile.seasonfolder = "Season " + str(seasonnum)
                         currentfile.fixEpName(seasonnum)
                     else:
                         # 如果存在大量重复 epnum
                         # 如果检测不到 seasonnum 可能是多季？
-                        if currentfile.secondfolder == '':
+                        if currentfile.seasonfolder == '':
                             currentfile.season = 1
-                            currentfile.secondfolder = "Season " + str(1)
+                            currentfile.seasonfolder = "Season " + str(1)
                             currentfile.fixEpName(1)
                         else:
                             if '花絮' in dirfolder and currentfile.topfolder != '.':
-                                currentfile.secondfolder = "Specials"
+                                currentfile.seasonfolder = "Specials"
                                 currentfile.season = 0
                                 currentfile.fixEpName(0)
 
     # 检测是否是特殊的导评/花絮内容
     # TODO 更多关于花絮的规则
     if currentfile.name == "导演访谈":
-        if currentfile.secondfolder == '' and currentfile.topfolder != '.':
-            currentfile.secondfolder = "extras"
+        if currentfile.seasonfolder == '' and currentfile.topfolder != '.':
+            currentfile.seasonfolder = "extras"
