@@ -142,7 +142,7 @@ def startTransfer():
         content = request.get_json()
         transfer.ctrlTransfer(content['source_folder'], content['output_folder'],
                               content['linktype'], content['soft_prefix'],
-                              content['escape_folder'],
+                              content['escape_folder'], content['specified_files'],
                               content['fix_series'],
                               content['clean_others'], content['replace_CJK'],
                               content.get('refresh_url'))

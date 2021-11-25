@@ -139,12 +139,12 @@ def autoTransfer(real_path: str):
 
 def ctrlTransfer(src_folder, dest_folder, 
                 linktype, prefix, escape_folders,
-                fix_series,
+                specified_files, fix_series,
                 clean_others,
                 replace_CJK,
                 refresh_url):
     transfer(src_folder, dest_folder, linktype, prefix,
-            escape_folders, '', 
+            escape_folders, specified_files,
             clean_others, replace_CJK,
             fix_series)
     if refresh_url:
@@ -183,11 +183,15 @@ def transfer(src_folder, dest_folder,
                     if tf.topfolder != '.':
                         tf.parse()
                     movie_list.append(tf)
+            else:
+                taskService.updateTaskStatus(1, 'transfer')
+                current_app.logger.error("[!] specified_files not exists")
+                return False
 
         count = 0
         total = str(len(movie_list))
         taskService.updateTaskTotal(total, 'transfer')
-        current_app.logger.debug('[+]Find  ' + total+'  movies')
+        current_app.logger.debug('[+] Find  ' + total+'  movies')
 
         # 硬链接直接使用源目录
         if linktype == 1:
