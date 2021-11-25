@@ -221,13 +221,13 @@ def transfer(src_folder, dest_folder,
             if currentrecord.status == 2:
                 # 忽略标记，直接下一个
                 continue
-            if currentrecord.isepisode:
+            if fixseries_tag and currentrecord.isepisode:
                 currentfile.isepisode = currentrecord.isepisode
-                if currentrecord.season > -1:
+                if currentrecord.season and currentrecord.season > -1:
                     currentfile.season = currentrecord.season
-                if currentrecord.episode > -1:
+                if currentrecord.episode and currentrecord.episode > -1:
                     currentfile.epnum = currentrecord.episode
-                if currentrecord.status == 1:
+                if currentrecord.status and currentrecord.status == 1:
                     currentfile.locked = True
             # 优化命名
             naming(currentfile, movie_list, replace_CJK_tag, fixseries_tag)
