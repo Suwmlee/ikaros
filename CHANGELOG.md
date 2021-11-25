@@ -1,3 +1,16 @@
+# [1.11.0](https://github.com/Suwmlee/ikaros/compare/v1.10.4...v1.11.0) (2021-11-25)
+
+
+### Bug Fixes
+
+* check value ([659cc44](https://github.com/Suwmlee/ikaros/commit/659cc44b52f4d07822e49543f4b133a6f0fc0486))
+* update parser rules ([977c449](https://github.com/Suwmlee/ikaros/commit/977c449280ce7d6979dcd6e6dfeb73788f8398df))
+
+
+### Features
+
+* **transfer:** add `specified files` option ([d2d1a38](https://github.com/Suwmlee/ikaros/commit/d2d1a38495c7d37a5f22db81322d00611fcb3cd9))
+
 ## [1.10.4](https://github.com/Suwmlee/ikaros/compare/v1.10.3...v1.10.4) (2021-11-24)
 
 
