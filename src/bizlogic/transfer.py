@@ -169,7 +169,7 @@ def transfer(src_folder, dest_folder,
     try:
         movie_list = []
 
-        if specified_files == '':
+        if not specified_files or specified_files == '':
             movie_list = findAllVideos(src_folder, src_folder, re.split("[,，]", escape_folders))
         else:
             if os.path.exists(specified_files):
