@@ -49,13 +49,16 @@ def create_app():
             flask_migrate.stamp()
 
     # reset
-    executor.submit(resetAutoDefault)
+    executor.submit(resetDefaults)
 
     return app
 
 
-def resetAutoDefault():
+def resetDefaults():
     from .service.taskservice import autoTaskService
+    from .bizlogic.automation import checkTaskQueue
     print("Init task started!")
     autoTaskService.reset()
+    with app.app_context():
+        checkTaskQueue()
     print("Init task is done!")
