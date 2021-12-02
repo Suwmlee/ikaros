@@ -1,3 +1,10 @@
+## [1.11.2](https://github.com/Suwmlee/ikaros/compare/v1.11.1...v1.11.2) (2021-12-02)
+
+
+### Bug Fixes
+
+* check auto task at startup ([d1cb4a1](https://github.com/Suwmlee/ikaros/commit/d1cb4a1ff8f18d84730a38ad47e3abce1e9c1e3d))
+
 ## [1.11.1](https://github.com/Suwmlee/ikaros/compare/v1.11.0...v1.11.1) (2021-12-02)
 
 
