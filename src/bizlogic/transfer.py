@@ -4,6 +4,7 @@
 import os
 import pathlib
 import re
+from typing import List
 
 from .mediaserver import refreshMediaServer
 from ..service.configservice import transConfigService
@@ -167,7 +168,7 @@ def transfer(src_folder, dest_folder,
     taskService.updateTaskStatus(2, 'transfer')
 
     try:
-        movie_list = []
+        movie_list = List[FileInfo]
 
         if not specified_files or specified_files == '':
             movie_list = findAllVideos(src_folder, src_folder, re.split("[,，]", escape_folders))
@@ -206,6 +207,8 @@ def transfer(src_folder, dest_folder,
             dest_list = []
 
         for currentfile in movie_list:
+            if not isinstance(currentfile, FileInfo):
+                continue
             task = taskService.getTask('transfer')
             if task.status == 0:
                 return False

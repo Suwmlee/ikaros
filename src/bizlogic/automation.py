@@ -54,7 +54,7 @@ def checkTaskQueue():
                 runTask(task.path)
             except Exception as e:
                 current_app.logger.error(e)
-            current_app.logger.info("任务循环队列: 完成[{}]".format(task.path))
+            current_app.logger.info("任务循环队列: 清除任务[{}]".format(task.path))
             autoTaskService.deleteTask(task.id)
         else:
             current_app.logger.info("任务循环队列: 无新任务")

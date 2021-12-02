@@ -57,6 +57,15 @@ class AutoTaskService():
         db.session.commit()
         return task
 
+    def reset(self):
+        """ 重置
+        """
+        tasks = _AutoTask.query.filter_by(status=1).all()
+        if tasks:
+            for t in tasks:
+                t.status = 0
+            self.commit()
+
     def getTasks(self):
         return _AutoTask.query.all()
 

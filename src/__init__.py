@@ -3,6 +3,7 @@
     init app
 """
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from flask import Flask
 import flask_migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -11,6 +12,9 @@ from .config import Config
 db = SQLAlchemy()
 migrate = flask_migrate.Migrate()
 app = None
+
+# DOCS https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor
+executor = ThreadPoolExecutor(1)
 
 def create_app():
     """ create application
@@ -44,4 +48,14 @@ def create_app():
             print("Fix alembic version")
             flask_migrate.stamp()
 
+    # reset
+    executor.submit(resetAutoDefault)
+
     return app
+
+
+def resetAutoDefault():
+    from .service.taskservice import autoTaskService
+    print("Init task started!")
+    autoTaskService.reset()
+    print("Init task is done!")
