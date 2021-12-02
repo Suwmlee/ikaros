@@ -1,3 +1,10 @@
+## [1.11.1](https://github.com/Suwmlee/ikaros/compare/v1.11.0...v1.11.1) (2021-12-02)
+
+
+### Bug Fixes
+
+* Initialization at startup ([3328bff](https://github.com/Suwmlee/ikaros/commit/3328bffa062456b6e11de163fd2764c3939a279f))
+
 # [1.11.0](https://github.com/Suwmlee/ikaros/compare/v1.10.4...v1.11.0) (2021-11-25)
 
 
