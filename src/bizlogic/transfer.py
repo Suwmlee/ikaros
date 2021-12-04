@@ -168,7 +168,7 @@ def transfer(src_folder, dest_folder,
     taskService.updateTaskStatus(2, 'transfer')
 
     try:
-        movie_list = List[FileInfo]
+        movie_list = []
 
         if not specified_files or specified_files == '':
             movie_list = findAllVideos(src_folder, src_folder, re.split("[,，]", escape_folders))
