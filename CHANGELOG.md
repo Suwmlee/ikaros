@@ -1,3 +1,10 @@
+## [1.11.3](https://github.com/Suwmlee/ikaros/compare/v1.11.2...v1.11.3) (2021-12-04)
+
+
+### Bug Fixes
+
+* append FileInfo ([a9014a0](https://github.com/Suwmlee/ikaros/commit/a9014a0215691c9b8c330fa4f092891209f099e1))
+
 ## [1.11.2](https://github.com/Suwmlee/ikaros/compare/v1.11.1...v1.11.2) (2021-12-02)
 
 
