@@ -1,3 +1,10 @@
+## [1.11.4](https://github.com/Suwmlee/ikaros/compare/v1.11.3...v1.11.4) (2021-12-16)
+
+
+### Bug Fixes
+
+*  update web ([e94ca44](https://github.com/Suwmlee/ikaros/commit/e94ca4467011c249c8b5874020d018523dfed773))
+
 ## [1.11.3](https://github.com/Suwmlee/ikaros/compare/v1.11.2...v1.11.3) (2021-12-04)
 
 
