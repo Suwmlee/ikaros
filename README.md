@@ -35,7 +35,10 @@ docker run -d \
 - 配置`transmission`/`qBittorrent`下载完成脚本
   - `scripts`目录下`trcomplete.sh`/`qbcomplete.sh`
   - 在下载软件配置内指定脚本路径即可
-__注意:__ 默认请求 __127.0.0.1__ ,需根据实际情况更改
+
+__注意:__ 
+- 默认请求 __127.0.0.1__ ,需根据实际情况更改
+- 参考[配置tr完成脚本](https://github.com/ronggang/transmission-web-control/wiki/About-script-torrent-done-filename)
 
 #### 刮削配置-软链接前缀说明
 
