@@ -1,3 +1,10 @@
+## [1.11.5](https://github.com/Suwmlee/ikaros/compare/v1.11.4...v1.11.5) (2021-12-17)
+
+
+### Bug Fixes
+
+* update rename json ([53f81a6](https://github.com/Suwmlee/ikaros/commit/53f81a6a09f171a138cee27be78ed23e614524a4))
+
 ## [1.11.4](https://github.com/Suwmlee/ikaros/compare/v1.11.3...v1.11.4) (2021-12-16)
 
 
