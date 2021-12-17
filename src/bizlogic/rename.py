@@ -35,8 +35,7 @@ def renamebyreg(root, reg, prefix, preview: bool = True):
     正则匹配替换
     """
     tvs = findAllMatchedFiles(root)
-    todolist = []
-    newlist = []
+    table = []
     if prefix == '':
         prefix = "S01E"
     for name in tvs:
@@ -64,11 +63,7 @@ def renamebyreg(root, reg, prefix, preview: bool = True):
                 if not preview:
                     newfull = os.path.join(dirname, newname)
                     os.rename(name, newfull)
+                single = {'original': basename, 'rename': newname}
+                table.append(single)
 
-                todolist.append(basename)
-                newlist.append(newname)
-
-    ret = dict()
-    ret['todo'] = todolist
-    ret['prefix'] = newlist
-    return ret
+    return table
