@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/Suwmlee/ikaros/compare/v1.11.5...v1.12.0) (2021-12-19)
+
+
+### Features
+
+* delete transfer records ([70ab78a](https://github.com/Suwmlee/ikaros/commit/70ab78ac8e3d9d36b3dbf50eafabd9aaaf5cb88f))
+
 ## [1.11.5](https://github.com/Suwmlee/ikaros/compare/v1.11.4...v1.11.5) (2021-12-17)
 
 
