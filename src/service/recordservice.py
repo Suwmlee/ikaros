@@ -166,6 +166,20 @@ class TransRecordService():
         db.session.commit()
         return nums
 
+    def deleteByID(self, value) -> _TransRecords:
+        record = _TransRecords.query.filter_by(id=value).first()
+        if record:
+            if record.destpath != '':
+                basefolder = os.path.dirname(record.srcpath)
+                folder = os.path.dirname(record.destpath)
+                if os.path.exists(folder) and basefolder != folder:
+                    name = os.path.basename(record.destpath)
+                    # 前缀匹配
+                    filter  = os.path.splitext(name)[0]
+                    cleanScrapingfile(folder, filter)
+            db.session.delete(record)
+            db.session.commit()
+
 
 scrapingrecordService = ScrapingRecordService()
 transrecordService = TransRecordService()

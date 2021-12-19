@@ -10,5 +10,6 @@ def register(app):
     from . import view_ctrl
     from . import backup_ctrl
     from . import filescan_ctrl
+    from . import transferctrl
 
     app.register_blueprint(web)
