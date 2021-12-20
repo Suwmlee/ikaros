@@ -1,3 +1,11 @@
+## [1.13.1](https://github.com/Suwmlee/ikaros/compare/v1.13.0...v1.13.1) (2021-12-20)
+
+
+### Bug Fixes
+
+* update status ([ddaf0f8](https://github.com/Suwmlee/ikaros/commit/ddaf0f8abc705e62c05139038ff889c339b44d63))
+* **transfer:** specials season  0 ([722299e](https://github.com/Suwmlee/ikaros/commit/722299eb79919b6712809e3845e652c831b12a63))
+
 # [1.13.0](https://github.com/Suwmlee/ikaros/compare/v1.12.0...v1.13.0) (2021-12-20)
 
 
