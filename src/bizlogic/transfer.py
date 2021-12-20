@@ -344,32 +344,28 @@ def naming(currentfile: FileInfo, movie_list: list, replace_CJK_tag, fixseries_t
                 except:
                     currentfile.name = "S%02dE%02d" % (currentfile.season, currentfile.epnum)
             else:
-                # 查询 同级目录下所有视频
-                matches = [x for x in movie_list if x.folders == currentfile.folders]
-                if len(matches) > 0:
-                    # 检查剧集编号，超过2个且不同，连续？才继续处理
-                    # 自动推送只有单文件
-
+                if isinstance(currentfile.season, int) and currentfile.season > -1:
+                    seasonnum = currentfile.season
+                else:
                     # 检测视频上级目录是否有 season 标记
                     dirfolder = currentfile.folders[len(currentfile.folders)-1]
                     # 根据 season 标记 更新 secondfolder
                     seasonnum = matchSeason(dirfolder)
-                    if seasonnum:
-                        currentfile.season = seasonnum
-                        currentfile.secondfolder = "Season " + str(seasonnum)
-                        currentfile.fixEpName(seasonnum)
-                    else:
-                        # 如果存在大量重复 epnum
-                        # 如果检测不到 seasonnum 可能是多季？
-                        if currentfile.secondfolder == '':
-                            currentfile.season = 1
-                            currentfile.secondfolder = "Season " + str(1)
-                            currentfile.fixEpName(1)
-                        else:
-                            if '花絮' in dirfolder and currentfile.topfolder != '.':
-                                currentfile.secondfolder = "Specials"
-                                currentfile.season = 0
-                                currentfile.fixEpName(0)
+                if seasonnum:
+                    currentfile.season = seasonnum
+                    currentfile.secondfolder = "Season " + str(seasonnum)
+                    currentfile.fixEpName(seasonnum)
+                else:
+                    # 如果检测不到 seasonnum 可能是多季？默认第一季
+                    if currentfile.secondfolder == '':
+                        currentfile.season = 1
+                        currentfile.secondfolder = "Season " + str(1)
+                        currentfile.fixEpName(1)
+                    # TODO 更多关于花絮的规则
+                    elif '花絮' in dirfolder and currentfile.topfolder != '.':
+                        currentfile.secondfolder = "Specials"
+                        currentfile.season = 0
+                        currentfile.fixEpName(0)
 
     # 检测是否是特殊的导评/花絮内容
     # TODO 更多关于花絮的规则
