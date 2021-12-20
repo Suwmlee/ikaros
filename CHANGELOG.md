@@ -1,3 +1,16 @@
+# [1.13.0](https://github.com/Suwmlee/ikaros/compare/v1.12.0...v1.13.0) (2021-12-20)
+
+
+### Bug Fixes
+
+* normal naming ([52dfba5](https://github.com/Suwmlee/ikaros/commit/52dfba5dbbb5135af362e3c9170797d12744abb2))
+
+
+### Features
+
+* **transfer:** add edit dialog ([41bcdf2](https://github.com/Suwmlee/ikaros/commit/41bcdf28e78016343c46681337ad4c1e188f42de))
+* add search in transfer ([1c49343](https://github.com/Suwmlee/ikaros/commit/1c493437f26260b8888691164bee750482eeeaa3))
+
 # [1.12.0](https://github.com/Suwmlee/ikaros/compare/v1.11.5...v1.12.0) (2021-12-19)
 
 
