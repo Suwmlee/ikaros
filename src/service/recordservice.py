@@ -157,8 +157,12 @@ class TransRecordService():
             info.updatetime = datetime.datetime.now()
             db.session.commit()
 
-    def queryByPage(self, pagenum, pagesize, sort):
-        infos = _TransRecords.query.order_by(_TransRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+    def queryByPage(self, pagenum, pagesize, sort, blur):
+        infos = _TransRecords.query.filter(
+                    or_(_TransRecords.srcname.like("%" + blur + "%") if blur is not None else "",
+                        _TransRecords.destpath.like("%" + blur + "%") if blur is not None else "",
+                        _TransRecords.topfolder.like("%" + blur + "%") if blur is not None else "")
+                ).order_by(_TransRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
         return infos
 
     def deleteRecords(self):

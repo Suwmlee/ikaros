@@ -345,38 +345,6 @@ def deleteTransConf(cid):
 
 # transrecord
 
-
-@web.route("/api/transrecord", methods=['GET'])
-def getTransRecord():
-    """ 查询
-    """
-    try:
-        page = request.args.get('page')
-        pagenum = int(page)
-        size = int(request.args.get('size'))
-        sort = 0
-        infos = transrecordService.queryByPage(pagenum, size, sort)
-        data = []
-        for i in infos.items:
-            data.append(i.serialize())
-        ret = dict()
-        ret['data'] = data
-        ret['total'] = infos.total
-        ret['pages'] = infos.pages
-        ret['page'] = pagenum
-        taskinfo = taskService.getTask('transfer')
-        if taskinfo.status == 2:
-            ret['running'] = True
-            ret['tasktotal'] = taskinfo.total
-            ret['taskfinished'] = taskinfo.finished
-        else:
-            ret['running'] = False
-        return json.dumps(ret)
-    except Exception as err:
-        current_app.logger.error(err)
-        return Response(status=500)
-
-
 @web.route("/api/transrecord", methods=['DELETE'])
 def delTransRecord():
     """ 清理转移

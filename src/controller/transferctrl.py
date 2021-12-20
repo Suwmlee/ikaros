@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 
+import json
 from flask import request, Response, current_app
 from . import web
 from ..service.recordservice import transrecordService
+from ..service.taskservice import taskService
 
 
 @web.route("/api/transfer/record", methods=['DELETE'])
@@ -16,3 +18,36 @@ def deleteTransferRecordIds():
     except Exception as err:
         current_app.logger.error(err)
         return Response(status=500)
+
+
+@web.route("/api/transrecord", methods=['GET'])
+def getTransRecord():
+    """ 查询
+    """
+    try:
+        pagenum = int(request.args.get('page'))
+        size = int(request.args.get('size'))
+        sort = 0
+        blur = request.args.get('blur')
+        infos = transrecordService.queryByPage(pagenum, size, sort, blur)
+        data = []
+        for i in infos.items:
+            data.append(i.serialize())
+        ret = dict()
+        ret['data'] = data
+        ret['total'] = infos.total
+        ret['pages'] = infos.pages
+        ret['page'] = pagenum
+        taskinfo = taskService.getTask('transfer')
+        if taskinfo.status == 2:
+            ret['running'] = True
+            ret['tasktotal'] = taskinfo.total
+            ret['taskfinished'] = taskinfo.finished
+        else:
+            ret['running'] = False
+        return json.dumps(ret)
+    except Exception as err:
+        current_app.logger.error(err)
+        return Response(status=500)
+
+
