@@ -235,9 +235,9 @@ def transfer(src_folder, dest_folder,
                 continue
             if fixseries_tag and currentrecord.isepisode:
                 currentfile.isepisode = currentrecord.isepisode
-                if currentrecord.season and currentrecord.season > -1:
+                if isinstance(currentrecord.season, int) and currentrecord.season > -1:
                     currentfile.season = currentrecord.season
-                if currentrecord.episode and currentrecord.episode > -1:
+                if isinstance(currentrecord.episode, int) and currentrecord.episode > -1:
                     currentfile.epnum = currentrecord.episode
                 # 未生效，目前都以记录为准
                 if currentrecord.status and currentrecord.status == 1:
@@ -330,7 +330,8 @@ def naming(currentfile: FileInfo, movie_list: list, replace_CJK_tag, fixseries_t
         if currentfile.isepisode:
             current_app.logger.debug("[-] fix series name")
             # 检测是否有修正记录
-            if currentfile.season and currentfile.epnum:
+            if isinstance(currentfile.season, int) and isinstance(currentfile.epnum, int) \
+                and currentfile.season > -1 and currentfile.epnum > -1:
                 current_app.logger.debug("[-] directly use record")
                 if currentfile.season == 0:
                     currentfile.secondfolder = "Specials"
