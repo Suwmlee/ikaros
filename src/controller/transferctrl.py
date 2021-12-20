@@ -51,3 +51,14 @@ def getTransRecord():
         return Response(status=500)
 
 
+@web.route("/api/transfer/record", methods=['PUT'])
+def editTransferRecord():
+    try:
+        content = request.get_json()
+        transrecordService.update(content.get('srcpath'), content.get('linkpath'), content.get('destpath'),
+                                      content.get('topfolder'), content.get('secondfolder'),
+                                      content.get('isepisode'), content.get('season'), content.get('episode'))
+        return Response(status=200)
+    except Exception as err:
+        current_app.logger.error(err)
+        return Response(status=500)

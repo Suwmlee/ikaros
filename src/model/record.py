@@ -70,6 +70,7 @@ class _TransRecords(db.Model):
     status = Column(Integer, default=0)
 
     topfolder = Column(String, default='')
+    # 电影类，次级目录;如果是剧集则以season为准
     secondfolder = Column(String, default='')
     isepisode = Column(Boolean, default=False)
     season = Column(Integer, default=-1)
@@ -90,10 +91,12 @@ class _TransRecords(db.Model):
             'srcpath': self.srcpath,
             'srcsize': self.srcsize,
             'success': self.success,
-            'status':self.status,
-            'isepisode':self.isepisode,
-            'season':self.season,
-            'episode':self.episode,
+            'status': self.status,
+            'topfolder': self.topfolder,
+            'secondfolder': self.secondfolder,
+            'isepisode': self.isepisode,
+            'season': self.season,
+            'episode': self.episode,
             'linkpath': self.linkpath,
             'destpath': self.destpath,
             'updatetime': self.updatetime.strftime("%H:%M:%S %m/%d/%Y")

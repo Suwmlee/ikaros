@@ -144,12 +144,14 @@ class TransRecordService():
             return None
         return info
 
-    def update(self, path, softpath, destpath, isepisode, season, epnum):
+    def update(self, path, softpath, destpath, topfolder, secondfolder, isepisode, season, epnum):
         info = self.queryByPath(path)
         if info:
             info.success = True
             info.linkpath = softpath
             info.destpath = destpath
+            info.topfolder = topfolder
+            info.secondfolder = secondfolder
             if isepisode:
                 info.isepisode = isepisode
                 info.season = season

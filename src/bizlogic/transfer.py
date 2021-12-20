@@ -24,7 +24,7 @@ class FileInfo():
 
     midfolder = ''
     topfolder = ''
-    seasonfolder = ''
+    secondfolder = ''
     name = ''
     ext = ''
 
@@ -52,16 +52,16 @@ class FileInfo():
         self.folders = folders
         self.topfolder = folders[0]
         if len(folders) > 1:
-            self.seasonfolder = folders[1]
+            self.secondfolder = folders[1]
 
     def fixMidFolder(self):
         temp = self.folders
         temp[0] = self.topfolder
-        if self.seasonfolder != '':
+        if self.secondfolder != '':
             if len(temp) > 1:
-                temp[1] = self.seasonfolder
+                temp[1] = self.secondfolder
             else:
-                temp.append(self.seasonfolder)
+                temp.append(self.secondfolder)
         return os.path.join(*temp)
 
     def updateFinalPath(self, path):
@@ -167,7 +167,8 @@ def transfer(src_folder, dest_folder,
              replace_CJK_tag= False,
              fixseries_tag= False
              ):
-    """ 如果 top_files 有值，则使用 top_files 过滤文件且不清理其他文件
+    """
+    如果 specified_files 有值，则使用 specified_files 过滤文件且不清理其他文件
     """
 
     task = taskService.getTask('transfer')
@@ -238,6 +239,7 @@ def transfer(src_folder, dest_folder,
                     currentfile.season = currentrecord.season
                 if currentrecord.episode and currentrecord.episode > -1:
                     currentfile.epnum = currentrecord.episode
+                # 未生效，目前都以记录为准
                 if currentrecord.status and currentrecord.status == 1:
                     currentfile.locked = True
             # 优化命名
@@ -276,6 +278,7 @@ def transfer(src_folder, dest_folder,
 
             current_app.logger.info("[-] transfered [{}]".format(newpath))
             transrecordService.update(currentfile.realpath, link_path, newpath,
+                                      currentfile.topfolder, currentfile.secondfolder,
                                       currentfile.isepisode, currentfile.season, currentfile.epnum)
 
         if clean_others_tag:
@@ -330,9 +333,9 @@ def naming(currentfile: FileInfo, movie_list: list, replace_CJK_tag, fixseries_t
             if currentfile.season and currentfile.epnum:
                 current_app.logger.debug("[-] directly use record")
                 if currentfile.season == 0:
-                    currentfile.seasonfolder = "Specials"
+                    currentfile.secondfolder = "Specials"
                 else:
-                    currentfile.seasonfolder = "Season " + str(currentfile.season)
+                    currentfile.secondfolder = "Season " + str(currentfile.season)
                 try:
                     currentfile.fixEpName(currentfile.season)
                 except:
@@ -346,27 +349,27 @@ def naming(currentfile: FileInfo, movie_list: list, replace_CJK_tag, fixseries_t
 
                     # 检测视频上级目录是否有 season 标记
                     dirfolder = currentfile.folders[len(currentfile.folders)-1]
-                    # 根据 season 标记 更新 seasonfolder
+                    # 根据 season 标记 更新 secondfolder
                     seasonnum = matchSeason(dirfolder)
                     if seasonnum:
                         currentfile.season = seasonnum
-                        currentfile.seasonfolder = "Season " + str(seasonnum)
+                        currentfile.secondfolder = "Season " + str(seasonnum)
                         currentfile.fixEpName(seasonnum)
                     else:
                         # 如果存在大量重复 epnum
                         # 如果检测不到 seasonnum 可能是多季？
-                        if currentfile.seasonfolder == '':
+                        if currentfile.secondfolder == '':
                             currentfile.season = 1
-                            currentfile.seasonfolder = "Season " + str(1)
+                            currentfile.secondfolder = "Season " + str(1)
                             currentfile.fixEpName(1)
                         else:
                             if '花絮' in dirfolder and currentfile.topfolder != '.':
-                                currentfile.seasonfolder = "Specials"
+                                currentfile.secondfolder = "Specials"
                                 currentfile.season = 0
                                 currentfile.fixEpName(0)
 
     # 检测是否是特殊的导评/花絮内容
     # TODO 更多关于花絮的规则
     if currentfile.name == "导演访谈":
-        if currentfile.seasonfolder == '' and currentfile.topfolder != '.':
-            currentfile.seasonfolder = "extras"
+        if currentfile.secondfolder == '' and currentfile.topfolder != '.':
+            currentfile.secondfolder = "extras"
