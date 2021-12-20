@@ -233,15 +233,17 @@ def transfer(src_folder, dest_folder,
             if currentrecord.status == 2:
                 # 忽略标记，直接下一个
                 continue
+            if currentrecord.topfolder and currentrecord.topfolder != '.':
+                currentfile.topfolder = currentrecord.topfolder
+            if currentrecord.status and currentrecord.status == 1:
+                currentfile.locked = True
             if fixseries_tag and currentrecord.isepisode:
                 currentfile.isepisode = currentrecord.isepisode
                 if isinstance(currentrecord.season, int) and currentrecord.season > -1:
                     currentfile.season = currentrecord.season
                 if isinstance(currentrecord.episode, int) and currentrecord.episode > -1:
                     currentfile.epnum = currentrecord.episode
-                # 未生效，目前都以记录为准
-                if currentrecord.status and currentrecord.status == 1:
-                    currentfile.locked = True
+
             # 优化命名
             naming(currentfile, movie_list, replace_CJK_tag, fixseries_tag)
 
@@ -300,7 +302,7 @@ def transfer(src_folder, dest_folder,
 def naming(currentfile: FileInfo, movie_list: list, replace_CJK_tag, fixseries_tag):
     # 处理 midfolder 内特殊内容
     # CMCT组视频文件命名比文件夹命名更好
-    if 'CMCT' in currentfile.topfolder:
+    if 'CMCT' in currentfile.topfolder and not currentfile.locked:
         matches = [x for x in movie_list if x.topfolder == currentfile.topfolder]
         # 检测是否有剧集标记
         epfiles = [x for x in matches if x.isepisode]
@@ -312,7 +314,7 @@ def naming(currentfile: FileInfo, movie_list: list, replace_CJK_tag, fixseries_t
                     m.topfolder = namingfiles[0].name
             current_app.logger.debug("[-] handling cmct midfolder [{}] ".format(currentfile.midfolder))
     # topfolder 替换中文
-    if replace_CJK_tag:
+    if replace_CJK_tag and not currentfile.locked:
         minlen = 27
         tempmid = currentfile.topfolder
         tempmid = replaceCJK(tempmid)

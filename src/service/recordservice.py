@@ -150,6 +150,8 @@ class TransRecordService():
             info.success = True
             info.linkpath = softpath
             info.destpath = destpath
+            if topfolder == '':
+                topfolder = '.'
             info.topfolder = topfolder
             info.secondfolder = secondfolder
             if isepisode:

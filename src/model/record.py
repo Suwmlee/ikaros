@@ -57,7 +57,7 @@ class _ScrapingRecords(db.Model):
 class _TransRecords(db.Model):
     """ 转移记录
     status  0   
-            1   锁定
+            1   锁定    -> 针对顶层目录
             2   忽略
     """
     __tablename__ = 'transrecords'
