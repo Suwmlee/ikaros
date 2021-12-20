@@ -279,7 +279,7 @@ def transfer(src_folder, dest_folder,
                 dest_list.remove(newpath)
 
             current_app.logger.info("[-] transfered [{}]".format(newpath))
-            transrecordService.update(currentfile.realpath, link_path, newpath,
+            transrecordService.update(currentfile.realpath, link_path, newpath, currentrecord.status,
                                       currentfile.topfolder, currentfile.secondfolder,
                                       currentfile.isepisode, currentfile.season, currentfile.epnum)
 
