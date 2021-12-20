@@ -68,9 +68,9 @@ def openExcel(file='file.xls'):
 def allowedFormat(file='file.xls', colnameindex=0, by_index=0):
     """
     根据索引获取Excel表格中的数据   
-    参数:file：Excel文件路径    
-    colnameindex：表头列名所在行的索引 
-    by_index：表的索引
+    参数:file       Excel文件路径    
+    colnameindex:   表头列名所在行的索引 
+    by_index:       表的索引
     """
     data = openExcel(file)
     table = data.sheets()[by_index]

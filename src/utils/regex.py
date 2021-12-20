@@ -124,6 +124,16 @@ def matchEpPart(basename):
     return None
 
 
+def matchSeries(basename):
+    regstr = "s(\d{1,2})ep?(\d{1,4})"
+    results = regexMatch(basename, regstr)
+    if results and len(results) > 0:
+        season = int(results[0][0])
+        ep = int(results[0][1])
+        return season, ep
+    return None, None
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod(verbose=True)

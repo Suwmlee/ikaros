@@ -4,13 +4,12 @@
 import os
 import pathlib
 import re
-from typing import List
 
 from .mediaserver import refreshMediaServer
 from ..service.configservice import transConfigService
-from ..service.recordservice import transrecordService, _TransRecords
+from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
-from ..utils.regex import extractEpNum, matchSeason, matchEpPart
+from ..utils.regex import extractEpNum, matchSeason, matchEpPart, matchSeries
 from ..utils.filehelper import video_type, ext_type, replaceRegex, cleanFolderWithoutSuffix,\
      forceHardlink, forceSymlink, replaceCJK, cleanbyNameSuffix, cleanExtraMedia, copySubs
 from flask import current_app
@@ -71,25 +70,34 @@ class FileInfo():
         self.finalfolder = newfolder
 
     def parse(self):
+        # 正确的剧集命名
+        season, ep = matchSeries(self.name)
+        if season and ep:
+            self.isepisode = True
+            self.season = season
+            self.epnum = ep
+            self.originep  = 'Pass'
+            return
+        # 是否是需要修正的剧集命名
         originep = matchEpPart(self.name)
         if originep:
             epresult = extractEpNum(originep)
             if epresult:
                 self.isepisode = True
                 self.originep = originep
-                self.epnum = epresult
+                self.epnum = int(epresult)
 
     def fixEpName(self, season):
-        prefix = "S%02dE" % (season)
-        episode =  str(self.epnum)
-        current_app.logger.debug(self.originep + "   " + episode)
+        if self.originep == 'Pass':
+            return
+        prefix = "S%02dE%02d" % (season, self.epnum)
         if self.originep[0] == '.':
-            renum = "." + prefix + episode + "."
+            renum = "." + prefix + "."
         elif self.originep[0] == '[':
-            renum = "[" + prefix + episode + "]"
+            renum = "[" + prefix + "]"
         else:
-            renum = " " + prefix + episode + " "
-        current_app.logger.debug("替换内容：" + renum)
+            renum = " " + prefix + " "
+        current_app.logger.debug("替换内容:" + renum)
         newname = self.name.replace(self.originep, renum)
         self.name = newname
         current_app.logger.info("替换后:   {}".format(newname))
@@ -197,7 +205,7 @@ def transfer(src_folder, dest_folder,
         # 硬链接直接使用源目录
         if linktype == 1:
             prefix = src_folder
-        # 清理目标目录下的文件：视频 字幕
+        # 清理目标目录下的文件:视频 字幕
         if not os.path.exists(dest_folder):
             os.makedirs(dest_folder)
 

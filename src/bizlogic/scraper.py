@@ -414,7 +414,7 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
     #  1: 创建链接刮削 / Scraping mode
     #       - 1 软链接    - 2 硬链接    - 0 移动文件
     #  2: 整理模式 / Organizing mode ??
-    #  3：直接刮削
+    #  3: 直接刮削
     if conf.main_mode == 1:
         # 创建文件夹
         path = createFolder(json_data, conf)
