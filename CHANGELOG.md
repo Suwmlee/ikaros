@@ -1,3 +1,10 @@
+# [1.14.0](https://github.com/Suwmlee/ikaros/compare/v1.13.1...v1.14.0) (2021-12-21)
+
+
+### Features
+
+* rename all series folder ([43c44d8](https://github.com/Suwmlee/ikaros/commit/43c44d857dd87375c66414db49d7efa18c865885)), closes [#7](https://github.com/Suwmlee/ikaros/issues/7)
+
 ## [1.13.1](https://github.com/Suwmlee/ikaros/compare/v1.13.0...v1.13.1) (2021-12-20)
 
 
