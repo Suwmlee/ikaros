@@ -1,3 +1,10 @@
+## [1.14.1](https://github.com/Suwmlee/ikaros/compare/v1.14.0...v1.14.1) (2021-12-21)
+
+
+### Bug Fixes
+
+* update isepisode ([e225246](https://github.com/Suwmlee/ikaros/commit/e22524627794278a43f843537c916aaa7026080a))
+
 # [1.14.0](https://github.com/Suwmlee/ikaros/compare/v1.13.1...v1.14.0) (2021-12-21)
 
 
