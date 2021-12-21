@@ -165,6 +165,7 @@ class TransRecordService():
                     info.season = season
                 info.episode = epnum
             else:
+                info.isepisode = False
                 if renameSub_tag:
                     self.renameAllSecond(info.srcfolder, info.topfolder, info.secondfolder, secondfolder)
                 else:
