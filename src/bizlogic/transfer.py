@@ -230,6 +230,7 @@ def transfer(src_folder, dest_folder,
             link_path = os.path.join(prefix, currentfile.midfolder, currentfile.realname)
 
             currentrecord = transrecordService.add(currentfile.realpath)
+            currentrecord.srcfolder = src_folder
             if currentrecord.status == 2:
                 # 忽略标记，直接下一个
                 continue

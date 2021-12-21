@@ -66,7 +66,8 @@ class _TransRecords(db.Model):
     srcname = Column(String, default='')
     srcpath = Column(String, default='')
     srcsize = Column(BigInteger, default=0)
-    success = Column(Boolean, default=False)
+    srcfolder = Column(String, default='')
+
     status = Column(Integer, default=0)
 
     topfolder = Column(String, default='')
@@ -90,7 +91,7 @@ class _TransRecords(db.Model):
             'srcname': self.srcname,
             'srcpath': self.srcpath,
             'srcsize': self.srcsize,
-            'success': self.success,
+            'srcfolder': self.srcfolder,
             'status': self.status,
             'topfolder': self.topfolder,
             'secondfolder': self.secondfolder,
