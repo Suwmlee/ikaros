@@ -2,7 +2,6 @@
 '''
 '''
 import os
-import shutil
 import datetime
 from sqlalchemy import or_
 from ..model.record import _ScrapingRecords, _TransRecords
@@ -144,7 +143,10 @@ class TransRecordService():
             return None
         return info
 
-    def update(self, path, softpath, destpath, status, topfolder, secondfolder, isepisode, season, epnum):
+    def update(self, path, softpath, destpath, status, 
+                topfolder, secondfolder,
+                isepisode, season, epnum, 
+                renameTop_tag = False, renameSub_tag = False):
         info = self.queryByPath(path)
         if info:
             info.linkpath = softpath
@@ -152,12 +154,21 @@ class TransRecordService():
             info.status = status
             if topfolder == '':
                 topfolder = '.'
+            if renameTop_tag and topfolder != '.':
+                self.renameAllTop(info.srcfolder, info.topfolder, topfolder)
             info.topfolder = topfolder
-            info.secondfolder = secondfolder
             if isepisode:
-                info.isepisode = isepisode
-                info.season = season
+                if renameSub_tag:
+                    self.renameAllSeason(info.srcfolder, info.topfolder, info.season, season)
+                else:
+                    info.isepisode = True
+                    info.season = season
                 info.episode = epnum
+            else:
+                if renameSub_tag:
+                    self.renameAllSecond(info.srcfolder, info.topfolder, info.secondfolder, secondfolder)
+                else:
+                    info.secondfolder = secondfolder
             info.updatetime = datetime.datetime.now()
             db.session.commit()
 
@@ -187,6 +198,28 @@ class TransRecordService():
                     cleanScrapingfile(folder, filter)
             db.session.delete(record)
             db.session.commit()
+
+    def renameAllTop(self, srcfolder, top, new):
+        records = _TransRecords.query.filter_by(srcfolder=srcfolder, topfolder=top).all()
+        for single in records:
+            if single.status != 1 and single.status != 2:
+                single.topfolder = new
+                single.updatetime = datetime.datetime.now()
+
+    def renameAllSecond(self, srcfolder, top, second, new):
+        records = _TransRecords.query.filter_by(srcfolder=srcfolder, topfolder=top, secondfolder=second).all()
+        for single in records:
+            if single.status != 1 and single.status != 2:
+                single.secondfolder = new
+                single.updatetime = datetime.datetime.now()
+
+    def renameAllSeason(self, srcfolder, top, season, new):
+        records = _TransRecords.query.filter_by(srcfolder=srcfolder, topfolder=top, season=season).all()
+        for single in records:
+            if single.status != 1 and single.status != 2:
+                single.isepisode = True
+                single.season = new
+                single.updatetime = datetime.datetime.now()
 
 
 scrapingrecordService = ScrapingRecordService()
