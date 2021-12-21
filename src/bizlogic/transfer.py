@@ -236,14 +236,18 @@ def transfer(src_folder, dest_folder,
                 continue
             if currentrecord.topfolder and currentrecord.topfolder != '.':
                 currentfile.topfolder = currentrecord.topfolder
+            if currentrecord.secondfolder:
+                currentfile.secondfolder = currentrecord.secondfolder
             if currentrecord.status and currentrecord.status == 1:
                 currentfile.locked = True
-            if fixseries_tag and currentrecord.isepisode:
-                currentfile.isepisode = currentrecord.isepisode
+            if currentrecord.isepisode:
+                currentfile.isepisode = True
                 if isinstance(currentrecord.season, int) and currentrecord.season > -1:
                     currentfile.season = currentrecord.season
                 if isinstance(currentrecord.episode, int) and currentrecord.episode > -1:
                     currentfile.epnum = currentrecord.episode
+            else:
+                currentfile.isepisode = False
 
             # 优化命名
             naming(currentfile, movie_list, replace_CJK_tag, fixseries_tag)
@@ -370,6 +374,6 @@ def naming(currentfile: FileInfo, movie_list: list, replace_CJK_tag, fixseries_t
 
     # 检测是否是特殊的导评/花絮内容
     # TODO 更多关于花絮的规则
-    if currentfile.name == "导演访谈":
+    if currentfile.name == "导演访谈" and not currentfile.locked:
         if currentfile.secondfolder == '' and currentfile.topfolder != '.':
             currentfile.secondfolder = "extras"

@@ -20,7 +20,7 @@ class _ScrapingRecords(db.Model):
     srcpath = Column(String, default='')
     srcsize = Column(BigInteger, default=0)
     status = Column(Integer, default=0)
-    
+
     scrapingname = Column(String, default='', comment='used name for scraping')
     cdnum = Column(Integer, default=0, comment='cd num')
     cnsubtag = Column(Boolean, default=False, comment='cn sub')
@@ -51,7 +51,6 @@ class _ScrapingRecords(db.Model):
             'destpath': self.destpath,
             'updatetime': self.updatetime.strftime("%H:%M:%S %m/%d/%Y")
         }
-
 
 
 class _TransRecords(db.Model):
