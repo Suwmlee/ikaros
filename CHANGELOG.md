@@ -1,3 +1,10 @@
+## [1.14.2](https://github.com/Suwmlee/ikaros/compare/v1.14.1...v1.14.2) (2021-12-21)
+
+
+### Bug Fixes
+
+* **transfer:** movie extras ([9dbc513](https://github.com/Suwmlee/ikaros/commit/9dbc513184dbab6e217e724ab58baa15613dae3d))
+
 ## [1.14.1](https://github.com/Suwmlee/ikaros/compare/v1.14.0...v1.14.1) (2021-12-21)
 
 
