@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/Suwmlee/ikaros/compare/v1.14.3...v1.15.0) (2021-12-22)
+
+
+### Features
+
+* update options page ([e8b3987](https://github.com/Suwmlee/ikaros/commit/e8b3987f67cba926cda7f6aada5573b0f809eedf))
+
 ## [1.14.3](https://github.com/Suwmlee/ikaros/compare/v1.14.2...v1.14.3) (2021-12-22)
 
 
