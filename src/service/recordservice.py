@@ -53,6 +53,17 @@ class ScrapingRecordService():
             db.session.delete(record)
             db.session.commit()
 
+    def cleanUnavailable(self):
+        records = self.queryAll()
+        for i in records:
+            srcpath = i.srcpath
+            dstpath = i.destpath
+            if not os.path.exists(srcpath):
+                if i.linktype == 1:
+                    self.deleteByID(i.id)
+                if not os.path.exists(dstpath):
+                    self.deleteByID(i.id)
+
     def importRecord(self, name, path, size, status):
         record = _ScrapingRecords.query.filter_by(srcpath=path).first()
         if not record:
@@ -200,6 +211,13 @@ class TransRecordService():
                     cleanScrapingfile(folder, filter)
             db.session.delete(record)
             db.session.commit()
+
+    def cleanUnavailable(self):
+        records = _TransRecords.query.all()
+        for i in records:
+            srcpath = i.srcpath
+            if not os.path.exists(srcpath):
+                self.deleteByID(i.id)
 
     def renameAllTop(self, srcfolder, top, new):
         records = _TransRecords.query.filter_by(srcfolder=srcfolder, topfolder=top).all()

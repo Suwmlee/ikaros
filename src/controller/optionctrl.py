@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import os
+import json
+import logging
 import xlwt
 import xlrd
 import datetime
@@ -8,13 +10,43 @@ import datetime
 from flask import request, Response, send_from_directory
 
 from . import web
-from ..service.recordservice import scrapingrecordService
+from ..service.recordservice import scrapingrecordService, transrecordService
 from ..model.record import _ScrapingRecords
 from flask import current_app
 from ..utils.filehelper import cleanbySuffix
 
 
-@web.route("/api/export", methods=['GET'])
+@web.route("/api/options/loglevel", methods=['GET', 'PUT'])
+def loglevel():
+    """
+CRITICAL = 50
+FATAL = CRITICAL
+ERROR = 40
+WARNING = 30
+WARN = WARNING
+INFO = 20
+DEBUG = 10
+NOTSET = 0
+    """
+    try:
+        if request.method == 'GET':
+            level = current_app.logger.level
+            ret = {'loglevel': level}
+            return json.dumps(ret)
+        if request.method == 'PUT':
+            content = request.get_json()
+            if content and 'loglevel' in content:
+                level = int(content.get('loglevel'))
+                current_app.logger.setLevel(level)
+            else:
+                current_app.logger.setLevel(logging.INFO)
+            return Response(status=200)
+    except Exception as err:
+        current_app.logger.error(err)
+        return Response(status=500)
+
+
+@web.route("/api/options/exportjav", methods=['GET'])
 def exportExcel():
     """ 导出JAV excel
     https://skysec.top/2017/07/18/flask%E7%9A%84excel%E5%AF%BC%E5%85%A5%E4%B8%8E%E5%AF%BC%E5%87%BA/
@@ -92,7 +124,7 @@ def allowedFile(filename):
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
-@web.route("/api/import", methods=['POST'])
+@web.route("/api/options/importjav", methods=['POST'])
 def importExcel():
     """ 导入JAV excel
     """
@@ -113,7 +145,7 @@ def importExcel():
                     u = scrapingrecordService.queryByPath(srcpath)
                     if u:
                         pass_num += 1
-                        print("[Backup] Pass: " + srcpath)
+                        current_app.logger.debug("[Backup] Pass: " + srcpath)
                     else:
                         t = scrapingrecordService.add(srcpath)
                         for singlekey in headers:
@@ -125,7 +157,7 @@ def importExcel():
                                     setattr(t, singlekey, newvalue)
                         scrapingrecordService.commit()
                         success_num += 1
-                        print("[Backup] Add: " + srcpath)
+                        current_app.logger.debug("[Backup] Add: " + srcpath)
                 os.remove('import' + filename)
                 return Response(status=200)
             else:
@@ -138,23 +170,17 @@ def importExcel():
         return Response(status=500)
 
 
-@web.route("/api/cleandb", methods=['GET'])
+@web.route("/api/options/cleanrecord", methods=['GET'])
 def cleanErrData():
     """ clean record file not exist
     """
     try:
-        records = scrapingrecordService.queryAll()
-        for i in records:
-            srcpath = i.srcpath
-            dstpath = i.destpath
-            if not os.path.exists(srcpath):
-                if i.linktype == 1:
-                    print("[Clean scrapingrecord] : " + srcpath)
-                    scrapingrecordService.deleteByID(i.id)
-                if not os.path.exists(dstpath):
-                    print("[Clean scrapingrecord] : " + srcpath)
-                    scrapingrecordService.deleteByID(i.id)
+        scrapingrecordService.cleanUnavailable()
+        transrecordService.cleanUnavailable()
         return Response(status=200)
     except Exception as err:
         current_app.logger.error(err)
         return Response(status=500)
+
+
+
