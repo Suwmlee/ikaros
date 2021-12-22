@@ -85,12 +85,15 @@ class FileInfo():
             if epresult:
                 self.isepisode = True
                 self.originep = originep
-                self.epnum = int(epresult)
+                self.epnum = epresult
 
     def fixEpName(self, season):
         if self.originep == 'Pass':
             return
-        prefix = "S%02dE%02d" % (season, self.epnum)
+        if isinstance(self.epnum, int):
+            prefix = "S%02dE%02d" % (season, self.epnum)
+        else:
+            prefix = "S%02dE" % (season) + self.epnum
         if self.originep[0] == '.':
             renum = "." + prefix + "."
         elif self.originep[0] == '[':
@@ -234,6 +237,8 @@ def transfer(src_folder, dest_folder,
             if currentrecord.status == 2:
                 # 忽略标记，直接下一个
                 continue
+            # 记录优先
+            # 如果是剧集，season优先
             if currentrecord.topfolder and currentrecord.topfolder != '.':
                 currentfile.topfolder = currentrecord.topfolder
             if currentrecord.secondfolder:
@@ -246,7 +251,9 @@ def transfer(src_folder, dest_folder,
                     currentfile.season = currentrecord.season
                 if isinstance(currentrecord.episode, int) and currentrecord.episode > -1:
                     currentfile.epnum = currentrecord.episode
-            else:
+                elif isinstance(currentrecord.episode, str) and currentrecord != '':
+                    currentfile.epnum = currentrecord.episode
+            elif not fixseries_tag:
                 currentfile.isepisode = False
 
             # 优化命名
