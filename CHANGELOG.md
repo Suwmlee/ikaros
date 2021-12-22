@@ -1,3 +1,10 @@
+## [1.14.3](https://github.com/Suwmlee/ikaros/compare/v1.14.2...v1.14.3) (2021-12-22)
+
+
+### Bug Fixes
+
+* **transfer:** episode with tags ([7b50116](https://github.com/Suwmlee/ikaros/commit/7b5011634de38ae76aa2b143cf16a2cc31c197f0))
+
 ## [1.14.2](https://github.com/Suwmlee/ikaros/compare/v1.14.1...v1.14.2) (2021-12-21)
 
 
