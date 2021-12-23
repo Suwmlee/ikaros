@@ -374,10 +374,15 @@ def naming(currentfile: FileInfo, movie_list: list, replace_CJK_tag, fixseries_t
                         currentfile.secondfolder = "Season " + str(1)
                         currentfile.fixEpName(1)
                     # TODO 更多关于花絮的规则
-                    elif '花絮' in dirfolder and currentfile.topfolder != '.':
-                        currentfile.secondfolder = "Specials"
-                        currentfile.season = 0
-                        currentfile.fixEpName(0)
+                    else:
+                        try:
+                            dirfolder = currentfile.folders[len(currentfile.folders)-1]
+                            if '花絮' in dirfolder and currentfile.topfolder != '.':
+                                currentfile.secondfolder = "Specials"
+                                currentfile.season = 0
+                                currentfile.fixEpName(0)
+                        except Exception as ex:
+                            current_app.logger.error(ex)
 
     # 检测是否是特殊的导评/花絮内容
     # TODO 更多关于花絮的规则
