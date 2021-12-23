@@ -88,22 +88,27 @@ class FileInfo():
                 self.epnum = epresult
 
     def fixEpName(self, season):
-        if self.originep == 'Pass':
-            return
         if isinstance(self.epnum, int):
             prefix = "S%02dE%02d" % (season, self.epnum)
         else:
             prefix = "S%02dE" % (season) + self.epnum
-        if self.originep[0] == '.':
-            renum = "." + prefix + "."
-        elif self.originep[0] == '[':
-            renum = "[" + prefix + "]"
+
+        if self.originep == 'Pass':
+            if prefix in self.name:
+                return
+            else:
+                self.name = prefix
         else:
-            renum = " " + prefix + " "
-        current_app.logger.debug("替换内容:" + renum)
-        newname = self.name.replace(self.originep, renum)
-        self.name = newname
-        current_app.logger.info("替换后:   {}".format(newname))
+            if self.originep[0] == '.':
+                renum = "." + prefix + "."
+            elif self.originep[0] == '[':
+                renum = "[" + prefix + "]"
+            else:
+                renum = " " + prefix + " "
+            current_app.logger.debug("替换内容:" + renum)
+            newname = self.name.replace(self.originep, renum)
+            self.name = newname
+            current_app.logger.info("替换后:   {}".format(newname))
 
 
 def findAllVideos(root, src_folder, escape_folder, mode=1):
