@@ -170,7 +170,7 @@ class TransRecordService():
             info.topfolder = topfolder
             if isepisode:
                 if renameSub_tag:
-                    self.renameAllSeason(info.srcfolder, info.topfolder, info.season, season)
+                    self.renameAllSeason(info.srcfolder, info.topfolder, info.secondfolder, info.season, season)
                 else:
                     info.isepisode = True
                     info.season = season
@@ -234,8 +234,9 @@ class TransRecordService():
                 single.secondfolder = new
                 single.updatetime = datetime.datetime.now()
 
-    def renameAllSeason(self, srcfolder, top, season, new):
-        records = _TransRecords.query.filter_by(srcfolder=srcfolder, topfolder=top, season=season).all()
+    def renameAllSeason(self, srcfolder, top, second, season, new):
+        records = _TransRecords.query.filter_by(srcfolder=srcfolder, topfolder=top, 
+                                                secondfolder=second, season=season).all()
         for single in records:
             if single.status != 1 and single.status != 2:
                 single.isepisode = True
