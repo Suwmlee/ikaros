@@ -216,7 +216,8 @@ class TransRecordService():
         records = _TransRecords.query.all()
         for i in records:
             srcpath = i.srcpath
-            if not os.path.exists(srcpath):
+            dstpath = i.destpath
+            if not os.path.exists(srcpath) or not os.path.exists(dstpath):
                 self.deleteByID(i.id)
 
     def renameAllTop(self, srcfolder, top, new):
