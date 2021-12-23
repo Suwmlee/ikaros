@@ -1,3 +1,13 @@
+## [1.15.1](https://github.com/Suwmlee/ikaros/compare/v1.15.0...v1.15.1) (2021-12-23)
+
+
+### Bug Fixes
+
+* check special folder ([35883ef](https://github.com/Suwmlee/ikaros/commit/35883ef5a796ba2b79f888d7e277ea5dd1dc53ed))
+* clean dstpath not exists ([5247267](https://github.com/Suwmlee/ikaros/commit/5247267fa6cab78dd5072d56f473bd2e8a70add0))
+* episode name ([320154e](https://github.com/Suwmlee/ikaros/commit/320154e56554cd6dcebe163d1aae1988424b551d))
+* more accurate renaming range ([6e98a68](https://github.com/Suwmlee/ikaros/commit/6e98a6830badc293c26754a3901c7b227ca09f3c))
+
 # [1.15.0](https://github.com/Suwmlee/ikaros/compare/v1.14.3...v1.15.0) (2021-12-22)
 
 
