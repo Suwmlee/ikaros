@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/Suwmlee/ikaros/compare/v1.15.1...v1.16.0) (2021-12-24)
+
+
+### Features
+
+* update automation page ([53df6ac](https://github.com/Suwmlee/ikaros/commit/53df6ac0f2a7400cbceefa1bdab3dae779ff3891))
+
 ## [1.15.1](https://github.com/Suwmlee/ikaros/compare/v1.15.0...v1.15.1) (2021-12-23)
 
 
