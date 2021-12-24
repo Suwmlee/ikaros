@@ -8,9 +8,8 @@ from . import web
 from ..bizlogic import manager
 from ..bizlogic import transfer
 from ..bizlogic import rename
-from ..bizlogic import automation
 from ..service.recordservice import scrapingrecordService, transrecordService
-from ..service.configservice import scrapingConfService, transConfigService, autoConfigService
+from ..service.configservice import scrapingConfService, transConfigService
 from ..service.taskservice import taskService
 from flask import current_app
 # from concurrent.futures import ThreadPoolExecutor
@@ -52,41 +51,6 @@ def version():
 
 
 # action
-
-
-@web.route("/api/client", methods=['POST'])
-def clientAutoTask():
-    """ for client
-
-#!/bin/bash
-TR_DOWNLOADS="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
-curl -XPOST http://127.0.0.1:12346/api/client -H 'Content-Type: application/json' \
---data @<(cat <<EOF
-{"path":"$TR_DOWNLOADS"}
-EOF
-)
-    """
-    try:
-        content = request.get_json()
-        if content.get('path'):
-            client_path = content.get('path')
-            automation.start(client_path)
-        return Response(status=200)
-    except Exception as err:
-        current_app.logger.error(err)
-        return Response(status=500)
-
-
-@web.route("/api/client/clean", methods=['GET'])
-def clientCleanTaskQueue():
-    """ clean client task
-    """
-    try:
-        automation.clean()
-        return Response(status=200)
-    except Exception as err:
-        current_app.logger.error(err)
-        return Response(status=500)
 
 
 @web.route("/api/scraping", methods=['POST'])
@@ -320,29 +284,6 @@ def delTransRecord():
     """
     try:
         transrecordService.deleteRecords()
-        return Response(status=200)
-    except Exception as err:
-        current_app.logger.error(err)
-        return Response(status=500)
-
-# autoconf
-
-
-@web.route("/api/autoconf", methods=['GET'])
-def getAutoConf():
-    try:
-        content = autoConfigService.getSetting().serialize()
-        return json.dumps(content)
-    except Exception as err:
-        current_app.logger.error(err)
-        return Response(status=500)
-
-
-@web.route("/api/autoconf", methods=['POST'])
-def updateAutoConf():
-    try:
-        content = request.get_json()
-        autoConfigService.updateSetting(content)
         return Response(status=200)
     except Exception as err:
         current_app.logger.error(err)

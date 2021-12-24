@@ -31,3 +31,10 @@ class _AutoTask(db.Model):
 
     def __init__(self, path):
         self.path = path
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'path': self.path,
+            'status': self.status,
+        }

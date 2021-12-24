@@ -11,5 +11,6 @@ def register(app):
     from . import optionctrl
     from . import filescan_ctrl
     from . import transferctrl
+    from . import automationctrl
 
     app.register_blueprint(web)
