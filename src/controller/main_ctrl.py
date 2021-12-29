@@ -24,7 +24,7 @@ from flask import current_app
 def intro():
     try:
         localPath = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(localPath, "..", "..", 'README.md'), encoding='utf-8') as f:
+        with open(os.path.join(localPath, "..", "..", "docs", 'intro.md'), encoding='utf-8') as f:
             content = f.read()
         return content
     except Exception as err:
