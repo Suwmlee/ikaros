@@ -27,18 +27,18 @@
       -p 12346:12346 \
       -v /path/to/media:/media \
       -v /path/to/data:/ikaros/database \
-      -v /path/to/scripts:/ikaros/scripts \
       --restart unless-stopped \
       suwmlee/ikaros:latest
     ```
 
 - 群晖docker
-  待完善
-  截图1
+  1. 设置卷
+    ![path](docs/imgs/path.png)
+  2. 设置端口
+    ![port](docs/imgs/port.png)
 
-  截图2
 
-__注意:__ 
+__注:__ 
 - 默认Web访问端口:  __12346__
 - 可以使用[watchtower](https://hub.docker.com/r/containrrr/watchtower)自动化更新Docker
 
