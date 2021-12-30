@@ -1,3 +1,10 @@
+## [1.16.1](https://github.com/Suwmlee/ikaros/compare/v1.16.0...v1.16.1) (2021-12-30)
+
+
+### Bug Fixes
+
+* add intro imgs route ([dcf6320](https://github.com/Suwmlee/ikaros/commit/dcf6320d8deca702aaa05f862a9fc884dc57fbaa))
+
 # [1.16.0](https://github.com/Suwmlee/ikaros/compare/v1.15.1...v1.16.0) (2021-12-24)
 
 
