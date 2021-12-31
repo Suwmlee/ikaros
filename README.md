@@ -11,11 +11,11 @@
 
 ### 安装
 
-本项目仅后端，需要搭配[web端](https://github.com/Suwmlee/ikaros-web)
-可自行运行或使用编译好的文件
+本项目仅后端，需要搭配[ikaros-web](https://github.com/Suwmlee/ikaros-web)
+可自行编译或使用编译好的文件
 
-- 使用编译好的[web  release](https://github.com/Suwmlee/Spike/tree/release)
-  1. 将`index.html`文件放到`web/templates`
+- 使用编译好的[web  release](https://github.com/Suwmlee/ikaros-web/tree/release)
+  1. 将`index.html`放到`web/templates`
   2. 将其他文件放到`web/static`
   3. `pip install -r requirements.txt`
   4. `python app.py`

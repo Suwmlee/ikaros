@@ -2,19 +2,18 @@
 ## 使用说明
 
 __刮削:__<br>
-配置可参考 [Movie_Data_Capture的wiki](https://github.com/yoshiko2/Movie_Data_Capture/wiki)<br>
-~~精力有限，直接用的mdc的刮削库，因设计、需求不同，参数略有修改~~
+配置可参考 [Movie_Data_Capture wiki](https://github.com/yoshiko2/Movie_Data_Capture/wiki)<br>
+~~精力有限，使用mdc的刮削库，因设计、需求不同，参数略有修改~~
 
-cookies部分，浏览器内获取的完整的cookies内容
+cookies内容: 浏览器内获取的完整的cookies,不需要json格式
 
 刮削默认跳过带有忽略或已完成标记的影片，如果修改了刮削番号/中文标签/分集等，需要将状态设置为未完成并重新刮削
 
 __转移:__<br>
 开启`修正剧集名`后，最多两级目录。第一级是`剧集名`，第二级是`季`,分季视频在emby内手动识别一次就可以自动归到一个剧集下。
-遇到异常的视频，可参考tmdb内数据，手动调整具体`季/集`编号。
+遇到异常的视频，可参考tmdb内数据，手动修改`季/集`编号，并再次进行转移操作。
 
-所有修改均在web页面内操作，ikaros会记录。再次更新可以直接使用记录，便于再次刷新与维护
-
+_请在web页面内进行修改，这样ikaros会更新记录，再次转移会应用修改_
 
 ### 获取刷新emby库地址
 
@@ -22,14 +21,11 @@ __转移:__<br>
 
 按图示操作:
 
-  <!-- ![emby-1](imgs/emby1.jpg) -->
+图 1: 网页内刷新媒体库
 <img src="imgs/emby1.jpg" alt="emby-1" width="600"/>
 
-图 1: 刷新媒体库
-  <!-- ![emby-2](imgs/emby2.jpg) -->
-<img src="imgs/emby2.jpg" alt="emby-1" width="600"/>
-
 图 2: 查找媒体刷新链接
+<img src="imgs/emby2.jpg" alt="emby-1" width="600"/>
 
 找到刷新该媒体库的地址:
 ```
@@ -45,14 +41,14 @@ http://192.168.1.233:8096/emby/Items/3227ce1e069754c594af25ea66d69fc7/Refresh?Re
 http://192.168.1.233:8096/emby/Items/3227ce1e069754c594af25ea66d69fc7/Refresh?Recursive=true&ImageRefreshMode=Default&MetadataRefreshMode=Default&ReplaceAllImages=false&ReplaceAllMetadata=false&api_key=dd4b16934ab81cbxxxxxx
 ```
 
-以上地址即需要填入的刷新库链接地址
+以上地址即填入的刷新emby链接
 
 ~~emby也提供了其他刷新方式，但实现会麻烦很多，有兴趣的可以提交PR~~
 
 ### 自动检测/推送配置
 
 - 配置`transmission`/`qBittorrent`下载完成脚本
-  - `scripts`目录下`trcomplete.sh`/`qbcomplete.sh`，或在web页面里查看具体脚本内容
+  - `scripts`目录下`trcomplete.sh`/`qbcomplete.sh`，或在web页面里查看，自行创建脚本
   - 在下载软件配置内指定脚本路径即可
 - 在`自动`选项内配置过滤目录
 
@@ -60,6 +56,7 @@ http://192.168.1.233:8096/emby/Items/3227ce1e069754c594af25ea66d69fc7/Refresh?Re
 __注意:__ 
 - 默认请求 __127.0.0.1__ ,需根据实际情况更改
 - 参考[配置tr完成脚本](https://github.com/ronggang/transmission-web-control/wiki/About-script-torrent-done-filename)
+- [媒体文件分类/命名参考](https://suwmlee.github.io/posts/2021/12/05/%E5%AA%92%E4%BD%93%E6%96%87%E4%BB%B6%E5%91%BD%E5%90%8D.html)
 
 ### 刮削配置-软链接前缀说明
 
