@@ -21,10 +21,10 @@ _请在web页面内进行修改，这样ikaros会更新记录，再次转移会�
 
 按图示操作:
 
-图 1: 网页内刷新媒体库
+图 1: 网页内刷新媒体库<br>
 <img src="imgs/emby1.jpg" alt="emby-1" width="600"/>
 
-图 2: 查找媒体刷新链接
+图 2: 查找媒体刷新链接<br>
 <img src="imgs/emby2.jpg" alt="emby-1" width="600"/>
 
 找到刷新该媒体库的地址:
