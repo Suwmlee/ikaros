@@ -1,3 +1,10 @@
+## [1.16.2](https://github.com/Suwmlee/ikaros/compare/v1.16.1...v1.16.2) (2022-01-04)
+
+
+### Bug Fixes
+
+* update mapping dict ([5296afb](https://github.com/Suwmlee/ikaros/commit/5296afbd7d677c039000fdb9658f56125e6becdd))
+
 ## [1.16.1](https://github.com/Suwmlee/ikaros/compare/v1.16.0...v1.16.1) (2021-12-30)
 
 
