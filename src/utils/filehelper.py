@@ -145,8 +145,9 @@ def cleanScrapingfile(folder, filter):
                 os.remove(f)
 
 
-def copySubs(srcfolder, destfolder, basename, newname, saved=True):
-    """ copy subtitle
+def moveSubs(srcfolder, destfolder, basename, newname, saved=True):
+    """ 移动字幕
+    :param saved    True: 复制字幕  False: 移动字幕
     """
     dirs = os.listdir(srcfolder)
     for item in dirs:
@@ -165,12 +166,15 @@ def copySubs(srcfolder, destfolder, basename, newname, saved=True):
                      stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH)
 
 
-def copySubsbyFilepath(srcpath, destpath, saved=True):
+def moveSubsbyFilepath(srcpath, destpath, saved=True):
+    """ 根据文件名匹配字幕，并移动到指定目录
+    :param saved    True: 复制字幕  False: 移动字幕
+    """
     srcfolder, srcname = os.path.split(srcpath)
     srcbasename, srcext = os.path.splitext(srcname)
     destfolder, destname = os.path.split(destpath)
     destbasename, destext = os.path.splitext(destname)
-    copySubs(srcfolder, destfolder, srcbasename, destbasename, saved)
+    moveSubs(srcfolder, destfolder, srcbasename, destbasename, saved)
 
 
 def forceSymlink(srcpath, dstpath):

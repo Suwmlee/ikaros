@@ -10,7 +10,7 @@ from flask import current_app
 
 from ..service.configservice import scrapingConfService, _ScrapingConfigs
 from ..utils.ADC_function import G_USER_AGENT
-from ..utils.filehelper import copySubsbyFilepath, forceSymlink, forceHardlink
+from ..utils.filehelper import moveSubsbyFilepath, forceSymlink, forceHardlink
 from ..utils.number_parser import FileNumInfo
 from ..scrapinglib import get_data_from_json
 
@@ -360,7 +360,7 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
         else:
             copyTag = False
             os.rename(filepath, newpath)
-        copySubsbyFilepath(filepath, newpath, copyTag)
+        moveSubsbyFilepath(filepath, newpath, copyTag)
         return True, newpath
     except FileExistsError:
         current_app.logger.error('[-]File Exists! Please check your movie!')

@@ -11,7 +11,7 @@ from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
 from ..utils.regex import extractEpNum, matchSeason, matchEpPart, matchSeries
 from ..utils.filehelper import video_type, ext_type, replaceRegex, cleanFolderWithoutSuffix,\
-     forceHardlink, forceSymlink, replaceCJK, cleanbyNameSuffix, cleanExtraMedia, copySubs
+     forceHardlink, forceSymlink, replaceCJK, cleanbyNameSuffix, cleanExtraMedia, moveSubs
 from flask import current_app
 
 
@@ -290,7 +290,7 @@ def transfer(src_folder, dest_folder,
             # 使用最终的文件名
             cleanbyNameSuffix(currentfile.finalfolder, currentfile.name, ext_type)
             oldname = os.path.splitext(currentfile.realname)[0]
-            copySubs(currentfile.realfolder, currentfile.finalfolder, oldname, currentfile.name)
+            moveSubs(currentfile.realfolder, currentfile.finalfolder, oldname, currentfile.name)
 
             if newpath in dest_list:
                 dest_list.remove(newpath)
