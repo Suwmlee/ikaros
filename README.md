@@ -1,4 +1,6 @@
 
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/suwmlee/ikaros/Release)](https://github.com/suwmlee/ikaros/actions) [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/suwmlee/ikaros?color=blue&label=download&sort=semver)](https://github.com/suwmlee/ikaros/releases) [![Docker Pulls](https://img.shields.io/docker/pulls/suwmlee/ikaros)](https://hub.docker.com/r/suwmlee/ikaros)
+
 # ikaros
 
 关联`transmission`/`qBittorrent`与`emby`，下载完成后，自动筛选文件创建软/硬链接，刮削JAV目录，推送emby库刷新
