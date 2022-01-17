@@ -172,7 +172,7 @@ def transfer(src_folder, dest_folder,
              linktype, prefix,
              escape_folders, specified_files='',
              clean_others_tag = True,
-             replace_CJK_tag= False,
+             simplify_tag= False,
              fixseries_tag= False
              ):
     """
@@ -190,22 +190,22 @@ def transfer(src_folder, dest_folder,
         if not specified_files or specified_files == '':
             movie_list = findAllVideos(src_folder, src_folder, re.split("[,，]", escape_folders))
         else:
-            if os.path.exists(specified_files):
-                clean_others_tag = False
-                if os.path.isdir(specified_files):
-                    movie_list = findAllVideos(specified_files, src_folder, re.split("[,，]", escape_folders))
-                else:
-                    tf = FileInfo(specified_files)
-                    midfolder = tf.realfolder.replace(src_folder, '').lstrip("\\").lstrip("/")
-                    tf.updateMidFolder(midfolder)
-                    if tf.topfolder != '.':
-                        tf.parse()
-                    movie_list.append(tf)
+            if not os.path.exists(specified_files):
+                specified_files = os.path.join(src_folder, specified_files)
+                if not os.path.exists(specified_files):
+                    taskService.updateTaskStatus(1, 'transfer')
+                    current_app.logger.error("[!] specified_files not exists")
+                    return False
+            clean_others_tag = False
+            if os.path.isdir(specified_files):
+                movie_list = findAllVideos(specified_files, src_folder, re.split("[,，]", escape_folders))
             else:
-                taskService.updateTaskStatus(1, 'transfer')
-                current_app.logger.error("[!] specified_files not exists")
-                return False
-
+                tf = FileInfo(specified_files)
+                midfolder = tf.realfolder.replace(src_folder, '').lstrip("\\").lstrip("/")
+                tf.updateMidFolder(midfolder)
+                if tf.topfolder != '.':
+                    tf.parse()
+                movie_list.append(tf)
         count = 0
         total = str(len(movie_list))
         taskService.updateTaskTotal(total, 'transfer')
@@ -262,7 +262,7 @@ def transfer(src_folder, dest_folder,
                 currentfile.isepisode = False
 
             # 优化命名
-            naming(currentfile, movie_list, replace_CJK_tag, fixseries_tag)
+            naming(currentfile, movie_list, simplify_tag, fixseries_tag)
 
             flag_done = False
             if currentfile.topfolder == '.':
@@ -316,7 +316,7 @@ def transfer(src_folder, dest_folder,
     return True
 
 
-def naming(currentfile: FileInfo, movie_list: list, replace_CJK_tag, fixseries_tag):
+def naming(currentfile: FileInfo, movie_list: list, simplify_tag, fixseries_tag):
     # 处理 midfolder 内特殊内容
     # CMCT组视频文件命名比文件夹命名更好
     if 'CMCT' in currentfile.topfolder and not currentfile.locked:
@@ -330,8 +330,8 @@ def naming(currentfile: FileInfo, movie_list: list, replace_CJK_tag, fixseries_t
                 for m in matches:
                     m.topfolder = namingfiles[0].name
             current_app.logger.debug("[-] handling cmct midfolder [{}] ".format(currentfile.midfolder))
-    # topfolder 替换中文
-    if replace_CJK_tag and not currentfile.locked:
+    # topfolder
+    if simplify_tag and not currentfile.locked:
         minlen = 27
         tempmid = currentfile.topfolder
         tempmid = replaceCJK(tempmid)
