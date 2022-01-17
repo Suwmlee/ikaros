@@ -1,3 +1,10 @@
+## [1.16.4](https://github.com/Suwmlee/ikaros/compare/v1.16.3...v1.16.4) (2022-01-17)
+
+
+### Bug Fixes
+
+* default s00e00 checking ([d2c003b](https://github.com/Suwmlee/ikaros/commit/d2c003bb36c227d0d9cbb624e42035bc10a2ff2b))
+
 ## [1.16.3](https://github.com/Suwmlee/ikaros/compare/v1.16.2...v1.16.3) (2022-01-17)
 
 
