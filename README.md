@@ -1,7 +1,7 @@
 
 # ikaros
 
-关联`transmission`/`qBittorrent`与`emby`，下载任务完成后，自动筛选文件创建软/硬链接，自动刮削JAV目录，推送emby库刷新。
+关联`transmission`/`qBittorrent`与`emby`，下载完成后，自动筛选文件创建软/硬链接，刮削JAV目录，推送emby库刷新
 
 - 批量软/硬链接
 - 批量修改文件名，优化剧集名及自定义
@@ -10,10 +10,10 @@
 
 ### 安装
 
-本项目仅后端，需要搭配[ikaros-web](https://github.com/Suwmlee/ikaros-web)
+本项目仅后端，需要搭配[ikaros-web](https://github.com/Suwmlee/ikaros-web)  
 可自行编译或使用编译好的文件
 
-- 使用编译好的[web  release](https://github.com/Suwmlee/ikaros-web/tree/release)
+- 使用编译好的[web release](https://github.com/Suwmlee/ikaros-web/tree/release)
   1. 将`index.html`放到`web/templates`
   2. 将其他文件放到`web/static`
   3. `pip install -r requirements.txt`
