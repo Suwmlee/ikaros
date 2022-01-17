@@ -5,7 +5,7 @@ import os
 import datetime
 from sqlalchemy import or_
 from ..model.record import _ScrapingRecords, _TransRecords
-from ..utils.filehelper import cleanFolderbyFilter, cleanScrapingfile
+from ..utils.filehelper import cleanFolderbyFilter, cleanScrapingfile, cleanExtraMedia, cleanFolderWithoutSuffix, video_type
 from .. import db
 
 
@@ -200,17 +200,24 @@ class TransRecordService():
 
     def deleteByID(self, value) -> _TransRecords:
         record = _TransRecords.query.filter_by(id=value).first()
-        if record:
+        if record and isinstance(record, _TransRecords):
             if record.destpath != '':
                 basefolder = os.path.dirname(record.srcpath)
                 folder = os.path.dirname(record.destpath)
                 if os.path.exists(folder) and basefolder != folder:
                     name = os.path.basename(record.destpath)
                     # 前缀匹配
-                    filter  = os.path.splitext(name)[0]
+                    filter = os.path.splitext(name)[0]
                     cleanScrapingfile(folder, filter)
             db.session.delete(record)
             db.session.commit()
+
+            if record.topfolder != '.':
+                cleanfolder = os.path.dirname(record.destpath)
+                if record.secondfolder:
+                    cleanfolder = os.path.dirname(cleanfolder)
+                if os.path.exists(cleanfolder):
+                    cleanFolderWithoutSuffix(cleanfolder, video_type)
 
     def cleanUnavailable(self):
         records = _TransRecords.query.all()

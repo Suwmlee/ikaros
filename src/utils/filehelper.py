@@ -81,7 +81,7 @@ def cleanExtraMedia(folder):
             cleanExtraMedia(f)
         else:
             cleanflag = True
-            if file == "fanart.jpg" or file == "poster.jpg":
+            if file.lower().startswith(('fanart', 'poster', 'tvshow', 'season', 'landscape')):
                 cleanflag = False
             else:
                 for s in vlists:
@@ -94,7 +94,7 @@ def cleanExtraMedia(folder):
 
 
 def cleanFolderWithoutSuffix(folder, suffix):
-    """ 删除内部无匹配后缀的文件的目录
+    """ 删除无匹配后缀文件的目录
     """
     hassuffix = False
     dirs = os.listdir(folder)
@@ -104,11 +104,11 @@ def cleanFolderWithoutSuffix(folder, suffix):
             hastag = cleanFolderWithoutSuffix(f, suffix)
             if hastag:
                 hassuffix = True
-            else:
-                current_app.logger.info("clean empty media folder [{}]".format(f))
-                shutil.rmtree(f)
         elif os.path.splitext(f)[1].lower() in suffix:
             hassuffix = True
+    if not hassuffix:
+        current_app.logger.info("clean empty media folder [{}]".format(folder))
+        shutil.rmtree(folder)
     return hassuffix
 
 
