@@ -72,11 +72,11 @@ class FileInfo():
     def parse(self):
         # 正确的剧集命名
         season, ep = matchSeries(self.name)
-        if season and ep:
+        if isinstance(season, int) and season > -1 and isinstance(ep, int) and ep > -1:
             self.isepisode = True
             self.season = season
             self.epnum = ep
-            self.originep  = 'Pass'
+            self.originep = 'Pass'
             return
         # 是否是需要修正的剧集命名
         originep = matchEpPart(self.name)
