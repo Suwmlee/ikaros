@@ -1,3 +1,10 @@
+## [1.16.5](https://github.com/Suwmlee/ikaros/compare/v1.16.4...v1.16.5) (2022-01-19)
+
+
+### Bug Fixes
+
+* unified Number info ([f1ef6f6](https://github.com/Suwmlee/ikaros/commit/f1ef6f6506d234c838df75606c4b5e9778e7f9e2))
+
 ## [1.16.4](https://github.com/Suwmlee/ikaros/compare/v1.16.3...v1.16.4) (2022-01-17)
 
 
