@@ -71,6 +71,9 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
                 movie_info.destname = newname
                 movie_info.destpath = new_path
                 movie_info.linktype = conf.link_type
+                movie_info.cnsubtag = num_info.chs_tag
+                if num_info.multipart_tag:
+                    movie_info.cdnum = num_info.part[3:]
             else:
                 movie_info.status = 2
             movie_info.updatetime = datetime.datetime.now()

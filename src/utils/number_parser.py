@@ -8,7 +8,7 @@ G_spat = re.compile(
 
 
 class FileNumInfo():
-    """ 解析文件名获得的番号信息
+    """ 解析文件番号信息
     """
 
     def __init__(self, filepath: str):
@@ -32,8 +32,9 @@ class FileNumInfo():
                 self.chs_tag = True
                 break
         if '_cd' in filepath or '-cd' in filepath:
-            self.multipart_tag = True
             self.part = get_part(filepath)
+            if self.part:
+                self.multipart_tag = True
 
     def fixedName(self):
         name = self.num
