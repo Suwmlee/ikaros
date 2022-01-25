@@ -3,10 +3,12 @@
     init app
 """
 import logging
+import flask_migrate
 from concurrent.futures import ThreadPoolExecutor
 from flask import Flask
-import flask_migrate
+from logging.handlers import TimedRotatingFileHandler
 from flask_sqlalchemy import SQLAlchemy
+
 from .config import Config
 
 db = SQLAlchemy()
@@ -24,7 +26,8 @@ def create_app():
     app.config.from_object(Config)
     # Configure logging
     formatter = logging.Formatter(app.config['LOGGING_FORMAT'])
-    handler = logging.FileHandler(app.config['LOGGING_LOCATION'], encoding="utf-8")
+    handler = TimedRotatingFileHandler(app.config['LOGGING_LOCATION'], encoding="utf-8", when="midnight", interval=1)
+    handler.suffix = "%Y%m%d"
     handler.setFormatter(formatter)
     app.logger.addHandler(handler)
     app.logger.setLevel(app.config['LOGGING_LEVEL'])

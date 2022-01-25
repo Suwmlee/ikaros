@@ -6,6 +6,7 @@ import logging
 import xlwt
 import xlrd
 import datetime
+import time
 
 from flask import request, Response, send_from_directory
 
@@ -183,4 +184,19 @@ def cleanErrData():
         return Response(status=500)
 
 
+def flask_logger():
+    """creates logging information"""
+    localPath = os.path.dirname(os.path.abspath(__file__))
+    # TODO get web.log
+    logfile = os.path.join(localPath, "..", "..", "database", "web.log")
+    with open(logfile, encoding='UTF-8') as log_info:
+        for i in range(25):
+            data = log_info.read()
+            yield data.encode()
+            time.sleep(1)
 
+
+@web.route("/api/options/logstream", methods=["GET"])
+def stream():
+    """returns logging information"""
+    return Response(flask_logger(), mimetype="text/plain", content_type="text/event-stream; charset=utf-8")
