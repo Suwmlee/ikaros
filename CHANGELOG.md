@@ -1,3 +1,10 @@
+## [1.16.6](https://github.com/Suwmlee/ikaros/compare/v1.16.5...v1.16.6) (2022-01-25)
+
+
+### Bug Fixes
+
+* add filtering ([8d496dc](https://github.com/Suwmlee/ikaros/commit/8d496dc610b4c38639db36629b9b42a589c67be0))
+
 ## [1.16.5](https://github.com/Suwmlee/ikaros/compare/v1.16.4...v1.16.5) (2022-01-19)
 
 
