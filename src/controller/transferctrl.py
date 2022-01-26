@@ -55,7 +55,8 @@ def getTransRecord():
 def editTransferRecord():
     try:
         content = request.get_json()
-        transrecordService.update(content.get('srcpath'), content.get('linkpath'), content.get('destpath'),
+        info = transrecordService.queryByPath(content.get('srcpath'))
+        transrecordService.update(info, content.get('linkpath'), content.get('destpath'),
                                     content.get('status'), content.get('topfolder'), content.get('secondfolder'),
                                     content.get('isepisode'), content.get('season'), content.get('episode'),
                                     content.get('renameAllTop'), content.get('renameAllSub'))

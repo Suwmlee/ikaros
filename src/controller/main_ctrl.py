@@ -88,8 +88,8 @@ def startTransfer():
 @web.route("/api/stopall", methods=['GET'])
 def resetAllTaskStatus():
     try:
-        taskService.updateTaskStatus(0, 'transfer')
-        taskService.updateTaskStatus(0, 'scrape')
+        taskService.updateTaskStatus(taskService.getTask('transfer'), 0)
+        taskService.updateTaskStatus(taskService.getTask('scrape'), 0)
         return Response(status=200)
     except Exception as err:
         current_app.logger.error(err)

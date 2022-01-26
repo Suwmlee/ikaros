@@ -129,3 +129,4 @@ dmypy.json
 
 # Custom
 web/
+web.log.*

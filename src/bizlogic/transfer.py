@@ -182,7 +182,7 @@ def transfer(src_folder, dest_folder,
     task = taskService.getTask('transfer')
     if task.status == 2:
         return
-    taskService.updateTaskStatus(2, 'transfer')
+    taskService.updateTaskStatus(task, 2)
 
     try:
         movie_list = []
@@ -193,7 +193,7 @@ def transfer(src_folder, dest_folder,
             if not os.path.exists(specified_files):
                 specified_files = os.path.join(src_folder, specified_files)
                 if not os.path.exists(specified_files):
-                    taskService.updateTaskStatus(1, 'transfer')
+                    taskService.updateTaskStatus(task, 1)
                     current_app.logger.error("[!] specified_files not exists")
                     return False
             clean_others_tag = False
@@ -208,7 +208,7 @@ def transfer(src_folder, dest_folder,
                 movie_list.append(tf)
         count = 0
         total = str(len(movie_list))
-        taskService.updateTaskTotal(total, 'transfer')
+        taskService.updateTaskTotal(task, total)
         current_app.logger.debug('[+] Find  ' + total+'  movies')
 
         # 硬链接直接使用源目录
@@ -230,7 +230,7 @@ def transfer(src_folder, dest_folder,
             if task.status == 0:
                 return False
             count += 1
-            taskService.updateTaskFinished(count, 'transfer')
+            taskService.updateTaskFinished(task, count)
             current_app.logger.debug('[!] - ' + str(count) + '/' + total + ' -')
             current_app.logger.debug("[+] start check [{}] ".format(currentfile.realpath))
 
@@ -296,7 +296,7 @@ def transfer(src_folder, dest_folder,
                 dest_list.remove(newpath)
 
             current_app.logger.info("[-] transfered [{}]".format(newpath))
-            transrecordService.update(currentfile.realpath, link_path, newpath, currentrecord.status,
+            transrecordService.update(currentrecord, link_path, newpath, currentrecord.status,
                                       currentfile.topfolder, currentfile.secondfolder,
                                       currentfile.isepisode, currentfile.season, currentfile.epnum)
 
@@ -311,7 +311,7 @@ def transfer(src_folder, dest_folder,
     except Exception as e:
         current_app.logger.error(e)
 
-    taskService.updateTaskStatus(1, 'transfer')
+    taskService.updateTaskStatus(task, 1)
 
     return True
 

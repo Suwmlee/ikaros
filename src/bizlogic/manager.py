@@ -95,7 +95,7 @@ def startScrapingAll(folder=''):
     task = taskService.getTask('scrape')
     if task.status == 2:
         return
-    taskService.updateTaskStatus(2, 'scrape')
+    taskService.updateTaskStatus(task, 2)
 
     conf = scrapingConfService.getSetting()
     cleanFolder(conf.failed_folder)
@@ -106,8 +106,8 @@ def startScrapingAll(folder=''):
 
     count = 0
     total = str(len(movie_list))
-    taskService.updateTaskFinished(0, 'scrape')
-    taskService.updateTaskTotal(total, 'scrape')
+    taskService.updateTaskFinished(task, 0)
+    taskService.updateTaskTotal(task, total)
     current_app.logger.info("[*]======================================================")
     current_app.logger.info('[+]Find  ' + total+'  movies')
 
@@ -115,13 +115,13 @@ def startScrapingAll(folder=''):
         task = taskService.getTask('scrape')
         if task.status == 0:
             return
-        taskService.updateTaskFinished(count, 'scrape')
+        taskService.updateTaskFinished(task, count)
         percentage = str(count / int(total) * 100)[:4] + '%'
         current_app.logger.debug('[!] - ' + percentage + ' [' + str(count) + '/' + total + '] -')
         create_data_and_move(movie_path, conf)
         count = count + 1
 
-    taskService.updateTaskStatus(1, 'scrape')
+    taskService.updateTaskStatus(task, 1)
 
     if conf.refresh_url:
         current_app.logger.info("[+]Refresh MediaServer")
@@ -137,14 +137,14 @@ def startScrapingSingle(movie_path: str):
     task = taskService.getTask('scrape')
     if task.status == 2:
         return
-    taskService.updateTaskStatus(2, 'scrape')
+    taskService.updateTaskStatus(task, 2)
 
     current_app.logger.info("[+]Single start!!!")
     if os.path.exists(movie_path) and os.path.isfile(movie_path):
         conf = scrapingConfService.getSetting()
         create_data_and_move(movie_path, conf)
 
-    taskService.updateTaskStatus(1, 'scrape')
+    taskService.updateTaskStatus(task, 1)
 
     if conf.refresh_url:
         current_app.logger.info("[+]Refresh MediaServer")

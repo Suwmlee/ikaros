@@ -7,7 +7,7 @@ from .. import db
 
 class TaskService():
 
-    def getTask(self, taskname):
+    def getTask(self, taskname) -> _Task:
         task = _Task.query.filter_by(name=taskname).first()
         if not task:
             task = _Task(taskname)
@@ -21,29 +21,26 @@ class TaskService():
             return True
         return False
 
-    def updateTaskStatus(self, status, taskname):
+    def updateTaskStatus(self, task: _Task, status):
         """ status
             0: wait
             1: finished
             2: runing
         """
-        task = self.getTask(taskname)
         if task.status != status:
             task.status = status
             db.session.commit()
 
-    def updateTaskTotal(self, num, taskname):
+    def updateTaskTotal(self, task: _Task, num):
         """ Update total num
         """
-        task = self.getTask(taskname)
         if task.total != num:
             task.total = num
             db.session.commit()
 
-    def updateTaskFinished(self, num, taskname):
+    def updateTaskFinished(self, task: _Task, num):
         """ Update finished num
         """
-        task = self.getTask(taskname)
         if task.finished != num:
             task.finished = num
             db.session.commit()
