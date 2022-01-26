@@ -209,7 +209,7 @@ def transfer(src_folder, dest_folder,
                 movie_list.append(tf)
         count = 0
         total = str(len(movie_list))
-        taskService.updateTaskTotal(task, total)
+        taskService.updateTaskNum(task, total)
         current_app.logger.debug('[+] Find  ' + total+'  movies')
 
         # 硬链接直接使用源目录

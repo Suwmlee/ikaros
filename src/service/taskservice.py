@@ -21,7 +21,7 @@ class TaskService():
             return True
         return False
 
-    def updateTaskStatus(self, task: _Task, status):
+    def updateTaskStatus(self, task: _Task, status: int):
         """ status
             0: wait
             1: finished
@@ -29,13 +29,17 @@ class TaskService():
         """
         if task.status != status:
             task.status = status
+            if status == 1:
+                task.total = 0
+                task.finished = 0
             db.session.commit()
 
-    def updateTaskTotal(self, task: _Task, num):
+    def updateTaskNum(self, task: _Task, total, finished = 0):
         """ Update total num
         """
-        if task.total != num:
-            task.total = num
+        if task.total != total:
+            task.total = total
+            task.finished = finished
             db.session.commit()
 
     def updateTaskFinished(self, task: _Task, num):

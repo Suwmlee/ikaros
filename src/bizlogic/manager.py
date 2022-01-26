@@ -106,8 +106,7 @@ def startScrapingAll(folder=''):
 
     count = 0
     total = str(len(movie_list))
-    taskService.updateTaskFinished(task, 0)
-    taskService.updateTaskTotal(task, total)
+    taskService.updateTaskNum(task, total)
     current_app.logger.info("[*]======================================================")
     current_app.logger.info('[+]Find  ' + total+'  movies')
 
