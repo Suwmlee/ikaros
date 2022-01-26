@@ -94,43 +94,61 @@ class ScrapingRecordService():
         """
         if sortprop == 'status':
             if sortorder == 'ascending':
-                infos = _ScrapingRecords.query.filter(
-                    or_(_ScrapingRecords.srcname.like("%" + blur + "%") if blur is not None else "",
-                        _ScrapingRecords.scrapingname.like("%" + blur + "%") if blur is not None else "",
-                        _ScrapingRecords.destname.like("%" + blur + "%") if blur is not None else "")
-                ).order_by(_ScrapingRecords.status.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                if blur:
+                    infos = _ScrapingRecords.query.filter(
+                        or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
+                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
+                            _ScrapingRecords.destname.like("%" + blur + "%"))
+                    ).order_by(_ScrapingRecords.status.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                else:
+                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.status.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
             else:
-                infos = _ScrapingRecords.query.filter(
-                    or_(_ScrapingRecords.srcname.like("%" + blur + "%") if blur is not None else "",
-                        _ScrapingRecords.scrapingname.like("%" + blur + "%") if blur is not None else "",
-                        _ScrapingRecords.destname.like("%" + blur + "%") if blur is not None else "")
-                ).order_by(_ScrapingRecords.status.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                if blur:
+                    infos = _ScrapingRecords.query.filter(
+                        or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
+                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
+                            _ScrapingRecords.destname.like("%" + blur + "%"))
+                    ).order_by(_ScrapingRecords.status.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                else:
+                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.status.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
         elif sortprop == 'cnsubtag':
             if sortorder == 'ascending':
-                infos = _ScrapingRecords.query.filter(
-                    or_(_ScrapingRecords.srcname.like("%" + blur + "%") if blur is not None else "",
-                        _ScrapingRecords.scrapingname.like("%" + blur + "%") if blur is not None else "",
-                        _ScrapingRecords.destname.like("%" + blur + "%") if blur is not None else "")
-                ).order_by(_ScrapingRecords.cnsubtag.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                if blur:
+                    infos = _ScrapingRecords.query.filter(
+                        or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
+                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
+                            _ScrapingRecords.destname.like("%" + blur + "%"))
+                    ).order_by(_ScrapingRecords.cnsubtag.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                else:
+                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.cnsubtag.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
             else:
-                infos = _ScrapingRecords.query.filter(
-                    or_(_ScrapingRecords.srcname.like("%" + blur + "%") if blur is not None else "",
-                        _ScrapingRecords.scrapingname.like("%" + blur + "%") if blur is not None else "",
-                        _ScrapingRecords.destname.like("%" + blur + "%") if blur is not None else "")
-                ).order_by(_ScrapingRecords.cnsubtag.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                if blur:
+                    infos = _ScrapingRecords.query.filter(
+                        or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
+                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
+                            _ScrapingRecords.destname.like("%" + blur + "%"))
+                    ).order_by(_ScrapingRecords.cnsubtag.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                else:
+                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.cnsubtag.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
         else:
             if sortorder == 'ascending':
-                infos = _ScrapingRecords.query.filter(
-                    or_(_ScrapingRecords.srcname.like("%" + blur + "%") if blur is not None else "",
-                        _ScrapingRecords.scrapingname.like("%" + blur + "%") if blur is not None else "",
-                        _ScrapingRecords.destname.like("%" + blur + "%") if blur is not None else "")
-                ).order_by(_ScrapingRecords.updatetime.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                if blur:
+                    infos = _ScrapingRecords.query.filter(
+                        or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
+                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
+                            _ScrapingRecords.destname.like("%" + blur + "%"))
+                    ).order_by(_ScrapingRecords.updatetime.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                else:
+                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.updatetime.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
             else:
-                infos = _ScrapingRecords.query.filter(
-                    or_(_ScrapingRecords.srcname.like("%" + blur + "%") if blur is not None else "",
-                        _ScrapingRecords.scrapingname.like("%" + blur + "%") if blur is not None else "",
-                        _ScrapingRecords.destname.like("%" + blur + "%") if blur is not None else "")
-                ).order_by(_ScrapingRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                if blur:
+                    infos = _ScrapingRecords.query.filter(
+                        or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
+                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
+                            _ScrapingRecords.destname.like("%" + blur + "%"))
+                    ).order_by(_ScrapingRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                else:
+                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
         return infos
 
 
@@ -185,11 +203,14 @@ class TransRecordService():
             db.session.commit()
 
     def queryByPage(self, pagenum, pagesize, sort, blur):
-        infos = _TransRecords.query.filter(
-                    or_(_TransRecords.srcname.like("%" + blur + "%") if blur is not None else "",
-                        _TransRecords.destpath.like("%" + blur + "%") if blur is not None else "",
-                        _TransRecords.topfolder.like("%" + blur + "%") if blur is not None else "")
-                ).order_by(_TransRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+        if blur:
+            infos = _TransRecords.query.filter(
+                        or_(_TransRecords.srcname.like("%" + blur + "%"),
+                            _TransRecords.destpath.like("%" + blur + "%"),
+                            _TransRecords.topfolder.like("%" + blur + "%"))
+                    ).order_by(_TransRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+        else:
+            infos = _TransRecords.query.order_by(_TransRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
         return infos
 
     def deleteRecords(self):
