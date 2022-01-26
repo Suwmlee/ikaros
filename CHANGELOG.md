@@ -1,3 +1,15 @@
+# [1.17.0](https://github.com/Suwmlee/ikaros/compare/v1.16.6...v1.17.0) (2022-01-26)
+
+
+### Bug Fixes
+
+* db lock during query ([5e62599](https://github.com/Suwmlee/ikaros/commit/5e6259973b368cc60ef19ac5a9c7d37f1b223beb))
+
+
+### Features
+
+* add log stream api ([ebe8d28](https://github.com/Suwmlee/ikaros/commit/ebe8d288a5c0d96b1f26d257dd75446d0f8b3065))
+
 ## [1.16.6](https://github.com/Suwmlee/ikaros/compare/v1.16.5...v1.16.6) (2022-01-25)
 
 
