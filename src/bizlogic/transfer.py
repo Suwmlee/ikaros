@@ -4,6 +4,7 @@
 import os
 import pathlib
 import re
+import time
 
 from .mediaserver import refreshMediaServer
 from ..service.configservice import transConfigService
@@ -299,6 +300,8 @@ def transfer(src_folder, dest_folder,
             transrecordService.update(currentrecord, link_path, newpath, currentrecord.status,
                                       currentfile.topfolder, currentfile.secondfolder,
                                       currentfile.isepisode, currentfile.season, currentfile.epnum)
+            # need rest 100ms
+            time.sleep(0.1)
 
         if clean_others_tag:
             for torm in dest_list:
