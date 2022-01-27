@@ -10,6 +10,7 @@ def register(app):
     from . import view_ctrl
     from . import optionctrl
     from . import filescan_ctrl
+    from . import scrapingctrl
     from . import transferctrl
     from . import automationctrl
 

@@ -37,7 +37,7 @@ class ScrapingRecordService():
     def queryByID(self, value) -> _ScrapingRecords:
         return _ScrapingRecords.query.filter_by(id=value).first()
 
-    def deleteByID(self, value) -> _ScrapingRecords:
+    def deleteByID(self, value):
         record = _ScrapingRecords.query.filter_by(id=value).first()
         if record:
             if record.destpath != '':
@@ -52,6 +52,22 @@ class ScrapingRecordService():
                         cleanFolderbyFilter(folder, filter)
             db.session.delete(record)
             db.session.commit()
+
+    def deleteByIds(self, ids):
+        records = _ScrapingRecords.query.filter(_ScrapingRecords.id.in_(ids)).all()
+        for record in records:
+            if record.destpath != '':
+                basefolder = os.path.dirname(record.srcpath)
+                folder = os.path.dirname(record.destpath)
+                if os.path.exists(folder) and basefolder != folder:
+                    name = os.path.basename(record.destpath)
+                    filter  = os.path.splitext(name)[0]
+                    if record.cdnum and record.cdnum > 0:
+                        cleanScrapingfile(folder, filter)
+                    else:
+                        cleanFolderbyFilter(folder, filter)
+            db.session.delete(record)
+        db.session.commit()
 
     def cleanUnavailable(self):
         records = self.queryAll()
