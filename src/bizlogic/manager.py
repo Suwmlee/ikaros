@@ -53,7 +53,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
                         cleanFolderbyFilter(folder, filter)
             num_info = FileNumInfo(file_path)
             # 查询是否有额外设置
-            if movie_info.scrapingname != '':
+            if movie_info.scrapingname and movie_info.scrapingname != '':
                 num_info.num = movie_info.scrapingname
             if movie_info.cnsubtag:
                 num_info.chs_tag = True
