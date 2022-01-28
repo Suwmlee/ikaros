@@ -1,3 +1,12 @@
+## [1.17.1](https://github.com/Suwmlee/ikaros/compare/v1.17.0...v1.17.1) (2022-01-28)
+
+
+### Bug Fixes
+
+* check None num ([9bb7132](https://github.com/Suwmlee/ikaros/commit/9bb71329cdd8deed447ff959b6ca7e613bdf2b93))
+* parse num ([8a43273](https://github.com/Suwmlee/ikaros/commit/8a4327364c63bba3efd8a3c8c6c391e29a023062))
+* re-scraping ([9cc245c](https://github.com/Suwmlee/ikaros/commit/9cc245cdf89a3dc5d0b341ba85fc2ac7413e38f0)), closes [#8](https://github.com/Suwmlee/ikaros/issues/8)
+
 # [1.17.0](https://github.com/Suwmlee/ikaros/compare/v1.16.6...v1.17.0) (2022-01-26)
 
 
