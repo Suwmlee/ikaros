@@ -59,8 +59,7 @@ def startScraping():
         content = request.get_json()
         if content and content.get('srcpath'):
             filepath = content.get('srcpath')
-            if os.path.exists(filepath) and os.path.isfile(filepath):
-                manager.startScrapingSingle(filepath)
+            manager.startScrapingSingle(filepath)
         else:
             manager.startScrapingAll()
         return Response(status=200)
