@@ -1,3 +1,10 @@
+# [1.18.0](https://github.com/Suwmlee/ikaros/compare/v1.17.1...v1.18.0) (2022-02-21)
+
+
+### Features
+
+* support mv91, madou ([e0f5ce0](https://github.com/Suwmlee/ikaros/commit/e0f5ce0181aa775c72e48ba9d37f1413391738d0))
+
 ## [1.17.1](https://github.com/Suwmlee/ikaros/compare/v1.17.0...v1.17.1) (2022-01-28)
 
 
