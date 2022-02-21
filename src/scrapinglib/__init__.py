@@ -22,6 +22,8 @@ from . import xcity
 from . import dlsite
 from . import carib
 from . import fc2club
+from . import mv91
+from . import madou
 from flask import current_app
 
 
@@ -62,7 +64,9 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
         # "javlib": javlib.main,
         "dlsite": dlsite.main,
         "carib": carib.main,
-        "fc2club": fc2club.main
+        "fc2club": fc2club.main,
+        "mv91": mv91.main,
+        "madou": madou.main
     }
 
     # default fetch order list, from the beginning to the end
