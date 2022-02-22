@@ -70,6 +70,8 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
     }
 
     # default fetch order list, from the beginning to the end
+    if not c_sources:
+        c_sources = "javbus,airav,fanza,xcity,javdb,mgstage,madou,fc2,avsox,dlsite,carib,fc2club"
     sources = c_sources.split(',')
     # if the input file name matches certain rules,
     # move some web service to the beginning of the list
