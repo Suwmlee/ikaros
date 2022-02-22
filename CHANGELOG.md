@@ -1,3 +1,16 @@
+# [1.19.0](https://github.com/Suwmlee/ikaros/compare/v1.18.1...v1.19.0) (2022-02-22)
+
+
+### Bug Fixes
+
+* add CDATA in nfo ([1de0864](https://github.com/Suwmlee/ikaros/commit/1de086484b2e23e0c85d94415f6cb2d55102ddc9))
+
+
+### Features
+
+* support custom more tags ([0e6a977](https://github.com/Suwmlee/ikaros/commit/0e6a97754c385efc31141bdbacb7bd24f7aa610f))
+* support hack tag ([c69f375](https://github.com/Suwmlee/ikaros/commit/c69f3757e50b287d93bfa334e3f5153715866597))
+
 ## [1.18.1](https://github.com/Suwmlee/ikaros/compare/v1.18.0...v1.18.1) (2022-02-22)
 
 
