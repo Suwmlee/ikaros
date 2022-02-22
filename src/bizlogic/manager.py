@@ -58,6 +58,12 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
                 num_info.num = movie_info.scrapingname
             if movie_info.cnsubtag:
                 num_info.chs_tag = True
+            if movie_info.leaktag:
+                num_info.leak_tag = True
+            if movie_info.uncensoredtag:
+                num_info.uncensored_tag = True
+            if movie_info.hacktag:
+                num_info.hack_tag = True
             if movie_info.cdnum:
                 num_info.updateCD(movie_info.cdnum)
             current_app.logger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, num_info.num))
@@ -73,6 +79,9 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
                 movie_info.destpath = new_path
                 movie_info.linktype = conf.link_type
                 movie_info.cnsubtag = num_info.chs_tag
+                movie_info.leaktag = num_info.leak_tag
+                movie_info.uncensoredtag = num_info.uncensored_tag
+                movie_info.hacktag = num_info.hack_tag
                 if num_info.multipart_tag:
                     movie_info.cdnum = num_info.part[3:]
             else:

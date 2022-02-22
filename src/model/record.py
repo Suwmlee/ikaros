@@ -23,7 +23,10 @@ class _ScrapingRecords(db.Model):
 
     scrapingname = Column(String, default='', comment='used name for scraping')
     cdnum = Column(Integer, default=0, comment='cd num')
-    cnsubtag = Column(Boolean, default=False, comment='cn sub')
+    cnsubtag = Column(Boolean, default=False, comment='cn tag')
+    leaktag = Column(Boolean, default=False, comment='leak tag')
+    uncensoredtag = Column(Boolean, default=False, comment='uncensored tag')
+    hacktag = Column(Boolean, default=False, comment='hack tag')
     scrapingurl = Column(String, default='', comment='scraping site url')
 
     linktype = Column(Integer, comment='ln type')
@@ -45,6 +48,9 @@ class _ScrapingRecords(db.Model):
             'scrapingname': self.scrapingname,
             'cdnum': self.cdnum,
             'cnsubtag': self.cnsubtag,
+            'leaktag': self.leaktag,
+            'uncensoredtag': self.uncensoredtag,
+            'hacktag': self.hacktag,
             'scrapingurl': self.scrapingurl,
             'linktype': self.linktype,
             'destname': self.destname,
