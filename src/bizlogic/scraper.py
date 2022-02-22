@@ -171,7 +171,7 @@ def download_extrafanart(urls, path, extrafanart_folder):
     return True
 
 
-def create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
+def create_nfo_file(path, prefilename, json_data, numinfo: FileNumInfo):
     title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label = parseJsonInfo(json_data)
     naming_rule = json_data.get('naming_rule')
     actor_list = json_data.get('actor_list')
@@ -208,24 +208,28 @@ def create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_
                 pass
             print("  <maker>" + studio + "</maker>", file=code)
             print("  <label>" + label + "</label>", file=code)
-            if chs_tag:
+            if numinfo.chs_tag:
                 print("  <tag>中文字幕</tag>", file=code)
-            if leak_tag:
+            if numinfo.leak_tag:
                 print("  <tag>流出</tag>", file=code)
-            if uncensored_tag:
+            if numinfo.uncensored_tag:
                 print("  <tag>无码</tag>", file=code)
+            if numinfo.hack_tag:
+                print("  <tag>破解</tag>", file=code)
             try:
                 for i in tags:
                     print("  <tag>" + i + "</tag>", file=code)
                 print("  <tag>" + series + "</tag>", file=code)
             except:
                 pass
-            if chs_tag:
+            if numinfo.chs_tag:
                 print("  <genre>中文字幕</genre>", file=code)
-            if leak_tag:
+            if numinfo.leak_tag:
                 print("  <genre>流出</genre>", file=code)
-            if uncensored_tag:
+            if numinfo.uncensored_tag:
                 print("  <genre>无码</genre>", file=code)
+            if numinfo.hack_tag:
+                print("  <genre>破解</genre>", file=code)
             try:
                 for i in tags:
                     print("  <genre>" + i + "</genre>", file=code)
@@ -273,39 +277,42 @@ def crop_poster(imagecut, path, prefilename):
         current_app.logger.debug('[+]Image Copyed!     ' + posterpath)
 
 
-def add_mark(pics, chs_tag, leak_tag, uncensored_tag, count, size):
+def add_mark(pics, numinfo: FileNumInfo, count, size):
     """ 
     Add water mark 
-    :param chs_tag          中文字幕  bool
-    :param leak_tag         流出      bool
-    :param uncensored_tag   无码      bool
-    :param count            右上 0, 左上 1, 左下 2，右下 3
+    :param numinfo          番号信息,内有详细Tag信息
+    :param count            右上:0 左上:1 左下:2 右下:3
     :param size             添加的水印相对整图的比例
     """
     mark_type = ''
-    if chs_tag:
+    if numinfo.chs_tag:
         mark_type += ',字幕'
-    if leak_tag:
+    if numinfo.leak_tag:
         mark_type += ',流出'
-    if uncensored_tag:
+    if numinfo.uncensored_tag:
         mark_type += ',无码'
+    if numinfo.hack_tag:
+        mark_type += ',破解'
     if mark_type == '':
         return
     for pic in pics:
-        add_mark_thread(pic, chs_tag, leak_tag, uncensored_tag, count, size)
+        add_mark_thread(pic, numinfo, count, size)
         current_app.logger.debug('[+]Image Add Mark:   ' + mark_type.strip(','))
 
 
-def add_mark_thread(pic_path, chs_tag, leak_tag, uncensored_tag, count, size):
+def add_mark_thread(pic_path, numinfo: FileNumInfo, count, size):
     img_pic = Image.open(pic_path)
-    if chs_tag:
+    if numinfo.chs_tag:
         add_to_pic(pic_path, img_pic, size, count, 1)
         count = (count + 1) % 4
-    if leak_tag:
+    if numinfo.leak_tag:
         add_to_pic(pic_path, img_pic, size, count, 2)
         count = (count + 1) % 4
-    if uncensored_tag:
+    if numinfo.uncensored_tag:
         add_to_pic(pic_path, img_pic, size, count, 3)
+        count = (count + 1) % 4
+    if numinfo.hack_tag:
+        add_to_pic(pic_path, img_pic, size, count, 4)
     img_pic.close()
 
 
@@ -318,6 +325,8 @@ def add_to_pic(pic_path, img_pic, size, count, mode):
         mark_pic_path = basedir +'/../images/LEAK.png'
     elif mode == 3:
         mark_pic_path = basedir +'/../images/UNCENSORED.png'
+    elif mode == 4:
+        mark_pic_path = basedir +'/../images/HACK.png'
     img_subt = Image.open(mark_pic_path)
     scroll_high = int(img_pic.height / size)
     scroll_wide = int(scroll_high * img_subt.width / img_subt.height)
@@ -388,9 +397,6 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
     --移动视频/字幕
 
     """
-    chs_tag = numinfo.chs_tag
-    uncensored_tag = numinfo.uncensored_tag
-    leak_tag = numinfo.leak_tag
 
     number = numinfo.num
     json_data = get_data_from_json(number, conf.site_sources, conf.naming_rule, conf.async_request)
@@ -437,8 +443,8 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
         if conf.watermark_enable:
             pics = [os.path.join(path, prefilename + '-poster.jpg'),
                     os.path.join(path, prefilename + '-thumb.jpg')]
-            add_mark(pics, chs_tag, leak_tag, uncensored_tag, conf.watermark_location, conf.watermark_size)
-        if not create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
+            add_mark(pics, numinfo, conf.watermark_location, conf.watermark_size)
+        if not create_nfo_file(path, prefilename, json_data, numinfo):
             moveFailedFolder(filepath)
 
         # 移动文件
@@ -470,8 +476,8 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
         if conf.watermark_enable:
             pics = [os.path.join(path, prefilename + '-poster.jpg'),
                     os.path.join(path, prefilename + '-thumb.jpg')]
-            add_mark(pics, chs_tag, leak_tag, uncensored_tag, conf.watermark_location, conf.watermark_size)
-        if not create_nfo_file(path, prefilename, json_data, chs_tag, leak_tag, uncensored_tag):
+            add_mark(pics, numinfo, conf.watermark_location, conf.watermark_size)
+        if not create_nfo_file(path, prefilename, json_data, numinfo):
             moveFailedFolder(filepath)
 
         return True, filepath

@@ -17,6 +17,7 @@ class FileNumInfo():
         self.chs_tag = False
         self.uncensored_tag = False
         self.leak_tag = False
+        self.hack_tag = False
         self.multipart_tag = False
         self.part = ''
 
@@ -26,6 +27,9 @@ class FileNumInfo():
         if '流出' in filepath or '-leak' in filepath or '_leak' in filepath \
                 or '-uncensored' in filepath or '_uncensored' in filepath:
             self.leak_tag = True
+        if '破解' in filepath or '-hack' in filepath or '_hack' in filepath:
+            self.hack_tag = True
+
         cnlist = ['中文', '字幕', '-c.', '_c.', '_c_', '-c-']
         for single in cnlist:
             if single in filepath:
@@ -42,6 +46,8 @@ class FileNumInfo():
             name += '-uncensored'
         if self.leak_tag:
             name += '-leak'
+        if self.hack_tag:
+            name += '-hack'
         if self.chs_tag:
             name += '-C'
         if self.multipart_tag:
