@@ -1,3 +1,11 @@
+## [1.18.1](https://github.com/Suwmlee/ikaros/compare/v1.18.0...v1.18.1) (2022-02-22)
+
+
+### Bug Fixes
+
+* update default site sources ([1a8764c](https://github.com/Suwmlee/ikaros/commit/1a8764c8e7b30672a8481e9fc0eb689aa0b31f77))
+* **scrapinglib:** javdb ([20b8691](https://github.com/Suwmlee/ikaros/commit/20b8691d47dd0eedd8650198f47f360775ba7461))
+
 # [1.18.0](https://github.com/Suwmlee/ikaros/compare/v1.17.1...v1.18.0) (2022-02-21)
 
 
