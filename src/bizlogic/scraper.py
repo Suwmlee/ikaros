@@ -393,7 +393,7 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
     leak_tag = numinfo.leak_tag
 
     number = numinfo.num
-    json_data = get_data_from_json(number, conf.website_priority, conf.naming_rule, conf.async_request)
+    json_data = get_data_from_json(number, conf.site_sources, conf.naming_rule, conf.async_request)
 
     # Return if blank dict returned (data not found)
     if not json_data:

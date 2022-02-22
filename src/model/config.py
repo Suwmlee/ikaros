@@ -35,12 +35,12 @@ class _ScrapingConfigs(db.Model):
     proxy_timeout = Column(Integer, default=10)
     proxy_retry = Column(Integer, default=3)
 
+    site_sources = Column(String, default="")
     location_rule = Column(String, default="actor+'/'+number+' '+title")
     naming_rule = Column(String, default="number+' '+title")
     max_title_len = Column(Integer, default=50)
     update_check = Column(Boolean, default=False)
-    website_priority = Column(String, default="javbus,javlib,airav,fanza,xcity,javdb,mgstage,fc2club,fc2,avsox,dlsite,carib")
-    
+
     extrafanart_enable = Column(Boolean, default=False)
     extrafanart_folder = Column(String, default='extrafanart', server_default='extrafanart')
     watermark_enable = Column(Boolean, default=True, comment='enable water mark')
@@ -53,7 +53,7 @@ class _ScrapingConfigs(db.Model):
     transalte_enable = Column(Boolean, default=False)
     transalte_to_sc = Column(Boolean, default=False)
     transalte_values = Column(String, default="title,outline")
-    
+
     cookies_javdb = Column(String, default="")
     cookies_javlib = Column(String, default="")
     refresh_url = Column(String, default='')
@@ -70,9 +70,9 @@ class _ScrapingConfigs(db.Model):
             'failed_folder': self.failed_folder,
             'location_rule': self.location_rule,
             'naming_rule': self.naming_rule,
-            'website_priority': self.website_priority,
-            'extrafanart_enable':self.extrafanart_enable,
-            'extrafanart_folder':self.extrafanart_folder,
+            'site_sources': self.site_sources,
+            'extrafanart_enable': self.extrafanart_enable,
+            'extrafanart_folder': self.extrafanart_folder,
             'watermark_enable': self.watermark_enable,
             'watermark_location': self.watermark_location,
             'watermark_size': self.watermark_size,
@@ -113,7 +113,7 @@ class _TransferConfigs(db.Model):
             'escape_folder': self.escape_folder,
             'clean_others': self.clean_others,
             'replace_CJK': self.replace_CJK,
-            'fix_series' : self.fix_series,
+            'fix_series': self.fix_series,
             'refresh_url': self.refresh_url,
             'mark': self.mark
         }
