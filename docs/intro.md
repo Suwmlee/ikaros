@@ -6,19 +6,20 @@
 ##### 刮削
 
 配置可参考 [Movie_Data_Capture wiki](https://github.com/yoshiko2/Movie_Data_Capture/wiki)<br>
-~~精力有限，使用mdc的刮削库，因设计、需求不同，参数略有修改~~
+~~使用mdc的刮削库，参数略有修改~~
 
-cookies内容: 浏览器内获取的完整的cookies,不需要json格式
+填写cookies: 复制浏览器内完整的cookies,不需要json格式
 
-刮削默认跳过带有忽略或已完成标记的影片，如果自定义刮削番号/中文标签等，需要将状态设置为未完成并重新刮削
+刮削默认跳过带有忽略或已完成标记的影片，如需自定义刮削番号/中文标签等，需要将状态设置为未完成并重新刮削
 
 ##### 转移
 
-开启`修正剧集名`后，最多两级目录。第一级是`剧名`，第二级是`季`,分季视频在emby内手动识别一次就可以自动归到一个剧集下。
+开启`修正剧集名`后，剧集文件夹最多两级目录结构。第一级是`剧集名字`，第二级是`季`或者特典目录`Specials`。多季的剧集识别正常后，emby会自动将多季文件夹归到一个剧集下展示。<br>
 遇到异常的视频，可参考tmdb内数据，手动修改`季/集`编号，并再次进行转移操作。
 
 _请在web页面内进行自定义修改，这样ikaros会更新记录，再次转移会应用修改_<br>
 _[媒体文件分类/命名参考](https://suwmlee.github.io/posts/2021/12/05/%E5%AA%92%E4%BD%93%E6%96%87%E4%BB%B6%E5%91%BD%E5%90%8D.html)_<br>
+_特典SP剧集的季编号为 0_<br>
 _在命名与网络正常的情况下，emby自带的刮削功能完全可以满足日常使用，即使出现个别问题，也可以手动修改_
 
 ### 获取刷新emby库地址
@@ -44,7 +45,7 @@ http://192.168.1.233:8096/emby/Items/3227ce1e069754c594af25ea66d69fc7/Refresh?Re
 
 在emby服务端`控制面板 - 高级 - API密钥` 获取 __api_key__ : `dd4b16934ab81cbxxxxxx`
 
-替换链接`ReplaceAllMetadata=false`后半部分:
+替换找到的刷新链接`itemid`和`ReplaceAllMetadata=false`后半部分:
 ```
 http://192.168.1.233:8096/emby/Items/3227ce1e069754c594af25ea66d69fc7/Refresh?Recursive=true&ImageRefreshMode=Default&MetadataRefreshMode=Default&ReplaceAllImages=false&ReplaceAllMetadata=false&api_key=dd4b16934ab81cbxxxxxx
 ```
@@ -56,9 +57,9 @@ http://192.168.1.233:8096/emby/Items/3227ce1e069754c594af25ea66d69fc7/Refresh?Re
 ### 关联 transmission/qBittorrent
 
 - 配置 transmission/qBittorrent 下载完成脚本
-  - 脚本在项目的`scripts`目录下，或在web页面里查看并自行创建脚本
+  - 脚本在项目的`scripts`目录，或在web页面里查看并自行创建脚本
   - 在下载软件配置内指定脚本路径
-- 在`自动`选项内配置过滤目录
+- 在`自动`选项卡里配置过滤目录
 
 __注:__ 
 - 默认请求 __127.0.0.1__ ,需根据实际情况更改
