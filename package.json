@@ -1,17 +1,17 @@
 {
   "dependencies": {
-    "@google/semantic-release-replace-plugin": "^1.0.2",
-    "@semantic-release/changelog": "^5.0.1",
-    "@semantic-release/exec": "^5.0.0",
-    "@semantic-release/git": "^9.0.0",
-    "is-ci": "^3.0.0",
-    "semantic-release": "^17.4.3"
+    "@google/semantic-release-replace-plugin": "^1.1.0",
+    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "is-ci": "^3.0.1",
+    "semantic-release": "^19.0.2"
   },
   "devDependencies": {
-    "@commitlint/cli": "^12.1.4",
-    "@commitlint/config-conventional": "^12.1.4",
-    "commitlint": "^12.1.4",
-    "pinst": "^2.1.6"
+    "@commitlint/cli": "^16.2.1",
+    "@commitlint/config-conventional": "^16.2.1",
+    "commitlint": "^16.2.1",
+    "pinst": "^3.0.0"
   },
   "commitlint": {
     "extends": [
