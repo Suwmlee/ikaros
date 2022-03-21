@@ -1,3 +1,10 @@
+## [1.20.1](https://github.com/Suwmlee/ikaros/compare/v1.20.0...v1.20.1) (2022-03-21)
+
+
+### Bug Fixes
+
+* parse epnum ([0a59727](https://github.com/Suwmlee/ikaros/commit/0a59727e2a60c2c18b4a8e059e2a3d2ccb4e943b))
+
 # [1.20.0](https://github.com/Suwmlee/ikaros/compare/v1.19.1...v1.20.0) (2022-03-21)
 
 
