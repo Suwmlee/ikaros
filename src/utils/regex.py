@@ -134,6 +134,32 @@ def matchSeries(basename):
     return None, None
 
 
+def simpleMatchEp(basename: str):
+    """ 针对已经强制season但未能正常解析出ep的名字
+    
+    >>> simpleMatchEp("01 呵呵呵")
+    1
+    >>> simpleMatchEp("02_哈哈哈")
+    2
+    >>> simpleMatchEp("03.嘿嘿嘿")
+    3
+    >>> simpleMatchEp("04. 嘿嘿嘿")
+    4
+    >>> simpleMatchEp("05 - 嘿嘿嘿")
+    5
+    >>> simpleMatchEp("06")
+    6
+    """
+    if basename.isdigit():
+        return int(basename)
+    regstr = "^(\d{1,3}) ?(_|-|.)? ?([^\W\d]+)"
+    results = re.findall(regstr, basename)
+    if results and len(results) == 1:
+        epnunm = int(results[0][0])
+        return epnunm
+    return None
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod(verbose=True)

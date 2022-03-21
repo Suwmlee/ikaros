@@ -10,7 +10,7 @@ from .mediaserver import refreshMediaServer
 from ..service.configservice import transConfigService
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
-from ..utils.regex import extractEpNum, matchSeason, matchEpPart, matchSeries
+from ..utils.regex import extractEpNum, matchSeason, matchEpPart, matchSeries, simpleMatchEp
 from ..utils.filehelper import video_type, ext_type, replaceRegex, cleanFolderWithoutSuffix,\
      forceHardlink, forceSymlink, replaceCJK, cleanbyNameSuffix, cleanExtraMedia, moveSubs
 from flask import current_app
@@ -31,6 +31,7 @@ class FileInfo():
 
     isepisode = False
     locked = False
+    forcedseason = False
     originep = ''
     season = None
     epnum = None
@@ -89,6 +90,14 @@ class FileInfo():
                 self.epnum = epresult
 
     def fixEpName(self, season):
+        if not self.epnum and self.forcedseason:
+            current_app.logger.debug("强制`season`后,尝试获取`ep`")
+            sep = simpleMatchEp(self.name)
+            if sep:
+                self.epnum = sep
+                self.originep = 'Pass'
+            else:
+                return
         if isinstance(self.epnum, int):
             prefix = "S%02dE%02d" % (season, self.epnum)
         else:
@@ -255,6 +264,7 @@ def transfer(src_folder, dest_folder,
                 currentfile.isepisode = True
                 if isinstance(currentrecord.season, int) and currentrecord.season > -1:
                     currentfile.season = currentrecord.season
+                    currentfile.forcedseason = True
                 if isinstance(currentrecord.episode, int) and currentrecord.episode > -1:
                     currentfile.epnum = currentrecord.episode
                 elif isinstance(currentrecord.episode, str) and currentrecord != '':
