@@ -35,6 +35,7 @@
 - 群晖docker
   1. 设置卷
     <img src="docs/imgs/path.png" alt="set-vol" width="600"/>
+
   2. 设置端口
     <img src="docs/imgs/port.png" alt="set-port" width="600"/>
 
@@ -45,17 +46,11 @@ __注:__
 
 ### 默认WEB界面预览
 
-- 刮削
-<img src="docs/imgs/javview.png" alt="javview" width="600"/>
-
-- 刮削-修改
-<img src="docs/imgs/javmodify.png" alt="javmodify" width="600"/>
-
-- 转移文件
-<img src="docs/imgs/transferview.png" alt="transferview" width="600"/>
-
-- 转移文件-修改
-<img src="docs/imgs/transfermodify.png" alt="transfermodify" width="600"/>
+ 
+|                 刮削                  |                    转移文件                     |
+| :-----------------------------------: | :---------------------------------------------: |
+|   ![javview](docs/imgs/javview.png)   |   ![transferview](docs/imgs/transferview.png)   |
+| ![javmodify](docs/imgs/javmodify.png) | ![transfermodify](docs/imgs/transfermodify.png) |
 
 ### 文档
 
