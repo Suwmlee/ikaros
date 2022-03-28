@@ -1,3 +1,10 @@
+# [1.21.0](https://github.com/Suwmlee/ikaros/compare/v1.20.1...v1.21.0) (2022-03-28)
+
+
+### Features
+
+* update scrapinglib ([a586ca9](https://github.com/Suwmlee/ikaros/commit/a586ca9ffea3ebb58c59b49bccdd0a54b4d12500))
+
 ## [1.20.1](https://github.com/Suwmlee/ikaros/compare/v1.20.0...v1.20.1) (2022-03-21)
 
 
