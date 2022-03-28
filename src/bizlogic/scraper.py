@@ -240,6 +240,13 @@ def create_nfo_file(path, prefilename, json_data, numinfo: FileNumInfo):
             print("  <premiered>" + release + "</premiered>", file=code)
             print("  <releasedate>" + release + "</releasedate>", file=code)
             print("  <release>" + release + "</release>", file=code)
+            try:
+                f_rating = float(json_data['userrating'])
+                print(f"  <userrating>{round(f_rating * 2.0)}</userrating>", file=code)
+                print(f"  <rating>{round(f_rating * 2.0, 1)}</rating>", file=code)
+                print(f"  <criticrating>{round(f_rating * 20.0, 1)}</criticrating>", file=code)
+            except:
+                pass
             print("  <cover>" + cover + "</cover>", file=code)
             print("  <website>" + website + "</website>", file=code)
             print("</movie>", file=code)
