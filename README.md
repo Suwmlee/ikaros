@@ -25,12 +25,19 @@
     ```sh
     docker run -d \
       --name=ikaros \
+      -e PUID=1000 \
+      -e PGID=1000 \
       -p 12346:12346 \
       -v /path/to/media:/media \
       -v /path/to/data:/ikaros/database \
       --restart unless-stopped \
       suwmlee/ikaros:latest
     ```
+  默认 PUID=1000 and PGID=1000, 可以用下面的id命令查找具体值:
+  ```
+  $ id username
+    uid=1000(dockeruser) gid=1000(dockergroup) groups=1000(dockergroup)
+  ```
 
 - 群晖docker
   1. 设置卷
