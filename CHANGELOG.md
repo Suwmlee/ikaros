@@ -1,3 +1,10 @@
+## [1.22.2](https://github.com/Suwmlee/ikaros/compare/v1.22.1...v1.22.2) (2022-04-11)
+
+
+### Bug Fixes
+
+* **docker:** PUID PGID error ([ceb509e](https://github.com/Suwmlee/ikaros/commit/ceb509e72357eaa95544cb3a5c819050f4611197))
+
 ## [1.22.1](https://github.com/Suwmlee/ikaros/compare/v1.22.0...v1.22.1) (2022-04-11)
 
 
