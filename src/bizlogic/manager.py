@@ -16,8 +16,9 @@ from ..utils.number_parser import FileNumInfo
 from ..utils.filehelper import cleanScrapingfile, video_type, cleanFolder, cleanFolderbyFilter
 
 
-def findAllMovies(root, escape_folder):
+def findAllMovies(root, escape_folder, minsize):
     """ find all movies
+    minsize: MB
     """
     if os.path.basename(root) in escape_folder:
         return []
@@ -26,9 +27,13 @@ def findAllMovies(root, escape_folder):
     for entry in dirs:
         f = os.path.join(root, entry)
         if os.path.isdir(f):
-            total += findAllMovies(f, escape_folder)
+            total += findAllMovies(f, escape_folder, minsize)
         elif os.path.splitext(f)[1].lower() in video_type:
-            total.append(f)
+            filesize = os.path.getsize(f)
+            if filesize > minsize:
+                total.append(f)
+            else:
+                current_app.logger.info('[!] ' + str(f) +' below size limit, will pass')
     return total
 
 
@@ -112,7 +117,10 @@ def startScrapingAll(folder=''):
 
     if folder == '':
         folder = conf.scraping_folder
-    movie_list = findAllMovies(folder, re.split("[,，]", conf.escape_folders))
+    minsize = 0
+    if conf.escape_size and conf.escape_size > 0:
+        minsize = conf.escape_size * 1024 * 1024
+    movie_list = findAllMovies(folder, re.split("[,，]", conf.escape_folders), minsize)
 
     count = 0
     total = str(len(movie_list))
@@ -159,7 +167,16 @@ def startScrapingSingle(movie_path: str):
             os.rename(movie_info.destpath, movie_path)
     if os.path.exists(movie_path) and os.path.isfile(movie_path):
         conf = scrapingConfService.getSetting()
-        create_data_and_move(movie_path, conf)
+        if conf.escape_size and conf.escape_size > 0:
+            minsize = conf.escape_size * 1024 * 1024
+            filesize = os.path.getsize(movie_path)
+            if filesize > minsize:
+                create_data_and_move(movie_path, conf)
+            else:
+                current_app.logger.info('[!] ' + movie_path+' below size limit, will pass')
+        else:
+            create_data_and_move(movie_path, conf)
+
 
     taskService.updateTaskStatus(task, 1)
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from email.policy import default
 from sqlalchemy import Column, Integer, String, Boolean
 from .. import db
 
@@ -49,6 +50,7 @@ class _ScrapingConfigs(db.Model):
 
     escape_folders = Column(String, default="failed,output")
     escape_literals = Column(String, default="\()/")
+    escape_size = Column(Integer, default=0)
 
     transalte_enable = Column(Boolean, default=False)
     transalte_to_sc = Column(Boolean, default=False)
@@ -77,6 +79,7 @@ class _ScrapingConfigs(db.Model):
             'watermark_location': self.watermark_location,
             'watermark_size': self.watermark_size,
             'escape_folders': self.escape_folders,
+            'escape_size': self.escape_size,
             'proxy_enable': self.proxy_enable,
             'proxy_type': self.proxy_type,
             'proxy_address': self.proxy_address,
@@ -97,6 +100,7 @@ class _TransferConfigs(db.Model):
     linktype = Column(Integer, default=0)
     output_folder = Column(String, default='/media/output')
     escape_folder = Column(String, default='Sample,sample')
+    escape_size = Column(Integer, default=0)
     clean_others = Column(Boolean, default=False)
     replace_CJK = Column(Boolean, default=False)
     fix_series = Column(Boolean, default=False)
@@ -111,6 +115,7 @@ class _TransferConfigs(db.Model):
             'soft_prefix': self.soft_prefix,
             'output_folder': self.output_folder,
             'escape_folder': self.escape_folder,
+            'escape_size': self.escape_size,
             'clean_others': self.clean_others,
             'replace_CJK': self.replace_CJK,
             'fix_series': self.fix_series,
