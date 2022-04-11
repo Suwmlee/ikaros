@@ -33,10 +33,10 @@
       --restart unless-stopped \
       suwmlee/ikaros:latest
     ```
-  默认 PUID=1000 and PGID=1000, 可以用下面的id命令查找具体值:
+  默认 `PUID=1000 PGID=1000`,可以用 __id__ 命令查找具体用户值:
   ```
   $ id username
-    uid=1000(dockeruser) gid=1000(dockergroup) groups=1000(dockergroup)
+    uid=1000(ikaros) gid=1000(ikarosgroup) groups=1000(ikarosgroup)
   ```
 
 - 群晖docker
