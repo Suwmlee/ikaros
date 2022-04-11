@@ -1,3 +1,16 @@
+# [1.22.0](https://github.com/Suwmlee/ikaros/compare/v1.21.0...v1.22.0) (2022-04-11)
+
+
+### Bug Fixes
+
+* optimize file path display ([dea67c9](https://github.com/Suwmlee/ikaros/commit/dea67c96bd7226787d2a47be88238de76e8d3252))
+
+
+### Features
+
+* **docker:** add user permission ([eac3142](https://github.com/Suwmlee/ikaros/commit/eac3142b0a49b360c42fffd12365675cbc06508f))
+* **scraping:** add filesize limit ([489b24e](https://github.com/Suwmlee/ikaros/commit/489b24ecbba11aa48e4aa896c941195a86aa14e9))
+
 # [1.21.0](https://github.com/Suwmlee/ikaros/compare/v1.20.1...v1.21.0) (2022-03-28)
 
 
