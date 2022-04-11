@@ -160,11 +160,15 @@ def startScrapingSingle(movie_path: str):
 
     movie_info = scrapingrecordService.queryByPath(movie_path)
     if movie_info:
-        # 源文件不存在，目的文件存在。(刮削后进行了移动，非链接模式)
-        if not os.path.exists(movie_path) \
-           and os.path.exists(movie_info.destpath) and os.path.isfile(movie_info.destpath) \
-           and not pathlib.Path(movie_info.destpath).is_symlink():
-            os.rename(movie_info.destpath, movie_path)
+        if os.path.exists(movie_path):
+            # 源文件存在，目的文件存在。(链接模式)
+            if os.path.exists(movie_info.destpath):
+                scrapingrecordService.deleteByIds([movie_info.id])
+        else:
+            # 源文件不存在，目的文件存在。(非链接模式,刮削后进行了移动)
+            if os.path.exists(movie_info.destpath) and os.path.isfile(movie_info.destpath) \
+                and not pathlib.Path(movie_info.destpath).is_symlink():
+                os.rename(movie_info.destpath, movie_path)
     if os.path.exists(movie_path) and os.path.isfile(movie_path):
         conf = scrapingConfService.getSetting()
         if conf.escape_size and conf.escape_size > 0:
