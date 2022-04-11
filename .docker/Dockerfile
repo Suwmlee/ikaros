@@ -19,6 +19,13 @@ RUN apt-get clean autoclean -y \
     && apt-get purge -y wget \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
+
+ENV PUID=1000
+ENV PGID=1000
+RUN groupadd -g $PGID -o ikaros \
+    && useradd -m -u $PUID -g $PGID -o -s /bin/bash ikaros
+USER ikaros
+
 VOLUME /media
 VOLUME /ikaros/database
 
