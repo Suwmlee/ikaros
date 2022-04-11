@@ -1,3 +1,10 @@
+## [1.22.1](https://github.com/Suwmlee/ikaros/compare/v1.22.0...v1.22.1) (2022-04-11)
+
+
+### Bug Fixes
+
+* clean re-scrape files ([aec983a](https://github.com/Suwmlee/ikaros/commit/aec983a085262ff7079c4ff2402700b9a3f70a42))
+
 # [1.22.0](https://github.com/Suwmlee/ikaros/compare/v1.21.0...v1.22.0) (2022-04-11)
 
 
