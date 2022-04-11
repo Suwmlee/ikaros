@@ -51,6 +51,7 @@ def createFolder(json_data: dict, conf: _ScrapingConfigs):
             path = escapePath(path, conf.escape_literals)
 
             os.makedirs(path)
+    path = os.path.abspath(path)
     return path
 
 
