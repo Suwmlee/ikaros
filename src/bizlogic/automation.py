@@ -78,7 +78,7 @@ def runTask(client_path: str):
     scrapingConfId = 0
     for sid in scrapingFolders:
         sconfig = scrapingConfService.getSetting(sid)
-        if sconfig and real_path.startswith(sconfig.source_folder):
+        if sconfig and real_path.startswith(sconfig.scraping_folder):
             flag_scraping = True
             scrapingConfId = sid
             break
