@@ -1,3 +1,11 @@
+# [1.23.0](https://github.com/Suwmlee/ikaros/compare/v1.22.2...v1.23.0) (2022-04-13)
+
+
+### Features
+
+* support multi scraping config ([dcfe405](https://github.com/Suwmlee/ikaros/commit/dcfe405a5bba7b17ed8bd8c66f49b666fbd07fe0)), closes [#12](https://github.com/Suwmlee/ikaros/issues/12)
+* update config selection in automation ([b1a0348](https://github.com/Suwmlee/ikaros/commit/b1a0348ca1d9fc448123657a23ef71825b5ea8fa))
+
 ## [1.22.2](https://github.com/Suwmlee/ikaros/compare/v1.22.1...v1.22.2) (2022-04-11)
 
 
