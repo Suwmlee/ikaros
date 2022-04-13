@@ -1,3 +1,10 @@
+## [1.23.1](https://github.com/Suwmlee/ikaros/compare/v1.23.0...v1.23.1) (2022-04-13)
+
+
+### Bug Fixes
+
+* **auto:** scraping folder ([be1df35](https://github.com/Suwmlee/ikaros/commit/be1df353a2f418954df65ee99da4f74f7f5a2ebb))
+
 # [1.23.0](https://github.com/Suwmlee/ikaros/compare/v1.22.2...v1.23.0) (2022-04-13)
 
 
