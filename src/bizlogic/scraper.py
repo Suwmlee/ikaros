@@ -95,7 +95,8 @@ def parseJsonInfo(json_data):
 # =====================资源下载部分===========================
 
 def download_file_with_filename(url, filename, path):
-    configProxy = scrapingConfService.getProxySetting()
+    task = taskService.getTask('scrape')
+    configProxy = scrapingConfService.getProxySetting(task.cid)
 
     if not os.path.exists(path):
         os.makedirs(path)

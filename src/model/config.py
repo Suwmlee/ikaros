@@ -59,9 +59,11 @@ class _ScrapingConfigs(db.Model):
     cookies_javdb = Column(String, default="")
     cookies_javlib = Column(String, default="")
     refresh_url = Column(String, default='')
+    remark = Column(String, default='备注')
 
     def serialize(self):
         return {
+            'id': self.id,
             'main_mode': self.main_mode,
             'multi_scraping': self.multi_scraping,
             'async_request': self.async_request,
@@ -88,6 +90,7 @@ class _ScrapingConfigs(db.Model):
             'cookies_javdb': self.cookies_javdb,
             'cookies_javlib': self.cookies_javlib,
             'refresh_url': self.refresh_url,
+            'remark': self.remark
         }
 
 

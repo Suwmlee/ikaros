@@ -7,6 +7,17 @@ from .. import db
 
 class ScrapingConfService():
 
+    def getConfiglist(self):
+        configs = _ScrapingConfigs.query.all()
+        if not configs:
+            config = _ScrapingConfigs()
+            db.session.add(config)
+            db.session.commit()
+            configs = []
+            configs.append(config)
+            return configs
+        return configs
+
     def getSetting(self, sid):
         setting = _ScrapingConfigs.query.filter_by(id=sid).first()
         if not setting:
@@ -18,21 +29,30 @@ class ScrapingConfService():
         return setting
 
     def updateSetting(self, content):
-        changed = False
-        setting = self.getSetting()
+        cid = None
+        if 'id' in content and content['id']:
+            cid = content['id']
+        config = _ScrapingConfigs.query.filter_by(id=cid).first()
+        if not config:
+            config = _ScrapingConfigs()
+            db.session.add(config)
         for singlekey in content.keys():
-            if hasattr(setting, singlekey):
-                value = getattr(setting, singlekey)
+            if hasattr(config, singlekey) and singlekey != 'id':
+                value = getattr(config, singlekey)
                 newvalue = content.get(singlekey)
                 if value != newvalue:
-                    setattr(setting, singlekey, newvalue)
-                    changed = True
-        if changed:
-            db.session.commit()
-        return True
+                    setattr(config, singlekey, newvalue)
+        db.session.commit()
+        return config
 
-    def getProxySetting(self):
-        setting = self.getSetting()
+    def deleteConf(self, cid):
+        config = _ScrapingConfigs.query.filter_by(id=cid).first()
+        if config:
+            db.session.delete(config)
+            db.session.commit()
+
+    def getProxySetting(self, cid):
+        setting = _ScrapingConfigs.query.filter_by(id=cid).first()
         proxyConfig = ProxyConfig(setting.proxy_enable, setting.proxy_address,
                                   setting.proxy_timeout, setting.proxy_retry, setting.proxy_type)
         return proxyConfig

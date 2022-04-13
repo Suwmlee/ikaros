@@ -24,7 +24,8 @@ G_USER_AGENT = r'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (K
 def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None):
     """ 网页请求核心
     """
-    configProxy = scrapingConfService.getProxySetting()
+    task = taskService.getTask('scrape')
+    configProxy = scrapingConfService.getProxySetting(task.cid)
 
     headers = {"User-Agent": ua or G_USER_AGENT}  # noqa
 
@@ -54,7 +55,8 @@ def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None,
 
 
 def post_html(url: str, query: dict, headers: dict = None) -> requests.Response:
-    configProxy = scrapingConfService.getProxySetting()
+    task = taskService.getTask('scrape')
+    configProxy = scrapingConfService.getProxySetting(task.cid)
     headers_ua = {"User-Agent": G_USER_AGENT}
     if headers is None:
         headers = headers_ua
@@ -93,7 +95,8 @@ class TimeoutHTTPAdapter(HTTPAdapter):
 
 #  with keep-alive feature
 def get_html_session(url:str = None, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None):
-    configProxy = scrapingConfService.getProxySetting()
+    task = taskService.getTask('scrape')
+    configProxy = scrapingConfService.getProxySetting(task.cid)
     session = requests.Session()
     if isinstance(cookies, dict) and len(cookies):
         requests.utils.add_dict_to_cookiejar(session.cookies, cookies)
@@ -128,7 +131,8 @@ def get_html_session(url:str = None, cookies: dict = None, ua: str = None, retur
 
 
 def get_html_by_browser(url:str = None, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None, use_scraper: bool = False):
-    configProxy = scrapingConfService.getProxySetting()
+    task = taskService.getTask('scrape')
+    configProxy = scrapingConfService.getProxySetting(task.cid)
     s = create_scraper(browser={'custom': ua or G_USER_AGENT,}) if use_scraper else requests.Session()
     if isinstance(cookies, dict) and len(cookies):
         requests.utils.add_dict_to_cookiejar(s.cookies, cookies)
@@ -163,7 +167,8 @@ def get_html_by_browser(url:str = None, cookies: dict = None, ua: str = None, re
 
 
 def get_html_by_form(url, form_select: str = None, fields: dict = None, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None):
-    configProxy = scrapingConfService.getProxySetting()
+    task = taskService.getTask('scrape')
+    configProxy = scrapingConfService.getProxySetting(task.cid)
     s = requests.Session()
     if isinstance(cookies, dict) and len(cookies):
         requests.utils.add_dict_to_cookiejar(s.cookies, cookies)
@@ -200,7 +205,8 @@ def get_html_by_form(url, form_select: str = None, fields: dict = None, cookies:
 
 
 def get_html_by_scraper(url:str = None, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None):
-    configProxy = scrapingConfService.getProxySetting()
+    task = taskService.getTask('scrape')
+    configProxy = scrapingConfService.getProxySetting(task.cid)
     session = create_scraper(browser={'custom': ua or G_USER_AGENT,})
     if isinstance(cookies, dict) and len(cookies):
         requests.utils.add_dict_to_cookiejar(session.cookies, cookies)
