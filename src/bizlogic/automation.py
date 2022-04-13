@@ -5,7 +5,7 @@ import os
 import time
 
 from flask import current_app
-from ..service.configservice import autoConfigService
+from ..service.configservice import autoConfigService, transConfigService
 from ..service.taskservice import autoTaskService, taskService
 from .manager import startScrapingAll, startScrapingSingle
 from .transfer import autoTransfer
@@ -74,13 +74,16 @@ def runTask(client_path: str):
     transferFolders = conf.transferfolders.split(';')
     flag_scraping = False
     flag_transfer = False
+    flag_transfer_id = 0
     for sc in scrapingFolders:
         if real_path.startswith(sc):
             flag_scraping = True
             break
-    for sc in transferFolders:
-        if real_path.startswith(sc):
+    for tid in transferFolders:
+        tconfig = transConfigService.getConfigById(tid)
+        if tconfig and real_path.startswith(tconfig.source_folder):
             flag_transfer = True
+            flag_transfer_id = tid
             break
     # 3. run
     if flag_scraping:
@@ -90,7 +93,7 @@ def runTask(client_path: str):
         else:
             startScrapingSingle(real_path)
     elif flag_transfer:
-        autoTransfer(real_path)
+        autoTransfer(real_path, flag_transfer_id)
     else:
         current_app.logger.error("无匹配的目录")
 

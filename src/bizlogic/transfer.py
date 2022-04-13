@@ -148,20 +148,18 @@ def findAllVideos(root, src_folder, escape_folder, mode=1):
     return total
 
 
-def autoTransfer(real_path: str):
+def autoTransfer(real_path: str, cid):
     """ 自动转移
     """
-    confs = transConfigService.getConfiglist()
-    for conf in confs:
-        if real_path.startswith(conf.source_folder):
-            current_app.logger.debug("任务详情: 转移")
-            transfer(conf.source_folder, conf.output_folder,
-                     conf.linktype, conf.soft_prefix,
-                     conf.escape_folder, real_path,
-                     False, conf.replace_CJK, conf.fix_series)
-            if conf.refresh_url:
-                refreshMediaServer(conf.refresh_url)
-            break
+    conf = transConfigService.getConfigById(cid)
+    if conf:
+        current_app.logger.debug("任务详情: 自动转移")
+        transfer(conf.source_folder, conf.output_folder,
+                    conf.linktype, conf.soft_prefix,
+                    conf.escape_folder, real_path,
+                    False, conf.replace_CJK, conf.fix_series)
+        if conf.refresh_url:
+            refreshMediaServer(conf.refresh_url)
 
 
 def ctrlTransfer(src_folder, dest_folder, 

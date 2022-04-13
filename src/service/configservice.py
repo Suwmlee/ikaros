@@ -40,6 +40,10 @@ class TransConfService():
     """ 转移模块服务
     """
 
+    def getConfigById(self, cid) -> _TransferConfigs:
+        config = _TransferConfigs.query.filter_by(id=cid).first()
+        return config
+
     def getConfiglist(self):
         configs = _TransferConfigs.query.all()
         if not configs:
