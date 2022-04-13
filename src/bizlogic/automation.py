@@ -5,7 +5,7 @@ import os
 import time
 
 from flask import current_app
-from ..service.configservice import autoConfigService, transConfigService
+from ..service.configservice import autoConfigService, transConfigService, scrapingConfService
 from ..service.taskservice import autoTaskService, taskService
 from .manager import startScrapingAll, startScrapingSingle
 from .transfer import autoTransfer
@@ -70,30 +70,33 @@ def runTask(client_path: str):
         return
     current_app.logger.debug("任务详情: 实际路径[{}]".format(real_path))
     # 2. select scrape or transfer
-    scrapingFolders = conf.scrapingfolders.split(';')
-    transferFolders = conf.transferfolders.split(';')
+    scrapingFolders = conf.scrapingconfs.split(';')
+    transferFolders = conf.transferconfs.split(';')
     flag_scraping = False
     flag_transfer = False
-    flag_transfer_id = 0
-    for sc in scrapingFolders:
-        if real_path.startswith(sc):
+    transConfigId = 0
+    scrapingConfId = 0
+    for sid in scrapingFolders:
+        sconfig = scrapingConfService.getSetting(sid)
+        if sconfig and real_path.startswith(sconfig.source_folder):
             flag_scraping = True
+            scrapingConfId = sid
             break
     for tid in transferFolders:
         tconfig = transConfigService.getConfigById(tid)
         if tconfig and real_path.startswith(tconfig.source_folder):
             flag_transfer = True
-            flag_transfer_id = tid
+            transConfigId = tid
             break
     # 3. run
     if flag_scraping:
         current_app.logger.debug("任务详情: JAV")
         if os.path.isdir(real_path):
-            startScrapingAll(real_path)
+            startScrapingAll(scrapingConfId, real_path)
         else:
-            startScrapingSingle(real_path)
+            startScrapingSingle(scrapingConfId, real_path)
     elif flag_transfer:
-        autoTransfer(real_path, flag_transfer_id)
+        autoTransfer(transConfigId, real_path)
     else:
         current_app.logger.error("无匹配的目录")
 

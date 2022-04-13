@@ -108,7 +108,7 @@ class _TransferConfigs(db.Model):
     replace_CJK = Column(Boolean, default=False)
     fix_series = Column(Boolean, default=False)
     refresh_url = Column(String, default='')
-    mark = Column(String, default='备注')
+    remark = Column(String, default='备注')
 
     def serialize(self):
         return {
@@ -123,7 +123,7 @@ class _TransferConfigs(db.Model):
             'replace_CJK': self.replace_CJK,
             'fix_series': self.fix_series,
             'refresh_url': self.refresh_url,
-            'mark': self.mark
+            'remark': self.remark
         }
 
 
@@ -135,7 +135,9 @@ class _AutoConfigs(db.Model):
     prefixed = Column(String, default="", comment="前缀")
     scrapingfolders = Column(String, default="", comment="以;间隔")
     transferfolders = Column(String, default="", comment="以;间隔")
-    mark = Column(String, default='auto')
+    scrapingconfs = Column(String, default="", comment="以;间隔")
+    transferconfs = Column(String, default="", comment="以;间隔")
+    remark = Column(String, default='备注')
 
     def serialize(self):
         return {
@@ -144,5 +146,7 @@ class _AutoConfigs(db.Model):
             'prefixed': self.prefixed,
             'scrapingfolders': self.scrapingfolders,
             'transferfolders': self.transferfolders,
-            'mark': self.mark
+            'scrapingconfs': self.scrapingconfs,
+            'transferconfs': self.transferconfs,
+            'remark': self.remark
         }

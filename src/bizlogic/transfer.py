@@ -148,7 +148,7 @@ def findAllVideos(root, src_folder, escape_folder, mode=1):
     return total
 
 
-def autoTransfer(real_path: str, cid):
+def autoTransfer(cid, real_path: str):
     """ 自动转移
     """
     conf = transConfigService.getConfigById(cid)
