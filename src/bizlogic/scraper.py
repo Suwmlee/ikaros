@@ -8,6 +8,7 @@ import requests
 from PIL import Image
 from flask import current_app
 
+from ..service.taskservice import taskService
 from ..service.configservice import scrapingConfService, _ScrapingConfigs
 from ..utils.ADC_function import G_USER_AGENT
 from ..utils.filehelper import moveSubsbyFilepath, forceSymlink, forceHardlink
@@ -61,7 +62,8 @@ def moveFailedFolder(filepath):
     """
     try:
         current_app.logger.info('[-]Move to Failed folder')
-        conf = scrapingConfService.getSetting()
+        task = taskService.getTask('scrape')
+        conf = scrapingConfService.getSetting(task.cid)
         if conf.main_mode == 1 and (conf.link_type == 1 or conf.link_type == 2):
             (filefolder, name) = os.path.split(filepath)
             newpath = os.path.join(conf.failed_folder, name)
@@ -360,7 +362,8 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
         newpath = os.path.join(path, prefilename + houzhui)
         if link_type == 1:
             (filefolder, name) = os.path.split(filepath)
-            settings = scrapingConfService.getSetting()
+            task = taskService.getTask('scrape')
+            settings = scrapingConfService.getSetting(task.cid)
             soft_prefix = settings.soft_prefix
             src_folder = settings.scraping_folder
             midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")

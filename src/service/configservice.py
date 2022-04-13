@@ -7,12 +7,14 @@ from .. import db
 
 class ScrapingConfService():
 
-    def getSetting(self):
-        setting = _ScrapingConfigs.query.filter_by(id=1).first()
+    def getSetting(self, sid):
+        setting = _ScrapingConfigs.query.filter_by(id=sid).first()
         if not setting:
-            setting = _ScrapingConfigs()
-            db.session.add(setting)
-            db.session.commit()
+            configs = _ScrapingConfigs.query.all()
+            if not configs:
+                setting = _ScrapingConfigs()
+                db.session.add(setting)
+                db.session.commit()
         return setting
 
     def updateSetting(self, content):

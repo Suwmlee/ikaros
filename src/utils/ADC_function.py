@@ -14,6 +14,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from cloudscraper import create_scraper
 from flask import current_app
+from ..service.taskservice import taskService
 from ..service.configservice import scrapingConfService
 
 
@@ -318,7 +319,8 @@ def translate(
 # 并填写到以上json文件的相应字段中
 def load_javdb_cookies():
     try:
-        javdb = scrapingConfService.getSetting().cookies_javdb
+        task = taskService.getTask('scrape')
+        javdb = scrapingConfService.getSetting(task.cid).cookies_javdb
         cookies = load_cookies(javdb)
         return cookies
     except:
@@ -327,7 +329,8 @@ def load_javdb_cookies():
 
 def load_javlib_cookies():
     try:
-        javlib = scrapingConfService.getSetting().cookies_javlib
+        task = taskService.getTask('scrape')
+        javlib = scrapingConfService.getSetting(task.cid).cookies_javlib
         cookies = load_cookies(javlib)
         return cookies
     except:

@@ -49,6 +49,9 @@ class TaskService():
             task.finished = num
             db.session.commit()
 
+    def commit(self):
+        db.session.commit()
+
 
 class AutoTaskService():
 

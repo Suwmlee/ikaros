@@ -103,16 +103,19 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
     current_app.logger.info("[*]======================================================")
 
 
-def startScrapingAll(folder=''):
+def startScrapingAll(cid, folder=''):
     """ 启动入口
     """
 
     task = taskService.getTask('scrape')
     if task.status == 2:
         return
-    taskService.updateTaskStatus(task, 2)
+    # taskService.updateTaskStatus(task, 2)
+    task.status = 2
+    task.cid = cid
+    taskService.commit()
 
-    conf = scrapingConfService.getSetting()
+    conf = scrapingConfService.getSetting(cid)
     cleanFolder(conf.failed_folder)
 
     if folder == '':
@@ -129,6 +132,7 @@ def startScrapingAll(folder=''):
     current_app.logger.info('[+]Find  ' + total+'  movies')
 
     for movie_path in movie_list:
+        # refresh data
         task = taskService.getTask('scrape')
         if task.status == 0:
             return
@@ -148,13 +152,16 @@ def startScrapingAll(folder=''):
     current_app.logger.info("[*]======================================================")
 
 
-def startScrapingSingle(movie_path: str):
+def startScrapingSingle(cid, movie_path: str):
     """ single movie
     """
     task = taskService.getTask('scrape')
     if task.status == 2:
         return
-    taskService.updateTaskStatus(task, 2)
+    # taskService.updateTaskStatus(task, 2)
+    task.status = 2
+    task.cid = cid
+    taskService.commit()
 
     current_app.logger.info("[+]Single start!!!")
 
@@ -170,7 +177,7 @@ def startScrapingSingle(movie_path: str):
                 and not pathlib.Path(movie_info.destpath).is_symlink():
                 os.rename(movie_info.destpath, movie_path)
     if os.path.exists(movie_path) and os.path.isfile(movie_path):
-        conf = scrapingConfService.getSetting()
+        conf = scrapingConfService.getSetting(cid)
         if conf.escape_size and conf.escape_size > 0:
             minsize = conf.escape_size * 1024 * 1024
             filesize = os.path.getsize(movie_path)
