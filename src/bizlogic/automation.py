@@ -9,6 +9,7 @@ from ..service.configservice import autoConfigService, transConfigService, scrap
 from ..service.taskservice import autoTaskService, taskService
 from .manager import startScrapingAll, startScrapingSingle
 from .transfer import autoTransfer
+from ..notifications import notificationService
 
 
 def start(client_path: str):
@@ -54,6 +55,7 @@ def checkTaskQueue():
                 runTask(task.path)
             except Exception as e:
                 current_app.logger.error(e)
+                notificationService.sendtext("自动任务:[{}], 异常:{}".format(task.path,str(e)))
             current_app.logger.info("任务循环队列: 清除任务[{}]".format(task.path))
             autoTaskService.deleteTask(task.id)
         else:
@@ -83,6 +85,8 @@ def runTask(client_path: str):
                     flag_scraping = True
                     scrapingConfId = sid
                     break
+    else:
+        current_app.logger.error("任务详情: 未配置 自动-刮削配置,请配置后再使用")
     if conf.transferconfs:
         transferIds = conf.transferconfs.split(';')
         if transferIds:
@@ -92,15 +96,30 @@ def runTask(client_path: str):
                     flag_transfer = True
                     transConfigId = tid
                     break
+    else:
+        current_app.logger.error("任务详情: 未配置 自动-转移配置,请配置后再使用")
     # 3. run
+    status = 99
     if flag_scraping:
         current_app.logger.debug("任务详情: JAV")
         if os.path.isdir(real_path):
-            startScrapingAll(scrapingConfId, real_path)
+            status = startScrapingAll(scrapingConfId, real_path)
         else:
-            startScrapingSingle(scrapingConfId, real_path)
+            status = startScrapingSingle(scrapingConfId, real_path)
+        if status == 1:
+            notificationService.sendtext("自动任务:[{}], 刮削完成,已推送媒体库".format(real_path))
+        elif status == 2:
+            notificationService.sendtext("自动任务:[{}], 刮削完成,推送媒体库异常".format(real_path))
+        else:
+            notificationService.sendtext("自动任务:[{}], 刮削异常,详情请查看日志".format(real_path))
     elif flag_transfer:
-        autoTransfer(transConfigId, real_path)
+        status = autoTransfer(transConfigId, real_path)
+        if status == 1:
+            notificationService.sendtext("自动任务:[{}], 转移完成,已推送媒体库".format(real_path))
+        elif status == 2:
+            notificationService.sendtext("自动任务:[{}], 转移完成,推送媒体库异常".format(real_path))
+        else:
+            notificationService.sendtext("自动任务:[{}], 转移异常,详情请查看日志".format(real_path))
     else:
         current_app.logger.error("无匹配的目录")
 

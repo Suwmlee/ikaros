@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from email.policy import default
 from sqlalchemy import Column, Integer, String, Boolean
 from .. import db
 
@@ -149,4 +148,25 @@ class _AutoConfigs(db.Model):
             'scrapingconfs': self.scrapingconfs,
             'transferconfs': self.transferconfs,
             'remark': self.remark
+        }
+
+
+class _NotificationConfigs(db.Model):
+    __tablename__ = 'notificationconfigs'
+
+    id = Column(Integer, primary_key=True)
+    tg_token = Column(String, default="")
+    tg_chatid = Column(String, default="")
+    wechat_corpid = Column(String, default="")
+    wechat_corpsecret = Column(String, default="")
+    wechat_agentid = Column(String, default="")
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'tg_token': self.tg_token,
+            'tg_chatid': self.tg_chatid,
+            'wechat_corpid': self.wechat_corpid,
+            'wechat_corpsecret': self.wechat_corpsecret,
+            'wechat_agentid': self.wechat_agentid
         }

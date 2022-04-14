@@ -11,11 +11,11 @@ import time
 from flask import request, Response, send_from_directory
 
 from . import web
-from ..service.recordservice import scrapingrecordService, transrecordService
 from ..model.record import _ScrapingRecords
 from flask import current_app
 from ..utils.filehelper import cleanbySuffix
-
+from ..service.recordservice import scrapingrecordService, transrecordService
+from ..service.configservice import notificationConfService
 
 @web.route("/api/options/loglevel", methods=['GET', 'PUT'])
 def loglevel():
@@ -200,3 +200,24 @@ def flask_logger():
 def stream():
     """returns logging information"""
     return Response(flask_logger(), mimetype="text/plain", content_type="text/event-stream; charset=utf-8")
+
+
+@web.route("/api/options/notification", methods=["GET"])
+def getNotificationConfig():
+    """returns notification config"""
+    try:
+        content = notificationConfService.getConfig().serialize()
+        return json.dumps(content)
+    except Exception as err:
+        current_app.logger.error(err)
+        return Response(status=500)
+
+@web.route("/api/options/notification", methods=['PUT'])
+def updateNotifiConf():
+    try:
+        content = request.get_json()
+        notificationConfService.updateConfig(content)
+        return Response(status=200)
+    except Exception as err:
+        current_app.logger.error(err)
+        return Response(status=500)

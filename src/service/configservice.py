@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ''' 刮削配置
 '''
-from ..model.config import _ScrapingConfigs, _TransferConfigs, _AutoConfigs
+from ..model.config import _ScrapingConfigs, _TransferConfigs, _AutoConfigs, _NotificationConfigs
 from .. import db
 
 
@@ -163,6 +163,33 @@ class AutoConfService():
         return True
 
 
+class NotificationConfService():
+    """ 通知推送配置
+    """
+    def getConfig(self):
+        config = _NotificationConfigs.query.filter_by(id=1).first()
+        if not config:
+            config = _NotificationConfigs()
+            db.session.add(config)
+            db.session.commit()
+        return config
+
+    def updateConfig(self, content):
+        changed = False
+        setting = self.getConfig()
+        for singlekey in content.keys():
+            if hasattr(setting, singlekey):
+                value = getattr(setting, singlekey)
+                newvalue = content.get(singlekey)
+                if value != newvalue:
+                    setattr(setting, singlekey, newvalue)
+                    changed = True
+        if changed:
+            db.session.commit()
+        return True
+
+
 scrapingConfService = ScrapingConfService()
 transConfigService = TransConfService()
 autoConfigService = AutoConfService()
+notificationConfService = NotificationConfService()
