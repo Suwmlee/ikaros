@@ -70,24 +70,28 @@ def runTask(client_path: str):
         return
     current_app.logger.debug("任务详情: 实际路径[{}]".format(real_path))
     # 2. select scrape or transfer
-    scrapingFolders = conf.scrapingconfs.split(';')
-    transferFolders = conf.transferconfs.split(';')
     flag_scraping = False
+    scrapingConfId = 0
     flag_transfer = False
     transConfigId = 0
-    scrapingConfId = 0
-    for sid in scrapingFolders:
-        sconfig = scrapingConfService.getSetting(sid)
-        if sconfig and real_path.startswith(sconfig.scraping_folder):
-            flag_scraping = True
-            scrapingConfId = sid
-            break
-    for tid in transferFolders:
-        tconfig = transConfigService.getConfigById(tid)
-        if tconfig and real_path.startswith(tconfig.source_folder):
-            flag_transfer = True
-            transConfigId = tid
-            break
+    if conf.scrapingconfs:
+        scrapingIds = conf.scrapingconfs.split(';')
+        if scrapingIds:
+            for sid in scrapingIds:
+                sconfig = scrapingConfService.getSetting(sid)
+                if sconfig and real_path.startswith(sconfig.scraping_folder):
+                    flag_scraping = True
+                    scrapingConfId = sid
+                    break
+    if conf.transferconfs:
+        transferIds = conf.transferconfs.split(';')
+        if transferIds:
+            for tid in transferIds:
+                tconfig = transConfigService.getConfigById(tid)
+                if tconfig and real_path.startswith(tconfig.source_folder):
+                    flag_transfer = True
+                    transConfigId = tid
+                    break
     # 3. run
     if flag_scraping:
         current_app.logger.debug("任务详情: JAV")
