@@ -1,3 +1,15 @@
+# [1.24.0](https://github.com/Suwmlee/ikaros/compare/v1.23.1...v1.24.0) (2022-04-14)
+
+
+### Bug Fixes
+
+* **auto:** check config ([ee53084](https://github.com/Suwmlee/ikaros/commit/ee53084ef04972510e79144eaa7d38d753a5e21d))
+
+
+### Features
+
+* support pushing message ([92353dc](https://github.com/Suwmlee/ikaros/commit/92353dc6def2f80f089d63aae1733b0972d90009)), closes [#13](https://github.com/Suwmlee/ikaros/issues/13)
+
 ## [1.23.1](https://github.com/Suwmlee/ikaros/compare/v1.23.0...v1.23.1) (2022-04-13)
 
 
