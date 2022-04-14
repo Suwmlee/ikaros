@@ -150,16 +150,25 @@ def findAllVideos(root, src_folder, escape_folder, mode=1):
 
 def autoTransfer(cid, real_path: str):
     """ 自动转移
+    返回
+    0:  转移失败
+    1:  转移成功,推送媒体库
+    2:  转移成功,推送媒体库异常
     """
     conf = transConfigService.getConfigById(cid)
-    if conf:
+    try:
         current_app.logger.debug("任务详情: 自动转移")
-        transfer(conf.source_folder, conf.output_folder,
+        if not transfer(conf.source_folder, conf.output_folder,
                     conf.linktype, conf.soft_prefix,
                     conf.escape_folder, real_path,
-                    False, conf.replace_CJK, conf.fix_series)
+                    False, conf.replace_CJK, conf.fix_series):
+            return 0
         if conf.refresh_url:
-            refreshMediaServer(conf.refresh_url)
+            if not refreshMediaServer(conf.refresh_url):
+                return 2
+        return 1
+    except:
+        return 0
 
 
 def ctrlTransfer(src_folder, dest_folder, 
@@ -189,7 +198,7 @@ def transfer(src_folder, dest_folder,
 
     task = taskService.getTask('transfer')
     if task.status == 2:
-        return
+        return False
     taskService.updateTaskStatus(task, 2)
 
     try:

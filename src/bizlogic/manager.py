@@ -105,11 +105,16 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
 
 def startScrapingAll(cid, folder=''):
     """ 启动入口
+    返回
+    0:  刮削失败
+    1:  刮削完成,推送媒体库
+    2:  刮削完成,推送媒体库异常
+    3:  正在执行其他任务
+    4:  任务中断
     """
-
     task = taskService.getTask('scrape')
     if task.status == 2:
-        return
+        return 3
     # taskService.updateTaskStatus(task, 2)
     task.status = 2
     task.cid = cid
@@ -135,7 +140,7 @@ def startScrapingAll(cid, folder=''):
         # refresh data
         task = taskService.getTask('scrape')
         if task.status == 0:
-            return
+            return 4
         taskService.updateTaskFinished(task, count)
         percentage = str(count / int(total) * 100)[:4] + '%'
         current_app.logger.debug('[!] - ' + percentage + ' [' + str(count) + '/' + total + '] -')
@@ -146,18 +151,25 @@ def startScrapingAll(cid, folder=''):
 
     if conf.refresh_url:
         current_app.logger.info("[+]Refresh MediaServer")
-        refreshMediaServer(conf.refresh_url)
+        if not refreshMediaServer(conf.refresh_url):
+            return 2
 
     current_app.logger.info("[+] All scraping finished!!!")
     current_app.logger.info("[*]======================================================")
+    return 1
 
 
 def startScrapingSingle(cid, movie_path: str):
     """ single movie
+    返回
+    0:  刮削失败
+    1:  刮削完成,推送媒体库
+    2:  刮削完成,推送媒体库异常
+    3:  正在执行其他任务
     """
     task = taskService.getTask('scrape')
     if task.status == 2:
-        return
+        return 3
     # taskService.updateTaskStatus(task, 2)
     task.status = 2
     task.cid = cid
@@ -188,11 +200,12 @@ def startScrapingSingle(cid, movie_path: str):
         else:
             create_data_and_move(movie_path, conf)
 
-
     taskService.updateTaskStatus(task, 1)
 
     if conf.refresh_url:
         current_app.logger.info("[+]Refresh MediaServer")
-        refreshMediaServer(conf.refresh_url)
+        if not refreshMediaServer(conf.refresh_url):
+            return 2
 
     current_app.logger.info("[+]Single finished!!!")
+    return 1
