@@ -65,7 +65,7 @@ def checkTaskQueue():
 
 def runTask(client_path: str):
     # 1. convert path to real path for flask
-    conf = autoConfigService.getSetting()
+    conf = autoConfigService.getConfig()
     real_path = client_path.replace(conf.original, conf.prefixed)
     if not os.path.exists(real_path):
         current_app.logger.debug("任务详情: 不存在路径[{}]".format(real_path))
@@ -80,7 +80,7 @@ def runTask(client_path: str):
         scrapingIds = conf.scrapingconfs.split(';')
         if scrapingIds:
             for sid in scrapingIds:
-                sconfig = scrapingConfService.getSetting(sid)
+                sconfig = scrapingConfService.getConfig(sid)
                 if sconfig and real_path.startswith(sconfig.scraping_folder):
                     flag_scraping = True
                     scrapingConfId = sid

@@ -4,23 +4,85 @@
 import json
 from flask import request, Response, current_app
 from . import web
+from ..bizlogic import transfer
+from ..service.configservice import transConfigService
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
 
 
-@web.route("/api/transfer/record", methods=['DELETE'])
-def deleteTransferRecordIds():
+@web.route("/api/transfer", methods=['POST'])
+def startTransfer():
     try:
-        ids = request.get_json()
-        for sid in ids:
-            transrecordService.deleteByID(sid)
+        content = request.get_json()
+        transfer.ctrlTransfer(content['source_folder'], content['output_folder'],
+                              content['linktype'], content['soft_prefix'],
+                              content['escape_folder'], content.get('specified_files'),
+                              content['fix_series'],
+                              content['clean_others'], content['replace_CJK'],
+                              content.get('refresh_url'))
         return Response(status=200)
     except Exception as err:
         current_app.logger.error(err)
         return Response(status=500)
 
 
-@web.route("/api/transrecord", methods=['GET'])
+@web.route("/api/transfer/conf/all", methods=['GET'])
+def getTransConfs():
+    """ 查询转移配置
+    """
+    try:
+        configs = transConfigService.getConfiglist()
+        all = []
+        for conf in configs:
+            all.append(conf.serialize())
+        return json.dumps(all)
+    except Exception as err:
+        current_app.logger.error(err)
+        return Response(status=500)
+
+
+@web.route("/api/transfer/conf", methods=['POST'])
+def addTransConf():
+    """ 新增转移配置
+    """
+    try:
+        content = request.get_json()
+        content['id'] = None
+        config = transConfigService.updateConf(content)
+        return json.dumps(config.serialize())
+    except Exception as err:
+        current_app.logger.error(err)
+        return Response(status=500)
+
+
+@web.route("/api/transfer/conf", methods=['PUT'])
+def updateTransConf():
+    """ 更新转移配置
+    """
+    try:
+        content = request.get_json()
+        config = transConfigService.updateConf(content)
+        return json.dumps(config.serialize())
+    except Exception as err:
+        current_app.logger.error(err)
+        return Response(status=500)
+
+
+@web.route("/api/transfer/conf/<cid>", methods=['DELETE'])
+def deleteTransConf(cid):
+    """ 删除转移配置
+    """
+    try:
+        iid = int(cid)
+        transConfigService.deleteConf(iid)
+        return Response(status=200)
+    except Exception as err:
+        current_app.logger.error(err)
+        return Response(status=500)
+
+# record
+
+@web.route("/api/transfer/record", methods=['GET'])
 def getTransRecord():
     """ 查询
     """
@@ -60,6 +122,18 @@ def editTransferRecord():
                                     content.get('status'), content.get('topfolder'), content.get('secondfolder'),
                                     content.get('isepisode'), content.get('season'), content.get('episode'),
                                     content.get('renameAllTop'), content.get('renameAllSub'))
+        return Response(status=200)
+    except Exception as err:
+        current_app.logger.error(err)
+        return Response(status=500)
+
+
+@web.route("/api/transfer/record", methods=['DELETE'])
+def deleteTransferRecordIds():
+    try:
+        ids = request.get_json()
+        for sid in ids:
+            transrecordService.deleteByID(sid)
         return Response(status=200)
     except Exception as err:
         current_app.logger.error(err)

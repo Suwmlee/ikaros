@@ -120,7 +120,7 @@ def startScrapingAll(cid, folder=''):
     task.cid = cid
     taskService.commit()
 
-    conf = scrapingConfService.getSetting(cid)
+    conf = scrapingConfService.getConfig(cid)
     cleanFolder(conf.failed_folder)
 
     if folder == '':
@@ -189,7 +189,7 @@ def startScrapingSingle(cid, movie_path: str):
                 and not pathlib.Path(movie_info.destpath).is_symlink():
                 os.rename(movie_info.destpath, movie_path)
     if os.path.exists(movie_path) and os.path.isfile(movie_path):
-        conf = scrapingConfService.getSetting(cid)
+        conf = scrapingConfService.getConfig(cid)
         if conf.escape_size and conf.escape_size > 0:
             minsize = conf.escape_size * 1024 * 1024
             filesize = os.path.getsize(movie_path)

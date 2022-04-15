@@ -25,7 +25,7 @@ def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None,
     """ 网页请求核心
     """
     task = taskService.getTask('scrape')
-    configProxy = scrapingConfService.getProxySetting(task.cid)
+    configProxy = scrapingConfService.getProxyConfig(task.cid)
 
     headers = {"User-Agent": ua or G_USER_AGENT}  # noqa
 
@@ -56,7 +56,7 @@ def get_html(url, cookies: dict = None, ua: str = None, return_type: str = None,
 
 def post_html(url: str, query: dict, headers: dict = None) -> requests.Response:
     task = taskService.getTask('scrape')
-    configProxy = scrapingConfService.getProxySetting(task.cid)
+    configProxy = scrapingConfService.getProxyConfig(task.cid)
     headers_ua = {"User-Agent": G_USER_AGENT}
     if headers is None:
         headers = headers_ua
@@ -96,7 +96,7 @@ class TimeoutHTTPAdapter(HTTPAdapter):
 #  with keep-alive feature
 def get_html_session(url:str = None, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None):
     task = taskService.getTask('scrape')
-    configProxy = scrapingConfService.getProxySetting(task.cid)
+    configProxy = scrapingConfService.getProxyConfig(task.cid)
     session = requests.Session()
     if isinstance(cookies, dict) and len(cookies):
         requests.utils.add_dict_to_cookiejar(session.cookies, cookies)
@@ -132,7 +132,7 @@ def get_html_session(url:str = None, cookies: dict = None, ua: str = None, retur
 
 def get_html_by_browser(url:str = None, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None, use_scraper: bool = False):
     task = taskService.getTask('scrape')
-    configProxy = scrapingConfService.getProxySetting(task.cid)
+    configProxy = scrapingConfService.getProxyConfig(task.cid)
     s = create_scraper(browser={'custom': ua or G_USER_AGENT,}) if use_scraper else requests.Session()
     if isinstance(cookies, dict) and len(cookies):
         requests.utils.add_dict_to_cookiejar(s.cookies, cookies)
@@ -168,7 +168,7 @@ def get_html_by_browser(url:str = None, cookies: dict = None, ua: str = None, re
 
 def get_html_by_form(url, form_select: str = None, fields: dict = None, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None):
     task = taskService.getTask('scrape')
-    configProxy = scrapingConfService.getProxySetting(task.cid)
+    configProxy = scrapingConfService.getProxyConfig(task.cid)
     s = requests.Session()
     if isinstance(cookies, dict) and len(cookies):
         requests.utils.add_dict_to_cookiejar(s.cookies, cookies)
@@ -206,7 +206,7 @@ def get_html_by_form(url, form_select: str = None, fields: dict = None, cookies:
 
 def get_html_by_scraper(url:str = None, cookies: dict = None, ua: str = None, return_type: str = None, encoding: str = None):
     task = taskService.getTask('scrape')
-    configProxy = scrapingConfService.getProxySetting(task.cid)
+    configProxy = scrapingConfService.getProxyConfig(task.cid)
     session = create_scraper(browser={'custom': ua or G_USER_AGENT,})
     if isinstance(cookies, dict) and len(cookies):
         requests.utils.add_dict_to_cookiejar(session.cookies, cookies)
@@ -326,7 +326,7 @@ def translate(
 def load_javdb_cookies():
     try:
         task = taskService.getTask('scrape')
-        javdb = scrapingConfService.getSetting(task.cid).cookies_javdb
+        javdb = scrapingConfService.getConfig(task.cid).cookies_javdb
         cookies = load_cookies(javdb)
         return cookies
     except:
@@ -336,7 +336,7 @@ def load_javdb_cookies():
 def load_javlib_cookies():
     try:
         task = taskService.getTask('scrape')
-        javlib = scrapingConfService.getSetting(task.cid).cookies_javlib
+        javlib = scrapingConfService.getConfig(task.cid).cookies_javlib
         cookies = load_cookies(javlib)
         return cookies
     except:

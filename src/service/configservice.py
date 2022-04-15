@@ -18,17 +18,17 @@ class ScrapingConfService():
             return configs
         return configs
 
-    def getSetting(self, sid):
-        setting = _ScrapingConfigs.query.filter_by(id=sid).first()
-        if not setting:
+    def getConfig(self, sid):
+        config = _ScrapingConfigs.query.filter_by(id=sid).first()
+        if not config:
             configs = _ScrapingConfigs.query.all()
             if not configs:
-                setting = _ScrapingConfigs()
-                db.session.add(setting)
+                config = _ScrapingConfigs()
+                db.session.add(config)
                 db.session.commit()
-        return setting
+        return config
 
-    def updateSetting(self, content):
+    def updateConfig(self, content):
         cid = None
         if 'id' in content and content['id']:
             cid = content['id']
@@ -51,10 +51,10 @@ class ScrapingConfService():
             db.session.delete(config)
             db.session.commit()
 
-    def getProxySetting(self, cid):
-        setting = _ScrapingConfigs.query.filter_by(id=cid).first()
-        proxyConfig = ProxyConfig(setting.proxy_enable, setting.proxy_address,
-                                  setting.proxy_timeout, setting.proxy_retry, setting.proxy_type)
+    def getProxyConfig(self, cid):
+        config = _ScrapingConfigs.query.filter_by(id=cid).first()
+        proxyConfig = ProxyConfig(config.proxy_enable, config.proxy_address,
+                                  config.proxy_timeout, config.proxy_retry, config.proxy_type)
         return proxyConfig
 
 
@@ -140,23 +140,23 @@ class ProxyConfig():
 class AutoConfService():
     """ 自动化配置
     """
-    def getSetting(self):
-        setting = _AutoConfigs.query.filter_by(id=1).first()
-        if not setting:
-            setting = _AutoConfigs()
-            db.session.add(setting)
+    def getConfig(self):
+        config = _AutoConfigs.query.filter_by(id=1).first()
+        if not config:
+            config = _AutoConfigs()
+            db.session.add(config)
             db.session.commit()
-        return setting
+        return config
 
-    def updateSetting(self, content):
+    def updateConfig(self, content):
         changed = False
-        setting = self.getSetting()
+        config = self.getConfig()
         for singlekey in content.keys():
-            if hasattr(setting, singlekey):
-                value = getattr(setting, singlekey)
+            if hasattr(config, singlekey):
+                value = getattr(config, singlekey)
                 newvalue = content.get(singlekey)
                 if value != newvalue:
-                    setattr(setting, singlekey, newvalue)
+                    setattr(config, singlekey, newvalue)
                     changed = True
         if changed:
             db.session.commit()
@@ -176,13 +176,13 @@ class NotificationConfService():
 
     def updateConfig(self, content):
         changed = False
-        setting = self.getConfig()
+        config = self.getConfig()
         for singlekey in content.keys():
-            if hasattr(setting, singlekey):
-                value = getattr(setting, singlekey)
+            if hasattr(config, singlekey):
+                value = getattr(config, singlekey)
                 newvalue = content.get(singlekey)
                 if value != newvalue:
-                    setattr(setting, singlekey, newvalue)
+                    setattr(config, singlekey, newvalue)
                     changed = True
         if changed:
             db.session.commit()

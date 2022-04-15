@@ -29,18 +29,18 @@ def clientAutoTask():
 @web.route("/api/auto/conf", methods=['GET'])
 def getAutoConf():
     try:
-        content = autoConfigService.getSetting().serialize()
+        content = autoConfigService.getConfig().serialize()
         return json.dumps(content)
     except Exception as err:
         current_app.logger.error(err)
         return Response(status=500)
 
 
-@web.route("/api/auto/conf", methods=['POST'])
+@web.route("/api/auto/conf", methods=['PUT'])
 def updateAutoConf():
     try:
         content = request.get_json()
-        autoConfigService.updateSetting(content)
+        autoConfigService.updateConfig(content)
         return Response(status=200)
     except Exception as err:
         current_app.logger.error(err)

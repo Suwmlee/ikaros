@@ -61,7 +61,7 @@ def addConf():
     try:
         content = request.get_json()
         content['id'] = None
-        config = scrapingConfService.updateSetting(content)
+        config = scrapingConfService.updateConfig(content)
         return json.dumps(config.serialize())
     except Exception as err:
         current_app.logger.error(err)
@@ -72,7 +72,7 @@ def addConf():
 def updateScapingConf():
     try:
         content = request.get_json()
-        scrapingConfService.updateSetting(content)
+        scrapingConfService.updateConfig(content)
         return Response(status=200)
     except Exception as err:
         current_app.logger.error(err)

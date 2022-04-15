@@ -63,7 +63,7 @@ def moveFailedFolder(filepath):
     try:
         current_app.logger.info('[-]Move to Failed folder')
         task = taskService.getTask('scrape')
-        conf = scrapingConfService.getSetting(task.cid)
+        conf = scrapingConfService.getConfig(task.cid)
         if conf.main_mode == 1 and (conf.link_type == 1 or conf.link_type == 2):
             (filefolder, name) = os.path.split(filepath)
             newpath = os.path.join(conf.failed_folder, name)
@@ -96,7 +96,7 @@ def parseJsonInfo(json_data):
 
 def download_file_with_filename(url, filename, path):
     task = taskService.getTask('scrape')
-    configProxy = scrapingConfService.getProxySetting(task.cid)
+    configProxy = scrapingConfService.getProxyConfig(task.cid)
 
     if not os.path.exists(path):
         os.makedirs(path)
@@ -364,9 +364,9 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
         if link_type == 1:
             (filefolder, name) = os.path.split(filepath)
             task = taskService.getTask('scrape')
-            settings = scrapingConfService.getSetting(task.cid)
-            soft_prefix = settings.soft_prefix
-            src_folder = settings.scraping_folder
+            config = scrapingConfService.getConfig(task.cid)
+            soft_prefix = config.soft_prefix
+            src_folder = config.scraping_folder
             midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
             soft_path = os.path.join(soft_prefix, midfolder, name)
             if pathlib.Path(newpath).is_symlink() and os.readlink(newpath) == soft_path:
