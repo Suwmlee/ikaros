@@ -15,7 +15,7 @@ class _ScrapingConfigs(db.Model):
     :2  整理
     :3  直接刮削
     """
-    __tablename__ = 'settings'
+    __tablename__ = 'scrapingconfigs'
 
     id = Column(Integer, primary_key=True)
     main_mode = Column(Integer, default=1)
