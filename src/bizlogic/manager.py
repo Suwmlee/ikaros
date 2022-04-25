@@ -16,9 +16,8 @@ from ..utils.number_parser import FileNumInfo
 from ..utils.filehelper import cleanScrapingfile, video_type, cleanFolder, cleanFolderbyFilter
 
 
-def findAllMovies(root, escape_folder, minsize):
+def findAllMovies(root, escape_folder):
     """ find all movies
-    minsize: MB
     """
     if os.path.basename(root) in escape_folder:
         return []
@@ -27,13 +26,9 @@ def findAllMovies(root, escape_folder, minsize):
     for entry in dirs:
         f = os.path.join(root, entry)
         if os.path.isdir(f):
-            total += findAllMovies(f, escape_folder, minsize)
+            total += findAllMovies(f, escape_folder)
         elif os.path.splitext(f)[1].lower() in video_type:
-            filesize = os.path.getsize(f)
-            if filesize > minsize:
-                total.append(f)
-            else:
-                current_app.logger.info('[!] ' + str(f) +' below size limit, will pass')
+            total.append(f)
     return total
 
 
@@ -76,21 +71,32 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
             movie_info.scrapingname = num_info.num
             movie_info.updatetime = datetime.datetime.now()
             scrapingrecordService.commit()
-            (flag, new_path) = core_main(file_path, num_info, conf)
-            if flag:
-                movie_info.status = 1
-                (filefolder, newname) = os.path.split(new_path)
-                movie_info.destname = newname
-                movie_info.destpath = new_path
-                movie_info.linktype = conf.link_type
-                movie_info.cnsubtag = num_info.chs_tag
-                movie_info.leaktag = num_info.leak_tag
-                movie_info.uncensoredtag = num_info.uncensored_tag
-                movie_info.hacktag = num_info.hack_tag
-                if num_info.multipart_tag:
-                    movie_info.cdnum = num_info.part[3:]
+            # 过滤
+            ignore = False
+            if conf.escape_size and conf.escape_size > 0:
+                minsize = conf.escape_size * 1024 * 1024
+                filesize = os.path.getsize(file_path)
+                if filesize < minsize:
+                    ignore = True
+                    current_app.logger.info('[!] ' + str(file_path) +' below size limit, will pass')
+            if not ignore:
+                (flag, new_path) = core_main(file_path, num_info, conf)
+                if flag:
+                    movie_info.status = 1
+                    (filefolder, newname) = os.path.split(new_path)
+                    movie_info.destname = newname
+                    movie_info.destpath = new_path
+                    movie_info.linktype = conf.link_type
+                    movie_info.cnsubtag = num_info.chs_tag
+                    movie_info.leaktag = num_info.leak_tag
+                    movie_info.uncensoredtag = num_info.uncensored_tag
+                    movie_info.hacktag = num_info.hack_tag
+                    if num_info.multipart_tag:
+                        movie_info.cdnum = num_info.part[3:]
+                else:
+                    movie_info.status = 2
             else:
-                movie_info.status = 2
+                movie_info.status = 3
             movie_info.updatetime = datetime.datetime.now()
             scrapingrecordService.commit()
         else:
@@ -125,10 +131,7 @@ def startScrapingAll(cid, folder=''):
 
     if folder == '':
         folder = conf.scraping_folder
-    minsize = 0
-    if conf.escape_size and conf.escape_size > 0:
-        minsize = conf.escape_size * 1024 * 1024
-    movie_list = findAllMovies(folder, re.split("[,，]", conf.escape_folders), minsize)
+    movie_list = findAllMovies(folder, re.split("[,，]", conf.escape_folders))
 
     count = 0
     total = str(len(movie_list))
@@ -190,15 +193,7 @@ def startScrapingSingle(cid, movie_path: str):
                 os.rename(movie_info.destpath, movie_path)
     if os.path.exists(movie_path) and os.path.isfile(movie_path):
         conf = scrapingConfService.getConfig(cid)
-        if conf.escape_size and conf.escape_size > 0:
-            minsize = conf.escape_size * 1024 * 1024
-            filesize = os.path.getsize(movie_path)
-            if filesize > minsize:
-                create_data_and_move(movie_path, conf)
-            else:
-                current_app.logger.info('[!] ' + movie_path+' below size limit, will pass')
-        else:
-            create_data_and_move(movie_path, conf)
+        create_data_and_move(movie_path, conf)
 
     taskService.updateTaskStatus(task, 1)
 
