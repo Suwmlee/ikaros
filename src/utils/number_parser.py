@@ -3,7 +3,9 @@ import re
 from flask import current_app
 
 G_spat = re.compile(
-    "^22-sht\.me|-fhd|_fhd|^fhd_|^fhd-|-hd|_hd|^hd_|^hd-|-sd|_sd|-1080p|_1080p|-720p|_720p|^hhd800\.com@|-uncensored|_uncensored|-leak|_leak",
+    "^\w+\.(cc|com|net|me|club|jp|tv|xyz|biz|wiki|info|tw|us|de)@|^22-sht\.me|"
+    "^(fhd|hd|sd|1080p|720p|4K)(-|_)|"
+    "(-|_)(fhd|hd|sd|1080p|720p|4K|x264|x265|uncensored|leak)",
     re.IGNORECASE)
 
 
@@ -76,7 +78,6 @@ def get_number(file_path: str) -> str:
         elif '-' in filename or '_' in filename:  # 普通提取番号 主要处理包含减号-和_的番号
             filename = G_spat.sub("", filename)
             # TODO more filter
-            filename = str(re.sub("(-|_|.)x26(4|5)", "", filename, flags=re.IGNORECASE))
             filename = str(re.sub("\[\d{4}-\d{1,2}-\d{1,2}\] - ", "", filename))  # 去除文件名中时间
             lower_check = filename.lower()
             if 'fc2' in lower_check:
