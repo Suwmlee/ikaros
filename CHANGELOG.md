@@ -1,3 +1,11 @@
+## [1.24.2](https://github.com/Suwmlee/ikaros/compare/v1.24.1...v1.24.2) (2022-04-25)
+
+
+### Bug Fixes
+
+* add file below limit-size into records ([dd432e7](https://github.com/Suwmlee/ikaros/commit/dd432e70884cf9ffea718a6e760d0180360b533c))
+* update number parser ([4183172](https://github.com/Suwmlee/ikaros/commit/4183172cc52749bbae2ebcdcb3fbc1f5a759f207))
+
 ## [1.24.1](https://github.com/Suwmlee/ikaros/compare/v1.24.0...v1.24.1) (2022-04-14)
 
 
