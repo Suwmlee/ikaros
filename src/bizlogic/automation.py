@@ -3,8 +3,10 @@
 '''
 import os
 import time
-
+import xml.etree.ElementTree as ET
 from flask import current_app
+
+from ..service.recordservice import scrapingrecordService, transrecordService
 from ..service.configservice import autoConfigService, transConfigService, scrapingConfService
 from ..service.taskservice import autoTaskService, taskService
 from .manager import startScrapingAll, startScrapingSingle
@@ -12,20 +14,20 @@ from .transfer import autoTransfer
 from ..notifications import notificationService
 
 
-def start(client_path: str):
+def start(clientPath: str):
     """
     """
-    task = autoTaskService.getPath(client_path)
+    task = autoTaskService.getPath(clientPath)
     if task:
-        current_app.logger.info("自动任务: 已经存在任务")
+        current_app.logger.info("托管任务: 已经存在任务")
         return 200
     else:
-        current_app.logger.info("自动任务: 加入队列[{}]".format(client_path))
-        task = autoTaskService.init(client_path)
+        current_app.logger.info("托管任务: 加入队列[{}]".format(clientPath))
+        task = autoTaskService.init(clientPath)
 
     runningTask = autoTaskService.getRunning()
     if runningTask:
-        current_app.logger.debug("自动任务: 正在执行其他任务")
+        current_app.logger.debug("托管任务: 正在执行其他任务")
     else:
         checkTaskQueue()
 
@@ -55,7 +57,7 @@ def checkTaskQueue():
                 runTask(task.path)
             except Exception as e:
                 current_app.logger.error(e)
-                notificationService.sendtext("自动任务:[{}], 异常:{}".format(task.path,str(e)))
+                notificationService.sendtext("托管任务:[{}], 异常:{}".format(task.path,str(e)))
             current_app.logger.info("任务循环队列: 清除任务[{}]".format(task.path))
             autoTaskService.deleteTask(task.id)
         else:
@@ -66,11 +68,11 @@ def checkTaskQueue():
 def runTask(client_path: str):
     # 1. convert path to real path for flask
     conf = autoConfigService.getConfig()
-    real_path = client_path.replace(conf.original, conf.prefixed)
-    if not os.path.exists(real_path):
-        current_app.logger.debug("任务详情: 不存在路径[{}]".format(real_path))
+    realPath = client_path.replace(conf.original, conf.prefixed)
+    if not os.path.exists(realPath):
+        current_app.logger.debug("任务详情: 不存在路径[{}]".format(realPath))
         return
-    current_app.logger.debug("任务详情: 实际路径[{}]".format(real_path))
+    current_app.logger.debug("任务详情: 实际路径[{}]".format(realPath))
     # 2. select scrape or transfer
     flag_scraping = False
     scrapingConfId = 0
@@ -81,7 +83,7 @@ def runTask(client_path: str):
         if scrapingIds:
             for sid in scrapingIds:
                 sconfig = scrapingConfService.getConfig(sid)
-                if sconfig and real_path.startswith(sconfig.scraping_folder):
+                if sconfig and realPath.startswith(sconfig.scraping_folder):
                     flag_scraping = True
                     scrapingConfId = sid
                     break
@@ -92,7 +94,7 @@ def runTask(client_path: str):
         if transferIds:
             for tid in transferIds:
                 tconfig = transConfigService.getConfigById(tid)
-                if tconfig and real_path.startswith(tconfig.source_folder):
+                if tconfig and realPath.startswith(tconfig.source_folder):
                     flag_transfer = True
                     transConfigId = tid
                     break
@@ -102,24 +104,29 @@ def runTask(client_path: str):
     status = 99
     if flag_scraping:
         current_app.logger.debug("任务详情: JAV")
-        if os.path.isdir(real_path):
-            status = startScrapingAll(scrapingConfId, real_path)
+        if os.path.isdir(realPath):
+            status = startScrapingAll(scrapingConfId, realPath)
         else:
-            status = startScrapingSingle(scrapingConfId, real_path)
-        if status == 1:
-            notificationService.sendtext("自动任务:[{}], 刮削完成,已推送媒体库".format(real_path))
-        elif status == 2:
-            notificationService.sendtext("自动任务:[{}], 刮削完成,推送媒体库异常".format(real_path))
-        else:
-            notificationService.sendtext("自动任务:[{}], 刮削异常,详情请查看日志".format(real_path))
+            status = startScrapingSingle(scrapingConfId, realPath)
+        if status == 1 or status == 2:
+            records = scrapingrecordService.queryLatest(realPath)
+            for record in records:
+                # limit = datetime.datetime.now() - datetime.timedelta(minutes=10)
+                if record and record.status == 1:
+                    sendScrapingMessage(record.srcpath, record.destpath)
+            return
+        notificationService.sendtext("托管任务:[{}], 刮削异常,详情请查看日志".format(realPath))
     elif flag_transfer:
-        status = autoTransfer(transConfigId, real_path)
-        if status == 1:
-            notificationService.sendtext("自动任务:[{}], 转移完成,已推送媒体库".format(real_path))
-        elif status == 2:
-            notificationService.sendtext("自动任务:[{}], 转移完成,推送媒体库异常".format(real_path))
-        else:
-            notificationService.sendtext("自动任务:[{}], 转移异常,详情请查看日志".format(real_path))
+        status = autoTransfer(transConfigId, realPath)
+        if status == 1 or status == 2:
+            records = transrecordService.queryLatest(realPath)
+            for record in records:
+                # limit = datetime.datetime.now() - datetime.timedelta(minutes=10)
+                if record:
+                    from .. import executor
+                    executor.submit(waitTask(record.srcpath, record.destpath))
+                    return
+        notificationService.sendtext("托管任务:[{}], 转移异常,详情请查看日志".format(realPath))
     else:
         current_app.logger.error("无匹配的目录")
 
@@ -130,3 +137,85 @@ def clean():
     tasks = autoTaskService.getTasks()
     for single in tasks:
         autoTaskService.deleteTask(single.id)
+
+
+def sendScrapingMessage(srcpath, dstpath):
+    """
+    组织发送刮削消息
+    """
+    headname, ext = os.path.splitext(dstpath)
+    nfofile = headname + '.nfo'
+    picfile = headname + '-fanart.jpg'
+    if os.path.exists(nfofile):
+        tree = ET.parse(nfofile)
+        root = tree.getroot()
+        title = root.find('title').text
+        caption = '新增影片 \n*标题:* `' + title + '` \n_来源:_ `' + srcpath + '`'
+        if os.path.exists(picfile):
+            notificationService.sendTGphoto(caption, picfile)
+            # TODO Wechat
+        else:
+            notificationService.sendTGMarkdown(caption)
+            # TODO Wechat
+    else:
+        notificationService.sendtext("托管任务:[{}], 刮削完成,已推送媒体库".format(srcpath))
+
+
+def waitTask(srcpath, dstpath):
+    """
+    等待 emby 更新完再提取
+    """
+    time.sleep(15)
+    sendTransferMessage(srcpath, dstpath)
+
+
+def sendTransferMessage(srcpath, dstpath):
+    """
+    组织发送转移消息
+    """
+    headname, ext = os.path.splitext(dstpath)
+    nfofile = headname + '.nfo'
+    if os.path.exists(nfofile):
+        tree = ET.parse(nfofile)
+        root = tree.getroot()
+        title = root.find('title').text
+        year = root.find('year').text
+        imdbid = root.find('imdbid').text
+        tmdbid = root.find('tmdbid').text
+        if root.tag == 'episodedetails':
+            # tvshow info
+            showtitle = root.find('showtitle').text
+            episode = root.find('episode').text
+            season = root.find('season').text
+            text = '新增剧集 \n*' + showtitle + '* ('+ year +') \n'
+            text = text + '第 ' + season + ' 季 ' + episode + ' 集 '+ title +' \n'
+            text = text + '[ [IMDB](https://www.imdb.com/title/'+ imdbid \
+                        +') | [TMDB](https://www.themoviedb.org/movie/' + tmdbid + ')]\n' 
+            text = text + '_来源:_ `' + srcpath + '`'
+            picfile = headname + '-thumb.jpg'
+            if os.path.exists(picfile):
+                notificationService.sendTGphoto(text, picfile)
+                # TODO Wechat
+            else:
+                notificationService.sendTGMarkdown(text)
+                # TODO Wechat
+        else:
+            # movie
+            picfile = headname + '-poster.jpg'
+            cfolder = os.path.dirname(dstpath)
+            spic = os.path.join(cfolder, 'poster.jpg')
+            text = '新增影片 \n*' + title + '* ('+ year +') \n'
+            text = text + '[ [IMDB](https://www.imdb.com/title/'+ imdbid \
+                        +') | [TMDB](https://www.themoviedb.org/movie/' + tmdbid + ') ]\n' 
+            text = text + '_来源:_ `' + srcpath + '`'
+            if os.path.exists(picfile):
+                notificationService.sendTGphoto(text, picfile)
+                # TODO Wechat
+            elif os.path.exists(spic):
+                notificationService.sendTGphoto(text, spic)
+                # TODO Wechat
+            else:
+                notificationService.sendTGMarkdown(text)
+                # TODO Wechat
+    else:
+        notificationService.sendtext("托管任务:[{}], 转移完成,推送媒体库异常".format(srcpath))

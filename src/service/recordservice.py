@@ -34,6 +34,10 @@ class ScrapingRecordService():
     def queryByPath(self, value) -> _ScrapingRecords:
         return _ScrapingRecords.query.filter_by(srcpath=value).first()
 
+    def queryLatest(self, value):
+        infos = _ScrapingRecords.query.filter(_ScrapingRecords.srcpath.like("%" + value + "%")).all()
+        return infos
+
     def queryByID(self, value) -> _ScrapingRecords:
         return _ScrapingRecords.query.filter_by(id=value).first()
 
@@ -190,6 +194,10 @@ class TransRecordService():
         if not info:
             return None
         return info
+
+    def queryLatest(self, value):
+        infos = _TransRecords.query.filter(_TransRecords.srcpath.like("%" + value + "%")).all()
+        return infos
 
     def update(self, info: _TransRecords, softpath, destpath, status, 
                 topfolder, secondfolder,
