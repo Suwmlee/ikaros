@@ -1,3 +1,10 @@
+# [1.25.0](https://github.com/Suwmlee/ikaros/compare/v1.24.2...v1.25.0) (2022-04-26)
+
+
+### Features
+
+* notification with image ([82dc955](https://github.com/Suwmlee/ikaros/commit/82dc955b342805d8034078d1d37170db6c890903))
+
 ## [1.24.2](https://github.com/Suwmlee/ikaros/compare/v1.24.1...v1.24.2) (2022-04-25)
 
 
