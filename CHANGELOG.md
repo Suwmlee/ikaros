@@ -1,3 +1,10 @@
+## [1.25.1](https://github.com/Suwmlee/ikaros/compare/v1.25.0...v1.25.1) (2022-04-27)
+
+
+### Bug Fixes
+
+* wechat markdown ([4268475](https://github.com/Suwmlee/ikaros/commit/4268475c335fbd6e3276e2d8d3477e8afd0f8407))
+
 # [1.25.0](https://github.com/Suwmlee/ikaros/compare/v1.24.2...v1.25.0) (2022-04-26)
 
 
