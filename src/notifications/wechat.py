@@ -56,6 +56,33 @@ class WeChat():
                 except:
                     pass
 
+    def sendmarkdown(self, text: str):
+        """ 使用 企业微信 发送 markdown 消息
+        """
+        if self.updateConfig():
+            url = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={}".format(self.updateAccessToken())
+            for i in range(3):
+                requestContent = {
+                    "touser": "@all",
+                    "msgtype": "markdown",
+                    "agentid": self.agentid,
+                    "markdown": {
+                        "content": text
+                    },
+                    "safe": 0,
+                    "enable_id_trans": 0,
+                    "enable_duplicate_check": 0
+                }
+                try:
+                    result = requests.post(url, json=requestContent, headers= self.headers, timeout= self.timeout)
+                    if result:
+                        ret = result.json()
+                        if ret['errcode'] == 0:
+                            current_app.logger.error("[!] 推送: 微信消息 {}".format(ret['errmsg']))
+                            break
+                except:
+                    pass
+
     def updateAccessToken(self):
         """ 获取 access_token,具有时效性
         """

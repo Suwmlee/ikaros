@@ -121,7 +121,6 @@ def runTask(client_path: str):
         if status == 1 or status == 2:
             records = transrecordService.queryLatest(realPath)
             for record in records:
-                # limit = datetime.datetime.now() - datetime.timedelta(minutes=10)
                 if record:
                     from .. import executor
                     executor.submit(waitTask(record.srcpath, record.destpath))
@@ -153,10 +152,9 @@ def sendScrapingMessage(srcpath, dstpath):
         caption = '新增影片 \n*标题:* `' + title + '` \n_来源:_ `' + srcpath + '`'
         if os.path.exists(picfile):
             notificationService.sendTGphoto(caption, picfile)
-            # TODO Wechat
+            notificationService.sendWeMarkdown(caption)
         else:
-            notificationService.sendTGMarkdown(caption)
-            # TODO Wechat
+            notificationService.sendMarkdown(caption)
     else:
         notificationService.sendtext("托管任务:[{}], 刮削完成,已推送媒体库".format(srcpath))
 
@@ -189,33 +187,31 @@ def sendTransferMessage(srcpath, dstpath):
             season = root.find('season').text
             text = '新增剧集 \n*' + showtitle + '* ('+ year +') \n'
             text = text + '第 ' + season + ' 季 ' + episode + ' 集 '+ title +' \n'
-            text = text + '[ [IMDB](https://www.imdb.com/title/'+ imdbid \
-                        +') | [TMDB](https://www.themoviedb.org/movie/' + tmdbid + ')]\n' 
+            text = text + '【 [IMDB](https://www.imdb.com/title/'+ imdbid \
+                        +') | [TMDB](https://www.themoviedb.org/movie/' + tmdbid + ') 】\n' 
             text = text + '_来源:_ `' + srcpath + '`'
             picfile = headname + '-thumb.jpg'
             if os.path.exists(picfile):
                 notificationService.sendTGphoto(text, picfile)
-                # TODO Wechat
+                notificationService.sendWeMarkdown(text)
             else:
-                notificationService.sendTGMarkdown(text)
-                # TODO Wechat
+                notificationService.sendMarkdown(text)
         else:
             # movie
             picfile = headname + '-poster.jpg'
             cfolder = os.path.dirname(dstpath)
             spic = os.path.join(cfolder, 'poster.jpg')
             text = '新增影片 \n*' + title + '* ('+ year +') \n'
-            text = text + '[ [IMDB](https://www.imdb.com/title/'+ imdbid \
-                        +') | [TMDB](https://www.themoviedb.org/movie/' + tmdbid + ') ]\n' 
+            text = text + '【 [IMDB](https://www.imdb.com/title/'+ imdbid \
+                        +') | [TMDB](https://www.themoviedb.org/movie/' + tmdbid + ') 】\n' 
             text = text + '_来源:_ `' + srcpath + '`'
             if os.path.exists(picfile):
                 notificationService.sendTGphoto(text, picfile)
-                # TODO Wechat
+                notificationService.sendWeMarkdown(text)
             elif os.path.exists(spic):
                 notificationService.sendTGphoto(text, spic)
-                # TODO Wechat
+                notificationService.sendWeMarkdown(text)
             else:
-                notificationService.sendTGMarkdown(text)
-                # TODO Wechat
+                notificationService.sendMarkdown(text)
     else:
         notificationService.sendtext("托管任务:[{}], 转移完成,推送媒体库异常".format(srcpath))

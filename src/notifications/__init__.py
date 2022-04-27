@@ -19,10 +19,11 @@ class Notification():
     def sendTGphoto(self, text:str, picpath):
         self.telegram.sendphoto(text, picpath)
 
-    def sendTGMarkdown(self, text):
+    def sendMarkdown(self, text):
         self.telegram.sendmarkdown(text)
+        self.wechat.sendmarkdown(text)
 
-    def sendWeMessage(self, text):
+    def sendWeMarkdown(self, text):
         self.wechat.sendtext(text)
 
 notificationService = Notification()
