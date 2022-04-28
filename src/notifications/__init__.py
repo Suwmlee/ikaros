@@ -16,14 +16,17 @@ class Notification():
         self.telegram.sendtext(text)
         self.wechat.sendtext(text)
 
-    def sendTGphoto(self, text:str, picpath):
-        self.telegram.sendphoto(text, picpath)
-
-    def sendMarkdown(self, text):
-        self.telegram.sendmarkdown(text)
-        self.wechat.sendmarkdown(text)
+    def sendWeNews(self, title, description, picurl, url):
+        self.wechat.sendnews(title, description, picurl, url)
 
     def sendWeMarkdown(self, text):
-        self.wechat.sendtext(text)
+        self.wechat.sendmarkdown(text)
+
+    def sendTgphoto(self, text:str, picpath):
+        self.telegram.sendphoto(text, picpath)
+
+    def sendTgMarkdown(self, text):
+        self.telegram.sendmarkdown(text)
+
 
 notificationService = Notification()

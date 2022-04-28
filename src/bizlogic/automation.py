@@ -6,6 +6,7 @@ import time
 import xml.etree.ElementTree as ET
 from flask import current_app
 
+from ..scrapinglib.tmdb import tmdbParser
 from ..service.recordservice import scrapingrecordService, transrecordService
 from ..service.configservice import autoConfigService, transConfigService, scrapingConfService
 from ..service.taskservice import autoTaskService, taskService
@@ -151,10 +152,10 @@ def sendScrapingMessage(srcpath, dstpath):
         title = root.find('title').text
         caption = '新增影片 \n*标题:* `' + title + '` \n_来源:_ `' + srcpath + '`'
         if os.path.exists(picfile):
-            notificationService.sendTGphoto(caption, picfile)
-            notificationService.sendWeMarkdown(caption)
+            notificationService.sendTgphoto(caption, picfile)
         else:
-            notificationService.sendMarkdown(caption)
+            notificationService.sendTgMarkdown(caption)
+        notificationService.sendWeMarkdown(caption)
     else:
         notificationService.sendtext("托管任务:[{}], 刮削完成,已推送媒体库".format(srcpath))
 
@@ -180,6 +181,7 @@ def sendTransferMessage(srcpath, dstpath):
         year = root.find('year').text
         imdbid = root.find('imdbid').text
         tmdbid = root.find('tmdbid').text
+        imgaeurl = tmdbParser.getOpenGraphImage(tmdbParser.getPage(tmdbid))
         if root.tag == 'episodedetails':
             # tvshow info
             showtitle = root.find('showtitle').text
@@ -188,30 +190,37 @@ def sendTransferMessage(srcpath, dstpath):
             text = '新增剧集 \n*' + showtitle + '* ('+ year +') \n'
             text = text + '第 ' + season + ' 季 ' + episode + ' 集 '+ title +' \n'
             text = text + '【 [IMDB](https://www.imdb.com/title/'+ imdbid \
-                        +') | [TMDB](https://www.themoviedb.org/movie/' + tmdbid + ') 】\n' 
+                        +') | [TMDB](https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN) 】\n' 
             text = text + '_来源:_ `' + srcpath + '`'
             picfile = headname + '-thumb.jpg'
             if os.path.exists(picfile):
-                notificationService.sendTGphoto(text, picfile)
-                notificationService.sendWeMarkdown(text)
+                notificationService.sendTgphoto(text, picfile)
             else:
-                notificationService.sendMarkdown(text)
+                notificationService.sendTgMarkdown(text)
+
+            text_title = '新增影片  ' + title + ' ('+ year +')'
+            text_description = '来源: ' + srcpath
+            text_url = 'https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN'
+            notificationService.sendWeNews(text_title, text_description, imgaeurl, text_url)
         else:
             # movie
             picfile = headname + '-poster.jpg'
-            cfolder = os.path.dirname(dstpath)
-            spic = os.path.join(cfolder, 'poster.jpg')
+            if not os.path.exists(picfile):
+                cfolder = os.path.dirname(dstpath)
+                picfile = os.path.join(cfolder, 'poster.jpg')
+
             text = '新增影片 \n*' + title + '* ('+ year +') \n'
             text = text + '【 [IMDB](https://www.imdb.com/title/'+ imdbid \
-                        +') | [TMDB](https://www.themoviedb.org/movie/' + tmdbid + ') 】\n' 
+                        +') | [TMDB](https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN) 】\n' 
             text = text + '_来源:_ `' + srcpath + '`'
             if os.path.exists(picfile):
-                notificationService.sendTGphoto(text, picfile)
-                notificationService.sendWeMarkdown(text)
-            elif os.path.exists(spic):
-                notificationService.sendTGphoto(text, spic)
-                notificationService.sendWeMarkdown(text)
+                notificationService.sendTgphoto(text, picfile)
             else:
-                notificationService.sendMarkdown(text)
+                notificationService.sendTgMarkdown(text)
+            
+            text_title = '新增影片  ' + title + ' ('+ year +')'
+            text_description = '来源: ' + srcpath
+            text_url = 'https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN'
+            notificationService.sendWeNews(text_title, text_description, imgaeurl, text_url)
     else:
         notificationService.sendtext("托管任务:[{}], 转移完成,推送媒体库异常".format(srcpath))
