@@ -1,3 +1,11 @@
+## [1.25.2](https://github.com/Suwmlee/ikaros/compare/v1.25.1...v1.25.2) (2022-04-28)
+
+
+### Bug Fixes
+
+* add tmdb og parser ([27f1f88](https://github.com/Suwmlee/ikaros/commit/27f1f888603e5f79f9fb42ff6278538efc8f175c))
+* push wechat news ([0d15374](https://github.com/Suwmlee/ikaros/commit/0d15374cf82a7b546507f9d44d4b82895ce2192c))
+
 ## [1.25.1](https://github.com/Suwmlee/ikaros/compare/v1.25.0...v1.25.1) (2022-04-27)
 
 
