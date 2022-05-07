@@ -16,6 +16,12 @@ class Notification():
         self.telegram.sendtext(text)
         self.wechat.sendtext(text)
 
+    def isWeEnabled(self):
+        return self.wechat.updateConfig()
+
+    def isTgEnabled(self):
+        return self.telegram.updateConfig()
+
     def sendWeNews(self, title, description, picurl, url):
         self.wechat.sendnews(title, description, picurl, url)
 
