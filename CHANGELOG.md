@@ -1,3 +1,11 @@
+## [1.25.3](https://github.com/Suwmlee/ikaros/compare/v1.25.2...v1.25.3) (2022-05-10)
+
+
+### Bug Fixes
+
+* check notification enable first ([409ff24](https://github.com/Suwmlee/ikaros/commit/409ff2411ef031bd252529bd60dabaab9d9304dd))
+* temporarily disable multithreading ([e20c6b8](https://github.com/Suwmlee/ikaros/commit/e20c6b8445ccdafe78c495273ea533e1ba19be1c))
+
 ## [1.25.2](https://github.com/Suwmlee/ikaros/compare/v1.25.1...v1.25.2) (2022-04-28)
 
 
