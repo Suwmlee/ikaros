@@ -123,38 +123,38 @@ def get_data_from_json(file_number: str, c_sources: str, c_naming_rule, c_multi_
 
     json_data = {}
 
-    if c_multi_threading:
-        current_app.logger.info('[+] Multi threading enabled')
-        pool = ThreadPool(processes=len(sources))
+    # if c_multi_threading:
+    #     current_app.logger.info('[+] Multi threading enabled')
+    #     pool = ThreadPool(processes=len(sources))
 
-        # Set the priority of multi-thread crawling and join the multi-thread queue
-        for source in sources:
-            pool.apply_async(func_mapping[source], (file_number,))
+    #     # Set the priority of multi-thread crawling and join the multi-thread queue
+    #     for source in sources:
+    #         pool.apply_async(func_mapping[source], (file_number,))
 
-        # Get multi-threaded crawling response
-        # !!! Still follow sources sort not the first response
-        for source in sources:
-            current_app.logger.debug('[-] Check', source)
-            json_data = json.loads(pool.apply_async(func_mapping[source], (file_number,)).get())
+    #     # Get multi-threaded crawling response
+    #     # !!! Still follow sources sort not the first response
+    #     for source in sources:
+    #         current_app.logger.debug('[-] Check', source)
+    #         json_data = json.loads(pool.apply_async(func_mapping[source], (file_number,)).get())
+    #         # if any service return a valid return, break
+    #         if get_data_state(json_data):
+    #             current_app.logger.info('[-] Matched [{}] in source [{}]'.format(file_number, source))
+    #             break
+    #     pool.close()
+    #     pool.terminate()
+    # else:
+    for source in sources:
+        try:
+            current_app.logger.debug('[+] Select Source: ' + source)
+            json_data = json.loads(func_mapping[source](file_number))
             # if any service return a valid return, break
             if get_data_state(json_data):
                 current_app.logger.info('[-] Matched [{}] in source [{}]'.format(file_number, source))
                 break
-        pool.close()
-        pool.terminate()
-    else:
-        for source in sources:
-            try:
-                current_app.logger.debug('[+] Select Source: ' + source)
-                json_data = json.loads(func_mapping[source](file_number))
-                # if any service return a valid return, break
-                if get_data_state(json_data):
-                    current_app.logger.info('[-] Matched [{}] in source [{}]'.format(file_number, source))
-                    break
-            except Exception as err:
-                current_app.logger.info('[!] Source error: ' + source)
-                current_app.logger.error(err)
-                continue
+        except Exception as err:
+            current_app.logger.info('[!] Source error: ' + source)
+            current_app.logger.error(err)
+            continue
 
     # Return if data not found in all sources
     if not json_data:
