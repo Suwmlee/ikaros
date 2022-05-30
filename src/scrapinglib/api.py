@@ -20,15 +20,16 @@ from .xcity import Xcity
 from .avsox import Avsox
 
 
-def search(number, souces=None, proxies=None, verify=None, type='adult',
+def search(number, sources: str=None, proxies=None, verify=None, type='adult',
             dbcookies=None, dbsite=None, morestoryline=False):
     """ 根据``番号/电影``名搜索信息
 
     :param number: number/name  depends on type
+    :param sources: sources string with `,` like ``avsox,javbus``
     :param type: ``adult``, ``general``
     """
     sc = Scraping()
-    return sc.search(number, souces, proxies=proxies, verify=verify, type=type,
+    return sc.search(number, sources, proxies=proxies, verify=verify, type=type,
                      dbcookies=dbcookies, dbsite=dbsite, morestoryline=morestoryline)
 
 class Scraping():
@@ -134,9 +135,9 @@ class Scraping():
 
     def checkSources(self, c_sources, file_number):
         if not c_sources:
-            c_sources = self.full_sources
-
-        sources = c_sources.split(',')
+            sources = self.full_sources
+        else:
+            sources = c_sources.split(',')
         def insert(sources,source):
             if source in sources:
                 sources.insert(0, sources.pop(sources.index(source)))

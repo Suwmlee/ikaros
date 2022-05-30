@@ -413,11 +413,13 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
 
     number = numinfo.num
     # json_data = get_data_from_json(number, conf.site_sources, conf.naming_rule, conf.async_request)
-
+    c_sources = conf.site_sources
+    if not c_sources:
+        c_sources = "javbus,airav,fanza,xcity,javdb,mgstage,madou,fc2,avsox,dlsite,carib,fc2club"
     task = taskService.getTask('scrape')
     configProxy = scrapingConfService.getProxyConfig(task.cid)
     proxies = configProxy.proxies() if configProxy.enable else None
-    json_data = search(number, conf.site_sources, proxies=proxies, morestoryline=True)
+    json_data = search(number, c_sources, proxies=proxies, morestoryline=True)
     json_data = fixJson(json_data, conf.naming_rule)
 
     # Return if blank dict returned (data not found)
