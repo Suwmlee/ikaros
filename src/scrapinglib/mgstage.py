@@ -1,141 +1,81 @@
-import sys
-sys.path.append('../')
+# -*- coding: utf-8 -*-
+
 import re
 from lxml import etree
-import json
 from bs4 import BeautifulSoup
-from ..utils.ADC_function import *
-# import sys
-# import io
-# sys.stdout = io.TextIOWrapper(sys.stdout.buffer, errors = 'replace', line_buffering = True)
+from .parser import Parser
 
-def getTitle(a):
-    try:
-        html = etree.fromstring(a, etree.HTMLParser())
-        result = str(html.xpath('//*[@id="center_column"]/div[1]/h1/text()')).strip(" ['']")
-        return result.replace('/', ',')
-    except:
-        return ''
-def getActor(a): #//*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
-    html = etree.fromstring(a, etree.HTMLParser()) #//table/tr[1]/td[1]/text()
-    result1=str(html.xpath('//th[contains(text(),"出演：")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip('\\n')
-    result2=str(html.xpath('//th[contains(text(),"出演：")]/../td/text()')).strip(" ['']").strip('\\n    ').strip('\\n')
-    return str(result1+result2).strip('+').replace("', '",'').replace('"','').replace('/',',')
-def getStudio(a):
-    html = etree.fromstring(a, etree.HTMLParser()) #//table/tr[1]/td[1]/text()
-    result1=str(html.xpath('//th[contains(text(),"メーカー：")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip('\\n')
-    result2=str(html.xpath('//th[contains(text(),"メーカー：")]/../td/text()')).strip(" ['']").strip('\\n    ').strip('\\n')
-    return str(result1+result2).strip('+').replace("', '",'').replace('"','')
-def getRuntime(a):
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result1 = str(html.xpath('//th[contains(text(),"収録時間：")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip('\\n')
-    result2 = str(html.xpath('//th[contains(text(),"収録時間：")]/../td/text()')).strip(" ['']").strip('\\n    ').strip('\\n')
-    return str(result1 + result2).strip('+').rstrip('mi')
-def getLabel(a):
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result1 = str(html.xpath('//th[contains(text(),"シリーズ：")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip(
-        '\\n')
-    result2 = str(html.xpath('//th[contains(text(),"シリーズ：")]/../td/text()')).strip(" ['']").strip('\\n    ').strip(
-        '\\n')
-    return str(result1 + result2).strip('+').replace("', '",'').replace('"','')
-def getNum(a):
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result1 = str(html.xpath('//th[contains(text(),"品番：")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip(
-        '\\n')
-    result2 = str(html.xpath('//th[contains(text(),"品番：")]/../td/text()')).strip(" ['']").strip('\\n    ').strip(
-        '\\n')
-    return str(result1 + result2).strip('+')
-def getYear(getRelease):
-    try:
-        result = str(re.search('\d{4}',getRelease).group())
+
+class Mgstage(Parser):
+    source = 'mgstage'
+
+    expr_number = '//th[contains(text(),"品番：")]/../td/a/text()'
+    expr_title = '//*[@id="center_column"]/div[1]/h1/text()'
+    expr_studio = '//th[contains(text(),"メーカー：")]/../td/a/text()'
+    expr_outline = '//p/text()'
+    expr_runtime = '//th[contains(text(),"収録時間：")]/../td/a/text()'
+    expr_director = '//th[contains(text(),"シリーズ")]/../td/a/text()'
+    expr_actor = '//th[contains(text(),"出演：")]/../td/a/text()'
+    expr_release = '//th[contains(text(),"配信開始日：")]/../td/a/text()'
+    expr_cover = '//*[@id="EnlargeImage"]/@href'
+    expr_label = '//th[contains(text(),"シリーズ：")]/../td/a/text()'
+    expr_tags = '//th[contains(text(),"ジャンル：")]/../td/a/text()'
+    expr_tags2 = '//th[contains(text(),"ジャンル：")]/../td/text()'
+    expr_series = '//th[contains(text(),"シリーズ")]/../td/a/text()'
+
+    def search(self, number):
+        self.number = number.upper()
+        self.cookies = {'adc':'1'}
+        self.detailurl = 'https://www.mgstage.com/product/product_detail/'+str(self.number)+'/'
+        self.htmlcode = self.getHtml(self.detailurl)
+
+        soup = BeautifulSoup(self.htmlcode, 'lxml')
+        self.detailpage = str(soup.find(attrs={'class': 'detail_data'})).replace('\n                                        ','').replace('                                ','').replace('\n                            ','').replace('\n                        ','')
+        b2 = str(soup.find(attrs={'id': 'introduction'})).replace('\n                                        ','').replace('                                ','').replace('\n                            ','').replace('\n                        ','')
+        self.htmlcodetree = etree.HTML(self.htmlcode)
+        self.detailtree = etree.HTML(self.detailpage)
+        self.introtree = etree.HTML(b2)
+
+        result = self.dictformat(self.detailtree)
         return result
-    except:
-        return getRelease
-def getRelease(a):
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result1 = str(html.xpath('//th[contains(text(),"配信開始日：")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip(
-        '\\n')
-    result2 = str(html.xpath('//th[contains(text(),"配信開始日：")]/../td/text()')).strip(" ['']").strip('\\n    ').strip(
-        '\\n')
-    return str(result1 + result2).strip('+').replace('/','-')
-def getTag(a):
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result1 = str(html.xpath('//th[contains(text(),"ジャンル：")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip(
-        '\\n')
-    result2 = str(html.xpath('//th[contains(text(),"ジャンル：")]/../td/text()')).strip(" ['']").strip('\\n    ').strip(
-        '\\n')
-    result = str(result1 + result2).strip('+').replace("', '\\n",",").replace("', '","").replace('"','').replace(',,','').split(',')
-    return result
-def getCover(htmlcode):
-    html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = str(html.xpath('//*[@id="EnlargeImage"]/@href')).strip(" ['']")
-    # result = str(html.xpath('//*[@id="center_column"]/div[1]/div[1]/div/div/h2/img/@src')).strip(" ['']")
-    #                    /html/body/div[2]/article[2]/div[1]/div[1]/div/div/h2/img/@src
-    return result
-def getDirector(a):
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result1 = str(html.xpath('//th[contains(text(),"シリーズ")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip(
-        '\\n')
-    result2 = str(html.xpath('//th[contains(text(),"シリーズ")]/../td/text()')).strip(" ['']").strip('\\n    ').strip(
-        '\\n')
-    return str(result1 + result2).strip('+').replace("', '",'').replace('"','')
-def getOutline(htmlcode):
-    html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = str(html.xpath('//p/text()')).strip(" ['']").replace(u'\\n', '').replace("', '', '", '')
-    return result
-def getSeries(a):
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result1 = str(html.xpath('//th[contains(text(),"シリーズ")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip(
-        '\\n')
-    result2 = str(html.xpath('//th[contains(text(),"シリーズ")]/../td/text()')).strip(" ['']").strip('\\n    ').strip(
-        '\\n')
-    return str(result1 + result2).strip('+').replace("', '", '').replace('"', '')
 
-def getExtrafanart(htmlcode):  # 获取剧照
-    html_pather = re.compile(r'<dd>\s*?<ul>[\s\S]*?</ul>\s*?</dd>')
-    html = html_pather.search(htmlcode)
-    if html:
-        html = html.group()
-        extrafanart_pather = re.compile(r'<a class=\"sample_image\" href=\"(.*?)\"')
-        extrafanart_imgs = extrafanart_pather.findall(html)
-        if extrafanart_imgs:
-            return extrafanart_imgs
-    return ''
+    def getTitle(self, htmltree):
+        return super().getTitle(self.htmlcodetree).replace('/', ',').replace("\\n",'').replace('        ', '').strip()
 
-def main(number2):
-    number=number2.upper()
-    htmlcode=str(get_html('https://www.mgstage.com/product/product_detail/'+str(number)+'/',cookies={'adc':'1'}))
-    soup = BeautifulSoup(htmlcode, 'lxml')
-    a = str(soup.find(attrs={'class': 'detail_data'})).replace('\n                                        ','').replace('                                ','').replace('\n                            ','').replace('\n                        ','')
-    b = str(soup.find(attrs={'id': 'introduction'})).replace('\n                                        ','').replace('                                ','').replace('\n                            ','').replace('\n                        ','')
-    #print(b)
-    try:
-        dic = {
-            'title': getTitle(htmlcode).replace("\\n", '').replace('        ', ''),
-            'studio': getStudio(a),
-            'outline': getOutline(b),
-            'runtime': getRuntime(a),
-            'director': getDirector(a),
-            'actor': getActor(a),
-            'release': getRelease(a),
-            'number': getNum(a),
-            'cover': getCover(htmlcode),
-            'imagecut': 1,
-            'tag': getTag(a),
-            'label': getLabel(a),
-            'extrafanart': getExtrafanart(htmlcode),
-            'year': getYear(getRelease(a)),  # str(re.search('\d{4}',getRelease(a)).group()),
-            'actor_photo': '',
-            'website': 'https://www.mgstage.com/product/product_detail/' + str(number) + '/',
-            'source': 'mgstage.py',
-            'series': getSeries(a),
-        }
-    except Exception as e:
-        current_app.logger.error(e)
-        dic = {"title": ""}
+    def getOutline(self, htmltree):
+        return super().getOutline(self.introtree).strip(" ['']").replace(u'\\n', '').replace("', '', '", '')
 
-    js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
-    return js
+    def getCover(self, htmltree):
+        return super().getCover(self.htmlcodetree)
 
-if __name__ == '__main__':
-    print(main('SIRO-4149'))
+    def getTags(self, htmltree):
+        result1 = str(self.getAll(htmltree, self.expr_tags)).strip(" ['']").strip('\\n    ').strip('\\n')
+        result2 = str(self.getAll(htmltree, self.expr_tags2)).strip(" ['']").strip('\\n    ').strip('\\n')
+        result = str(result1 + result2).strip('+').replace("', '\\n",",").replace("', '","").replace('"','').replace(',,','').split(',')
+        return result
+
+    def getExtrafanart(self, htmltree):
+        html_pather = re.compile(r'<dd>\s*?<ul>[\s\S]*?</ul>\s*?</dd>')
+        html = html_pather.search(self.htmlcode)
+        if html:
+            html = html.group()
+            extrafanart_pather = re.compile(r'<a class=\"sample_image\" href=\"(.*?)\"')
+            extrafanart_imgs = extrafanart_pather.findall(html)
+            if extrafanart_imgs:
+                return extrafanart_imgs
+        return ''
+
+    def getTreeIndex(self, tree, expr, index=0):
+        if expr == '':
+            return ''
+        if tree == self.detailtree:
+            # NOTE: 合并 getMgsString
+            result1 = str(tree.xpath(expr)).strip(" ['']").strip('\\n    ').strip('\\n').strip(" ['']").replace(u'\\n', '').replace("', '', '", '')
+            result2 = str(tree.xpath(expr.replace('td/a/','td/'))).strip(" ['']").strip('\\n    ').strip('\\n')
+            return str(result1 + result2).strip('+').replace("', '",'').replace('"','')
+        else:
+            result = tree.xpath(expr)
+            try:
+                return result[index]
+            except:
+                return ''

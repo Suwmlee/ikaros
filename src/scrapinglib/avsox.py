@@ -1,118 +1,80 @@
-import sys
-sys.path.append('..')
+# -*- coding: utf-8 -*-
+
 import re
-from lxml import etree
-import json
-from ..utils.ADC_function import *
-from .storyline import getStoryline
-# import io
-# sys.stdout = io.TextIOWrapper(sys.stdout.buffer, errors = 'replace', line_buffering = True)
+from .parser import Parser
 
-def getActorPhoto(html):
-    a = html.xpath('//a[@class="avatar-box"]')
-    d = {}
-    for i in a:
-        l = i.find('.//img').attrib['src']
-        t = i.find('span').text
-        p2 = {t: l}
-        d.update(p2)
-    return d
-def getTitle(html):
-    try:
-        result = str(html.xpath('/html/body/div[2]/h3/text()')).strip(" ['']") #[0]
-        return result.replace('/', '')
-    except:
-        return ''
-def getActor(html):
-    a = html.xpath('//a[@class="avatar-box"]')
-    d = []
-    for i in a:
-        d.append(i.find('span').text)
-    return d
-def getStudio(html):
-    result1 = str(html.xpath('//p[contains(text(),"制作商: ")]/following-sibling::p[1]/a/text()')).strip(" ['']").replace("', '",' ')
-    return result1
-def getRuntime(html):
-    result1 = str(html.xpath('//span[contains(text(),"长度:")]/../text()')).strip(" ['分钟']")
-    return result1
-def getLabel(html):
-    result1 = str(html.xpath('//p[contains(text(),"系列:")]/following-sibling::p[1]/a/text()')).strip(" ['']")
-    return result1
-def getNum(html):
-    result1 = str(html.xpath('//span[contains(text(),"识别码:")]/../span[2]/text()')).strip(" ['']")
-    return result1
-def getYear(release):
-    try:
-        result = str(re.search('\d{4}',release).group())
-        return result
-    except:
-        return release
-def getRelease(html):
-    result1 = str(html.xpath('//span[contains(text(),"发行时间:")]/../text()')).strip(" ['']")
-    return result1
-def getCover(html):
-    result = str(html.xpath('/html/body/div[2]/div[1]/div[1]/a/img/@src')).strip(" ['']")
-    return result
-def getCover_small(html):
-    result = str(html.xpath('//*[@id="waterfall"]/div/a/div[1]/img/@src')).strip(" ['']")
-    return result
-def getTag(html):
-    x = html.xpath('/html/head/meta[@name="keywords"]/@content')[0].split(',')
-    return [i.strip() for i in x[2:]]  if len(x) > 2 else []
-def getSeries(html):
-    try:
-        result1 = str(html.xpath('//span[contains(text(),"系列:")]/../span[2]/text()')).strip(" ['']")
-        return result1
-    except:
-        return ''
 
-def main(number):
-    html = get_html('https://tellme.pw/avsox')
-    site = etree.HTML(html).xpath('//div[@class="container"]/div/a/@href')[0]
-    a = get_html(site + '/cn/search/' + number)
-    html = etree.fromstring(a, etree.HTMLParser())
-    result1 = str(html.xpath('//*[@id="waterfall"]/div/a/@href')).strip(" ['']")
-    if result1 == '' or result1 == 'null' or result1 == 'None':
-        a = get_html(site + '/cn/search/' + number.replace('-', '_'))
-        html = etree.fromstring(a, etree.HTMLParser())
-        result1 = str(html.xpath('//*[@id="waterfall"]/div/a/@href')).strip(" ['']")
+class Avsox(Parser):
+
+    source = 'avsox'
+    imagecut = 3
+
+    expr_number = '//span[contains(text(),"识别码:")]/../span[2]/text()'
+    expr_actor = '//a[@class="avatar-box"]'
+    expr_actorphoto = '//a[@class="avatar-box"]'
+    expr_title = '/html/body/div[2]/h3/text()'
+    expr_studio = '//p[contains(text(),"制作商: ")]/following-sibling::p[1]/a/text()'
+    expr_release = '//span[contains(text(),"发行时间:")]/../text()'
+    expr_cover = '/html/body/div[2]/div[1]/div[1]/a/img/@src'
+    expr_smallcover = '//*[@id="waterfall"]/div/a/div[1]/img/@src'
+    expr_tags = '/html/head/meta[@name="keywords"]/@content'
+    expr_label = '//p[contains(text(),"系列:")]/following-sibling::p[1]/a/text()'
+    expr_series = '//span[contains(text(),"系列:")]/../span[2]/text()'
+
+    def queryNumberUrl(self, number):
+        qurySiteTree = self.getHtmlTree('https://tellme.pw/avsox')
+        site = self.getTreeIndex(qurySiteTree, '//div[@class="container"]/div/a/@href')
+        self.searchtree = self.getHtmlTree(site + '/cn/search/' + number)
+        result1 = self.getTreeIndex(self.searchtree, '//*[@id="waterfall"]/div/a/@href')
         if result1 == '' or result1 == 'null' or result1 == 'None':
-            a = get_html(site + '/cn/search/' + number.replace('_', ''))
-            html = etree.fromstring(a, etree.HTMLParser())
-            result1 = str(html.xpath('//*[@id="waterfall"]/div/a/@href')).strip(" ['']")
-    detail = get_html("https:" + result1)
-    lx = etree.fromstring(detail, etree.HTMLParser())
-    try:
-        new_number = getNum(lx)
-        if new_number.upper() != number.upper():
-            raise ValueError('number not found')
-        title = getTitle(lx).strip(new_number)
-        dic = {
-            'actor': getActor(lx),
-            'title': title,
-            'studio': getStudio(lx),
-            'outline': getStoryline(number, title),
-            'runtime': getRuntime(lx),
-            'director': '',  #
-            'release': getRelease(lx),
-            'number': new_number,
-            'cover': getCover(lx),
-            'cover_small': getCover_small(html),
-            'imagecut': 3,
-            'tag': getTag(lx),
-            'label': getLabel(lx),
-            'year': getYear(getRelease(lx)),
-            'actor_photo': getActorPhoto(lx),
-            'website': "https:" + result1,
-            'source': 'avsox.py',
-            'series': getSeries(lx),
-        }
-    except Exception as e:
-        current_app.logger.error(e)
-        dic = {"title": ""}
-    js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
-    return js
+            self.searchtree = self.getHtmlTree(site + '/cn/search/' + number.replace('-', '_'))
+            result1 = self.getTreeIndex(self.searchtree, '//*[@id="waterfall"]/div/a/@href')
+            if result1 == '' or result1 == 'null' or result1 == 'None':
+                self.searchtree = self.getHtmlTree(site + '/cn/search/' + number.replace('_', ''))
+                result1 = self.getTreeIndex(self.searchtree, '//*[@id="waterfall"]/div/a/@href')
+        return "https:" + result1
 
-if __name__ == "__main__":
-    print(main('012717_472'))
-    print(main('1')) # got fake result raise 'number not found'
+    def getNum(self, htmltree):
+        new_number = self.getTreeIndex(htmltree, self.expr_number)
+        if new_number.upper() != self.number.upper():
+            raise ValueError('number not found in ' + self.source)
+        self.number = new_number
+        return new_number
+
+    def getTitle(self, htmltree):
+        return super().getTitle(htmltree).replace('/', '').strip(self.number)
+
+    def getStudio(self, htmltree):
+        return super().getStudio(htmltree).replace("', '", ' ')
+
+    def getSmallCover(self, htmltree):
+        """ 使用搜索页面的预览小图
+        """
+        return self.getTreeIndex(self.searchtree, self.expr_smallcover)
+
+    def getTags(self, htmltree):
+        tags = super().getTags(htmltree).split(',')
+        return [i.strip() for i in tags[2:]] if len(tags) > 2 else []
+
+    def getOutline(self, htmltree):
+        if self.morestoryline:
+            from .storyline import getStoryline
+            return getStoryline(self.number)
+        return ''
+
+    def getActors(self, htmltree):
+        a = super().getActors(htmltree)
+        d = []
+        for i in a:
+            d.append(i.find('span').text)
+        return d
+
+    def getActorPhoto(self, htmltree):
+        a = super().getActorPhoto(htmltree)
+        d = {}
+        for i in a:
+            l = i.find('.//img').attrib['src']
+            t = i.find('span').text
+            p2 = {t: l}
+            d.update(p2)
+        return d

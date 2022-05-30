@@ -1,160 +1,95 @@
+# -*- coding: utf-8 -*-
+
 import re
 from lxml import etree
-import json
-import sys
-sys.path.append('../')
-from ..utils.ADC_function import *
-# import sys
-# import io
-# sys.stdout = io.TextIOWrapper(sys.stdout.buffer, errors = 'replace', line_buffering = True)
-#print(get_html('https://www.dlsite.com/maniax/work/=/product_id/VJ013152.html'))
-#title /html/head/title/text()
-#studio //th[contains(text(),"ブランド名")]/../td/span[1]/a/text()
-#release //th[contains(text(),"販売日")]/../td/a/text()
-#story //th[contains(text(),"シナリオ")]/../td/a/text()
-#senyo //th[contains(text(),"声優")]/../td/a/text()
-#tag //th[contains(text(),"ジャンル")]/../td/div/a/text()
-#jianjie //*[@id="main_inner"]/div[3]/text()
-#photo //*[@id="work_left"]/div/div/div[2]/div/div[1]/div[1]/ul/li/img/@src
+from .parser import Parser
 
-#https://www.dlsite.com/maniax/work/=/product_id/VJ013152.html
 
-def getTitle(html):
-    result = str(html.xpath('/html/head/title/text()')[0])
-    result = result[:result.rfind(' | DLsite')]
-    result = result[:result.rfind(' [')]
-    return result
-def getActor(html):  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
-    try:
-        result1 = html.xpath('//th[contains(text(),"声优")]/../td/a/text()')
-    except:
-        result1 = ''
-    return result1
-def getActorPhoto(actor): #//*[@id="star_qdt"]/li/a/img
-    a = actor.split(',')
-    d={}
-    for i in a:
-        p={i:''}
-        d.update(p)
-    return d
-def getStudio(html):
-    try:
+class Dlsite(Parser):
+    source = 'dlsite'
+    imagecut = 4
+    allow_number_change = True
+
+    expr_title = '/html/head/title/text()'
+    expr_actor = '//th[contains(text(),"声优")]/../td/a/text()'
+    expr_studio = '//th[contains(text(),"商标名")]/../td/span[1]/a/text()'
+    expr_studio2 = '//th[contains(text(),"社团名")]/../td/span[1]/a/text()'
+    expr_runtime = '//strong[contains(text(),"時長")]/../span/text()'
+    expr_runtime2 = '//strong[contains(text(),"時長")]/../span/a/text()'
+    expr_outline = '//*[@class="work_parts_area"]/p/text()'
+    expr_series = '//th[contains(text(),"系列名")]/../td/span[1]/a/text()'
+    expr_series2 = '//th[contains(text(),"社团名")]/../td/span[1]/a/text()'
+    expr_director = '//th[contains(text(),"剧情")]/../td/a/text()'
+    expr_release = '//th[contains(text(),"贩卖日")]/../td/a/text()'
+    expr_cover = '//*[@id="work_left"]/div/div/div[2]/div/div[1]/div[1]/ul/li[1]/picture/source/@srcset'
+    expr_tags = '//th[contains(text(),"分类")]/../td/div/a/text()'
+    expr_label = '//th[contains(text(),"系列名")]/../td/span[1]/a/text()'
+    expr_label2 = '//th[contains(text(),"社团名")]/../td/span[1]/a/text()'
+    expr_extrafanart = '//*[@id="work_left"]/div/div/div[1]/div/@data-src'
+
+    def search(self, number):
+        self.cookies = {'locale': 'zh-cn'}
+        if "RJ" in number or "VJ" in number:
+            self.number = number.upper()
+            self.detailurl = 'https://www.dlsite.com/maniax/work/=/product_id/' + self.number + '.html/?locale=zh_CN'
+            htmltree = self.getHtmlTree(self.detailurl)
+        else:
+            self.detailurl = f'https://www.dlsite.com/maniax/fsr/=/language/jp/sex_category/male/keyword/{number}/order/trend/work_type_category/movie'
+            htmltree = self.getHtmlTree(self.detailurl)
+            search_result = self.getAll(htmltree, '//*[@id="search_result_img_box"]/li[1]/dl/dd[2]/div[2]/a/@href')
+            if len(search_result) == 0:
+                number = number.replace("THE ANIMATION", "").replace("he Animation", "").replace("t", "").replace("T","")
+                htmltree = self.getHtmlTree(f'https://www.dlsite.com/maniax/fsr/=/language/jp/sex_category/male/keyword/{number}/order/trend/work_type_category/movie')
+                search_result = self.getAll(htmltree, '//*[@id="search_result_img_box"]/li[1]/dl/dd[2]/div[2]/a/@href')
+                if len(search_result) == 0:
+                    if "～" in number:
+                        number = number.replace("～","〜")
+                    elif "〜" in number:
+                        number = number.replace("〜","～")
+                    htmltree = self.getHtmlTree(f'https://www.dlsite.com/maniax/fsr/=/language/jp/sex_category/male/keyword/{number}/order/trend/work_type_category/movie')
+                    search_result = self.getAll(htmltree, '//*[@id="search_result_img_box"]/li[1]/dl/dd[2]/div[2]/a/@href')
+                    if len(search_result) == 0:
+                        number = number.replace('上巻', '').replace('下巻', '').replace('前編', '').replace('後編', '')
+                        htmltree = self.getHtmlTree(f'https://www.dlsite.com/maniax/fsr/=/language/jp/sex_category/male/keyword/{number}/order/trend/work_type_category/movie')
+                        search_result = self.getAll(htmltree, '//*[@id="search_result_img_box"]/li[1]/dl/dd[2]/div[2]/a/@href')
+            self.detailurl = search_result[0]
+            htmltree = self.getHtmlTree(self.detailurl)
+            self.number = str(re.findall("\wJ\w+", self.detailurl)).strip(" [']")
+
+        result = self.dictformat(htmltree)
+        return result
+
+    def getNum(self, htmltree):
+        return self.number
+
+    def getTitle(self, htmltree):
+        result = super().getTitle(htmltree)
+        result = result[:result.rfind(' | DLsite')]
+        result = result[:result.rfind(' [')]
+        result = result.replace('【HD版】', '')
+        return result
+
+    def getOutline(self, htmltree):
+        total = []
+        result = self.getAll(htmltree, self.expr_outline)
+        for i in result:
+            total.append(i.strip('\r\n'))
+        return str(total).strip(" ['']").replace("', '', '",r'\n').replace("', '",r'\n').strip(", '', '")
+
+    def getRelease(self, htmltree):
+        return super().getRelease(htmltree).replace('年','-').replace('月','-').replace('日','')
+
+    def getCover(self, htmltree):
+        return 'https:' + super().getCover(htmltree).replace('.webp', '.jpg')
+
+    def getTags(self, htmltree):
+        return self.getAll(htmltree, self.expr_tags)
+
+    def getExtrafanart(self, htmltree):
         try:
-            result = html.xpath('//th[contains(text(),"系列名")]/../td/span[1]/a/text()')[0]
+            result = []
+            for i in self.getAll(self.expr_extrafanart):
+                result.append("https:" + i)
         except:
-            result = html.xpath('//th[contains(text(),"社团名")]/../td/span[1]/a/text()')[0]
-    except:
-        result = ''
-    return result
-def getRuntime(a):
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result1 = str(html.xpath('//strong[contains(text(),"時長")]/../span/text()')).strip(" ['']")
-    result2 = str(html.xpath('//strong[contains(text(),"時長")]/../span/a/text()')).strip(" ['']")
-    return str(result1 + result2).strip('+').rstrip('mi')
-def getLabel(html):
-    try:
-        try:
-            result = html.xpath('//th[contains(text(),"系列名")]/../td/span[1]/a/text()')[0]
-        except:
-            result = html.xpath('//th[contains(text(),"社团名")]/../td/span[1]/a/text()')[0]
-    except:
-        result = ''
-    return result
-def getYear(getRelease):
-    try:
-        result = str(re.search('\d{4}', getRelease).group())
+            result = ''
         return result
-    except:
-        return getRelease
-def getRelease(html):
-    result1 = html.xpath('//th[contains(text(),"贩卖日")]/../td/a/text()')[0]
-    return result1.replace('年','-').replace('月','-').replace('日','')
-def getTag(html):
-    try:
-        result = html.xpath('//th[contains(text(),"分类")]/../td/div/a/text()')
-        return result
-    except:
-        return ''
-
-def getCover_small(a, index=0):
-    # same issue mentioned below,
-    # javdb sometime returns multiple results
-    # DO NOT just get the firt one, get the one with correct index number
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    try:
-        result = html.xpath("//div[@class='item-image fix-scale-cover']/img/@src")[index]
-        if not 'https' in result:
-            result = 'https:' + result
-        return result
-    except: # 2020.7.17 Repair Cover Url crawl
-        result = html.xpath("//div[@class='item-image fix-scale-cover']/img/@data-src")[index]
-        if not 'https' in result:
-            result = 'https:' + result
-        return result
-def getCover(html):
-    result = html.xpath('//*[@id="work_left"]/div/div/div[2]/div/div[1]/div[1]/ul/li[1]/picture/source/@srcset')[0]
-    return result.replace('.webp', '.jpg')
-def getDirector(html):
-    try:
-        result = html.xpath('//th[contains(text(),"剧情")]/../td/a/text()')[0]
-    except:
-        result = ''
-    return result
-def getOutline(html):
-    total = []
-    result = html.xpath('//*[@class="work_parts_area"]/p/text()')
-    for i in result:
-        total.append(i.strip('\r\n'))
-    return str(total).strip(" ['']").replace("', '', '",r'\n').replace("', '",r'\n').strip(", '', '")
-def getSeries(html):
-    try:
-        try:
-            result = html.xpath('//th[contains(text(),"系列名")]/../td/span[1]/a/text()')[0]
-        except:
-            result = html.xpath('//th[contains(text(),"社团名")]/../td/span[1]/a/text()')[0]
-    except:
-        result = ''
-    return result
-def main(number):
-    try:
-        number = number.upper()
-        htmlcode = get_html('https://www.dlsite.com/maniax/work/=/product_id/' + number + '.html/?locale=zh_CN',
-                            cookies={'locale': 'zh-cn'})
-        html = etree.fromstring(htmlcode, etree.HTMLParser())
-        dic = {
-            'actor': getActor(html),
-            'title': getTitle(html),
-            'studio': getStudio(html),
-            'outline': getOutline(html),
-            'runtime': '',
-            'director': getDirector(html),
-            'release': getRelease(html),
-            'number': number,
-            'cover': 'https:' + getCover(html),
-            'cover_small': '',
-            'imagecut': 0,
-            'tag': getTag(html),
-            'label': getLabel(html),
-            'year': getYear(getRelease(html)),  # str(re.search('\d{4}',getRelease(a)).group()),
-            'actor_photo': '',
-            'website': 'https://www.dlsite.com/maniax/work/=/product_id/' + number + '.html',
-            'source': 'dlsite.py',
-            'series': getSeries(html),
-        }
-        js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
-        return js
-    except Exception as e:
-        current_app.logger.error(e)
-        data = {
-            "title": "",
-        }
-        js = json.dumps(
-            data, ensure_ascii=False, sort_keys=True, indent=4, separators=(",", ":")
-        )
-        return js
-
-# main('DV-1562')
-# input("[+][+]Press enter key exit, you can check the error messge before you exit.\n[+][+]按回车键结束，你可以在结束之前查看和错误信息。")
-if __name__ == "__main__":
-    print(main('VJ013178'))
-    print(main('RJ329607'))
