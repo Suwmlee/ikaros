@@ -1,3 +1,16 @@
+# [1.26.0](https://github.com/Suwmlee/ikaros/compare/v1.25.3...v1.26.0) (2022-05-30)
+
+
+### Bug Fixes
+
+* default sources ([b34c77c](https://github.com/Suwmlee/ikaros/commit/b34c77cb1ea927f450ec6aa108c0a4a0163634cf))
+* tmdb scrapinglib ([7329ce0](https://github.com/Suwmlee/ikaros/commit/7329ce0a5b1fe827a45659b14d7ef1749a87213e))
+
+
+### Features
+
+* update scrapinglib ([f076623](https://github.com/Suwmlee/ikaros/commit/f076623b53cf70797a5c71aaa62a20053aa205a3))
+
 ## [1.25.3](https://github.com/Suwmlee/ikaros/compare/v1.25.2...v1.25.3) (2022-05-10)
 
 
