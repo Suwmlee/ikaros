@@ -19,6 +19,8 @@ from .javbus import Javbus
 from .xcity import Xcity
 from .avsox import Avsox
 
+from .tmdb import Tmdb
+
 
 def search(number, sources: str=None, proxies=None, verify=None, type='adult',
             dbcookies=None, dbsite=None, morestoryline=False):
@@ -94,14 +96,15 @@ class Scraping():
         if type == 'adult':
             return self.searchAdult(number, sources)
         else:
-            return self.searchGeneral()
+            return self.searchGeneral(number, sources)
 
-    def searchGeneral(self):
+    def searchGeneral(self, number, sources):
         """ 查询电影电视剧
         imdb,tmdb
         """
-        # TODO
-        return None
+        data = Tmdb().scrape(number, self)
+        json_data = json.loads(data)
+        return json_data
 
     def searchAdult(self, number, sources):
         sources = self.checkSources(sources, number)

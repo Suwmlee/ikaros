@@ -1,59 +1,40 @@
 # -*- coding: utf-8 -*-
-'''
-'''
-from bs4 import BeautifulSoup
-from ..utils.ADC_function import get_html
 
-class TmdbParser():
 
-    def getPage(self, id):
-        """ 抓取页面
+from .parser import Parser
 
-        Returns:
-            soup (string): HTML source of scraped page.
+
+class Tmdb(Parser):
+    """
+    两种实现,带apikey与不带key
+    apikey
+    """
+    source = 'tmdb'
+    imagecut = 0
+    apikey = None
+
+    expr_title = './/head/meta[@property="og:title"]'
+    expr_release = '//div/span[@class="release"]/text()'
+    expr_cover = './/head/meta[@property="og:image"]'
+    expr_outline = './/head/meta[@property="og:description"]'
+
+    # def search(self, number):
+    #     self.detailurl = self.queryNumberUrl(number)
+    #     detailpage = self.getHtml(self.detailurl)
+
+    def queryNumberUrl(self, number):
         """
+        TODO 区分 ID 与 名称
+        """
+        id  = number
         movieUrl = "https://www.themoviedb.org/movie/" + id + "?language=zh-CN"
-        htmltext = get_html(movieUrl)
-        soup = BeautifulSoup(htmltext, 'html.parser')
-        return soup
+        return movieUrl
 
-    def getOpenGraphImage(self, soup):
-        """ Return the Open Graph image
+    def getTitle(self, htmltree):
+        return self.getTreeIndex(htmltree, self.expr_title).get('content')
 
-        Args:
-            soup: HTML from Beautiful Soup.
-        Returns:
-            value: Parsed content. 
-        """
-        if soup.findAll("meta", property="og:image"):
-            endurl = soup.find("meta", property="og:image")["content"]
-            return "https://www.themoviedb.org" + endurl
-        return
+    def getCover(self, htmltree):
+        return "https://www.themoviedb.org" + self.getTreeIndex(htmltree, self.expr_cover).get('content')
 
-    def getOpenGraphTitle(self, soup):
-        """Return the Open Graph title
-
-        Args:
-            soup: HTML from Beautiful Soup.
-        
-        Returns:
-            value: Parsed content. 
-        """
-        if soup.findAll("meta", property="og:title"):
-            return soup.find("meta", property="og:title")["content"]
-        return
-
-    def getOpenGraphDescription(self, soup):
-        """Return the Open Graph description
-
-        Args:
-            soup: HTML from Beautiful Soup.
-        
-        Returns:
-            value: Parsed content. 
-        """
-        if soup.findAll("meta", property="og:description"):
-            return soup.find("meta", property="og:description")["content"]
-        return
-
-tmdbParser = TmdbParser()
+    def getOutline(self, htmltree):
+        return self.getTreeIndex(htmltree, self.expr_outline).get('content')

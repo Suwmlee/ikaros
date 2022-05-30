@@ -6,7 +6,7 @@ import time
 import xml.etree.ElementTree as ET
 from flask import current_app
 
-from ..scrapinglib.tmdb import tmdbParser
+from ..scrapinglib import search
 from ..service.recordservice import scrapingrecordService, transrecordService
 from ..service.configservice import autoConfigService, transConfigService, scrapingConfService
 from ..service.taskservice import autoTaskService, taskService
@@ -216,11 +216,11 @@ def sendTransferMessage(srcpath, dstpath):
                     notificationService.sendTgMarkdown(text)
 
         if notificationService.isWeEnabled() and title and year and tmdbid:
-            soup = tmdbParser.getPage(tmdbid)
-            imgaeurl = tmdbParser.getOpenGraphImage(soup)
-            text_title = '新增影片  ' + title + ' ('+ year +')'
+            jsondata = search(tmdbid, type='general')
+            imageurl = jsondata.get('cover')
+            text_title = '新增  ' + title + ' ('+ year +')'
             text_description = '来源: ' + srcpath
             text_url = 'https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN'
-            notificationService.sendWeNews(text_title, text_description, imgaeurl, text_url)
+            notificationService.sendWeNews(text_title, text_description, imageurl, text_url)
     else:
         notificationService.sendtext("托管任务:[{}], 转移完成,推送媒体库异常".format(srcpath))
