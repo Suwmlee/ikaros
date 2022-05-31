@@ -4,17 +4,15 @@
 import os
 import pathlib
 import shutil
-import requests
 from PIL import Image
 from lxml import etree
 from flask import current_app
 
 from ..service.taskservice import taskService
 from ..service.configservice import scrapingConfService, _ScrapingConfigs
-from ..utils.ADC_function import G_USER_AGENT
 from ..utils.filehelper import moveSubsbyFilepath, forceSymlink, forceHardlink
 from ..utils.number_parser import FileNumInfo
-from ..scrapinglib import search
+from ..scrapinglib import search, httprequest
 
 
 def escapePath(path, escape_literals: str):
@@ -93,48 +91,24 @@ def parseJsonInfo(json_data):
     return title, studio, year, outline, runtime, director, actor_photo, release, number, cover, trailer, website, series, label
 
 
-# =====================资源下载部分===========================
-
 def download_file_with_filename(url, filename, path):
+    """ 下载文件
+    """
     task = taskService.getTask('scrape')
     configProxy = scrapingConfService.getProxyConfig(task.cid)
-
+    proxies = configProxy.proxies() if configProxy.enable else None
     if not os.path.exists(path):
         os.makedirs(path)
-    headers = {'User-Agent': G_USER_AGENT}
-    for i in range(configProxy.retry):
-        try:
-            if configProxy.enable:
-                proxies = configProxy.proxies()
-                r = requests.get(url, headers=headers, timeout=configProxy.timeout, proxies=proxies)
-                if r == '':
-                    current_app.logger.info('[-]Movie Data not found!')
-                    return False
-                with open(os.path.join(path, filename), "wb") as code:
-                    code.write(r.content)
-                return True
-            else:
-                r = requests.get(url, headers=headers, timeout=configProxy.timeout)
-                if r == '':
-                    current_app.logger.info('[-]Movie Data not found!')
-                    return False
-                with open(os.path.join(path, filename), "wb") as code:
-                    code.write(r.content)
-                return True
-        except requests.exceptions.RequestException:
-            i += 1
-            current_app.logger.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
-        except requests.exceptions.ConnectionError:
-            i += 1
-            current_app.logger.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
-        except requests.exceptions.ProxyError:
-            i += 1
-            current_app.logger.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
-        except requests.exceptions.ConnectTimeout:
-            i += 1
-            current_app.logger.debug('[-]Image Download :  Connect retry ' + str(i) + '/' + str(configProxy.retry))
-    current_app.logger.error('[-]Connect Failed! Please check your Proxy or Network!')
-    return False
+    try:
+        r = httprequest.get(url, proxies=proxies, return_type='object')
+        if r == '':
+            current_app.logger.info('[-] source not found!')
+            return False
+        with open(os.path.join(path, filename), "wb") as code:
+            code.write(r.content)
+        return True
+    except:
+        return False
 
 
 def download_poster(path, prefilename, cover_small_url):
