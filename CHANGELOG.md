@@ -1,3 +1,10 @@
+## [1.26.1](https://github.com/Suwmlee/ikaros/compare/v1.26.0...v1.26.1) (2022-05-31)
+
+
+### Bug Fixes
+
+* notification proxy ([4631d7e](https://github.com/Suwmlee/ikaros/commit/4631d7efff8aed4a996335219f5edc886bc0d55a)), closes [#22](https://github.com/Suwmlee/ikaros/issues/22)
+
 # [1.26.0](https://github.com/Suwmlee/ikaros/compare/v1.25.3...v1.26.0) (2022-05-30)
 
 
