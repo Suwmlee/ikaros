@@ -112,7 +112,7 @@ class ProxyConfig():
     retry = 3
     proxytype = "socks5"
 
-    def __init__(self, enable, address, timeout, retry, proxytype) -> None:
+    def __init__(self, enable, address, timeout=5, retry=3, proxytype='socks5') -> None:
         """ Initial Proxy
         """
         self.enable = enable
@@ -187,6 +187,11 @@ class NotificationConfService():
         if changed:
             db.session.commit()
         return True
+
+    def getProxyConfig(self):
+        config = _NotificationConfigs.query.filter_by(id=1).first()
+        proxyConfig = ProxyConfig(config.proxy_enable, config.proxy_address, proxytype=config.proxy_type)
+        return proxyConfig
 
 
 scrapingConfService = ScrapingConfService()

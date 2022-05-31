@@ -161,6 +161,9 @@ class _NotificationConfigs(db.Model):
     wechat_corpsecret = Column(String, default="")
     wechat_agentid = Column(String, default="")
 
+    proxy_enable = Column(Boolean, default=False)
+    proxy_type = Column(String, default='socks5h')
+    proxy_address = Column(String, default='127.0.0.1:1080')
     def serialize(self):
         return {
             'id': self.id,
@@ -168,5 +171,8 @@ class _NotificationConfigs(db.Model):
             'tg_chatid': self.tg_chatid,
             'wechat_corpid': self.wechat_corpid,
             'wechat_corpsecret': self.wechat_corpsecret,
-            'wechat_agentid': self.wechat_agentid
+            'wechat_agentid': self.wechat_agentid,
+            'proxy_enable': self.proxy_enable,
+            'proxy_type': self.proxy_type,
+            'proxy_address': self.proxy_address,
         }
