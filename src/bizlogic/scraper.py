@@ -67,8 +67,9 @@ def moveFailedFolder(filepath):
             (filefolder, name) = os.path.split(filepath)
             newpath = os.path.join(conf.failed_folder, name)
             forceHardlink(filepath, newpath)
+            return newpath
     except:
-        pass
+        return ''
 
 
 def parseJsonInfo(json_data):
@@ -399,8 +400,7 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
     # Return if blank dict returned (data not found)
     if not json_data:
         current_app.logger.error('[-]Movie Data not found!')
-        moveFailedFolder(filepath)
-        return False, ''
+        return False, moveFailedFolder(filepath)
 
     if json_data.get("number") != number:
         # fix issue #119

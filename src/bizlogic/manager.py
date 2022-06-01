@@ -94,8 +94,11 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
                     if num_info.multipart_tag:
                         movie_info.cdnum = num_info.part[3:]
                 else:
+                    # 失败
                     movie_info.status = 2
+                    movie_info.destpath = new_path
             else:
+                # 忽略
                 movie_info.status = 3
             movie_info.updatetime = datetime.datetime.now()
             scrapingrecordService.commit()
