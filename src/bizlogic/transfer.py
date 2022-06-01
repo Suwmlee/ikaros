@@ -282,7 +282,6 @@ def transfer(src_folder, dest_folder,
             # 优化命名
             naming(currentfile, movie_list, simplify_tag, fixseries_tag)
 
-            flag_done = False
             if currentfile.topfolder == '.':
                 newpath = os.path.join(dest_folder, currentfile.name + currentfile.ext)
             else:
@@ -291,14 +290,12 @@ def transfer(src_folder, dest_folder,
             newfolder = currentfile.finalfolder
             # https://stackoverflow.com/questions/41941401/how-to-find-out-if-a-folder-is-a-hard-link-and-get-its-real-path
             if os.path.exists(newpath) and os.path.samefile(link_path, newpath):
-                flag_done = True
                 current_app.logger.debug("[!] same file already exists")
             elif pathlib.Path(newpath).is_symlink() and os.readlink(newpath) == link_path :
-                flag_done = True
                 current_app.logger.debug("[!] link file already exists")
-            if not os.path.exists(newfolder):
-                os.makedirs(newfolder)
-            if not flag_done:
+            else:
+                if not os.path.exists(newfolder):
+                    os.makedirs(newfolder)
                 current_app.logger.debug("[-] create link from [{}] to [{}]".format(link_path, newpath))
                 if linktype == 0:
                     forceSymlink(link_path, newpath)
