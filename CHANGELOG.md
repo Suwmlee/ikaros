@@ -1,3 +1,11 @@
+## [1.26.2](https://github.com/Suwmlee/ikaros/compare/v1.26.1...v1.26.2) (2022-06-01)
+
+
+### Bug Fixes
+
+*  default server value in notification table ([94bed95](https://github.com/Suwmlee/ikaros/commit/94bed95f0456c197579dba7f41fc38992bc6f056))
+* clean failed file ([1d9add8](https://github.com/Suwmlee/ikaros/commit/1d9add892d0faabc87a44f2ce0bca8f4bdfba834))
+
 ## [1.26.1](https://github.com/Suwmlee/ikaros/compare/v1.26.0...v1.26.1) (2022-05-31)
 
 
