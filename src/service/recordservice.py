@@ -61,7 +61,7 @@ class ScrapingRecordService():
         records = _ScrapingRecords.query.filter(_ScrapingRecords.id.in_(ids)).all()
         for record in records:
             basefolder = os.path.dirname(record.srcpath)
-            if delsrc:
+            if delsrc and os.path.exists(basefolder):
                 srcname = os.path.basename(record.srcpath)
                 srcfilter  = os.path.splitext(srcname)[0]
                 cleanFilebyFilter(basefolder, srcfilter)
@@ -253,7 +253,7 @@ class TransRecordService():
         record = _TransRecords.query.filter_by(id=value).first()
         if record and isinstance(record, _TransRecords):
             basefolder = os.path.dirname(record.srcpath)
-            if delsrc:
+            if delsrc and os.path.exists(basefolder):
                 srcname = os.path.basename(record.srcpath)
                 srcfilter  = os.path.splitext(srcname)[0]
                 cleanFilebyFilter(basefolder, srcfilter)
