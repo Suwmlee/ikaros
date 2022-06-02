@@ -1,3 +1,10 @@
+# [1.27.0](https://github.com/Suwmlee/ikaros/compare/v1.26.2...v1.27.0) (2022-06-02)
+
+
+### Features
+
+* confirm to delete source file ([ecaa194](https://github.com/Suwmlee/ikaros/commit/ecaa194214e1af942753e12660c9df2745db0203))
+
 ## [1.26.2](https://github.com/Suwmlee/ikaros/compare/v1.26.1...v1.26.2) (2022-06-01)
 
 
