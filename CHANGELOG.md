@@ -1,3 +1,10 @@
+## [1.27.1](https://github.com/Suwmlee/ikaros/compare/v1.27.0...v1.27.1) (2022-06-02)
+
+
+### Bug Fixes
+
+* check source folder exists ([616e021](https://github.com/Suwmlee/ikaros/commit/616e021a8468623478849dc2c726a7a136090033))
+
 # [1.27.0](https://github.com/Suwmlee/ikaros/compare/v1.26.2...v1.27.0) (2022-06-02)
 
 
