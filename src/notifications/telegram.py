@@ -53,6 +53,6 @@ class Telegram():
                 configProxy = notificationConfService.getProxyConfig()
                 proxies = configProxy.proxies() if configProxy.enable else None
                 try:
-                    httprequest.post(url, params, proxies=proxies)
+                    httprequest.post(url, params, files=files, proxies=proxies)
                 except:
                     pass
