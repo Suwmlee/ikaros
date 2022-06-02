@@ -1,3 +1,11 @@
+## [1.27.2](https://github.com/Suwmlee/ikaros/compare/v1.27.1...v1.27.2) (2022-06-02)
+
+
+### Bug Fixes
+
+* telegram send photo ([c92b426](https://github.com/Suwmlee/ikaros/commit/c92b42672cc13d54ce98d714a31d0abfd98819d5))
+* try updating scrapinglib to fix javdb issue ([6a343ba](https://github.com/Suwmlee/ikaros/commit/6a343ba09c687a3020b00ebca9c2ecd187bdc844))
+
 ## [1.27.1](https://github.com/Suwmlee/ikaros/compare/v1.27.0...v1.27.1) (2022-06-02)
 
 
