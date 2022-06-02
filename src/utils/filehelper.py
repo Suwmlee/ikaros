@@ -133,15 +133,17 @@ def cleanFolderbyFilter(folder, filter):
         shutil.rmtree(folder)
 
 
-def cleanScrapingfile(folder, filter):
-    """ 根据过滤名删除刮削文件
+def cleanFilebyFilter(folder, filter):
+    """ 根据过滤名删除文件
+
+    只当前目录,不递归删除
     """
     dirs = os.listdir(folder)
     for file in dirs:
         f = os.path.join(folder, file)
         if not os.path.isdir(f):
             if file.startswith(filter):
-                current_app.logger.info("clean scraping file [{}]".format(f))
+                current_app.logger.info("clean file [{}]".format(f))
                 os.remove(f)
 
 

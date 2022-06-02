@@ -131,9 +131,11 @@ def editTransferRecord():
 @web.route("/api/transfer/record", methods=['DELETE'])
 def deleteTransferRecordIds():
     try:
-        ids = request.get_json()
+        content = request.get_json()
+        ids = content.get('ids')
+        delsrc = content.get('delsrc')
         for sid in ids:
-            transrecordService.deleteByID(sid)
+            transrecordService.deleteByID(sid, delsrc)
         return Response(status=200)
     except Exception as err:
         current_app.logger.error(err)

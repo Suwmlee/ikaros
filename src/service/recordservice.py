@@ -5,7 +5,7 @@ import os
 import datetime
 from sqlalchemy import or_
 from ..model.record import _ScrapingRecords, _TransRecords
-from ..utils.filehelper import cleanFolderbyFilter, cleanScrapingfile, cleanExtraMedia, cleanFolderWithoutSuffix, video_type
+from ..utils.filehelper import cleanFolderbyFilter, cleanFilebyFilter, cleanExtraMedia, cleanFolderWithoutSuffix, video_type
 from .. import db
 
 
@@ -51,23 +51,27 @@ class ScrapingRecordService():
                     name = os.path.basename(record.destpath)
                     filter  = os.path.splitext(name)[0]
                     if record.cdnum and record.cdnum > 0:
-                        cleanScrapingfile(folder, filter)
+                        cleanFilebyFilter(folder, filter)
                     else:
                         cleanFolderbyFilter(folder, filter)
             db.session.delete(record)
             db.session.commit()
 
-    def deleteByIds(self, ids):
+    def deleteByIds(self, ids, delsrc=False):
         records = _ScrapingRecords.query.filter(_ScrapingRecords.id.in_(ids)).all()
         for record in records:
+            basefolder = os.path.dirname(record.srcpath)
+            if delsrc:
+                srcname = os.path.basename(record.srcpath)
+                srcfilter  = os.path.splitext(srcname)[0]
+                cleanFilebyFilter(basefolder, srcfilter)
             if record.destpath != '':
-                basefolder = os.path.dirname(record.srcpath)
                 folder = os.path.dirname(record.destpath)
                 if os.path.exists(folder) and basefolder != folder:
                     name = os.path.basename(record.destpath)
                     filter  = os.path.splitext(name)[0]
                     if record.cdnum and record.cdnum > 0:
-                        cleanScrapingfile(folder, filter)
+                        cleanFilebyFilter(folder, filter)
                     else:
                         cleanFolderbyFilter(folder, filter)
             db.session.delete(record)
@@ -245,17 +249,21 @@ class TransRecordService():
         db.session.commit()
         return nums
 
-    def deleteByID(self, value) -> _TransRecords:
+    def deleteByID(self, value, delsrc=False) -> _TransRecords:
         record = _TransRecords.query.filter_by(id=value).first()
         if record and isinstance(record, _TransRecords):
+            basefolder = os.path.dirname(record.srcpath)
+            if delsrc:
+                srcname = os.path.basename(record.srcpath)
+                srcfilter  = os.path.splitext(srcname)[0]
+                cleanFilebyFilter(basefolder, srcfilter)
             if record.destpath != '':
-                basefolder = os.path.dirname(record.srcpath)
                 folder = os.path.dirname(record.destpath)
                 if os.path.exists(folder) and basefolder != folder:
                     name = os.path.basename(record.destpath)
                     # 前缀匹配
                     filter = os.path.splitext(name)[0]
-                    cleanScrapingfile(folder, filter)
+                    cleanFilebyFilter(folder, filter)
             db.session.delete(record)
             db.session.commit()
 

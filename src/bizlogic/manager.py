@@ -13,7 +13,7 @@ from .scraper import core_main, moveFailedFolder
 from .mediaserver import refreshMediaServer
 from flask import current_app
 from ..utils.number_parser import FileNumInfo
-from ..utils.filehelper import cleanScrapingfile, video_type, cleanFolder, cleanFolderbyFilter
+from ..utils.filehelper import cleanFilebyFilter, video_type, cleanFolder, cleanFolderbyFilter
 
 
 def findAllMovies(root, escape_folder):
@@ -49,7 +49,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
                     filter = os.path.splitext(name)[0]
                     if movie_info.cdnum and movie_info.cdnum > 0:
                         # 如果是多集，则只清理当前文件
-                        cleanScrapingfile(folder, filter)
+                        cleanFilebyFilter(folder, filter)
                     else:
                         cleanFolderbyFilter(folder, filter)
             num_info = FileNumInfo(file_path)
