@@ -159,8 +159,12 @@ def create_nfo_file(path, prefilename, json_data, numinfo: FileNumInfo):
     try:
         if not os.path.exists(path):
             os.makedirs(path)
+        nfo_path = os.path.join(path, prefilename + ".nfo")
 
-        with open(os.path.join(path, prefilename + ".nfo"), "wt", encoding='UTF-8') as code:
+        # KODI内查看影片信息时找不到number，配置naming_rule=number+'#'+title虽可解决
+        # 但使得标题太长，放入时常为空的outline内会更适合，软件给outline留出的显示版面也较大
+        outline = f"{number}#{outline}"
+        with open(nfo_path, "wt", encoding='UTF-8') as code:
             print('<?xml version="1.0" encoding="UTF-8" ?>', file=code)
             print("<movie>", file=code)
             print("  <title><![CDATA[" + naming_rule + "]]></title>", file=code)
@@ -168,8 +172,10 @@ def create_nfo_file(path, prefilename, json_data, numinfo: FileNumInfo):
             print("  <sorttitle><![CDATA[" + naming_rule + "]]></sorttitle>", file=code)
             print("  <customrating>JP-18+</customrating>", file=code)
             print("  <mpaa>JP-18+</mpaa>", file=code)
-            print("  <set>", file=code)
-            print("  </set>", file=code)
+            try:
+                print("  <set>" + series + "</set>", file=code)
+            except:
+                print("  <set></set>", file=code)
             print("  <studio>" + studio + "</studio>", file=code)
             print("  <year>" + year + "</year>", file=code)
             print("  <outline><![CDATA[" + outline + "]]></outline>", file=code)
@@ -183,6 +189,10 @@ def create_nfo_file(path, prefilename, json_data, numinfo: FileNumInfo):
                 for key in actor_list:
                     print("  <actor>", file=code)
                     print("    <name>" + key + "</name>", file=code)
+                    try:
+                        print("    <thumb>" + actor_photo.get(str(key)) + "</thumb>", file=code)
+                    except:
+                        pass
                     print("  </actor>", file=code)
             except:
                 pass
@@ -199,7 +209,7 @@ def create_nfo_file(path, prefilename, json_data, numinfo: FileNumInfo):
             try:
                 for i in tags:
                     print("  <tag>" + i + "</tag>", file=code)
-                print("  <tag>" + series + "</tag>", file=code)
+                # print("  <tag>" + series + "</tag>", file=code)
             except:
                 pass
             if numinfo.chs_tag:
@@ -213,7 +223,7 @@ def create_nfo_file(path, prefilename, json_data, numinfo: FileNumInfo):
             try:
                 for i in tags:
                     print("  <genre>" + i + "</genre>", file=code)
-                print("  <genre>" + series + "</genre>", file=code)
+                # print("  <genre>" + series + "</genre>", file=code)
             except:
                 pass
             print("  <num>" + number + "</num>", file=code)
@@ -221,23 +231,30 @@ def create_nfo_file(path, prefilename, json_data, numinfo: FileNumInfo):
             print("  <releasedate>" + release + "</releasedate>", file=code)
             print("  <release>" + release + "</release>", file=code)
             try:
-                f_rating = float(json_data['userrating'])
-                print(f"  <userrating>{round(f_rating * 2.0)}</userrating>", file=code)
-                print(f"  <rating>{round(f_rating * 2.0, 1)}</rating>", file=code)
-                print(f"  <criticrating>{round(f_rating * 20.0, 1)}</criticrating>", file=code)
+                f_rating = json_data['userrating']
+                uc = json_data['uservotes']
+                print(f"""  <rating>{round(f_rating * 2.0, 1)}</rating>
+  <criticrating>{round(f_rating * 20.0, 1)}</criticrating>
+  <ratings>
+    <rating name="javdb" max="5" default="true">
+      <value>{f_rating}</value>
+      <votes>{uc}</votes>
+    </rating>
+  </ratings>""", file=code)
             except:
                 pass
             print("  <cover>" + cover + "</cover>", file=code)
+            print("  <trailer>" + trailer + "</trailer>", file=code)
             print("  <website>" + website + "</website>", file=code)
             print("</movie>", file=code)
-            current_app.logger.info("[+]Wrote!            " + path + "/" + prefilename + ".nfo")
+            current_app.logger.info("[+]Wrote!            " + nfo_path)
             return True
     except IOError as e:
-        current_app.logger.error("[-]Write Failed!")
+        current_app.logger.error("[-]Write NFO Failed!")
         current_app.logger.error(e)
         return False
     except Exception as e1:
-        current_app.logger.error("[-]Write Failed!")
+        current_app.logger.error("[-]Write NFO Failed!")
         current_app.logger.error(e1)
         return False
 
@@ -394,7 +411,7 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
     task = taskService.getTask('scrape')
     configProxy = scrapingConfService.getProxyConfig(task.cid)
     proxies = configProxy.proxies() if configProxy.enable else None
-    json_data = search(number, c_sources, proxies=proxies, morestoryline=True)
+    json_data = search(number, c_sources, proxies=proxies, morestoryline=False)
     json_data = fixJson(json_data, conf.naming_rule)
 
     # Return if blank dict returned (data not found)
