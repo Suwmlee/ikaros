@@ -1,3 +1,10 @@
+## [1.27.4](https://github.com/Suwmlee/ikaros/compare/v1.27.3...v1.27.4) (2022-06-07)
+
+
+### Bug Fixes
+
+* multi part ([7a002a2](https://github.com/Suwmlee/ikaros/commit/7a002a2c661769dfc94a69fbb05e8d1b0d09c396))
+
 ## [1.27.3](https://github.com/Suwmlee/ikaros/compare/v1.27.2...v1.27.3) (2022-06-07)
 
 
