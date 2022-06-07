@@ -137,14 +137,21 @@ def cleanFilebyFilter(folder, filter):
     """ 根据过滤名删除文件
 
     只当前目录,不递归删除
+    未含分集标识的filter不能删除带有分集标识的文件
     """
     dirs = os.listdir(folder)
     for file in dirs:
         f = os.path.join(folder, file)
         if not os.path.isdir(f):
             if file.startswith(filter):
-                current_app.logger.info("clean file [{}]".format(f))
-                os.remove(f)
+                # 未分集到分集 重复删除分集内容
+                if '-CD' in file.upper():
+                    if '-CD' in filter.upper():
+                        current_app.logger.info("clean file [{}]".format(f))
+                        os.remove(f)
+                else:
+                    current_app.logger.info("clean file [{}]".format(f))
+                    os.remove(f)
 
 
 def moveSubs(srcfolder, destfolder, basename, newname, saved=True):

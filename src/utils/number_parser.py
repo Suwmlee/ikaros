@@ -21,6 +21,7 @@ class FileNumInfo():
         self.leak_tag = False
         self.hack_tag = False
         self.multipart_tag = False
+        self.special = False
         self.part = ''
 
         if self.num and is_uncensored(self.num):
@@ -37,10 +38,12 @@ class FileNumInfo():
             if single in filepath:
                 self.chs_tag = True
                 break
-        if '_cd' in filepath or '-cd' in filepath:
-            self.part = get_part(filepath)
-            if self.part:
-                self.multipart_tag = True
+
+        basename = os.path.basename(filepath)
+        self.part = self.checkPart(basename)
+        if self.part:
+            self.multipart_tag = True
+        self.special = self.checkSp(basename)
 
     def fixedName(self):
         name = self.num
@@ -65,6 +68,36 @@ class FileNumInfo():
             return True
         return False
 
+    @staticmethod
+    def checkPart(filename):
+        try:
+            if '_cd' in filename or '-cd' in filename:
+                prog = re.compile("(?:-|_)cd\d{1,2}", re.IGNORECASE | re.X | re.S)
+                result = prog.findall(filename)
+                if result:
+                    part = str(result[0]).upper().replace('_', '-')
+                    return part
+            prog = re.compile("(?:-|_)\d{1,2}$", re.IGNORECASE | re.X | re.S)
+            bname = os.path.splitext(filename)[0]
+            result = prog.findall(bname)
+            if result:
+                part = str(result[0]).upper().replace('_', '-')
+                if 'CD' not in part:
+                    part = part.replace('-', '-CD')
+                return part
+        except:
+            return
+
+    @staticmethod
+    def checkSp(filename):
+        try:
+            prog = re.compile("(?:-|_)sp$", re.IGNORECASE | re.X | re.S)
+            bname = os.path.splitext(filename)[0]
+            result = prog.findall(bname)
+            if result and len(result) == 1:
+                return True
+        except:
+            return False
 
 def get_number(file_path: str) -> str:
     """ 获取番号

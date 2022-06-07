@@ -379,7 +379,7 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
         current_app.logger.error('[-]Error! Please run as administrator!')
         return False, ''
     except OSError as oserr:
-        current_app.logger.error('[-]OS Error :' + oserr.errno)
+        current_app.logger.error(oserr)
         return False, ''
 
 
