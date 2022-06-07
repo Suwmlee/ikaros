@@ -12,6 +12,7 @@ class Javdb(Parser):
     source = 'javdb'
 
     fixstudio = False
+    noauth = False
 
     expr_number = '//strong[contains(text(),"番號")]/../span/text()'
     expr_number2 = '//strong[contains(text(),"番號")]/../span/a/text()'
