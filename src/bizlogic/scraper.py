@@ -411,7 +411,7 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
     task = taskService.getTask('scrape')
     configProxy = scrapingConfService.getProxyConfig(task.cid)
     proxies = configProxy.proxies() if configProxy.enable else None
-    json_data = search(number, c_sources, proxies=proxies, morestoryline=False)
+    json_data = search(number, c_sources, proxies=proxies, morestoryline=conf.morestoryline)
     json_data = fixJson(json_data, conf.naming_rule)
 
     # Return if blank dict returned (data not found)

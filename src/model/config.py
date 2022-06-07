@@ -40,6 +40,7 @@ class _ScrapingConfigs(db.Model):
     naming_rule = Column(String, default="number+' '+title")
     max_title_len = Column(Integer, default=50)
     update_check = Column(Boolean, default=False)
+    morestoryline = Column(Boolean, default=True)
 
     extrafanart_enable = Column(Boolean, default=False)
     extrafanart_folder = Column(String, default='extrafanart', server_default='extrafanart')
@@ -74,6 +75,7 @@ class _ScrapingConfigs(db.Model):
             'location_rule': self.location_rule,
             'naming_rule': self.naming_rule,
             'site_sources': self.site_sources,
+            'morestoryline': self.morestoryline,
             'extrafanart_enable': self.extrafanart_enable,
             'extrafanart_folder': self.extrafanart_folder,
             'watermark_enable': self.watermark_enable,
