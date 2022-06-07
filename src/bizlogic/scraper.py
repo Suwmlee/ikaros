@@ -249,13 +249,9 @@ def create_nfo_file(path, prefilename, json_data, numinfo: FileNumInfo):
             print("</movie>", file=code)
             current_app.logger.info("[+]Wrote!            " + nfo_path)
             return True
-    except IOError as e:
+    except Exception as e:
         current_app.logger.error("[-]Write NFO Failed!")
         current_app.logger.error(e)
-        return False
-    except Exception as e1:
-        current_app.logger.error("[-]Write NFO Failed!")
-        current_app.logger.error(e1)
         return False
 
 

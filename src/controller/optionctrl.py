@@ -183,6 +183,7 @@ def cleanErrData():
         current_app.logger.error(err)
         return Response(status=500)
 
+# TODO refactor log
 
 def flask_logger():
     """creates logging information"""
