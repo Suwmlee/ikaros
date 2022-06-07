@@ -26,6 +26,6 @@ VOLUME /ikaros/database
 
 RUN useradd -u 666 -U -d /ikaros -s /bin/bash abc \
     && usermod -G users abc
-COPY .docker/entrypoint.sh /ikaros/entrypoint.sh
+COPY docker/entrypoint.sh /ikaros/entrypoint.sh
 RUN chmod +x /ikaros/entrypoint.sh
 CMD [ "/ikaros/entrypoint.sh" ]

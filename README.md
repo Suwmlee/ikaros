@@ -25,15 +25,15 @@
     ```sh
     docker run -d \
       --name=ikaros \
-      -e PUID=1000 \
-      -e PGID=1000 \
+      -e PUID=0 \
+      -e PGID=0 \
       -p 12346:12346 \
       -v /path/to/media:/media \
       -v /path/to/data:/ikaros/database \
       --restart unless-stopped \
       suwmlee/ikaros:latest
     ```
-  默认 `PUID=1000 PGID=1000`,可以用 __id__ 命令查找具体用户值:
+  默认 `PUID=1000 PGID=1000`,此处PUID,PGID为0，即使用root用户权限，也可以用 __id__ 命令查找具体用户值:
   ```
   $ id username
     uid=1000(ikaros) gid=1000(ikarosgroup) groups=1000(ikarosgroup)
