@@ -1,3 +1,12 @@
+## [1.27.3](https://github.com/Suwmlee/ikaros/compare/v1.27.2...v1.27.3) (2022-06-07)
+
+
+### Bug Fixes
+
+* add morestoryline option ([414602b](https://github.com/Suwmlee/ikaros/commit/414602bc6da1381f90e822db65dc50ad478bd037))
+* update nfo ([fda81f9](https://github.com/Suwmlee/ikaros/commit/fda81f9463d723076e37328536befcb49639f108))
+* update scrapinglib ([248b18e](https://github.com/Suwmlee/ikaros/commit/248b18e720ae9cc8c47dc9a1d69abc15cd4004a8))
+
 ## [1.27.2](https://github.com/Suwmlee/ikaros/compare/v1.27.1...v1.27.2) (2022-06-02)
 
 
