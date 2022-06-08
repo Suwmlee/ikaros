@@ -1,3 +1,11 @@
+## [1.27.5](https://github.com/Suwmlee/ikaros/compare/v1.27.4...v1.27.5) (2022-06-08)
+
+
+### Bug Fixes
+
+* multi part format ([3b3665b](https://github.com/Suwmlee/ikaros/commit/3b3665bec0e126df00dfc07e1ad472b369219a3d))
+* update scheduler ([443a49c](https://github.com/Suwmlee/ikaros/commit/443a49c795f817d9d6ab6b16d64c5878db0ac726))
+
 ## [1.27.4](https://github.com/Suwmlee/ikaros/compare/v1.27.3...v1.27.4) (2022-06-07)
 
 
