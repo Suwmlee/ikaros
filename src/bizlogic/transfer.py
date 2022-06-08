@@ -2,7 +2,6 @@
 '''
 '''
 import os
-import pathlib
 import re
 import time
 
@@ -11,8 +10,8 @@ from ..service.configservice import transConfigService
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
 from ..utils.regex import extractEpNum, matchSeason, matchEpPart, matchSeries, simpleMatchEp
-from ..utils.filehelper import video_type, ext_type, replaceRegex, cleanFolderWithoutSuffix,\
-     forceHardlink, forceSymlink, replaceCJK, cleanbyNameSuffix, cleanExtraMedia, moveSubs
+from ..utils.filehelper import linkFile, video_type, ext_type, replaceRegex, cleanFolderWithoutSuffix,\
+     replaceCJK, cleanbyNameSuffix, cleanExtraMedia, moveSubs
 from flask import current_app
 
 
@@ -68,8 +67,7 @@ class FileInfo():
 
     def updateFinalPath(self, path):
         self.finalpath = path
-        (newfolder, tname) = os.path.split(path)
-        self.finalfolder = newfolder
+        self.finalfolder = os.path.dirname(path)
 
     def parse(self):
         # 正确的剧集命名
@@ -287,20 +285,10 @@ def transfer(src_folder, dest_folder,
             else:
                 newpath = os.path.join(dest_folder, currentfile.fixMidFolder(), currentfile.name + currentfile.ext)
             currentfile.updateFinalPath(newpath)
-            newfolder = currentfile.finalfolder
-            # https://stackoverflow.com/questions/41941401/how-to-find-out-if-a-folder-is-a-hard-link-and-get-its-real-path
-            if os.path.exists(newpath) and os.path.samefile(link_path, newpath):
-                current_app.logger.debug("[!] same file already exists")
-            elif pathlib.Path(newpath).is_symlink() and os.readlink(newpath) == link_path :
-                current_app.logger.debug("[!] link file already exists")
+            if linktype == 0:
+                linkFile(link_path, newpath, 1)
             else:
-                if not os.path.exists(newfolder):
-                    os.makedirs(newfolder)
-                current_app.logger.debug("[-] create link from [{}] to [{}]".format(link_path, newpath))
-                if linktype == 0:
-                    forceSymlink(link_path, newpath)
-                else:
-                    forceHardlink(link_path, newpath)
+                linkFile(link_path, newpath, 2)
 
             # 使用最终的文件名
             cleanbyNameSuffix(currentfile.finalfolder, currentfile.name, ext_type)

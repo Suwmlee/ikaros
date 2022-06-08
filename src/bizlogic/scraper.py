@@ -2,7 +2,6 @@
 '''
 '''
 import os
-import pathlib
 import shutil
 from PIL import Image
 from lxml import etree
@@ -10,7 +9,7 @@ from flask import current_app
 
 from ..service.taskservice import taskService
 from ..service.configservice import scrapingConfService, _ScrapingConfigs
-from ..utils.filehelper import moveSubsbyFilepath, forceSymlink, forceHardlink
+from ..utils.filehelper import linkFile, moveSubsbyFilepath
 from ..utils.number_parser import FileNumInfo
 from ..scrapinglib import search, httprequest
 
@@ -24,7 +23,7 @@ def escapePath(path, escape_literals: str):
     return path
 
 
-def createFolder(json_data: dict, conf: _ScrapingConfigs):
+def createFolder(json_data: dict, conf: _ScrapingConfigs, extra=False):
     """ 根据json数据创建文件夹
     """
     success_folder = conf.success_folder
@@ -41,7 +40,10 @@ def createFolder(json_data: dict, conf: _ScrapingConfigs):
         location_rule = location_rule.replace(title, shorttitle)
 
     # path为影片+元数据所在目录
-    path = os.path.join(success_folder, f'./{location_rule.strip()}')
+    if extra:
+        path = os.path.join(success_folder, f'./{location_rule.strip()}', 'extras')
+    else:
+        path = os.path.join(success_folder, f'./{location_rule.strip()}')
     if not os.path.exists(path):
         path = escapePath(path, conf.escape_literals)
         try:
@@ -66,7 +68,7 @@ def moveFailedFolder(filepath):
         if conf.main_mode == 1 and (conf.link_type == 1 or conf.link_type == 2):
             (filefolder, name) = os.path.split(filepath)
             newpath = os.path.join(conf.failed_folder, name)
-            forceHardlink(filepath, newpath)
+            linkFile(filepath, newpath, 2)
             return newpath
     except:
         return ''
@@ -343,7 +345,7 @@ def add_to_pic(pic_path, img_pic, size, count, mode):
     img_pic.save(pic_path, quality=95)
 
 
-def paste_file_to_folder(filepath, path, prefilename, link_type):
+def paste_file_to_folder(filepath, path, prefilename, link_type, extra=False):
     """   move video and subtitle
     """
     houzhui = os.path.splitext(filepath)[1].replace(",", "")
@@ -358,15 +360,9 @@ def paste_file_to_folder(filepath, path, prefilename, link_type):
             src_folder = config.scraping_folder
             midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
             soft_path = os.path.join(soft_prefix, midfolder, name)
-            if pathlib.Path(newpath).is_symlink() and os.readlink(newpath) == soft_path:
-                current_app.logger.debug("[-] already exists")
-            else:
-                (newfolder, tname) = os.path.split(newpath)
-                if not os.path.exists(newfolder):
-                    os.makedirs(newfolder)
-                forceSymlink(soft_path, newpath)
+            linkFile(soft_path, newpath, 1)
         elif link_type == 2:
-            forceHardlink(filepath, newpath)
+            linkFile(filepath, newpath, 2)
         else:
             copyTag = False
             os.rename(filepath, newpath)
@@ -431,35 +427,36 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
     #  3: 直接刮削
     if conf.main_mode == 1:
         # 创建文件夹
-        path = createFolder(json_data, conf)
+        path = createFolder(json_data, conf, numinfo.special)
         # 文件名
         prefilename = numinfo.fixedName()
 
-        if imagecut == 3:
-            if not download_poster(path, prefilename, json_data.get('cover_small')):
+        if not numinfo.special:
+            if imagecut == 3:
+                if not download_poster(path, prefilename, json_data.get('cover_small')):
+                    moveFailedFolder(filepath)
+            if not download_cover(json_data.get('cover'), prefilename, path):
                 moveFailedFolder(filepath)
-        if not download_cover(json_data.get('cover'), prefilename, path):
-            moveFailedFolder(filepath)
-        if numinfo.isPartOneOrSingle():
-            try:
-                if conf.extrafanart_enable and json_data.get('extrafanart'):
-                    download_extrafanart(json_data.get('extrafanart'), path, conf.extrafanart_folder)
-            except:
-                pass
+            if numinfo.isPartOneOrSingle():
+                try:
+                    if conf.extrafanart_enable and json_data.get('extrafanart'):
+                        download_extrafanart(json_data.get('extrafanart'), path, conf.extrafanart_folder)
+                except:
+                    pass
 
-        crop_poster(imagecut, path, prefilename)
-        if conf.watermark_enable:
-            pics = [os.path.join(path, prefilename + '-poster.jpg'),
-                    os.path.join(path, prefilename + '-thumb.jpg')]
-            add_mark(pics, numinfo, conf.watermark_location, conf.watermark_size)
-        if not create_nfo_file(path, prefilename, json_data, numinfo):
-            moveFailedFolder(filepath)
+            crop_poster(imagecut, path, prefilename)
+            if conf.watermark_enable:
+                pics = [os.path.join(path, prefilename + '-poster.jpg'),
+                        os.path.join(path, prefilename + '-thumb.jpg')]
+                add_mark(pics, numinfo, conf.watermark_location, conf.watermark_size)
+            if not create_nfo_file(path, prefilename, json_data, numinfo):
+                moveFailedFolder(filepath)
 
         # 移动文件
         (flag, newpath) = paste_file_to_folder(filepath, path, prefilename, conf.link_type)
         return flag, newpath
     elif conf.main_mode == 2:
-        path = createFolder(json_data, conf)
+        path = createFolder(json_data, conf, numinfo.special)
         prefilename = numinfo.fixedName()
         (flag, newpath) = paste_file_to_folder(filepath, path, prefilename, conf.link_type)
         return flag, newpath

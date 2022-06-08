@@ -40,6 +40,7 @@ class FileNumInfo():
                 break
 
         basename = os.path.basename(filepath)
+        self.originalname = os.path.splitext(basename)[0]
         self.part = self.checkPart(basename)
         if self.part:
             self.multipart_tag = True
@@ -47,6 +48,8 @@ class FileNumInfo():
 
     def fixedName(self):
         name = self.num
+        if self.special:
+            return self.originalname
         if self.uncensored_tag:
             name += '-uncensored'
         if self.leak_tag:

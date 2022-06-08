@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import pathlib
 import re
 import errno
 import shutil
@@ -211,6 +212,28 @@ def forceHardlink(srcpath, dstpath):
             os.link(srcpath, dstpath)
         else:
             raise e
+
+
+def linkFile(srcpath, dstpath, linktype=1):
+    """ 链接文件
+
+    params: linktype: `1` 软链接 `2` 硬链接
+
+    https://stackoverflow.com/questions/41941401/how-to-find-out-if-a-folder-is-a-hard-link-and-get-its-real-path
+    """
+    if os.path.exists(dstpath) and os.path.samefile(srcpath, dstpath):
+        current_app.logger.debug("[!] same file already exists")
+    elif pathlib.Path(dstpath).is_symlink() and os.readlink(dstpath) == srcpath :
+        current_app.logger.debug("[!] link file already exists")
+    else:
+        dstfolder = os.path.dirname(dstpath)
+        if not os.path.exists(dstfolder):
+            os.makedirs(dstfolder)
+        current_app.logger.debug("[-] create link from [{}] to [{}]".format(srcpath, dstpath))
+        if linktype == 1:
+            forceSymlink(srcpath, dstpath)
+        else:
+            forceHardlink(srcpath, dstpath)
 
 
 def replaceCJK(base: str):
