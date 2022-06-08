@@ -4,7 +4,6 @@
 """
 import logging
 import flask_migrate
-from concurrent.futures import ThreadPoolExecutor
 from flask import Flask
 from logging.handlers import TimedRotatingFileHandler
 from flask_sqlalchemy import SQLAlchemy
@@ -15,8 +14,6 @@ db = SQLAlchemy()
 migrate = flask_migrate.Migrate()
 app = None
 
-# DOCS https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor
-executor = ThreadPoolExecutor(1)
 
 def create_app():
     """ create application
@@ -40,28 +37,32 @@ def create_app():
     from . import model
     controller.register(app)
     model.load_models()
-
     db.create_all()
     with app.app_context():
         try:
-            print("Upgrade db")
+            app.logger.info("ikaros启动: 更新数据库")
             flask_migrate.upgrade()
         except Exception as e:
-            print(e)
-            print("Fix alembic version")
+            app.logger.info(e)
+            app.logger.info("ikaros启动: Fix alembic version")
             flask_migrate.stamp()
 
-    # reset
-    executor.submit(resetDefaults)
+    from .service.schedulerservice import schedulerService
+    schedulerService.init(app)
+    schedulerService.start()
+    schedulerService.addJob('initJob', resetDefaults, args=[schedulerService.scheduler], seconds=3)
 
     return app
 
 
-def resetDefaults():
+def resetDefaults(scheduler):
+    scheduler.remove_job(id='initJob')
     from .service.taskservice import autoTaskService
     from .bizlogic.automation import checkTaskQueue
-    print("Init task started!")
+    from .bizlogic.schedulertask import initScheduler
+    scheduler.app.logger.info("初始化任务: 启动")
     autoTaskService.reset()
-    with app.app_context():
+    with scheduler.app.app_context():
         checkTaskQueue()
-    print("Init task is done!")
+    initScheduler()
+    scheduler.app.logger.info("初始化任务: 结束")

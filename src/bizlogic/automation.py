@@ -10,6 +10,7 @@ from ..scrapinglib import search
 from ..service.recordservice import scrapingrecordService, transrecordService
 from ..service.configservice import autoConfigService, transConfigService, scrapingConfService
 from ..service.taskservice import autoTaskService, taskService
+from ..service.schedulerservice import schedulerService
 from .manager import startScrapingAll, startScrapingSingle
 from .transfer import autoTransfer
 from ..notifications import notificationService
@@ -123,8 +124,8 @@ def runTask(client_path: str):
             records = transrecordService.queryLatest(realPath)
             for record in records:
                 if record:
-                    from .. import executor
-                    executor.submit(waitTask(record.srcpath, record.destpath))
+                    schedulerService.addJob('autoMessageJob', sendTransferMessage, 
+                                    args=[record.srcpath, record.destpath, schedulerService.scheduler], seconds=15)
                     return
         notificationService.sendtext("托管任务:[{}], 转移异常,详情请查看日志".format(realPath))
     else:
@@ -162,18 +163,12 @@ def sendScrapingMessage(srcpath, dstpath):
         notificationService.sendtext("托管任务:[{}], 刮削完成,已推送媒体库".format(srcpath))
 
 
-def waitTask(srcpath, dstpath):
-    """
-    等待 emby 更新完再提取
-    """
-    time.sleep(15)
-    sendTransferMessage(srcpath, dstpath)
-
-
-def sendTransferMessage(srcpath, dstpath):
+def sendTransferMessage(srcpath, dstpath, scheduler=None):
     """
     组织发送转移消息
     """
+    if scheduler:
+        scheduler.remove_job(id='autoMessageJob')
     headname, ext = os.path.splitext(dstpath)
     nfofile = headname + '.nfo'
     if os.path.exists(nfofile):

@@ -8,12 +8,6 @@ from . import web
 from ..bizlogic import rename
 from ..service.taskservice import taskService
 from flask import current_app
-# from concurrent.futures import ThreadPoolExecutor
-
-# DOCS https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor
-# executor = ThreadPoolExecutor(2)
-
-# Intro
 
 
 @web.route("/api/intro", methods=['GET'])

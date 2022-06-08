@@ -9,6 +9,7 @@ from . import httprequest
 class Parser:
 
     source = 'base'
+    # poster: `0` 复制 `1` 裁剪 
     imagecut = 1
     uncensored = False
     allow_number_change = False

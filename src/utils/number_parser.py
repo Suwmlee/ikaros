@@ -198,13 +198,3 @@ def is_uncensored(number):
         G_cache_uncensored_conf.set(uncensored_prefix.split(','))
     return G_cache_uncensored_conf.check(number)
 
-
-def get_part(filepath: str):
-    try:
-        prog = re.compile("(?:-|_)cd\d{1,2}", re.IGNORECASE | re.X | re.S)
-        result = prog.findall(filepath)
-        if result:
-            part = str(result[0]).upper().replace('_', '-')
-            return part
-    except:
-        return

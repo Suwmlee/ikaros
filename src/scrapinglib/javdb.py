@@ -67,6 +67,7 @@ class Javdb(Parser):
         self.deatilpage = self.session.get(self.detailurl).text
         if '此內容需要登入才能查看或操作' in self.deatilpage or '需要VIP權限才能訪問此內容' in self.deatilpage:
             self.noauth = True
+            self.imagecut = 0
             result = self.dictformat(self.querytree)
         else:
             htmltree = etree.fromstring(self.deatilpage, etree.HTMLParser())

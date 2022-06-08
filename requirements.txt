@@ -5,6 +5,7 @@ click==7.1.2
 cloudscraper==1.2.48
 cssselect==1.1.0
 Flask==1.1.2
+Flask-APScheduler
 Flask-Migrate==3.0.1
 Flask-SQLAlchemy==2.4.4
 idna==2.10
