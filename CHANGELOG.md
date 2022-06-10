@@ -1,3 +1,12 @@
+## [1.27.6](https://github.com/Suwmlee/ikaros/compare/v1.27.5...v1.27.6) (2022-06-10)
+
+
+### Bug Fixes
+
+* httprequest post file ([ff26a69](https://github.com/Suwmlee/ikaros/commit/ff26a6904297888bd07861187db3a286e7d71bc6))
+* update automation ([75d33bd](https://github.com/Suwmlee/ikaros/commit/75d33bd1da6cdbdd3ec4fe3f651c21d00f42f201))
+* update lib ([03989c3](https://github.com/Suwmlee/ikaros/commit/03989c30eb7a439409b96cf4553b7de5cca78b25))
+
 ## [1.27.5](https://github.com/Suwmlee/ikaros/compare/v1.27.4...v1.27.5) (2022-06-08)
 
 
