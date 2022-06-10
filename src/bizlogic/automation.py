@@ -22,49 +22,49 @@ def start(clientPath: str):
     """
     task = autoTaskService.getPath(clientPath)
     if task:
-        current_app.logger.info("托管任务: 已经存在任务")
+        current_app.logger.info("AutoTask: already exists")
         return 200
     else:
-        current_app.logger.info("托管任务: 加入队列[{}]".format(clientPath))
+        current_app.logger.info("AutoTask: join TaskQueue [{}]".format(clientPath))
         task = autoTaskService.init(clientPath)
 
     runningTask = autoTaskService.getRunning()
     if runningTask:
-        current_app.logger.debug("托管任务: 正在执行其他任务")
+        current_app.logger.debug("AutoTask: working on other tasks")
     else:
         checkTaskQueue()
 
 
 def checkTaskQueue():
-    """ 任务循环队列
+    """ 检查任务队列
     """
     running = True
     while running:
         runningTask = autoTaskService.getRunning()
         if runningTask:
-            current_app.logger.debug("任务循环队列: 正在执行其他任务")
+            current_app.logger.debug("TaskQueue: working on other tasks")
             break
 
         task = autoTaskService.getFirst()
         if task:
-            current_app.logger.info("任务循环队列: 开始[{}]".format(task.path))
+            current_app.logger.info("TaskQueue: start [{}]".format(task.path))
             task.status = 1
             autoTaskService.commit()
             try:
                 # 在已经有任务要进行情况下
                 # 其他任务会加入队列，当前任务等待手动任务完成
                 while taskService.haveRunningTask():
-                    current_app.logger.debug("任务循环队列: 等待手动任务结束")
+                    current_app.logger.debug("TaskQueue: waiting for manual tasks to complete")
                     time.sleep(5)
 
                 runTask(task.path)
             except Exception as e:
                 current_app.logger.error(e)
-                notificationService.sendtext("托管任务:[{}], 异常:{}".format(task.path,str(e)))
-            current_app.logger.info("任务循环队列: 清除任务[{}]".format(task.path))
+                notificationService.sendtext("托管任务:[{}], 异常:{}".format(task.path, str(e)))
+            current_app.logger.info("TaskQueue: finished [{}]".format(task.path))
             autoTaskService.deleteTask(task.id)
         else:
-            current_app.logger.info("任务循环队列: 无新任务")
+            current_app.logger.info("TaskQueue: no new task.")
             running = False
 
 
@@ -73,9 +73,9 @@ def runTask(client_path: str):
     conf = autoConfigService.getConfig()
     realPath = client_path.replace(conf.original, conf.prefixed)
     if not os.path.exists(realPath):
-        current_app.logger.debug("任务详情: 不存在路径[{}]".format(realPath))
+        current_app.logger.debug("AutoTask details: not exists [{}]".format(realPath))
         return
-    current_app.logger.debug("任务详情: 实际路径[{}]".format(realPath))
+    current_app.logger.debug("AutoTask details: real path [{}]".format(realPath))
     # 2. select scrape or transfer
     flag_scraping = False
     scrapingConfId = 0
@@ -91,7 +91,7 @@ def runTask(client_path: str):
                     scrapingConfId = sid
                     break
     else:
-        current_app.logger.error("任务详情: 未配置 自动-刮削配置,请配置后再使用")
+        current_app.logger.error("AutoTask details: Not configured!")
     if conf.transferconfs:
         transferIds = conf.transferconfs.split(';')
         if transferIds:
@@ -102,11 +102,11 @@ def runTask(client_path: str):
                     transConfigId = tid
                     break
     else:
-        current_app.logger.error("任务详情: 未配置 自动-转移配置,请配置后再使用")
+        current_app.logger.error("AutoTask details: Not configured!")
     # 3. run
     status = 99
     if flag_scraping:
-        current_app.logger.debug("任务详情: JAV")
+        current_app.logger.debug("AutoTask details: JAV")
         if os.path.isdir(realPath):
             status = startScrapingAll(scrapingConfId, realPath)
         else:
@@ -120,6 +120,7 @@ def runTask(client_path: str):
             return
         notificationService.sendtext("托管任务:[{}], 刮削异常,详情请查看日志".format(realPath))
     elif flag_transfer:
+        current_app.logger.debug("AutoTask details: Transfer")
         status = autoTransfer(transConfigId, realPath)
         if status == 1 or status == 2:
             records = transrecordService.queryLatest(realPath)
@@ -130,7 +131,7 @@ def runTask(client_path: str):
                     return
         notificationService.sendtext("托管任务:[{}], 转移异常,详情请查看日志".format(realPath))
     else:
-        current_app.logger.error("无匹配的目录")
+        current_app.logger.error("AutoTask details: no matched directory")
 
 
 def clean():

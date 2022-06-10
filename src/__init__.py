@@ -40,11 +40,11 @@ def create_app():
     db.create_all()
     with app.app_context():
         try:
-            app.logger.info("ikaros启动: 更新数据库")
+            app.logger.info("Initialization: upgrade db")
             flask_migrate.upgrade()
         except Exception as e:
             app.logger.info(e)
-            app.logger.info("ikaros启动: Fix alembic version")
+            app.logger.info("Initialization: fix alembic version")
             flask_migrate.stamp()
 
     from .service.schedulerservice import schedulerService
@@ -60,9 +60,9 @@ def resetDefaults(scheduler):
     from .service.taskservice import autoTaskService
     from .bizlogic.automation import checkTaskQueue
     from .bizlogic.schedulertask import initScheduler
-    scheduler.app.logger.info("初始化任务: 启动")
+    scheduler.app.logger.info("Initialization: start")
     autoTaskService.reset()
     with scheduler.app.app_context():
         checkTaskQueue()
     initScheduler()
-    scheduler.app.logger.info("初始化任务: 结束")
+    scheduler.app.logger.info("Initialization: finished")
