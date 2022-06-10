@@ -3,10 +3,11 @@
 '''
 import os
 import time
-import xml.etree.ElementTree as ET
+from lxml import etree
 from flask import current_app
 
 from ..scrapinglib import search
+from ..scrapinglib.utils import getTreeElement
 from ..service.recordservice import scrapingrecordService, transrecordService
 from ..service.configservice import autoConfigService, transConfigService, scrapingConfService
 from ..service.taskservice import autoTaskService, taskService
@@ -148,9 +149,8 @@ def sendScrapingMessage(srcpath, dstpath):
     nfofile = headname + '.nfo'
     picfile = headname + '-fanart.jpg'
     if os.path.exists(nfofile):
-        tree = ET.parse(nfofile)
-        root = tree.getroot()
-        title = root.find('title').text
+        xmltree = etree.parse(nfofile)
+        title = getTreeElement(xmltree, '//title/text()')
         caption = '新增影片 \n*标题:* `' + title + '` \n_来源:_ `' + srcpath + '`'
         if notificationService.isTgEnabled():
             if os.path.exists(picfile):
@@ -172,23 +172,32 @@ def sendTransferMessage(srcpath, dstpath, scheduler=None):
     headname, ext = os.path.splitext(dstpath)
     nfofile = headname + '.nfo'
     if os.path.exists(nfofile):
-        tree = ET.parse(nfofile)
-        root = tree.getroot()
-        title = root.findtext('title')
-        year = root.findtext('year')
-        imdbid = root.findtext('imdbid')
-        tmdbid = root.findtext('tmdbid')
-        if notificationService.isTgEnabled() and title and year and tmdbid and imdbid:
-            if root.tag == 'episodedetails':
+        xmltree = etree.parse(nfofile)
+        title = getTreeElement(xmltree, '//title/text()')
+        year = getTreeElement(xmltree, '//year/text()')
+
+        imdbid = getTreeElement(xmltree, '//movie/imdbid/text() | //movie/imdb_id/text()')
+        tmdbid = getTreeElement(xmltree, '//tmdbid/text()')
+        tvdbid = getTreeElement(xmltree, '//tvdbid/text()')
+
+        if notificationService.isTgEnabled():
+
+            if xmltree.xpath('//episodedetails'):
                 # tvshow info
-                showtitle = root.findtext('showtitle')
-                episode = root.findtext('episode')
-                season = root.findtext('season')
-                text = '新增剧集 \n*' + showtitle + '* ('+ year +') \n'
+                showtitle = getTreeElement(xmltree, '//showtitle/text()')
+                episode = getTreeElement(xmltree, '//episode/text()')
+                season = getTreeElement(xmltree, '//season/text()')
+                # 获取上级
+
+                text = '新增 \n*' + showtitle + '* ('+ year +') \n'
                 text = text + '第 ' + season + ' 季 ' + episode + ' 集 '+ title +' \n'
-                text = text + '【 [IMDB](https://www.imdb.com/title/'+ imdbid \
-                            +') | [TMDB](https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN) 】\n' 
-                text = text + '_来源:_ `' + srcpath + '`'
+                text += '【 '
+                if imdbid: 
+                    text += '[IMDB](https://www.imdb.com/title/'+ imdbid +')  '
+                if tmdbid:
+                    text += '[TMDB](https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN) ' 
+                text += ' 】\n' 
+                text += '_来源:_ `' + srcpath + '`'
                 picfile = headname + '-thumb.jpg'
                 if os.path.exists(picfile):
                     notificationService.sendTgphoto(text, picfile)
@@ -201,16 +210,20 @@ def sendTransferMessage(srcpath, dstpath, scheduler=None):
                     cfolder = os.path.dirname(dstpath)
                     picfile = os.path.join(cfolder, 'poster.jpg')
 
-                text = '新增影片 \n*' + title + '* ('+ year +') \n'
-                text = text + '【 [IMDB](https://www.imdb.com/title/'+ imdbid \
-                            +') | [TMDB](https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN) 】\n' 
-                text = text + '_来源:_ `' + srcpath + '`'
+                text = '新增 \n*' + title + '* ('+ year +') \n'
+                text += '【 '
+                if imdbid: 
+                    text += '[IMDB](https://www.imdb.com/title/'+ imdbid +')  '
+                if tmdbid:
+                    text += '[TMDB](https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN) ' 
+                text += ' 】\n' 
+                text += '_来源:_ `' + srcpath + '`'
                 if os.path.exists(picfile):
                     notificationService.sendTgphoto(text, picfile)
                 else:
                     notificationService.sendTgMarkdown(text)
 
-        if notificationService.isWeEnabled() and title and year and tmdbid:
+        if notificationService.isWeEnabled():
             jsondata = search(tmdbid, type='general')
             imageurl = jsondata.get('cover')
             text_title = '新增  ' + title + ' ('+ year +')'
@@ -218,4 +231,4 @@ def sendTransferMessage(srcpath, dstpath, scheduler=None):
             text_url = 'https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN'
             notificationService.sendWeNews(text_title, text_description, imageurl, text_url)
     else:
-        notificationService.sendtext("托管任务:[{}], 转移完成,推送媒体库异常".format(srcpath))
+        notificationService.sendtext("托管:[{}], 转移完成,媒体库未自动识别,请手动识别".format(srcpath))
