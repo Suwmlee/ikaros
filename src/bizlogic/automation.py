@@ -151,7 +151,7 @@ def sendScrapingMessage(srcpath, dstpath):
     if os.path.exists(nfofile):
         xmltree = etree.parse(nfofile)
         title = getTreeElement(xmltree, '//title/text()')
-        caption = '新增影片 \n*标题:* `' + title + '` \n_来源:_ `' + srcpath + '`'
+        caption = '_更新:_ \n `' + title + '` \n_来源:_ `' + srcpath + '`'
         if notificationService.isTgEnabled():
             if os.path.exists(picfile):
                 notificationService.sendTgphoto(caption, picfile)
@@ -174,61 +174,73 @@ def sendTransferMessage(srcpath, dstpath, scheduler=None):
     if os.path.exists(nfofile):
         xmltree = etree.parse(nfofile)
         title = getTreeElement(xmltree, '//title/text()')
+        showtitle = getTreeElement(xmltree, '//showtitle/text()')
         year = getTreeElement(xmltree, '//year/text()')
-
-        imdbid = getTreeElement(xmltree, '//movie/imdbid/text() | //movie/imdb_id/text()')
-        tmdbid = getTreeElement(xmltree, '//tmdbid/text()')
-        tvdbid = getTreeElement(xmltree, '//tvdbid/text()')
+        imdbid = getTreeElement(xmltree, '//movie/imdbid/text() | //episodedetails/imdbid/text()')
+        tmdbid = getTreeElement(xmltree, '//movie/tmdbid/text() | //episodedetails/tmdbid/text()')
+        episode = getTreeElement(xmltree, '//episode/text()')
+        season = getTreeElement(xmltree, '//season/text()')
+        if getTreeElement(xmltree, '//episodedetails'):
+            cufolder = os.path.dirname(dstpath)
+            tvnfopath = os.path.join(cufolder, 'tvshow.nfo')
+            if not os.path.exists(tvnfopath):
+                tvnfopath = os.path.join(os.path.dirname(cufolder), 'tvshow.nfo')
+            if os.path.exists(tvnfopath):
+                tvtree = etree.parse(tvnfopath)
+                if imdbid == '':
+                    imdbid = getTreeElement(tvtree, '//tvshow/imdb_id/text()')
+                if tmdbid == '':
+                    tmdbid = getTreeElement(tvtree, '//tvshow/tmdbid/text()')
 
         if notificationService.isTgEnabled():
 
-            if xmltree.xpath('//episodedetails'):
-                # tvshow info
-                showtitle = getTreeElement(xmltree, '//showtitle/text()')
-                episode = getTreeElement(xmltree, '//episode/text()')
-                season = getTreeElement(xmltree, '//season/text()')
-                # 获取上级
-
-                text = '新增 \n*' + showtitle + '* ('+ year +') \n'
-                text = text + '第 ' + season + ' 季 ' + episode + ' 集 '+ title +' \n'
-                text += '【 '
-                if imdbid: 
-                    text += '[IMDB](https://www.imdb.com/title/'+ imdbid +')  '
-                if tmdbid:
-                    text += '[TMDB](https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN) ' 
-                text += ' 】\n' 
-                text += '_来源:_ `' + srcpath + '`'
-                picfile = headname + '-thumb.jpg'
-                if os.path.exists(picfile):
-                    notificationService.sendTgphoto(text, picfile)
-                else:
-                    notificationService.sendTgMarkdown(text)
+            if showtitle != '':
+                text = '_更新_ \n*' + showtitle + '* ('+ year +') \n'
+                if season != '':
+                    text += '第 ' + season + ' 季 ' + episode + ' 集 '+ title +' \n'
             else:
-                # movie
-                picfile = headname + '-poster.jpg'
-                if not os.path.exists(picfile):
-                    cfolder = os.path.dirname(dstpath)
-                    picfile = os.path.join(cfolder, 'poster.jpg')
-
-                text = '新增 \n*' + title + '* ('+ year +') \n'
+                text = '_更新_ \n*' + title + '* ('+ year +') \n'
+            if imdbid != '' or tmdbid != '':
                 text += '【 '
                 if imdbid: 
                     text += '[IMDB](https://www.imdb.com/title/'+ imdbid +')  '
                 if tmdbid:
                     text += '[TMDB](https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN) ' 
                 text += ' 】\n' 
-                text += '_来源:_ `' + srcpath + '`'
-                if os.path.exists(picfile):
-                    notificationService.sendTgphoto(text, picfile)
-                else:
-                    notificationService.sendTgMarkdown(text)
+            text += '_来源:_ `' + srcpath + '`'
+
+            photopath = getPhotoPath(dstpath)
+            if photopath:
+                notificationService.sendTgphoto(text, photopath)
+            else:
+                notificationService.sendTgMarkdown(text)
 
         if notificationService.isWeEnabled():
-            jsondata = search(tmdbid, type='general')
-            imageurl = jsondata.get('cover')
-            text_title = '新增  ' + title + ' ('+ year +')'
-            text_description = '来源: ' + srcpath
-            text_url = 'https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN'
-            notificationService.sendWeNews(text_title, text_description, imageurl, text_url)
+            if tmdbid != '':
+                jsondata = search(tmdbid, type='general')
+                imageurl = jsondata.get('cover')
+                text_title = '更新  ' + title + ' ('+ year +')'
+                text_description = '来源: ' + srcpath
+                text_url = 'https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN'
+                notificationService.sendWeNews(text_title, text_description, imageurl, text_url)
+            else:
+                notificationService.sendtext("托管:[{}], 转移完成,媒体库未自动识别,请手动识别".format(srcpath))
     else:
+        # TODO 不存在文件,自己解析？
         notificationService.sendtext("托管:[{}], 转移完成,媒体库未自动识别,请手动识别".format(srcpath))
+
+def getPhotoPath(filepath):
+    headname, ext = os.path.splitext(filepath)
+    photopath = headname + '-poster.jpg'
+    if os.path.exists(photopath):
+        return photopath
+    else:
+        cfolder = os.path.dirname(filepath)
+        photopath = os.path.join(cfolder, 'poster.jpg')
+        if os.path.exists(photopath):
+            return photopath
+        else:
+            photopath = headname + '-thumb.jpg'
+            if os.path.exists(photopath):
+                return photopath
+    return ''
