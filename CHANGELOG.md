@@ -1,3 +1,10 @@
+## [1.27.7](https://github.com/Suwmlee/ikaros/compare/v1.27.6...v1.27.7) (2022-06-10)
+
+
+### Bug Fixes
+
+* **notification:** more details ([01a72f7](https://github.com/Suwmlee/ikaros/commit/01a72f7e6f998795eb716e373e76fc8d5fc0537e))
+
 ## [1.27.6](https://github.com/Suwmlee/ikaros/compare/v1.27.5...v1.27.6) (2022-06-10)
 
 
