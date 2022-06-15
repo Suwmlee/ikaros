@@ -47,12 +47,9 @@ class Carib(Parser):
     def getCover(self, htmltree):
         return f'https://www.caribbeancom.com/moviepages/{self.number}/images/l_l.jpg'
 
-    def getTags(self, htmltree):
-        return self.getAll(htmltree, self.expr_tags)
-
     def getExtrafanart(self, htmltree):
         r = []
-        genres = self.getAll(htmltree, self.expr_extrafanart)
+        genres = self.getTreeAll(htmltree, self.expr_extrafanart)
         for g in genres:
             jpg = str(g)
             if '/member/' in jpg:
@@ -62,7 +59,6 @@ class Carib(Parser):
         return r
 
     def getActorPhoto(self, htmltree):
-        # return super().getActorPhoto(htmltree)
         htmla = htmltree.xpath("//*[@id='moviepages']/div[@class='container']/div[@class='inner-container']/div[@class='movie-info section']/ul/li[@class='movie-spec']/span[@class='spec-content']/a[@itemprop='actor']")
         names = htmltree.xpath("//*[@id='moviepages']/div[@class='container']/div[@class='inner-container']/div[@class='movie-info section']/ul/li[@class='movie-spec']/span[@class='spec-content']/a[@itemprop='actor']/span[@itemprop='name']/text()")
         t = {}
