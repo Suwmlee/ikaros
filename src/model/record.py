@@ -33,6 +33,7 @@ class _ScrapingRecords(db.Model):
     destname = Column(String, default='', comment='final name')
     destpath = Column(String, default='', comment='final path')
     updatetime = Column(DateTime, default=datetime.datetime.now)
+    deadtime = Column(DateTime, default='', comment='time to delete files')
 
     def __init__(self, basename, basepath):
         self.srcname = basename
@@ -55,13 +56,14 @@ class _ScrapingRecords(db.Model):
             'linktype': self.linktype,
             'destname': self.destname,
             'destpath': self.destpath,
-            'updatetime': self.updatetime.strftime("%H:%M:%S %m/%d/%Y")
+            'updatetime': self.updatetime.strftime("%H:%M:%S %m/%d/%Y")  if self.updatetime else '',
+            'deadtime': self.deadtime.strftime("%H:%M:%S %m/%d/%Y") if self.deadtime else '',
         }
 
 
 class _TransRecords(db.Model):
     """ 转移记录
-    status  0   
+    status  0
             1   锁定    -> 针对顶层目录
             2   忽略
     """
@@ -85,6 +87,7 @@ class _TransRecords(db.Model):
     linkpath = Column(String, default='')
     destpath = Column(String, default='')
     updatetime = Column(DateTime, default=datetime.datetime.utcnow)
+    deadtime = Column(DateTime, default='', comment='time to delete files')
 
     def __init__(self, basename, basepath):
         self.srcname = basename
@@ -105,5 +108,6 @@ class _TransRecords(db.Model):
             'episode': self.episode,
             'linkpath': self.linkpath,
             'destpath': self.destpath,
-            'updatetime': self.updatetime.strftime("%H:%M:%S %m/%d/%Y")
+            'updatetime': self.updatetime.strftime("%H:%M:%S %m/%d/%Y")  if self.updatetime else '',
+            'deadtime': self.deadtime.strftime("%H:%M:%S %m/%d/%Y") if self.deadtime else '',
         }

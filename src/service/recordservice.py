@@ -28,9 +28,6 @@ class ScrapingRecordService():
             db.session.commit()
         return info
 
-    def queryAll(self):
-        return _ScrapingRecords.query.all()
-
     def queryByPath(self, value) -> _ScrapingRecords:
         return _ScrapingRecords.query.filter_by(srcpath=value).first()
 
@@ -78,7 +75,7 @@ class ScrapingRecordService():
         db.session.commit()
 
     def cleanUnavailable(self):
-        records = self.queryAll()
+        records = _ScrapingRecords.query.all()
         for i in records:
             srcpath = i.srcpath
             dstpath = i.destpath
@@ -88,16 +85,15 @@ class ScrapingRecordService():
                 if not os.path.exists(dstpath):
                     self.deleteByID(i.id)
 
-    def importRecord(self, name, path, size, status):
-        record = _ScrapingRecords.query.filter_by(srcpath=path).first()
-        if not record:
-            record = _ScrapingRecords(name, path)
-            record.srcsize = size
-            record.status = status
-            db.session.add(record)
-        else:
-            record.srcsize = size
-            record.status = status
+    def AddDeadtimetoMissingrecord(self):
+        records = _ScrapingRecords.query.all()
+        for i in records:
+            srcpath = i.srcpath
+            dstpath = i.destpath
+            if not os.path.exists(srcpath) or not os.path.exists(dstpath):
+                if not i.deadtime or i.deadtime == '':
+                    i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
+
         db.session.commit()
 
     def editRecord(self, sid, status, scrapingname, cnsubtag, leaktag, uncensoredtag, hacktag, cdnum):
@@ -281,6 +277,17 @@ class TransRecordService():
             dstpath = i.destpath
             if not os.path.exists(srcpath) or not os.path.exists(dstpath):
                 self.deleteByID(i.id)
+
+    def AddDeadtimetoMissingrecord(self):
+        records = _TransRecords.query.all()
+        for i in records:
+            srcpath = i.srcpath
+            dstpath = i.destpath
+            if not os.path.exists(srcpath) or not os.path.exists(dstpath):
+                if not i.deadtime or i.deadtime == '':
+                    i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
+
+        db.session.commit()
 
     def renameAllTop(self, srcfolder, top, new):
         records = _TransRecords.query.filter_by(srcfolder=srcfolder, topfolder=top).all()

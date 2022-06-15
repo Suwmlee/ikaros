@@ -22,7 +22,10 @@ def cleanRecordsTask(delete=True, scheduler=None):
         scrapingrecordService.cleanUnavailable()
         transrecordService.cleanUnavailable()
     else:
-        logger(scheduler).info('clean')
+        logger(scheduler).info('cleanRecords')
+        scrapingrecordService.AddDeadtimetoMissingrecord()
+        transrecordService.AddDeadtimetoMissingrecord()
+        logger(scheduler).info('done!')
 
 
 def checkDirectoriesTask(scheduler=None):
@@ -34,7 +37,7 @@ def checkDirectoriesTask(scheduler=None):
     """
     if taskService.haveRunningTask():
         return
-    logger(scheduler).info('check')
+    logger(scheduler).info('checkDirectories')
 
 
 def initScheduler():
@@ -42,8 +45,10 @@ def initScheduler():
     TODO 
     根据配置执行
     """
-    schedulerService.addJob('cleanRecords', cleanRecordsTask, args=[False, schedulerService.scheduler], seconds=300)
-    schedulerService.addJob('checkDirectories', checkDirectoriesTask, args=[schedulerService.scheduler], seconds=180)
+    cleanEnable = False
+    if cleanEnable:
+        schedulerService.addJob('cleanRecords', cleanRecordsTask, args=[False, schedulerService.scheduler], seconds=300)
+        schedulerService.addJob('checkDirectories', checkDirectoriesTask, args=[schedulerService.scheduler], seconds=180)
 
 
 def logger(scheduler=None) -> Logger: 
