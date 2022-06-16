@@ -38,65 +38,70 @@ class ScrapingRecordService():
     def queryByID(self, value) -> _ScrapingRecords:
         return _ScrapingRecords.query.filter_by(id=value).first()
 
-    def deleteByID(self, value):
-        record = _ScrapingRecords.query.filter_by(id=value).first()
-        if record:
-            if record.destpath != '':
-                basefolder = os.path.dirname(record.srcpath)
-                folder = os.path.dirname(record.destpath)
-                if os.path.exists(folder) and basefolder != folder:
-                    name = os.path.basename(record.destpath)
-                    filter  = os.path.splitext(name)[0]
-                    if record.cdnum and record.cdnum > 0:
-                        cleanFilebyFilter(folder, filter)
-                    else:
-                        cleanFolderbyFilter(folder, filter)
-            db.session.delete(record)
-            db.session.commit()
+    @staticmethod
+    def deleteRecord(record: _ScrapingRecords, delsrc):
+        basefolder = os.path.dirname(record.srcpath)
+        if delsrc and os.path.exists(basefolder):
+            srcname = os.path.basename(record.srcpath)
+            srcfilter  = os.path.splitext(srcname)[0]
+            cleanFilebyFilter(basefolder, srcfilter)
+        if record.destpath != '':
+            folder = os.path.dirname(record.destpath)
+            if os.path.exists(folder) and basefolder != folder:
+                name = os.path.basename(record.destpath)
+                filter  = os.path.splitext(name)[0]
+                if record.cdnum and record.cdnum > 0:
+                    cleanFilebyFilter(folder, filter)
+                else:
+                    cleanFolderbyFilter(folder, filter)
 
     def deleteByIds(self, ids, delsrc=False):
         records = _ScrapingRecords.query.filter(_ScrapingRecords.id.in_(ids)).all()
         for record in records:
-            basefolder = os.path.dirname(record.srcpath)
-            if delsrc and os.path.exists(basefolder):
-                srcname = os.path.basename(record.srcpath)
-                srcfilter  = os.path.splitext(srcname)[0]
-                cleanFilebyFilter(basefolder, srcfilter)
-            if record.destpath != '':
-                folder = os.path.dirname(record.destpath)
-                if os.path.exists(folder) and basefolder != folder:
-                    name = os.path.basename(record.destpath)
-                    filter  = os.path.splitext(name)[0]
-                    if record.cdnum and record.cdnum > 0:
-                        cleanFilebyFilter(folder, filter)
-                    else:
-                        cleanFolderbyFilter(folder, filter)
+            self.deleteRecord(record, delsrc)
             db.session.delete(record)
         db.session.commit()
 
     def cleanUnavailable(self):
         records = _ScrapingRecords.query.all()
         for i in records:
-            srcpath = i.srcpath
-            dstpath = i.destpath
-            if not os.path.exists(srcpath):
-                if i.linktype == 1:
-                    self.deleteByID(i.id)
-                if not os.path.exists(dstpath):
-                    self.deleteByID(i.id)
+            if i.linktype == 0:
+                if not os.path.exists(i.destpath):
+                    self.deleteRecord(i, False)
+                    db.session.delete(i)
+            else:
+                if not os.path.exists(i.srcpath) or not os.path.exists(i.dstpath):
+                    self.deleteRecord(i, False)
+                    db.session.delete(i)
+        db.session.commit()
 
-    def AddDeadtimetoMissingrecord(self):
+    def deadtimetoMissingrecord(self):
+        """ 源文件或目标文件不存在，全部删除
+        """
         records = _ScrapingRecords.query.all()
         for i in records:
-            srcpath = i.srcpath
-            dstpath = i.destpath
-            if not os.path.exists(srcpath) or not os.path.exists(dstpath):
-                if not i.deadtime or i.deadtime == '':
-                    i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
+            # 排除忽略标记
+            if i.status != 3:
+                # 已标记deadtime，检查是否到期，进行删除
+                if i.deadtime:
+                    nowtime = datetime.datetime.now()
+                    if nowtime > i.deadtime:
+                        self.deleteRecord(i, True)
+                        db.session.delete(i)
+                        continue
+                # 0 转移 1 软链接 2 硬链接
+                if i.linktype == 0:
+                    if not os.path.exists(i.destpath):
+                        if not i.deadtime or i.deadtime == '':
+                            i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
+                else:
+                    if not os.path.exists(i.srcpath) or not os.path.exists(i.dstpath):
+                        if not i.deadtime or i.deadtime == '':
+                            i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
 
         db.session.commit()
 
-    def editRecord(self, sid, status, scrapingname, cnsubtag, leaktag, uncensoredtag, hacktag, cdnum):
+    def editRecord(self, sid, status, scrapingname, cnsubtag, leaktag, uncensoredtag, hacktag, cdnum, deadtime):
         record = _ScrapingRecords.query.filter_by(id=sid).first()
         if record:
             record.status = status
@@ -107,6 +112,8 @@ class ScrapingRecordService():
             record.hacktag = hacktag
             record.cdnum = cdnum
             record.updatetime = datetime.datetime.now()
+            if deadtime == '' and record.deadtime:
+                record.deadtime = None
             db.session.commit()
 
     def commit(self):
@@ -115,63 +122,69 @@ class ScrapingRecordService():
     def queryByPage(self, pagenum, pagesize, sortprop, sortorder, blur):
         """ 查询
         """
+        blurparam = or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
+                        _ScrapingRecords.scrapingname.like("%" + blur + "%"),
+                        _ScrapingRecords.destname.like("%" + blur + "%"))
         if sortprop == 'status':
             if sortorder == 'ascending':
                 if blur:
-                    infos = _ScrapingRecords.query.filter(
-                        or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
-                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
-                            _ScrapingRecords.destname.like("%" + blur + "%"))
-                    ).order_by(_ScrapingRecords.status.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
+                        _ScrapingRecords.status.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
                 else:
-                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.status.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.status.asc()).paginate(
+                        pagenum, per_page=pagesize, error_out=False)
             else:
                 if blur:
-                    infos = _ScrapingRecords.query.filter(
-                        or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
-                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
-                            _ScrapingRecords.destname.like("%" + blur + "%"))
-                    ).order_by(_ScrapingRecords.status.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
+                        _ScrapingRecords.status.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
                 else:
-                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.status.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.status.desc()).paginate(
+                        pagenum, per_page=pagesize, error_out=False)
         elif sortprop == 'cnsubtag':
             if sortorder == 'ascending':
                 if blur:
-                    infos = _ScrapingRecords.query.filter(
-                        or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
-                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
-                            _ScrapingRecords.destname.like("%" + blur + "%"))
-                    ).order_by(_ScrapingRecords.cnsubtag.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
+                        _ScrapingRecords.cnsubtag.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
                 else:
-                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.cnsubtag.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.cnsubtag.asc()).paginate(
+                        pagenum, per_page=pagesize, error_out=False)
             else:
                 if blur:
-                    infos = _ScrapingRecords.query.filter(
-                        or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
-                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
-                            _ScrapingRecords.destname.like("%" + blur + "%"))
-                    ).order_by(_ScrapingRecords.cnsubtag.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
+                        _ScrapingRecords.cnsubtag.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
                 else:
-                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.cnsubtag.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.cnsubtag.desc()).paginate(
+                        pagenum, per_page=pagesize, error_out=False)
+        elif sortprop == 'deadtime':
+            if sortorder == 'ascending':
+                if blur:
+                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
+                        _ScrapingRecords.deadtime.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                else:
+                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.deadtime.asc()).paginate(
+                        pagenum, per_page=pagesize, error_out=False)
+            else:
+                if blur:
+                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
+                        _ScrapingRecords.deadtime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                else:
+                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.deadtime.desc()).paginate(
+                        pagenum, per_page=pagesize, error_out=False)
         else:
             if sortorder == 'ascending':
                 if blur:
-                    infos = _ScrapingRecords.query.filter(
-                        or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
-                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
-                            _ScrapingRecords.destname.like("%" + blur + "%"))
-                    ).order_by(_ScrapingRecords.updatetime.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
+                        _ScrapingRecords.updatetime.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
                 else:
-                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.updatetime.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.updatetime.asc(
+                    )).paginate(pagenum, per_page=pagesize, error_out=False)
             else:
                 if blur:
-                    infos = _ScrapingRecords.query.filter(
-                        or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
-                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
-                            _ScrapingRecords.destname.like("%" + blur + "%"))
-                    ).order_by(_ScrapingRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
+                        _ScrapingRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
                 else:
-                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.updatetime.desc(
+                    )).paginate(pagenum, per_page=pagesize, error_out=False)
         return infos
 
 
@@ -202,7 +215,7 @@ class TransRecordService():
     def update(self, info: _TransRecords, softpath, destpath, status, 
                 topfolder, secondfolder,
                 isepisode, season, epnum, 
-                renameTop_tag = False, renameSub_tag = False):
+                renameTop_tag = False, renameSub_tag = False, deadtime=None):
         if info:
             info.linkpath = softpath
             info.destpath = destpath
@@ -227,66 +240,106 @@ class TransRecordService():
                 else:
                     info.secondfolder = secondfolder
             info.updatetime = datetime.datetime.now()
+            if deadtime == '' and info.deadtime:
+                info.deadtime = None
             db.session.commit()
 
-    def queryByPage(self, pagenum, pagesize, sort, blur):
-        if blur:
-            infos = _TransRecords.query.filter(
-                        or_(_TransRecords.srcname.like("%" + blur + "%"),
-                            _TransRecords.destpath.like("%" + blur + "%"),
-                            _TransRecords.topfolder.like("%" + blur + "%"))
-                    ).order_by(_TransRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+    def queryByPage(self, pagenum, pagesize, sortprop, sortorder, blur):
+        blurparam = or_(_TransRecords.srcname.like("%" + blur + "%"),
+                        _TransRecords.destpath.like("%" + blur + "%"),
+                        _TransRecords.topfolder.like("%" + blur + "%"))
+        if sortprop == 'status':
+            if sortorder == 'ascending':
+                if blur:
+                    infos = _TransRecords.query.filter(blurparam).order_by(
+                        _TransRecords.status.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                else:
+                    infos = _TransRecords.query.order_by(_TransRecords.status.asc()).paginate(
+                        pagenum, per_page=pagesize, error_out=False)
+            else:
+                if blur:
+                    infos = _TransRecords.query.filter(blurparam).order_by(
+                        _TransRecords.status.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                else:
+                    infos = _TransRecords.query.order_by(_TransRecords.status.desc()).paginate(
+                        pagenum, per_page=pagesize, error_out=False)
+        elif sortprop == 'deadtime':
+            if sortorder == 'ascending':
+                if blur:
+                    infos = _TransRecords.query.filter(blurparam).order_by(
+                        _TransRecords.deadtime.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                else:
+                    infos = _TransRecords.query.order_by(_TransRecords.deadtime.asc()).paginate(
+                        pagenum, per_page=pagesize, error_out=False)
+            else:
+                if blur:
+                    infos = _TransRecords.query.filter(blurparam).order_by(
+                        _TransRecords.deadtime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                else:
+                    infos = _TransRecords.query.order_by(_TransRecords.deadtime.desc()).paginate(
+                        pagenum, per_page=pagesize, error_out=False)
         else:
-            infos = _TransRecords.query.order_by(_TransRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+            if sortorder == 'ascending':
+                if blur:
+                    infos = _TransRecords.query.filter(blurparam).order_by(
+                        _TransRecords.updatetime.asc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                else:
+                    infos = _TransRecords.query.order_by(_TransRecords.updatetime.asc()).paginate(
+                        pagenum, per_page=pagesize, error_out=False)
+            else:
+                if blur:
+                    infos = _TransRecords.query.filter(blurparam).order_by(
+                        _TransRecords.updatetime.desc()).paginate(pagenum, per_page=pagesize, error_out=False)
+                else:
+                    infos = _TransRecords.query.order_by(_TransRecords.updatetime.desc()).paginate(
+                        pagenum, per_page=pagesize, error_out=False)
         return infos
 
-    def deleteRecords(self):
-        nums  = _TransRecords.query.delete()
-        db.session.commit()
-        return nums
+    @staticmethod
+    def deleteRecord(record: _TransRecords, delsrc):
+        basefolder = os.path.dirname(record.srcpath)
+        if delsrc and os.path.exists(basefolder):
+            srcname = os.path.basename(record.srcpath)
+            srcfilter  = os.path.splitext(srcname)[0]
+            cleanFilebyFilter(basefolder, srcfilter)
+        if record.destpath != '':
+            folder = os.path.dirname(record.destpath)
+            if os.path.exists(folder) and basefolder != folder:
+                name = os.path.basename(record.destpath)
+                # 前缀匹配
+                filter = os.path.splitext(name)[0]
+                cleanFilebyFilter(folder, filter)
+        if record.topfolder != '.':
+            cleanfolder = os.path.dirname(record.destpath)
+            if record.secondfolder:
+                cleanfolder = os.path.dirname(cleanfolder)
+            if os.path.exists(cleanfolder):
+                cleanFolderWithoutSuffix(cleanfolder, video_type)
 
     def deleteByID(self, value, delsrc=False) -> _TransRecords:
         record = _TransRecords.query.filter_by(id=value).first()
         if record and isinstance(record, _TransRecords):
-            basefolder = os.path.dirname(record.srcpath)
-            if delsrc and os.path.exists(basefolder):
-                srcname = os.path.basename(record.srcpath)
-                srcfilter  = os.path.splitext(srcname)[0]
-                cleanFilebyFilter(basefolder, srcfilter)
-            if record.destpath != '':
-                folder = os.path.dirname(record.destpath)
-                if os.path.exists(folder) and basefolder != folder:
-                    name = os.path.basename(record.destpath)
-                    # 前缀匹配
-                    filter = os.path.splitext(name)[0]
-                    cleanFilebyFilter(folder, filter)
+            self.deleteRecord(record, delsrc)
             db.session.delete(record)
             db.session.commit()
-
-            if record.topfolder != '.':
-                cleanfolder = os.path.dirname(record.destpath)
-                if record.secondfolder:
-                    cleanfolder = os.path.dirname(cleanfolder)
-                if os.path.exists(cleanfolder):
-                    cleanFolderWithoutSuffix(cleanfolder, video_type)
 
     def cleanUnavailable(self):
         records = _TransRecords.query.all()
         for i in records:
-            srcpath = i.srcpath
-            dstpath = i.destpath
-            if not os.path.exists(srcpath) or not os.path.exists(dstpath):
-                self.deleteByID(i.id)
+            if not os.path.exists(i.srcpath) or not os.path.exists(i.destpath):
+                self.deleteRecord(i, False)
+                db.session.delete(i)
+        db.session.commit()
 
-    def AddDeadtimetoMissingrecord(self):
+    def deadtimetoMissingrecord(self):
         records = _TransRecords.query.all()
         for i in records:
-            srcpath = i.srcpath
-            dstpath = i.destpath
-            if not os.path.exists(srcpath) or not os.path.exists(dstpath):
-                if not i.deadtime or i.deadtime == '':
-                    i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
-
+            # 忽略标记
+            if i.status != 2:
+                # 0 软链接 1 硬链接
+                if not os.path.exists(i.srcpath) or not os.path.exists(i.destpath):
+                    if not i.deadtime or i.deadtime == '':
+                        i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
         db.session.commit()
 
     def renameAllTop(self, srcfolder, top, new):

@@ -11,7 +11,7 @@ from src.bizlogic.schedulertask import cleanRecordsTask
 
 from . import web
 from flask import current_app
-from ..service.configservice import notificationConfService
+from ..service.configservice import localConfService
 
 @web.route("/api/options/loglevel", methods=['GET', 'PUT'])
 def loglevel():
@@ -74,21 +74,21 @@ def stream():
     return Response(flask_logger(), mimetype="text/plain", content_type="text/event-stream; charset=utf-8")
 
 
-@web.route("/api/options/notification", methods=["GET"])
-def getNotificationConfig():
-    """returns notification config"""
+@web.route("/api/options/config", methods=["GET"])
+def getLocalConfig():
+    """returns config"""
     try:
-        content = notificationConfService.getConfig().serialize()
+        content = localConfService.getConfig().serialize()
         return json.dumps(content)
     except Exception as err:
         current_app.logger.error(err)
         return Response(status=500)
 
-@web.route("/api/options/notification", methods=['PUT'])
-def updateNotifiConf():
+@web.route("/api/options/config", methods=['PUT'])
+def updateLocalConf():
     try:
         content = request.get_json()
-        notificationConfService.updateConfig(content)
+        localConfService.updateConfig(content)
         return Response(status=200)
     except Exception as err:
         current_app.logger.error(err)

@@ -7,25 +7,26 @@ from flask import current_app
 from ..service.taskservice import taskService
 from ..service.schedulerservice import schedulerService
 from ..service.recordservice import scrapingrecordService, transrecordService
+from ..service.configservice import localConfService
 
 
 def cleanRecordsTask(delete=True, scheduler=None):
     """
-    TODO
+    TODO 关联下载器
     清除记录任务
     放开emby内删除文件权限,用户在emby内删除文件,ikaros检测到文件不存在
     增加 等待删除 标记，三天后，真正删除文件，种子文件
     """
-    # if scheduler:
-    #     scheduler.remove_job(id='cleanRecord')
     if delete:
         scrapingrecordService.cleanUnavailable()
         transrecordService.cleanUnavailable()
     else:
-        logger(scheduler).info('cleanRecords')
-        scrapingrecordService.AddDeadtimetoMissingrecord()
-        transrecordService.AddDeadtimetoMissingrecord()
-        logger(scheduler).info('done!')
+        localconfig = localConfService.getConfig()
+        if localconfig.task_clean:
+            logger(scheduler).info('cleanRecords')
+            scrapingrecordService.deadtimetoMissingrecord()
+            transrecordService.deadtimetoMissingrecord()
+            logger(scheduler).info('done!')
 
 
 def checkDirectoriesTask(scheduler=None):
@@ -42,13 +43,9 @@ def checkDirectoriesTask(scheduler=None):
 
 def initScheduler():
     """ 初始化
-    TODO 
-    根据配置执行
     """
-    cleanEnable = False
-    if cleanEnable:
-        schedulerService.addJob('cleanRecords', cleanRecordsTask, args=[False, schedulerService.scheduler], seconds=300)
-        schedulerService.addJob('checkDirectories', checkDirectoriesTask, args=[schedulerService.scheduler], seconds=180)
+    schedulerService.addJob('cleanRecords', cleanRecordsTask, args=[False, schedulerService.scheduler], seconds=30)
+    # schedulerService.addJob('checkDirectories', checkDirectoriesTask, args=[schedulerService.scheduler], seconds=180)
 
 
 def logger(scheduler=None) -> Logger: 

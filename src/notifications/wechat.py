@@ -3,7 +3,7 @@
 import requests
 from datetime import datetime
 from flask import current_app
-from ..service.configservice import notificationConfService
+from ..service.configservice import localConfService
 
 
 class WeChat():
@@ -21,7 +21,7 @@ class WeChat():
     timeout = 20
 
     def updateConfig(self):
-        config = notificationConfService.getConfig()
+        config = localConfService.getConfig()
         if config.wechat_corpid and config.wechat_corpsecret and config.wechat_agentid:
             self.corpid = config.wechat_corpid
             self.corpsecret = config.wechat_corpsecret

@@ -153,8 +153,8 @@ class _AutoConfigs(db.Model):
         }
 
 
-class _NotificationConfigs(db.Model):
-    __tablename__ = 'notificationconfigs'
+class _LocalConfigs(db.Model):
+    __tablename__ = 'localconfigs'
 
     id = Column(Integer, primary_key=True)
     tg_token = Column(String, default="")
@@ -166,6 +166,9 @@ class _NotificationConfigs(db.Model):
     proxy_enable = Column(Boolean, default=False)
     proxy_type = Column(String, default='socks5h')
     proxy_address = Column(String, default='127.0.0.1:1080')
+
+    task_clean = Column(Boolean, default=False)
+
     def serialize(self):
         return {
             'id': self.id,
@@ -177,4 +180,5 @@ class _NotificationConfigs(db.Model):
             'proxy_enable': self.proxy_enable,
             'proxy_type': self.proxy_type,
             'proxy_address': self.proxy_address,
+            'task_clean': self.task_clean,
         }

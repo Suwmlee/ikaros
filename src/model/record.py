@@ -56,8 +56,8 @@ class _ScrapingRecords(db.Model):
             'linktype': self.linktype,
             'destname': self.destname,
             'destpath': self.destpath,
-            'updatetime': self.updatetime.strftime("%H:%M:%S %m/%d/%Y")  if self.updatetime else '',
-            'deadtime': self.deadtime.strftime("%H:%M:%S %m/%d/%Y") if self.deadtime else '',
+            'updatetime': self.updatetime.strftime("%Y/%m/%d %H:%M:%S")  if self.updatetime else '',
+            'deadtime': self.deadtime.strftime("%Y/%m/%d %H:%M:%S") if self.deadtime else '',
         }
 
 
@@ -108,6 +108,6 @@ class _TransRecords(db.Model):
             'episode': self.episode,
             'linkpath': self.linkpath,
             'destpath': self.destpath,
-            'updatetime': self.updatetime.strftime("%H:%M:%S %m/%d/%Y")  if self.updatetime else '',
-            'deadtime': self.deadtime.strftime("%H:%M:%S %m/%d/%Y") if self.deadtime else '',
+            'updatetime': self.updatetime.strftime("%Y/%m/%d %H:%M:%S")  if self.updatetime else '',
+            'deadtime': self.deadtime.strftime("%Y/%m/%d %H:%M:%S") if self.deadtime else '',
         }

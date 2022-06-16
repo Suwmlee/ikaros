@@ -64,7 +64,7 @@ def checkTaskQueue():
             current_app.logger.info("TaskQueue: finished [{}]".format(task.path))
             autoTaskService.deleteTask(task.id)
         else:
-            current_app.logger.info("TaskQueue: no new task.")
+            current_app.logger.info("TaskQueue: found 0 task.")
             running = False
 
 

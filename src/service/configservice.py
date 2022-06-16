@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ''' 刮削配置
 '''
-from ..model.config import _ScrapingConfigs, _TransferConfigs, _AutoConfigs, _NotificationConfigs
+from ..model.config import _ScrapingConfigs, _TransferConfigs, _AutoConfigs, _LocalConfigs
 from .. import db
 
 
@@ -163,13 +163,13 @@ class AutoConfService():
         return True
 
 
-class NotificationConfService():
+class LocalConfService():
     """ 通知推送配置
     """
     def getConfig(self):
-        config = _NotificationConfigs.query.filter_by(id=1).first()
+        config = _LocalConfigs.query.filter_by(id=1).first()
         if not config:
-            config = _NotificationConfigs()
+            config = _LocalConfigs()
             db.session.add(config)
             db.session.commit()
         return config
@@ -189,7 +189,7 @@ class NotificationConfService():
         return True
 
     def getProxyConfig(self):
-        config = _NotificationConfigs.query.filter_by(id=1).first()
+        config = _LocalConfigs.query.filter_by(id=1).first()
         proxyConfig = ProxyConfig(config.proxy_enable, config.proxy_address, proxytype=config.proxy_type)
         return proxyConfig
 
@@ -197,4 +197,4 @@ class NotificationConfService():
 scrapingConfService = ScrapingConfService()
 transConfigService = TransConfService()
 autoConfigService = AutoConfService()
-notificationConfService = NotificationConfService()
+localConfService = LocalConfService()

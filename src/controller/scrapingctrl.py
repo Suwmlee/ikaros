@@ -155,7 +155,8 @@ def editScrapingData():
                                          content['leaktag'],
                                          content['uncensoredtag'],
                                          content['hacktag'],
-                                         content['cdnum'])
+                                         content['cdnum'],
+                                         content['deadtime'])
         return Response(status=200)
     except Exception as err:
         current_app.logger.error(err)

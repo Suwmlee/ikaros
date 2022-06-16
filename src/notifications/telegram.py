@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from ..scrapinglib import httprequest
-from ..service.configservice import notificationConfService
+from ..service.configservice import localConfService
 
 
 class Telegram():
@@ -10,7 +10,7 @@ class Telegram():
     chatid = None
 
     def updateConfig(self):
-        config = notificationConfService.getConfig()
+        config = localConfService.getConfig()
         if config.tg_chatid and config.tg_token:
             self.token = config.tg_token
             self.chatid = config.tg_chatid
@@ -22,7 +22,7 @@ class Telegram():
         """
         if self.updateConfig():
             url = "https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}".format(self.token, self.chatid, text)
-            configProxy = notificationConfService.getProxyConfig()
+            configProxy = localConfService.getProxyConfig()
             proxies = configProxy.proxies() if configProxy.enable else None
             try:
                 httprequest.get(url, proxies=proxies)
@@ -35,7 +35,7 @@ class Telegram():
         if self.updateConfig():
             params = {'chat_id': self.chatid, 'text': text, 'parse_mode': 'markdown'}
             url = "https://api.telegram.org/bot{}/sendMessage".format(self.token)
-            configProxy = notificationConfService.getProxyConfig()
+            configProxy = localConfService.getProxyConfig()
             proxies = configProxy.proxies() if configProxy.enable else None
             try:
                 httprequest.post(url, params, proxies=proxies)
@@ -50,7 +50,7 @@ class Telegram():
             with open(photopath, 'rb') as pic:
                 files = {'photo': pic}
                 url = "https://api.telegram.org/bot{}/sendPhoto".format(self.token)
-                configProxy = notificationConfService.getProxyConfig()
+                configProxy = localConfService.getProxyConfig()
                 proxies = configProxy.proxies() if configProxy.enable else None
                 try:
                     httprequest.post(url, params, files=files, proxies=proxies)

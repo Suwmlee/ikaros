@@ -89,9 +89,18 @@ def getTransRecord():
     try:
         pagenum = int(request.args.get('page'))
         size = int(request.args.get('size'))
-        sort = 0
+        # 排序  cnsubtag|status|updatetime,descending|ascending
+        sortprop = request.args.get('sortprop')
+        sortorder = request.args.get('sortorder')
+        # 模糊查询
         blur = request.args.get('blur')
-        infos = transrecordService.queryByPage(pagenum, size, sort, blur)
+        if not blur:
+            blur = ''
+        if not sortprop:
+            sortprop = ''
+            sortorder = 'desc'
+
+        infos = transrecordService.queryByPage(pagenum, size, sortprop, sortorder, blur)
         data = []
         for i in infos.items:
             data.append(i.serialize())
@@ -121,7 +130,7 @@ def editTransferRecord():
         transrecordService.update(info, content.get('linkpath'), content.get('destpath'),
                                     content.get('status'), content.get('topfolder'), content.get('secondfolder'),
                                     content.get('isepisode'), content.get('season'), content.get('episode'),
-                                    content.get('renameAllTop'), content.get('renameAllSub'))
+                                    content.get('renameAllTop'), content.get('renameAllSub'), content.get('deadtime'))
         return Response(status=200)
     except Exception as err:
         current_app.logger.error(err)
