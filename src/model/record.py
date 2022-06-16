@@ -33,7 +33,7 @@ class _ScrapingRecords(db.Model):
     destname = Column(String, default='', comment='final name')
     destpath = Column(String, default='', comment='final path')
     updatetime = Column(DateTime, default=datetime.datetime.now)
-    deadtime = Column(DateTime, default='', comment='time to delete files')
+    deadtime = Column(DateTime, default=None, comment='time to delete files')
 
     def __init__(self, basename, basepath):
         self.srcname = basename
@@ -87,7 +87,7 @@ class _TransRecords(db.Model):
     linkpath = Column(String, default='')
     destpath = Column(String, default='')
     updatetime = Column(DateTime, default=datetime.datetime.utcnow)
-    deadtime = Column(DateTime, default='', comment='time to delete files')
+    deadtime = Column(DateTime, default=None, comment='time to delete files')
 
     def __init__(self, basename, basepath):
         self.srcname = basename

@@ -70,7 +70,7 @@ class ScrapingRecordService():
                     self.deleteRecord(i, False)
                     db.session.delete(i)
             else:
-                if not os.path.exists(i.srcpath) or not os.path.exists(i.dstpath):
+                if not os.path.exists(i.srcpath) or not os.path.exists(i.destpath):
                     self.deleteRecord(i, False)
                     db.session.delete(i)
         db.session.commit()
@@ -95,7 +95,7 @@ class ScrapingRecordService():
                         if not i.deadtime or i.deadtime == '':
                             i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
                 else:
-                    if not os.path.exists(i.srcpath) or not os.path.exists(i.dstpath):
+                    if not os.path.exists(i.srcpath) or not os.path.exists(i.destpath):
                         if not i.deadtime or i.deadtime == '':
                             i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
 

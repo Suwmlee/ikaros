@@ -181,7 +181,7 @@ def sendTransferMessage(srcpath, dstpath, scheduler=None):
         tmdbid = getTreeElement(xmltree, '//movie/tmdbid/text() | //episodedetails/tmdbid/text()')
         episode = getTreeElement(xmltree, '//episode/text()')
         season = getTreeElement(xmltree, '//season/text()')
-        if getTreeElement(xmltree, '//episodedetails'):
+        if len(getTreeElement(xmltree, '//episodedetails')):
             cufolder = os.path.dirname(dstpath)
             tvnfopath = os.path.join(cufolder, 'tvshow.nfo')
             if not os.path.exists(tvnfopath):
