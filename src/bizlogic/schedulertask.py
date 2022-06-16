@@ -44,7 +44,7 @@ def checkDirectoriesTask(scheduler=None):
 def initScheduler():
     """ 初始化
     """
-    schedulerService.addJob('cleanRecords', cleanRecordsTask, args=[False, schedulerService.scheduler], seconds=30)
+    schedulerService.addJob('cleanRecords', cleanRecordsTask, args=[False, schedulerService.scheduler], seconds=300)
     # schedulerService.addJob('checkDirectories', checkDirectoriesTask, args=[schedulerService.scheduler], seconds=180)
 
 
