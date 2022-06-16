@@ -1,3 +1,10 @@
+## [1.29.1](https://github.com/Suwmlee/ikaros/compare/v1.29.0...v1.29.1) (2022-06-16)
+
+
+### Bug Fixes
+
+* scheduler task interval ([b00b128](https://github.com/Suwmlee/ikaros/commit/b00b12877a6856e89833244c70b1cd3740c35315))
+
 # [1.29.0](https://github.com/Suwmlee/ikaros/compare/v1.28.0...v1.29.0) (2022-06-16)
 
 
