@@ -1,3 +1,10 @@
+## [1.29.2](https://github.com/Suwmlee/ikaros/compare/v1.29.1...v1.29.2) (2022-06-16)
+
+
+### Bug Fixes
+
+* type & others ([486ab9d](https://github.com/Suwmlee/ikaros/commit/486ab9d6845409b1520bfa9881cb1e1f494ae8ca))
+
 ## [1.29.1](https://github.com/Suwmlee/ikaros/compare/v1.29.0...v1.29.1) (2022-06-16)
 
 
