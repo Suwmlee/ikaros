@@ -1,3 +1,10 @@
+# [1.29.0](https://github.com/Suwmlee/ikaros/compare/v1.28.0...v1.29.0) (2022-06-16)
+
+
+### Features
+
+* automatically clean up ([3f3942f](https://github.com/Suwmlee/ikaros/commit/3f3942fe28002c48549e4763abd52de24d7eb850)), closes [#21](https://github.com/Suwmlee/ikaros/issues/21)
+
 # [1.28.0](https://github.com/Suwmlee/ikaros/compare/v1.27.7...v1.28.0) (2022-06-15)
 
 
