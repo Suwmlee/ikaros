@@ -1,3 +1,10 @@
+## [1.29.3](https://github.com/Suwmlee/ikaros/compare/v1.29.2...v1.29.3) (2022-06-17)
+
+
+### Bug Fixes
+
+* checking file exists ([2c7c211](https://github.com/Suwmlee/ikaros/commit/2c7c2119d39a7d667f07a5b66397061b202d4e01))
+
 ## [1.29.2](https://github.com/Suwmlee/ikaros/compare/v1.29.1...v1.29.2) (2022-06-16)
 
 
