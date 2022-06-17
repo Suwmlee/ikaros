@@ -1,3 +1,10 @@
+## [1.29.4](https://github.com/Suwmlee/ikaros/compare/v1.29.3...v1.29.4) (2022-06-17)
+
+
+### Bug Fixes
+
+* **docker:** TZ env ([b83b5f2](https://github.com/Suwmlee/ikaros/commit/b83b5f28b521e258b1fe6739a9c1616909db5dd8))
+
 ## [1.29.3](https://github.com/Suwmlee/ikaros/compare/v1.29.2...v1.29.3) (2022-06-17)
 
 
