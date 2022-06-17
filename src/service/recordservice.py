@@ -5,7 +5,7 @@ import os
 import datetime
 from sqlalchemy import or_
 from ..model.record import _ScrapingRecords, _TransRecords
-from ..utils.filehelper import cleanFolderbyFilter, cleanFilebyFilter, cleanExtraMedia, cleanFolderWithoutSuffix, video_type
+from ..utils.filehelper import checkFileExists, cleanFolderbyFilter, cleanFilebyFilter, cleanExtraMedia, cleanFolderWithoutSuffix, video_type
 from .. import db
 
 
@@ -91,11 +91,20 @@ class ScrapingRecordService():
                         continue
                 # 0 转移 1 软链接 2 硬链接
                 if i.linktype == 0:
+                    # 转移必须是文件实体
                     if not os.path.exists(i.destpath):
                         if not i.deadtime or i.deadtime == '':
                             i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
+                    else:
+                        # 曾经标记过，但现在已经恢复，则取消删除计划
+                        if i.deadtime:
+                            i.deadtime = None
                 else:
-                    if not os.path.exists(i.srcpath) or not os.path.exists(i.destpath):
+                    if os.path.exists(i.srcpath) and checkFileExists(i.destpath):
+                        # 曾经标记过，但现在已经恢复，则取消删除计划
+                        if i.deadtime:
+                            i.deadtime = None
+                    else:
                         if not i.deadtime or i.deadtime == '':
                             i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
 
@@ -337,7 +346,11 @@ class TransRecordService():
             # 忽略标记
             if i.status != 2:
                 # 0 软链接 1 硬链接
-                if not os.path.exists(i.srcpath) or not os.path.exists(i.destpath):
+                if os.path.exists(i.srcpath) and checkFileExists(i.destpath):
+                    if i.deadtime:
+                        # 曾经标记过，但现在已经恢复，则取消删除计划
+                        i.deadtime = None
+                else:
                     if not i.deadtime or i.deadtime == '':
                         i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
         db.session.commit()

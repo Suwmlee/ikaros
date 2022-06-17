@@ -83,7 +83,7 @@ class _TransRecords(db.Model):
     isepisode = Column(Boolean, default=False)
     season = Column(Integer, default=-1)
     episode = Column(Integer, default=-1)
-
+    # 链接使用的地址，可能与docker内地址不同
     linkpath = Column(String, default='')
     destpath = Column(String, default='')
     updatetime = Column(DateTime, default=datetime.datetime.utcnow)

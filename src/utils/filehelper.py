@@ -213,6 +213,16 @@ def forceHardlink(srcpath, dstpath):
         else:
             raise e
 
+def checkFileExists(filepath):
+    """ 检测文件是否存在
+    软/硬链接
+    """
+    if os.path.exists(filepath):
+        return True
+    elif pathlib.Path(filepath).is_symlink():
+        return True
+    else:
+        return False
 
 def linkFile(srcpath, dstpath, linktype=1):
     """ 链接文件
