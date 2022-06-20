@@ -38,6 +38,8 @@ class FileNumInfo():
             if single in filepath:
                 self.chs_tag = True
                 break
+        if re.search(r'[-_]C(\.\w+$|-\w+)|\d+ch(\.\w+$|-\w+)', filepath, re.I):
+            self.chs_tag = True
 
         basename = os.path.basename(filepath)
         self.originalname = os.path.splitext(basename)[0]
@@ -111,16 +113,25 @@ def get_number(file_path: str) -> str:
         file_number = get_number_by_dict(filename)
         if file_number:
             return file_number
+        elif '字幕组' in filename or 'SUB' in filename.upper() or re.match(r'[\u30a0-\u30ff]+', filename):
+            filename = G_spat.sub("", filename)
+            filename = re.sub("\[.*?\]","",filename)
+            filename = filename.replace(".chs", "").replace(".cht", "")
+            file_number = str(re.findall(r'(.+?)\.', filename)).strip(" [']")
+            return file_number
         elif '-' in filename or '_' in filename:  # 普通提取番号 主要处理包含减号-和_的番号
             filename = G_spat.sub("", filename)
-            # TODO more filter
             filename = str(re.sub("\[\d{4}-\d{1,2}-\d{1,2}\] - ", "", filename))  # 去除文件名中时间
             lower_check = filename.lower()
             if 'fc2' in lower_check:
                 filename = lower_check.replace('ppv', '').replace('--', '-').replace('_', '-').upper()
-            filename = re.sub("(-|_)cd\d{1,2}", "", filename, flags=re.IGNORECASE)
+            filename = re.sub("[-_]cd\d{1,2}", "", filename, flags=re.IGNORECASE)
+            if not re.search("-|_", filename): # 去掉-CD1之后再无-的情况，例如n1012-CD1.wmv
+                return str(re.search(r'\w+', filename[:filename.find('.')], re.A).group())
             file_number = str(re.search(r'\w+(-|_)\w+', filename, re.A).group())
             file_number = re.sub("(-|_)c$", "", file_number, flags=re.IGNORECASE)
+            if re.search("\d+ch$", file_number, flags=re.I):
+                file_number = file_number[:-2]
             return file_number.upper()
         else:  # 提取不含减号-的番号，FANZA CID
             # 欧美番号匹配规则
@@ -138,6 +149,30 @@ def get_number(file_path: str) -> str:
         current_app.logger.error(e)
         return
 
+# modou提取number
+def md(filename):
+    m = re.search(r'(md[a-z]{0,2}-?)(\d{2,})(-ep\d*)*', filename, re.I)
+    return f'{m.group(1).replace("-","").upper()}{m.group(2).zfill(4)}{m.group(3) or ""}'
+
+def mmz(filename):
+    m = re.search(r'(mmz-?)(\d{2,})(-ep\d*)*', filename, re.I)
+    return f'{m.group(1).replace("-","").upper()}{m.group(2).zfill(3)}{m.group(3) or ""}'
+
+def msd(filename):
+    m = re.search(r'(msd-?)(\d{2,})(-ep\d*)*', filename, re.I)
+    return f'{m.group(1).replace("-","").upper()}{m.group(2).zfill(3)}{m.group(3) or ""}'
+
+def mky(filename):
+    m = re.search(r'(mky-[a-z]{2,2}-?)(\d{2,})(-ep\d*)*', filename, re.I)
+    return f'{m.group(1).replace("-","").upper()}{m.group(2).zfill(3)}{m.group(3) or ""}'
+
+def yk(filename):
+    m = re.search(r'(yk-?)(\d{2,})(-ep\d*)*', filename, re.I)
+    return f'{m.group(1).replace("-","").upper()}{m.group(2).zfill(3)}{m.group(3) or ""}'
+
+def pm(filename):
+    m = re.search(r'(pm[a-z]?-?)(\d{2,})(-ep\d*)*', filename, re.I)
+    return f'{m.group(1).replace("-","").upper()}{m.group(2).zfill(3)}{m.group(3) or ""}'
 
 # 按javdb数据源的命名规范提取number
 G_TAKE_NUM_RULES = {
@@ -148,7 +183,13 @@ G_TAKE_NUM_RULES = {
     'x-art': lambda x: str(re.search(r'x-art\.\d{2}\.\d{2}\.\d{2}', x, re.I).group()),
     'xxx-av': lambda x: ''.join(['xxx-av-', re.findall(r'xxx-av[^\d]*(\d{3,5})[^\d]*', x, re.I)[0]]),
     'heydouga': lambda x: 'heydouga-' + '-'.join(re.findall(r'(\d{4})[\-_](\d{3,4})[^\d]*', x, re.I)[0]),
-    'heyzo': lambda x: 'HEYZO-' + re.findall(r'heyzo[^\d]*(\d{4})', x, re.I)[0]
+    'heyzo': lambda x: 'HEYZO-' + re.findall(r'heyzo[^\d]*(\d{4})', x, re.I)[0],
+    r'\bmd[a-z]{0,2}-\d{2,}': md,
+    r'\bmmz-\d{2,}':mmz,
+    r'\bmsd-\d{2,}':msd,
+    r'\bmky-[a-z]{2,2}-\d{2,}':mky,
+    r'\byk-\d{2,3}': yk,
+    r'\bpm[a-z]?-?\d{2,}':pm
 }
 
 
@@ -193,7 +234,7 @@ def is_uncensored(number):
         re.I
     ):
         return True
-    uncensored_prefix = "S2M,BT,LAF,SMD,SMBD,SM3D2DBD,SKY-,SKYHD,CWP,CWDV,CWBD,CW3D2DBD,MKD,MKBD,MXBD,MK3D2DBD,MCB3DBD,MCBD,RHJ,RED"
+    uncensored_prefix = "S2M,BT,LAF,SMD,SMBD,SM3D2DBD,SKY-,SKYHD,CWP,CWDV,CWBD,CW3D2DBD,MKD,MKBD,MXBD,MK3D2DBD,MCB3DBD,MCBD,RHJ,MMDV"
     if G_cache_uncensored_conf.is_empty():
         G_cache_uncensored_conf.set(uncensored_prefix.split(','))
     return G_cache_uncensored_conf.check(number)

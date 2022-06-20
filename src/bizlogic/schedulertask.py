@@ -23,10 +23,10 @@ def cleanRecordsTask(delete=True, scheduler=None):
     else:
         localconfig = localConfService.getConfig()
         if localconfig.task_clean:
-            logger(scheduler).info('cleanRecords')
+            logger(scheduler).debug('cleanRecords')
             scrapingrecordService.deadtimetoMissingrecord()
             transrecordService.deadtimetoMissingrecord()
-            logger(scheduler).info('done!')
+            logger(scheduler).debug('done!')
 
 
 def checkDirectoriesTask(scheduler=None):
@@ -38,7 +38,7 @@ def checkDirectoriesTask(scheduler=None):
     """
     if taskService.haveRunningTask():
         return
-    logger(scheduler).info('checkDirectories')
+    logger(scheduler).debug('checkDirectories')
 
 
 def initScheduler():
