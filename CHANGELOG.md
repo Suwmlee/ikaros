@@ -1,3 +1,10 @@
+## [1.29.5](https://github.com/Suwmlee/ikaros/compare/v1.29.4...v1.29.5) (2022-06-20)
+
+
+### Bug Fixes
+
+* number parser ([57b0c88](https://github.com/Suwmlee/ikaros/commit/57b0c885f82712248d69edab050bda8cfca49b06))
+
 ## [1.29.4](https://github.com/Suwmlee/ikaros/compare/v1.29.3...v1.29.4) (2022-06-17)
 
 
