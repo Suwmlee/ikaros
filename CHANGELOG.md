@@ -1,3 +1,11 @@
+## [1.29.6](https://github.com/Suwmlee/ikaros/compare/v1.29.5...v1.29.6) (2022-06-20)
+
+
+### Bug Fixes
+
+* re-scrape without changing status ([c76feb1](https://github.com/Suwmlee/ikaros/commit/c76feb1d1229654481a12ec4449b701e408a7078))
+* **transfer:** enable clean task ([91b2610](https://github.com/Suwmlee/ikaros/commit/91b261029b5f7ed2262828dc3dc9ca2028be3837))
+
 ## [1.29.5](https://github.com/Suwmlee/ikaros/compare/v1.29.4...v1.29.5) (2022-06-20)
 
 
