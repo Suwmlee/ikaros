@@ -5,6 +5,7 @@ import re
 import errno
 import shutil
 import stat
+import logging
 from flask import current_app
 
 video_type = ['.mp4', '.avi', '.rmvb', '.wmv',
@@ -25,8 +26,8 @@ def creatFolder(foldername):
         try:
             os.makedirs(foldername + '/')
         except Exception as e:
-            current_app.logger.info("[-]failed!can not be make Failed output folder\n[-](Please run as Administrator)")
-            current_app.logger.error(e)
+            logger().info("[-]failed!can not be make Failed output folder\n[-](Please run as Administrator)")
+            logger().error(e)
             return
 
 
@@ -49,7 +50,7 @@ def cleanbySuffix(folder, suffix):
         if os.path.isdir(f):
             cleanbySuffix(f, suffix)
         elif os.path.splitext(f)[1].lower() in suffix:
-            current_app.logger.info("clean file by suffix [{}]".format(f))
+            logger().info("clean file by suffix [{}]".format(f))
             os.remove(f)
 
 
@@ -63,7 +64,7 @@ def cleanbyNameSuffix(folder, basename, suffix):
         if os.path.isdir(f):
             cleanbyNameSuffix(f, basename, suffix)
         elif fsuffix.lower() in suffix and fname.startswith(basename):
-            current_app.logger.debug("clean by name & suffix [{}]".format(f))
+            logger().debug("clean by name & suffix [{}]".format(f))
             os.remove(f)
 
 
@@ -90,7 +91,7 @@ def cleanExtraMedia(folder):
                         cleanflag = False
                         break
             if cleanflag:
-                current_app.logger.debug("clean extra media file [{}]".format(f))
+                logger().debug("clean extra media file [{}]".format(f))
                 os.remove(f)
 
 
@@ -108,7 +109,7 @@ def cleanFolderWithoutSuffix(folder, suffix):
         elif os.path.splitext(f)[1].lower() in suffix:
             hassuffix = True
     if not hassuffix:
-        current_app.logger.info("clean empty media folder [{}]".format(folder))
+        logger().info("clean empty media folder [{}]".format(folder))
         shutil.rmtree(folder)
     return hassuffix
 
@@ -126,7 +127,7 @@ def cleanFolderbyFilter(folder, filter):
             cleanAll = False
         else:
             if filter in file:
-                current_app.logger.info("clean folder by filter [{}]".format(f))
+                logger().info("clean folder by filter [{}]".format(f))
                 os.remove(f)
             else:
                 cleanAll = False
@@ -148,10 +149,10 @@ def cleanFilebyFilter(folder, filter):
                 # 未分集到分集 重复删除分集内容
                 if '-CD' in file.upper():
                     if '-CD' in filter.upper():
-                        current_app.logger.info("clean file [{}]".format(f))
+                        logger().info("clean file [{}]".format(f))
                         os.remove(f)
                 else:
-                    current_app.logger.info("clean file [{}]".format(f))
+                    logger().info("clean file [{}]".format(f))
                     os.remove(f)
 
 
@@ -165,7 +166,7 @@ def moveSubs(srcfolder, destfolder, basename, newname, saved=True):
         if ext.lower() in ext_type and path.startswith(basename):
             src_file = os.path.join(srcfolder, item)
             newpath = path.replace(basename, newname)
-            current_app.logger.debug("[-] - copy sub  " + src_file)
+            logger().debug("[-] - copy sub  " + src_file)
             newfile = os.path.join(destfolder, newpath + ext)
             if saved:
                 shutil.copyfile(src_file, newfile)
@@ -232,14 +233,14 @@ def linkFile(srcpath, dstpath, linktype=1):
     https://stackoverflow.com/questions/41941401/how-to-find-out-if-a-folder-is-a-hard-link-and-get-its-real-path
     """
     if os.path.exists(dstpath) and os.path.samefile(srcpath, dstpath):
-        current_app.logger.debug("[!] same file already exists")
+        logger().debug("[!] same file already exists")
     elif pathlib.Path(dstpath).is_symlink() and os.readlink(dstpath) == srcpath :
-        current_app.logger.debug("[!] link file already exists")
+        logger().debug("[!] link file already exists")
     else:
         dstfolder = os.path.dirname(dstpath)
         if not os.path.exists(dstfolder):
             os.makedirs(dstfolder)
-        current_app.logger.debug("[-] create link from [{}] to [{}]".format(srcpath, dstpath))
+        logger().debug("[-] create link from [{}] to [{}]".format(srcpath, dstpath))
         if linktype == 1:
             forceSymlink(srcpath, dstpath)
         else:
@@ -269,3 +270,12 @@ def replaceRegex(base: str, regex: str):
     base = cop.sub('', base)
     base = re.sub(r'(\W)\1+', r'\1', base).lstrip(' !?@#$.:：]）)').rstrip(' !?@#$.:：[(（')
     return base
+
+
+def logger() -> logging.Logger:
+    """
+    prevent app_context error
+    """
+    if current_app:
+        return logger()
+    return logging.getLogger('src')

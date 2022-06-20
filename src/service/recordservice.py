@@ -345,6 +345,13 @@ class TransRecordService():
         for i in records:
             # 忽略标记
             if i.status != 2:
+                # 已标记deadtime，检查是否到期，进行删除
+                if i.deadtime:
+                    nowtime = datetime.datetime.now()
+                    if nowtime > i.deadtime:
+                        self.deleteRecord(i, True)
+                        db.session.delete(i)
+                        continue
                 # 0 软链接 1 硬链接
                 if os.path.exists(i.srcpath) and checkFileExists(i.destpath):
                     if i.deadtime:
