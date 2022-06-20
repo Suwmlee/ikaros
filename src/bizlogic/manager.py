@@ -32,13 +32,13 @@ def findAllMovies(root, escape_folder):
     return total
 
 
-def create_data_and_move(file_path: str, conf: _ScrapingConfigs):
+def create_data_and_move(file_path: str, conf: _ScrapingConfigs, forced=False):
     """ scrape single file
     """
     try:
         movie_info = scrapingrecordService.queryByPath(file_path)
         # 查看单个文件刮削状态
-        if not movie_info or (movie_info.status != 1 and movie_info.status != 3 and movie_info.status != 4):
+        if not movie_info or forced or (movie_info.status != 1 and movie_info.status != 3 and movie_info.status != 4):
             movie_info = scrapingrecordService.add(file_path)
             # 查询是否已经存在刮削目录 & 不能在同一目录下
             if movie_info.destpath != '':
@@ -165,7 +165,7 @@ def startScrapingAll(cid, folder=''):
     return 1
 
 
-def startScrapingSingle(cid, movie_path: str):
+def startScrapingSingle(cid, movie_path: str, forced=False):
     """ single movie
     返回
     0:  刮削失败
@@ -196,7 +196,7 @@ def startScrapingSingle(cid, movie_path: str):
                 os.rename(movie_info.destpath, movie_path)
     if os.path.exists(movie_path) and os.path.isfile(movie_path):
         conf = scrapingConfService.getConfig(cid)
-        create_data_and_move(movie_path, conf)
+        create_data_and_move(movie_path, conf, forced)
 
     taskService.updateTaskStatus(task, 1)
 

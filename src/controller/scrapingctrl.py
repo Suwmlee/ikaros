@@ -30,7 +30,7 @@ def startScrapingdirect():
         if content and content.get('srcpath'):
             filepath = content.get('srcpath')
             cid = content.get('configid')
-            startScrapingSingle(cid, filepath)
+            startScrapingSingle(cid, filepath, True)
         return Response(status=200)
     except Exception as err:
         current_app.logger.error(err)
