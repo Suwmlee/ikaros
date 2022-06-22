@@ -1,3 +1,15 @@
+# [1.30.0](https://github.com/Suwmlee/ikaros/compare/v1.29.6...v1.30.0) (2022-06-22)
+
+
+### Bug Fixes
+
+* json null ([a68cbf8](https://github.com/Suwmlee/ikaros/commit/a68cbf8ebc968a8633e02941718f6b8922a7aef9))
+
+
+### Features
+
+* remove torrents  after clean records ([9bb5106](https://github.com/Suwmlee/ikaros/commit/9bb5106ba0f4444ecc43d45d0d51705517cefbe6))
+
 ## [1.29.6](https://github.com/Suwmlee/ikaros/compare/v1.29.5...v1.29.6) (2022-06-20)
 
 
