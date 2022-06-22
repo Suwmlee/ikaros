@@ -169,6 +169,11 @@ class _LocalConfigs(db.Model):
 
     task_clean = Column(Boolean, default=False)
 
+    tr_url = Column(String, default="")
+    tr_username = Column(String, default="")
+    tr_passwd = Column(String, default="")
+    tr_prefix = Column(String, default="")
+
     def serialize(self):
         return {
             'id': self.id,
@@ -181,4 +186,8 @@ class _LocalConfigs(db.Model):
             'proxy_type': self.proxy_type,
             'proxy_address': self.proxy_address,
             'task_clean': self.task_clean,
+            'tr_url': self.tr_url,
+            'tr_username': self.tr_username,
+            'tr_passwd': self.tr_passwd,
+            'tr_prefix': self.tr_prefix,
         }
