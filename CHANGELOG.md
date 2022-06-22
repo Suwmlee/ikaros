@@ -1,3 +1,10 @@
+## [1.30.1](https://github.com/Suwmlee/ikaros/compare/v1.30.0...v1.30.1) (2022-06-22)
+
+
+### Bug Fixes
+
+* save loglevel in db ([e87de26](https://github.com/Suwmlee/ikaros/commit/e87de268592ff4a53c630bcbf444d83faa5fb783))
+
 # [1.30.0](https://github.com/Suwmlee/ikaros/compare/v1.29.6...v1.30.0) (2022-06-22)
 
 
