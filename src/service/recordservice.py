@@ -75,9 +75,10 @@ class ScrapingRecordService():
                     db.session.delete(i)
         db.session.commit()
 
-    def deadtimetoMissingrecord(self):
+    def deadtimetoMissingrecord(self) -> list:
         """ 源文件或目标文件不存在，全部删除
         """
+        delrecords = []
         records = _ScrapingRecords.query.all()
         for i in records:
             # 排除忽略标记
@@ -87,6 +88,7 @@ class ScrapingRecordService():
                     nowtime = datetime.datetime.now()
                     if nowtime > i.deadtime:
                         self.deleteRecord(i, True)
+                        delrecords.append(i.srcpath)
                         db.session.delete(i)
                         continue
                 # 0 转移 1 软链接 2 硬链接
@@ -109,6 +111,7 @@ class ScrapingRecordService():
                             i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
 
         db.session.commit()
+        return delrecords
 
     def editRecord(self, sid, status, scrapingname, cnsubtag, leaktag, uncensoredtag, hacktag, cdnum, deadtime):
         record = _ScrapingRecords.query.filter_by(id=sid).first()
@@ -340,7 +343,8 @@ class TransRecordService():
                 db.session.delete(i)
         db.session.commit()
 
-    def deadtimetoMissingrecord(self):
+    def deadtimetoMissingrecord(self) -> list:
+        delrecords = []
         records = _TransRecords.query.all()
         for i in records:
             # 忽略标记
@@ -350,6 +354,7 @@ class TransRecordService():
                     nowtime = datetime.datetime.now()
                     if nowtime > i.deadtime:
                         self.deleteRecord(i, True)
+                        delrecords.append(i.srcpath)
                         db.session.delete(i)
                         continue
                 # 0 软链接 1 硬链接
@@ -361,6 +366,7 @@ class TransRecordService():
                     if not i.deadtime or i.deadtime == '':
                         i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
         db.session.commit()
+        return delrecords
 
     def renameAllTop(self, srcfolder, top, new):
         records = _TransRecords.query.filter_by(srcfolder=srcfolder, topfolder=top).all()

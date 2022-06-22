@@ -12,7 +12,7 @@ class Transmission():
     username = None
     password = None
 
-    tags = ["id", "name", "status", "error", "errorString"]
+    tags = ["id", "name", "status", "downloadDir", "error", "errorString"]
 
     def __init__(self, url: str, username, password):
         pis = url.split(':')
@@ -32,13 +32,13 @@ class Transmission():
 
     def login(self):
         try:
-            trsession = transmission_rpc.Client(host=self.host,
-                                                port=self.port,
-                                                protocol=self.protocol,
-                                                username=self.username,
-                                                password=self.password,
-                                                timeout=10)
-            return trsession
+            self.trsession = transmission_rpc.Client(host=self.host,
+                                                    port=self.port,
+                                                    protocol=self.protocol,
+                                                    username=self.username,
+                                                    password=self.password,
+                                                    timeout=10)
+            return self.trsession
         except Exception as ex:
             print(ex)
             return None
@@ -59,10 +59,11 @@ class Transmission():
 
     def searchByName(self, name):
         torrents = self.getTorrents()
+        results = []
         for i in torrents:
             if i.name == name:
-                return i
-        return None
+                results.append(i)
+        return []
 
     def searchByPath(self, path):
         retry = 3
@@ -84,7 +85,7 @@ class Transmission():
         else:
             return None
 
-    def removeTorrent(self, id):
+    def removeTorrent(self, id, delete=False):
         if not self.trsession:
             return None
-        self.trsession.remove_torrent([id])
+        self.trsession.remove_torrent([id], delete_data=delete)

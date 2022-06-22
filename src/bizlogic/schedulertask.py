@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
-
+import logging
+import os
 from logging import Logger
 from flask import current_app
 
+from ..utils.filehelper import checkFolderhasMedia
+from ..downloader.transmission import Transmission
 from ..service.taskservice import taskService
 from ..service.schedulerservice import schedulerService
 from ..service.recordservice import scrapingrecordService, transrecordService
@@ -23,10 +26,38 @@ def cleanRecordsTask(delete=True, scheduler=None):
     else:
         localconfig = localConfService.getConfig()
         if localconfig.task_clean:
-            logger(scheduler).debug('cleanRecords')
-            scrapingrecordService.deadtimetoMissingrecord()
-            transrecordService.deadtimetoMissingrecord()
-            logger(scheduler).debug('done!')
+            logger(scheduler).debug('[-] cleanRecords: start!')
+            srecords = scrapingrecordService.deadtimetoMissingrecord()
+            trecords = transrecordService.deadtimetoMissingrecord()
+            records = list(set(srecords + trecords))
+            cleanTorrents(records, localconfig)
+            logger(scheduler).debug('[-] cleanRecords: done!')
+
+def cleanTorrents(records, conf):
+    """ 删除关联的torrent
+    """
+    if not records:
+        return
+    try:
+        trurl = conf.tr_url
+        trusername = conf.tr_username
+        trpassword = conf.tr_passwd
+        trfolder = conf.tr_prefix.split(':')[0]
+        prefixed = conf.tr_prefix.split(':')[1]
+
+        trs = Transmission(trurl, trusername, trpassword)
+        trs.login()
+        for path in records:
+            torrents = trs.searchByPath(path)
+            for torrent in torrents:
+                downfolder = os.path.join(torrent.downloadDir, torrent.name)
+                fixedfolder = downfolder.replace(trfolder, prefixed, 1)
+                if checkFolderhasMedia(fixedfolder):
+                    continue
+                trs.removeTorrent(torrent.id, True)
+                logger().info(f'[-] cleanRecords: remove torrent {torrent.id} : {torrent.name}')
+    except:
+        pass
 
 
 def checkDirectoriesTask(scheduler=None):
@@ -51,6 +82,7 @@ def initScheduler():
 def logger(scheduler=None) -> Logger: 
     if scheduler:
         return scheduler.app.logger
-    else:
+    elif current_app:
         return current_app.logger
-
+    else:
+        return logging.getLogger('src')

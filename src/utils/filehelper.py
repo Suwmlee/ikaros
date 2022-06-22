@@ -31,6 +31,14 @@ def creatFolder(foldername):
             return
 
 
+def checkFolderhasMedia(folder):
+    for root, dirs, files in os.walk(folder, topdown=False):
+        for file in files:
+            if file.endswith(tuple(video_type)):
+                return True
+    return False
+
+
 def cleanFolder(foldername):
     """ 删除并重新创建文件夹
     """
@@ -277,5 +285,5 @@ def logger() -> logging.Logger:
     prevent app_context error
     """
     if current_app:
-        return logger()
+        return current_app.logger
     return logging.getLogger('src')
