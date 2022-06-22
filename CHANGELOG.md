@@ -1,3 +1,10 @@
+## [1.30.2](https://github.com/Suwmlee/ikaros/compare/v1.30.1...v1.30.2) (2022-06-22)
+
+
+### Bug Fixes
+
+* requirements ([f4068ca](https://github.com/Suwmlee/ikaros/commit/f4068ca8842e7a5a544baab0206d7a812f638174))
+
 ## [1.30.1](https://github.com/Suwmlee/ikaros/compare/v1.30.0...v1.30.1) (2022-06-22)
 
 
