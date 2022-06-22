@@ -404,12 +404,11 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
     configProxy = scrapingConfService.getProxyConfig(task.cid)
     proxies = configProxy.proxies() if configProxy.enable else None
     json_data = search(number, c_sources, proxies=proxies, morestoryline=conf.morestoryline)
-    json_data = fixJson(json_data, conf.naming_rule)
-
     # Return if blank dict returned (data not found)
     if not json_data:
         current_app.logger.error('[-]Movie Data not found!')
         return False, moveFailedFolder(filepath)
+    json_data = fixJson(json_data, conf.naming_rule)
 
     if json_data.get("number") != number:
         # fix issue #119
