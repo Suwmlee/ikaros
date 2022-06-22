@@ -7,11 +7,11 @@ import time
 
 from flask import request, Response
 
-from src.bizlogic.schedulertask import cleanRecordsTask
 
 from . import web
 from flask import current_app
 from ..service.configservice import localConfService
+from ..bizlogic.schedulertask import cleanRecordsTask
 
 @web.route("/api/options/loglevel", methods=['GET', 'PUT'])
 def loglevel():
@@ -34,8 +34,10 @@ NOTSET = 0
             content = request.get_json()
             if content and 'loglevel' in content:
                 level = int(content.get('loglevel'))
+                localConfService.updateLoglvl(level)
                 current_app.logger.setLevel(level)
             else:
+                localConfService.updateLoglvl(logging.INFO)
                 current_app.logger.setLevel(logging.INFO)
             return Response(status=200)
     except Exception as err:

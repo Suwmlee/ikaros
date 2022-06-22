@@ -174,6 +174,8 @@ class _LocalConfigs(db.Model):
     tr_passwd = Column(String, default="")
     tr_prefix = Column(String, default="")
 
+    loglevel = Column(Integer, default=20)
+
     def serialize(self):
         return {
             'id': self.id,

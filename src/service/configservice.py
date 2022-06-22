@@ -174,6 +174,11 @@ class LocalConfService():
             db.session.commit()
         return config
 
+    def updateLoglvl(self, lvl):
+        config = self.getConfig()
+        config.loglevel = lvl
+        db.session.commit()
+
     def updateConfig(self, content):
         changed = False
         config = self.getConfig()

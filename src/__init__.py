@@ -58,9 +58,14 @@ def create_app():
 def resetDefaults(scheduler):
     scheduler.remove_job(id='initJob')
     from .service.taskservice import autoTaskService
+    from .service.configservice import localConfService
     from .bizlogic.automation import checkTaskQueue
     from .bizlogic.schedulertask import initScheduler
     scheduler.app.logger.info("Initialization: start")
+    conf = localConfService.getConfig()
+    if conf.loglevel:
+        scheduler.app.logger.setLevel(conf.loglevel)
+        scheduler.app.logger.info(f"Initialization: set loglevel {conf.loglevel}")
     autoTaskService.reset()
     with scheduler.app.app_context():
         checkTaskQueue()
