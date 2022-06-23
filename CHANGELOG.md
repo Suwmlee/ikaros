@@ -1,3 +1,11 @@
+## [1.30.3](https://github.com/Suwmlee/ikaros/compare/v1.30.2...v1.30.3) (2022-06-23)
+
+
+### Bug Fixes
+
+* check media ([d2db1a8](https://github.com/Suwmlee/ikaros/commit/d2db1a898dbe1710add84636d9f5630ff47bb220))
+* **scrapinglib:** minor fixes ([ed03a90](https://github.com/Suwmlee/ikaros/commit/ed03a904df44b68cf2d5a96f68571529ff2cb25b))
+
 ## [1.30.2](https://github.com/Suwmlee/ikaros/compare/v1.30.1...v1.30.2) (2022-06-22)
 
 
