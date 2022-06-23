@@ -34,7 +34,7 @@ def creatFolder(foldername):
 def checkFolderhasMedia(folder):
     for root, dirs, files in os.walk(folder, topdown=False):
         for file in files:
-            if file.endswith(tuple(video_type)):
+            if file.lower().endswith(tuple(video_type)):
                 return True
     return False
 
