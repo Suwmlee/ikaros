@@ -27,6 +27,7 @@
       --name=ikaros \
       -e PUID=0 \
       -e PGID=0 \
+      -e TZ=Asia/Shanghai \
       -p 12346:12346 \
       -v /path/to/media:/media \
       -v /path/to/data:/ikaros/database \
