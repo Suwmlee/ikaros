@@ -53,8 +53,8 @@ class Mv91(Parser):
                 result = str(finds[0][0])
             else:
                 result = ' '.join(title.replace('/',' ').split())
-                result = result.split()[0].replace('「预告」','')
-            return result.strip()
+                result = result.split()[0]
+            return result.replace('「预告」','').strip('/ ')
         except:
             return ''
 

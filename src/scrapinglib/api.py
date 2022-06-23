@@ -37,10 +37,10 @@ def search(number, sources: str=None, proxies=None, verify=None, type='adult',
 class Scraping():
     """
     """
-
-    adult_full_sources = ['avsox', 'javbus', 'xcity', 'mgstage', 'madou', 'fc2', 
-                    'dlsite', 'jav321', 'fanza', 'airav', 'carib', 'mv91',
-                    'gcolle', 'javdb', 'getchu']
+    adult_full_sources = ['javdb', 'javbus', 'airav', 'fanza', 'xcity', 'jav321', 
+                          'mgstage', 'fc2', 'avsox', 'dlsite', 'carib', 'madou', 'mv91', 
+                          'getchu', 'gcolle'
+                          ]
     adult_func_mapping = {
         'avsox': Avsox().scrape,
         'javbus': Javbus().scrape,
