@@ -1,3 +1,10 @@
+## [1.30.4](https://github.com/Suwmlee/ikaros/compare/v1.30.3...v1.30.4) (2022-06-24)
+
+
+### Bug Fixes
+
+* check Transmission mapped folder ([49987b5](https://github.com/Suwmlee/ikaros/commit/49987b51b843d631e9f2140c22ff8bee02d43bc3))
+
 ## [1.30.3](https://github.com/Suwmlee/ikaros/compare/v1.30.2...v1.30.3) (2022-06-23)
 
 
