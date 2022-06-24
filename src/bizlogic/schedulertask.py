@@ -45,6 +45,9 @@ def cleanTorrents(records, conf):
         trfolder = conf.tr_prefix.split(':')[0]
         prefixed = conf.tr_prefix.split(':')[1]
 
+        if not os.path.exists(prefixed):
+            logger().info(f"[-] cleanRecords: Transmission mapped folder does't exist {trfolder} : {prefixed}")
+            return
         trs = Transmission(trurl, trusername, trpassword)
         trs.login()
         for path in records:
@@ -56,8 +59,9 @@ def cleanTorrents(records, conf):
                     continue
                 trs.removeTorrent(torrent.id, True)
                 logger().info(f'[-] cleanRecords: remove torrent {torrent.id} : {torrent.name}')
-    except:
-        pass
+    except Exception as e:
+        logger().info("[-] cleanRecords: error")
+        logger().error(e)
 
 
 def checkDirectoriesTask(scheduler=None):
