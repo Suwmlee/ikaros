@@ -1,3 +1,10 @@
+# [1.31.0](https://github.com/Suwmlee/ikaros/compare/v1.30.4...v1.31.0) (2022-06-24)
+
+
+### Features
+
+* support javlibrary and rating ([295e241](https://github.com/Suwmlee/ikaros/commit/295e241b67acf7fcbd1b2dce4554b10e0a513396))
+
 ## [1.30.4](https://github.com/Suwmlee/ikaros/compare/v1.30.3...v1.30.4) (2022-06-24)
 
 
