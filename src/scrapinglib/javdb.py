@@ -193,19 +193,19 @@ class Javdb(Parser):
 
     def getUserRating(self, htmltree):
         try:
-            result = str(self.getTreeElement(htmltree, self.expr_userrating))
-            v = re.findall(r'(\d+|\d+\.\d+)分, 由(\d+)人評價', result)
-            return float(v[0][0])
+            numstrs = self.getTreeElement(htmltree, self.expr_userrating)
+            nums = re.findall('[0-9.]+', numstrs)
+            return float(nums[0])
         except:
-            return
+            return ''
 
     def getUserVotes(self, htmltree):
         try:
-            result = str(self.getTreeElement(htmltree, self.expr_uservotes))
-            v = re.findall(r'(\d+|\d+\.\d+)分, 由(\d+)人評價', result)
-            return int(v[0][1])
+            result = self.getTreeElement(htmltree, self.expr_uservotes)
+            v = re.findall('[0-9.]+', result)
+            return int(v[1])
         except:
-            return
+            return ''
 
     def getaphoto(self, url, session):
         html_page = session.get(url).text

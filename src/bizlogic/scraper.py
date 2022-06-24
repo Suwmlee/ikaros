@@ -235,10 +235,21 @@ def create_nfo_file(path, prefilename, json_data, numinfo: FileNumInfo):
             try:
                 f_rating = json_data['userrating']
                 uc = json_data['uservotes']
-                print(f"""  <rating>{round(f_rating * 2.0, 1)}</rating>
+                if f_rating:
+                    if website == 'javdb':
+                        print(f"""  <rating>{round(f_rating * 2.0, 1)}</rating>
   <criticrating>{round(f_rating * 20.0, 1)}</criticrating>
   <ratings>
     <rating name="javdb" max="5" default="true">
+      <value>{f_rating}</value>
+      <votes>{uc}</votes>
+    </rating>
+  </ratings>""", file=code)
+                    elif website == 'javlibrary':
+                        print(f"""  <rating>{round(f_rating * 1.0, 1)}</rating>
+  <criticrating>{round(f_rating * 10.0, 1)}</criticrating>
+  <ratings>
+    <rating name="javlibrary" max="10" default="true">
       <value>{f_rating}</value>
       <votes>{uc}</votes>
     </rating>
@@ -399,7 +410,7 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
     # json_data = get_data_from_json(number, conf.site_sources, conf.naming_rule, conf.async_request)
     c_sources = conf.site_sources
     if not c_sources:
-        c_sources = "javbus,airav,fanza,xcity,javdb,mgstage,madou,fc2,avsox,dlsite,carib,fc2club"
+        c_sources = "javlibrary,javdb,javbus,airav,fanza,xcity,jav321,mgstage,fc2,avsox,dlsite,carib,madou,mv91,getchu,gcolle"
     task = taskService.getTask('scrape')
     configProxy = scrapingConfService.getProxyConfig(task.cid)
     proxies = configProxy.proxies() if configProxy.enable else None

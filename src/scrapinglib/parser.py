@@ -216,10 +216,18 @@ class Parser:
             return self.uncensored
 
     def getUserRating(self, htmltree):
-        return self.getTreeElement(htmltree, self.expr_userrating)
+        numstrs = self.getTreeElement(htmltree, self.expr_userrating)
+        nums = re.findall('[0-9.]+', numstrs)
+        if len(nums) == 1:
+            return float(nums[0])
+        return ''
 
     def getUserVotes(self, htmltree):
-        return self.getTreeElement(htmltree, self.expr_uservotes)
+        votestrs = self.getTreeElement(htmltree, self.expr_uservotes)
+        votes = re.findall('[0-9]+', votestrs)
+        if len(votes) == 1:
+            return int(votes[0])
+        return ''
 
     def getTreeElement(self, tree: html.HtmlElement, expr, index=0):
         """ 根据表达式从`xmltree`中获取匹配值,默认 index 为 0
