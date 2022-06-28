@@ -1,3 +1,10 @@
+## [1.31.1](https://github.com/Suwmlee/ikaros/compare/v1.31.0...v1.31.1) (2022-06-28)
+
+
+### Bug Fixes
+
+* search torrent ([945b8af](https://github.com/Suwmlee/ikaros/commit/945b8af5f7236ddecdb0dbf0c86b0df6dea57505))
+
 # [1.31.0](https://github.com/Suwmlee/ikaros/compare/v1.30.4...v1.31.0) (2022-06-24)
 
 
