@@ -51,8 +51,10 @@ def cleanTorrents(records, conf):
         trs = Transmission(trurl, trusername, trpassword)
         trs.login()
         for path in records:
+            logger().debug(f'[-] cleanRecords: check {path}')
             torrents = trs.searchByPath(path)
             for torrent in torrents:
+                logger().debug(f'[-] cleanRecords: find torrent {torrent.name}')
                 downfolder = os.path.join(torrent.downloadDir, torrent.name)
                 fixedfolder = downfolder.replace(trfolder, prefixed, 1)
                 if checkFolderhasMedia(fixedfolder):
@@ -60,7 +62,7 @@ def cleanTorrents(records, conf):
                 trs.removeTorrent(torrent.id, True)
                 logger().info(f'[-] cleanRecords: remove torrent {torrent.id} : {torrent.name}')
     except Exception as e:
-        logger().info("[-] cleanRecords: error")
+        logger().error("[-] cleanRecords: cleanTorrents error")
         logger().error(e)
 
 

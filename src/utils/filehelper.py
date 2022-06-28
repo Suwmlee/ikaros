@@ -32,6 +32,12 @@ def creatFolder(foldername):
 
 
 def checkFolderhasMedia(folder):
+    """ 检测文件夹内是否有视频文件
+    """
+    if not os.path.isdir(folder):
+        if os.path.exists(folder):
+            return True
+        return False
     for root, dirs, files in os.walk(folder, topdown=False):
         for file in files:
             if file.lower().endswith(tuple(video_type)):
