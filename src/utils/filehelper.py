@@ -246,9 +246,9 @@ def linkFile(srcpath, dstpath, linktype=1):
 
     https://stackoverflow.com/questions/41941401/how-to-find-out-if-a-folder-is-a-hard-link-and-get-its-real-path
     """
-    if os.path.exists(dstpath) and os.path.samefile(srcpath, dstpath):
+    if os.path.exists(dstpath) and os.path.samefile(srcpath, dstpath) and linktype == 2:
         logger().debug("[!] same file already exists")
-    elif pathlib.Path(dstpath).is_symlink() and os.readlink(dstpath) == srcpath :
+    elif pathlib.Path(dstpath).is_symlink() and os.readlink(dstpath) == srcpath and linktype == 1:
         logger().debug("[!] link file already exists")
     else:
         dstfolder = os.path.dirname(dstpath)

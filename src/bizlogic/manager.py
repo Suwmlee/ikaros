@@ -13,7 +13,7 @@ from .scraper import core_main, moveFailedFolder
 from .mediaserver import refreshMediaServer
 from flask import current_app
 from ..utils.number_parser import FileNumInfo
-from ..utils.filehelper import cleanFilebyFilter, video_type, cleanFolder, cleanFolderbyFilter
+from ..utils.filehelper import cleanFilebyFilter, linkFile, video_type, cleanFolder, cleanFolderbyFilter
 
 
 def findAllMovies(root, escape_folder):
@@ -103,8 +103,29 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs, forced=False):
             movie_info.updatetime = datetime.datetime.now()
             scrapingrecordService.commit()
         else:
-            # use cleandb function checking record
             current_app.logger.info("[!]Already done: [{}]".format(file_path))
+            current_app.logger.info(f"[!]Checking dest file status: type {conf.link_type} and destpath [{movie_info.destpath}]")
+            if movie_info and movie_info.status == 2:
+                if conf.link_type == 0:
+                    if os.path.exists(movie_info.destpath) and not pathlib.Path(movie_info.destpath).is_symlink():
+                        current_app.logger.info(f"[!]Checking file status: OK")
+                    else:
+                        current_app.logger.error(f"[!]Checking file status: file missing")
+                        if os.path.exists(movie_info.srcpath):
+                            os.rename(movie_info.srcpath, movie_info.destpath)
+                            current_app.logger.info(f"[!]Checking file status: fixed")
+                elif conf.link_type == 1:
+                    if os.path.exists(movie_info.srcpath) and pathlib.Path(movie_info.destpath).is_symlink():
+                        current_app.logger.info(f"[!]Checking file status: OK")
+                    else:
+                        current_app.logger.error(f"[!]Checking file status: wrong symlink")
+                elif conf.link_type == 2:
+                    if os.path.exists(movie_info.srcpath) and os.path.samefile(movie_info.srcpath, movie_info.destpath):
+                        current_app.logger.info(f"[!]Checking file status: OK")
+                    else:
+                        current_app.logger.error(f"[!]Checking file status: file missing")
+                        linkFile(movie_info.srcpath, movie_info.destpath, 2)
+                        current_app.logger.info(f"[!]Checking file status: fixed")
     except Exception as err:
         current_app.logger.error("[!] ERROR: [{}] ".format(file_path))
         current_app.logger.error(err)
@@ -137,10 +158,10 @@ def startScrapingAll(cid, folder=''):
     movie_list = findAllMovies(folder, re.split("[,，]", conf.escape_folders))
 
     count = 0
-    total = str(len(movie_list))
+    total = len(movie_list)
     taskService.updateTaskNum(task, total)
     current_app.logger.info("[*]======================================================")
-    current_app.logger.info('[+]Find  ' + total+'  movies')
+    current_app.logger.info('[+]Find  ' + str(total) +'  movies')
 
     for movie_path in movie_list:
         # refresh data
@@ -148,8 +169,8 @@ def startScrapingAll(cid, folder=''):
         if task.status == 0:
             return 4
         taskService.updateTaskFinished(task, count)
-        percentage = str(count / int(total) * 100)[:4] + '%'
-        current_app.logger.debug('[!] - ' + percentage + ' [' + str(count) + '/' + total + '] -')
+        percentage = str(count / total * 100)[:4] + '%'
+        current_app.logger.debug('[!] - ' + percentage + ' [' + str(count) + '/' + str(total) + '] -')
         create_data_and_move(movie_path, conf)
         count = count + 1
 
