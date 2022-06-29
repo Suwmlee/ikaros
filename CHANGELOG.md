@@ -1,3 +1,11 @@
+## [1.32.1](https://github.com/Suwmlee/ikaros/compare/v1.32.0...v1.32.1) (2022-06-29)
+
+
+### Bug Fixes
+
+* check file status ([96aaac1](https://github.com/Suwmlee/ikaros/commit/96aaac19c57c4d9b782af6d1fad2e68f165431ff))
+* clean torrents when delete records in web ([d92bfc3](https://github.com/Suwmlee/ikaros/commit/d92bfc3947fe21e97ae6456c7710bac0863cf722))
+
 # [1.32.0](https://github.com/Suwmlee/ikaros/compare/v1.31.1...v1.32.0) (2022-06-29)
 
 
