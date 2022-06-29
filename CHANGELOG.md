@@ -1,3 +1,10 @@
+# [1.32.0](https://github.com/Suwmlee/ikaros/compare/v1.31.1...v1.32.0) (2022-06-29)
+
+
+### Features
+
+* check  finished file status when scraping all files ([3f760b8](https://github.com/Suwmlee/ikaros/commit/3f760b891276158bc91594018869a7b8228c970b))
+
 ## [1.31.1](https://github.com/Suwmlee/ikaros/compare/v1.31.0...v1.31.1) (2022-06-28)
 
 
