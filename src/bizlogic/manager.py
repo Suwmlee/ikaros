@@ -104,28 +104,34 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs, forced=False):
             scrapingrecordService.commit()
         else:
             current_app.logger.info("[!]Already done: [{}]".format(file_path))
-            current_app.logger.info(f"[!]Checking dest file status: type {conf.link_type} and destpath [{movie_info.destpath}]")
-            if movie_info and movie_info.status == 2:
-                if conf.link_type == 0:
-                    if os.path.exists(movie_info.destpath) and not pathlib.Path(movie_info.destpath).is_symlink():
-                        current_app.logger.info(f"[!]Checking file status: OK")
-                    else:
-                        current_app.logger.error(f"[!]Checking file status: file missing")
-                        if os.path.exists(movie_info.srcpath):
-                            os.rename(movie_info.srcpath, movie_info.destpath)
+            try:
+                current_app.logger.info(f"[!]Checking dest file status: type {conf.link_type} and destpath [{movie_info.destpath}]")
+                if movie_info and movie_info.status == 1:
+                    if conf.link_type == 0:
+                        if os.path.exists(movie_info.destpath) and not pathlib.Path(movie_info.destpath).is_symlink():
+                            current_app.logger.info(f"[!]Checking file status: OK")
+                        else:
+                            current_app.logger.error(f"[!]Checking file status: file missing")
+                            if os.path.exists(movie_info.srcpath):
+                                os.rename(movie_info.srcpath, movie_info.destpath)
+                                current_app.logger.info(f"[!]Checking file status: fixed")
+                    elif conf.link_type == 1:
+                        if os.path.exists(movie_info.srcpath) and pathlib.Path(movie_info.destpath).is_symlink():
+                            current_app.logger.info(f"[!]Checking file status: OK")
+                        else:
+                            current_app.logger.error(f"[!]Checking file status: wrong symlink")
+                    elif conf.link_type == 2:
+                        if os.path.exists(movie_info.srcpath) and \
+                            os.path.exists(movie_info.destpath) and \
+                            os.path.samefile(movie_info.srcpath, movie_info.destpath):
+                            current_app.logger.info(f"[!]Checking file status: OK")
+                        else:
+                            current_app.logger.error(f"[!]Checking file status: file missing")
+                            linkFile(movie_info.srcpath, movie_info.destpath, 2)
                             current_app.logger.info(f"[!]Checking file status: fixed")
-                elif conf.link_type == 1:
-                    if os.path.exists(movie_info.srcpath) and pathlib.Path(movie_info.destpath).is_symlink():
-                        current_app.logger.info(f"[!]Checking file status: OK")
-                    else:
-                        current_app.logger.error(f"[!]Checking file status: wrong symlink")
-                elif conf.link_type == 2:
-                    if os.path.exists(movie_info.srcpath) and os.path.samefile(movie_info.srcpath, movie_info.destpath):
-                        current_app.logger.info(f"[!]Checking file status: OK")
-                    else:
-                        current_app.logger.error(f"[!]Checking file status: file missing")
-                        linkFile(movie_info.srcpath, movie_info.destpath, 2)
-                        current_app.logger.info(f"[!]Checking file status: fixed")
+            except Exception as e:
+                current_app.logger.error(f"[!]Checking file status: ERROR")
+                current_app.logger.error(e)
     except Exception as err:
         current_app.logger.error("[!] ERROR: [{}] ".format(file_path))
         current_app.logger.error(err)
