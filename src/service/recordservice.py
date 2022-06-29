@@ -56,11 +56,14 @@ class ScrapingRecordService():
                     cleanFolderbyFilter(folder, filter)
 
     def deleteByIds(self, ids, delsrc=False):
+        delrecords = []
         records = _ScrapingRecords.query.filter(_ScrapingRecords.id.in_(ids)).all()
         for record in records:
             self.deleteRecord(record, delsrc)
+            delrecords.append(record.srcpath)
             db.session.delete(record)
         db.session.commit()
+        return delrecords
 
     def cleanUnavailable(self):
         records = _ScrapingRecords.query.all()
@@ -214,6 +217,12 @@ class TransRecordService():
             return info
         return info
 
+    def queryByID(self, value) -> _TransRecords:
+        info = _TransRecords.query.filter_by(id=value).first()
+        if not info:
+            return None
+        return info
+
     def queryByPath(self, value) -> _TransRecords:
         info = _TransRecords.query.filter_by(srcpath=value).first()
         if not info:
@@ -328,12 +337,15 @@ class TransRecordService():
             if os.path.exists(cleanfolder):
                 cleanFolderWithoutSuffix(cleanfolder, video_type)
 
-    def deleteByID(self, value, delsrc=False) -> _TransRecords:
-        record = _TransRecords.query.filter_by(id=value).first()
-        if record and isinstance(record, _TransRecords):
+    def deleteByIds(self, ids, delsrc=False):
+        delrecords = []
+        records = _TransRecords.query.filter(_TransRecords.id.in_(ids)).all()
+        for record in records:
             self.deleteRecord(record, delsrc)
+            delrecords.append(record.srcpath)
             db.session.delete(record)
-            db.session.commit()
+        db.session.commit()
+        return delrecords
 
     def cleanUnavailable(self):
         records = _TransRecords.query.all()

@@ -3,9 +3,11 @@
 
 import json
 from flask import request, Response, current_app
+
 from . import web
-from ..bizlogic import transfer
-from ..service.configservice import transConfigService
+from ..bizlogic.transfer import ctrlTransfer
+from ..bizlogic.schedulertask import cleanTorrents
+from ..service.configservice import localConfService, transConfigService
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
 
@@ -14,7 +16,7 @@ from ..service.taskservice import taskService
 def startTransfer():
     try:
         content = request.get_json()
-        transfer.ctrlTransfer(content['source_folder'], content['output_folder'],
+        ctrlTransfer(content['source_folder'], content['output_folder'],
                               content['linktype'], content['soft_prefix'],
                               content['escape_folder'], content.get('specified_files'),
                               content['fix_series'],
@@ -144,7 +146,10 @@ def deleteTransferRecordIds():
         ids = content.get('ids')
         delsrc = content.get('delsrc')
         for sid in ids:
-            transrecordService.deleteByID(sid, delsrc)
+            delrecords = transrecordService.deleteByIds(sid, delsrc)
+            if delsrc:
+                localconfig = localConfService.getConfig()
+                cleanTorrents(delrecords, localconfig)
         return Response(status=200)
     except Exception as err:
         current_app.logger.error(err)

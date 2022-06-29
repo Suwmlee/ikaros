@@ -3,9 +3,11 @@
 
 import json
 from flask import request, Response, current_app
+
 from . import web
 from ..bizlogic.manager import startScrapingAll, startScrapingSingle
-from ..service.configservice import scrapingConfService
+from ..bizlogic.schedulertask import cleanTorrents
+from ..service.configservice import localConfService, scrapingConfService
 from ..service.recordservice import scrapingrecordService
 from ..service.taskservice import taskService
 
@@ -96,7 +98,12 @@ def deleteScrapingConf(cid):
 def deleteScrapingRecordIds():
     try:
         content = request.get_json()
-        scrapingrecordService.deleteByIds(content.get('ids'), content.get('delsrc'))
+        delsrc = content.get('delsrc')
+        ids = content.get('ids')
+        delrecords = scrapingrecordService.deleteByIds(ids, delsrc)
+        if delsrc:
+            localconfig = localConfService.getConfig()
+            cleanTorrents(delrecords, localconfig)
         return Response(status=200)
     except Exception as err:
         current_app.logger.error(err)
