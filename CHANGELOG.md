@@ -1,3 +1,11 @@
+## [1.32.2](https://github.com/Suwmlee/ikaros/compare/v1.32.1...v1.32.2) (2022-06-30)
+
+
+### Bug Fixes
+
+* mapping ignorecase ([66fb88c](https://github.com/Suwmlee/ikaros/commit/66fb88c1a604ceb964ec3a2381e27558c371d994))
+* rating source ([7eb6477](https://github.com/Suwmlee/ikaros/commit/7eb6477160fa02a81d8025ab651c3cf51341d213))
+
 ## [1.32.1](https://github.com/Suwmlee/ikaros/compare/v1.32.0...v1.32.1) (2022-06-29)
 
 
