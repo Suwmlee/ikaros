@@ -8,6 +8,8 @@ from .parser import Parser
 
 class Mv91(Parser):
     source = 'mv91'
+    imagecut = 0
+    uncensored = True
 
     expr_number = '//div[@class="player-title"]/text()'
     expr_title = '//div[@class="player-title"]/text()'

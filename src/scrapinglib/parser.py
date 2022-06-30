@@ -11,7 +11,10 @@ class Parser:
     """ 基础刮削类
     """
     source = 'base'
-    # poster: `0` 复制 `1` 裁剪 
+    # 获取poster封面: 
+    # `0` 复制cover
+    # `1` 裁剪cover 
+    # `3` 下载小封面
     imagecut = 1
     uncensored = False
     allow_number_change = False
@@ -115,26 +118,26 @@ class Parser:
                 'number': self.getNum(htmltree),
                 'title': self.getTitle(htmltree),
                 'studio': self.getStudio(htmltree),
+                'release': self.getRelease(htmltree),
                 'year': self.getYear(htmltree),
                 'outline': self.getOutline(htmltree),
                 'runtime': self.getRuntime(htmltree),
                 'director': self.getDirector(htmltree),
                 'actor': self.getActors(htmltree),
-                'release': self.getRelease(htmltree),
+                'actor_photo': self.getActorPhoto(htmltree),
                 'cover': self.getCover(htmltree),
                 'cover_small': self.getSmallCover(htmltree),
                 'extrafanart': self.getExtrafanart(htmltree),
                 'trailer': self.getTrailer(htmltree),
-                'imagecut': self.imagecut,
                 'tag': self.getTags(htmltree),
                 'label': self.getLabel(htmltree),
-                'actor_photo': self.getActorPhoto(htmltree),
+                'series': self.getSeries(htmltree),
+                'userrating': self.getUserRating(htmltree),
+                'uservotes': self.getUserVotes(htmltree),
+                'uncensored': self.getUncensored(htmltree),
                 'website': self.detailurl,
                 'source': self.source,
-                'series': self.getSeries(htmltree),
-                'uncensored': self.getUncensored(htmltree),
-                'userrating': self.getUserRating(htmltree),
-                'uservotes': self.getUserVotes(htmltree)
+                'imagecut': self.getImagecut(htmltree),
             }
             dic = self.extradict(dic)
         except Exception as e:
@@ -214,6 +217,13 @@ class Parser:
             return bool(u)
         else:
             return self.uncensored
+
+    def getImagecut(self, htmlree):
+        """ 修正 无码poster不裁剪cover
+        """
+        if self.imagecut == 1 and self.getUncensored(htmlree):
+            self.imagecut = 0
+        return self.imagecut
 
     def getUserRating(self, htmltree):
         numstrs = self.getTreeElement(htmltree, self.expr_userrating)

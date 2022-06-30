@@ -8,6 +8,7 @@ from .parser import Parser
 
 class Madou(Parser):
     source = 'madou'
+    imagecut = 0
     uncensored = True
 
     expr_url = '//a[@class="share-weixin"]/@data-url'
