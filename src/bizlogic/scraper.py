@@ -591,12 +591,12 @@ def fixJson(json_data, c_naming_rule):
             if not src:
                 return src
             # 忽略大小写
-            tmp = actor_mapping_data.xpath('a[contains(translate(@keyword,"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz"), $name)]/@jp', name=src)
+            tmp = actor_mapping_data.xpath('a[contains(translate(@keyword,"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz"), $name)]/@jp', name=src.lower())
             return tmp[0] if tmp else src
         def mappingInfo(src):
             if not src:
                 return src
-            tmp = info_mapping_data.xpath('a[contains(translate(@keyword,"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz"), $name)]/@jp', name=src)
+            tmp = info_mapping_data.xpath('a[contains(translate(@keyword,"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz"), $name)]/@jp', name=src.lower())
             return tmp[0] if tmp else src
 
         json_data['actor_list'] = [mappingActor(aa) for aa in json_data['actor_list']]
