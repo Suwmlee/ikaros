@@ -182,7 +182,7 @@ def create_nfo_file(path, prefilename, json_data, numinfo: FileNumInfo):
             print("  <year>" + year + "</year>", file=code)
             print("  <outline><![CDATA[" + outline + "]]></outline>", file=code)
             print("  <plot><![CDATA[" + outline + "]]></plot>", file=code)
-            print("  <runtime>" + str(runtime).replace(" ", "") + "</runtime>", file=code)
+            print("  <runtime>" + runtime + "</runtime>", file=code)
             print("  <director>" + director + "</director>", file=code)
             print("  <poster>" + prefilename + "-poster.jpg</poster>", file=code)
             print("  <thumb>" + prefilename + "-thumb.jpg</thumb>", file=code)
@@ -233,10 +233,11 @@ def create_nfo_file(path, prefilename, json_data, numinfo: FileNumInfo):
             print("  <releasedate>" + release + "</releasedate>", file=code)
             print("  <release>" + release + "</release>", file=code)
             try:
+                source = json_data.get('source')
                 f_rating = json_data['userrating']
                 uc = json_data['uservotes']
                 if f_rating:
-                    if website == 'javdb':
+                    if source == 'javdb':
                         print(f"""  <rating>{round(f_rating * 2.0, 1)}</rating>
   <criticrating>{round(f_rating * 20.0, 1)}</criticrating>
   <ratings>
@@ -245,7 +246,7 @@ def create_nfo_file(path, prefilename, json_data, numinfo: FileNumInfo):
       <votes>{uc}</votes>
     </rating>
   </ratings>""", file=code)
-                    elif website == 'javlibrary':
+                    elif source == 'javlibrary':
                         print(f"""  <rating>{round(f_rating * 1.0, 1)}</rating>
   <criticrating>{round(f_rating * 10.0, 1)}</criticrating>
   <ratings>
