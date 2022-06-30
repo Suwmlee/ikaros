@@ -1,3 +1,10 @@
+## [1.32.3](https://github.com/Suwmlee/ikaros/compare/v1.32.2...v1.32.3) (2022-06-30)
+
+
+### Bug Fixes
+
+* oops lower missing ([9a98e96](https://github.com/Suwmlee/ikaros/commit/9a98e96b85f912161e3cb0529c6e1165a6a32269))
+
 ## [1.32.2](https://github.com/Suwmlee/ikaros/compare/v1.32.1...v1.32.2) (2022-06-30)
 
 
