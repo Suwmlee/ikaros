@@ -1,3 +1,10 @@
+## [1.32.4](https://github.com/Suwmlee/ikaros/compare/v1.32.3...v1.32.4) (2022-06-30)
+
+
+### Bug Fixes
+
+* uncensored imagecut ([f56c702](https://github.com/Suwmlee/ikaros/commit/f56c7026e482425f41a5147572a00c5db8ecbb92))
+
 ## [1.32.3](https://github.com/Suwmlee/ikaros/compare/v1.32.2...v1.32.3) (2022-06-30)
 
 
