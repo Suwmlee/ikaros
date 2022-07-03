@@ -417,9 +417,10 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
     proxies = configProxy.proxies() if configProxy.enable else None
     json_data = search(number, c_sources, proxies=proxies, morestoryline=conf.morestoryline)
     # Return if blank dict returned (data not found)
-    if not json_data:
+    if not json_data or json_data.get('number') == '' or json_data.get('title') == '':
         current_app.logger.error('[-]Movie Data not found!')
         return False, moveFailedFolder(filepath)
+
     json_data = fixJson(json_data, conf.naming_rule)
 
     if json_data.get("number") != number:
@@ -540,9 +541,6 @@ def fixJson(json_data, c_naming_rule):
         tag.remove('xxx')
     actor = str(actor_list).strip("[ ]").replace("'", '').replace(" ", '')
 
-    if title == '' or number == '':
-        current_app.logger.info('[-]Movie Number or Title not found!')
-        return
 
     # if imagecut == '3':
     #     DownloadFileWithFilename()

@@ -96,7 +96,7 @@ class FileNumInfo():
     @staticmethod
     def checkSp(filename):
         try:
-            prog = re.compile("(?:-|_)sp$", re.IGNORECASE | re.X | re.S)
+            prog = re.compile("(?:-|_)sp(?:_|-|$)", re.IGNORECASE | re.X | re.S)
             bname = os.path.splitext(filename)[0]
             result = prog.findall(bname)
             if result and len(result) == 1:
