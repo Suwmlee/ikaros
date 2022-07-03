@@ -125,7 +125,9 @@ class ScrapingRecordService():
             record.leaktag = leaktag
             record.uncensoredtag = uncensoredtag
             record.hacktag = hacktag
-            record.cdnum = cdnum
+            if cdnum == '':
+                cdnum = 0
+            record.cdnum = int(cdnum)
             record.updatetime = datetime.datetime.now()
             if deadtime == '' and record.deadtime:
                 record.deadtime = None
