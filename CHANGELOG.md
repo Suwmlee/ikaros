@@ -1,3 +1,11 @@
+## [1.32.5](https://github.com/Suwmlee/ikaros/compare/v1.32.4...v1.32.5) (2022-07-03)
+
+
+### Bug Fixes
+
+* check data ([15a2c36](https://github.com/Suwmlee/ikaros/commit/15a2c363c7b9b06bb393a5101b79a429fa5697b9))
+* update cdnum ([415490b](https://github.com/Suwmlee/ikaros/commit/415490b79c91aba01d0d1d3b51f7cbb6b963da70))
+
 ## [1.32.4](https://github.com/Suwmlee/ikaros/compare/v1.32.3...v1.32.4) (2022-06-30)
 
 
