@@ -117,9 +117,8 @@ def deleteTransferRecordIds():
     content = request.get_json()
     ids = content.get('ids')
     delsrc = content.get('delsrc')
-    for sid in ids:
-        delrecords = transrecordService.deleteByIds(sid, delsrc)
-        if delsrc:
-            localconfig = localConfService.getConfig()
-            cleanTorrents(delrecords, localconfig)
+    delrecords = transrecordService.deleteByIds(ids, delsrc)
+    if delsrc:
+        localconfig = localConfService.getConfig()
+        cleanTorrents(delrecords, localconfig)
     return Response(status=200)
