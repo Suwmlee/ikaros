@@ -1,3 +1,10 @@
+## [1.32.6](https://github.com/Suwmlee/ikaros/compare/v1.32.5...v1.32.6) (2022-07-08)
+
+
+### Bug Fixes
+
+* deletebyids in transfer ([d44f49c](https://github.com/Suwmlee/ikaros/commit/d44f49c47db96b53faef5dbc4f0bd7b82a3ba1fe))
+
 ## [1.32.5](https://github.com/Suwmlee/ikaros/compare/v1.32.4...v1.32.5) (2022-07-03)
 
 
