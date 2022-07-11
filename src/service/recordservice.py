@@ -39,7 +39,7 @@ class ScrapingRecordService():
         return _ScrapingRecords.query.filter_by(id=value).first()
 
     @staticmethod
-    def deleteRecord(record: _ScrapingRecords, delsrc):
+    def deleteRecord(record: _ScrapingRecords, delsrc=False):
         basefolder = os.path.dirname(record.srcpath)
         if delsrc and os.path.exists(basefolder):
             srcname = os.path.basename(record.srcpath)
