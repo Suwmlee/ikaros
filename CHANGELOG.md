@@ -1,3 +1,10 @@
+## [1.32.7](https://github.com/Suwmlee/ikaros/compare/v1.32.6...v1.32.7) (2022-07-11)
+
+
+### Bug Fixes
+
+*  delete records when re-scraping ([067617a](https://github.com/Suwmlee/ikaros/commit/067617af3deb43c852a32af4b5952547d20c2cca))
+
 ## [1.32.6](https://github.com/Suwmlee/ikaros/compare/v1.32.5...v1.32.6) (2022-07-08)
 
 
