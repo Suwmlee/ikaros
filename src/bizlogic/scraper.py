@@ -234,25 +234,20 @@ def create_nfo_file(path, prefilename, json_data, numinfo: FileNumInfo):
             print("  <release>" + release + "</release>", file=code)
             try:
                 source = json_data.get('source')
-                f_rating = json_data['userrating']
-                uc = json_data['uservotes']
-                if f_rating:
-                    if source == 'javdb':
-                        print(f"""  <rating>{round(f_rating * 2.0, 1)}</rating>
-  <criticrating>{round(f_rating * 20.0, 1)}</criticrating>
+                if source == 'javdb':
+                    rating = json_data['userrating']
+                    votes = json_data['uservotes']
+                    toprating = 5
+                elif source == 'javlibrary':
+                    rating = json_data['userrating']
+                    votes = json_data['uservotes']
+                    toprating = 10
+                print(f"""  <rating>{round(rating * 10.0 / toprating, 1)}</rating>
+  <criticrating>{round(rating * 100.0 / toprating, 1)}</criticrating>
   <ratings>
-    <rating name="javdb" max="5" default="true">
-      <value>{f_rating}</value>
-      <votes>{uc}</votes>
-    </rating>
-  </ratings>""", file=code)
-                    elif source == 'javlibrary':
-                        print(f"""  <rating>{round(f_rating * 1.0, 1)}</rating>
-  <criticrating>{round(f_rating * 10.0, 1)}</criticrating>
-  <ratings>
-    <rating name="javlibrary" max="10" default="true">
-      <value>{f_rating}</value>
-      <votes>{uc}</votes>
+    <rating name="{source}" max="{toprating}" default="true">
+      <value>{rating}</value>
+      <votes>{votes}</votes>
     </rating>
   </ratings>""", file=code)
             except:
@@ -285,7 +280,7 @@ def crop_poster(imagecut, path, prefilename):
             current_app.logger.debug('[+]Image Cutted!     ' + posterpath)
         except:
             current_app.logger.info('[-]Cover cut failed!')
-    elif imagecut == 0: 
+    elif imagecut == 0:
         # 复制封面
         shutil.copyfile(fanartpath, posterpath)
         current_app.logger.debug('[+]Image Copyed!     ' + posterpath)
@@ -334,13 +329,13 @@ def add_to_pic(pic_path, img_pic, size, count, mode):
     mark_pic_path = ''
     basedir = os.path.abspath(os.path.dirname(__file__))
     if mode == 1:
-        mark_pic_path = basedir +'/../images/CNSUB.png'
+        mark_pic_path = basedir + '/../images/CNSUB.png'
     elif mode == 2:
-        mark_pic_path = basedir +'/../images/LEAK.png'
+        mark_pic_path = basedir + '/../images/LEAK.png'
     elif mode == 3:
-        mark_pic_path = basedir +'/../images/UNCENSORED.png'
+        mark_pic_path = basedir + '/../images/UNCENSORED.png'
     elif mode == 4:
-        mark_pic_path = basedir +'/../images/HACK.png'
+        mark_pic_path = basedir + '/../images/HACK.png'
     img_subt = Image.open(mark_pic_path)
     scroll_high = int(img_pic.height / size)
     scroll_wide = int(scroll_high * img_subt.width / img_subt.height)
@@ -541,7 +536,6 @@ def fixJson(json_data, c_naming_rule):
         tag.remove('xxx')
     actor = str(actor_list).strip("[ ]").replace("'", '').replace(" ", '')
 
-
     # if imagecut == '3':
     #     DownloadFileWithFilename()
 
@@ -591,6 +585,7 @@ def fixJson(json_data, c_naming_rule):
             # 忽略大小写
             tmp = actor_mapping_data.xpath('a[contains(translate(@keyword,"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz"), $name)]/@jp', name=src.lower())
             return tmp[0] if tmp else src
+
         def mappingInfo(src):
             if not src:
                 return src
@@ -615,25 +610,27 @@ def fixJson(json_data, c_naming_rule):
 
     return json_data
 
+
 def special_characters_replacement(text) -> str:
     if not isinstance(text, str):
         return text
     return (text.replace('\\', '∖').     # U+2216 SET MINUS @ Basic Multilingual Plane
-                replace('/', '∕').       # U+2215 DIVISION SLASH @ Basic Multilingual Plane
-                replace(':', '꞉').       # U+A789 MODIFIER LETTER COLON @ Latin Extended-D
-                replace('*', '∗').       # U+2217 ASTERISK OPERATOR @ Basic Multilingual Plane
-                replace('?', '？').      # U+FF1F FULLWIDTH QUESTION MARK @ Basic Multilingual Plane
-                replace('"', '＂').      # U+FF02 FULLWIDTH QUOTATION MARK @ Basic Multilingual Plane
-                replace('<', 'ᐸ').       # U+1438 CANADIAN SYLLABICS PA @ Basic Multilingual Plane
-                replace('>', 'ᐳ').       # U+1433 CANADIAN SYLLABICS PO @ Basic Multilingual Plane
-                replace('|', 'ǀ').       # U+01C0 LATIN LETTER DENTAL CLICK @ Basic Multilingual Plane
-                replace('&lsquo;', '‘'). # U+02018 LEFT SINGLE QUOTATION MARK
-                replace('&rsquo;', '’'). # U+02019 RIGHT SINGLE QUOTATION MARK
-                replace('&hellip;','…').
-                replace('&amp;', '＆')
+            replace('/', '∕').       # U+2215 DIVISION SLASH @ Basic Multilingual Plane
+            replace(':', '꞉').       # U+A789 MODIFIER LETTER COLON @ Latin Extended-D
+            replace('*', '∗').       # U+2217 ASTERISK OPERATOR @ Basic Multilingual Plane
+            replace('?', '？').      # U+FF1F FULLWIDTH QUESTION MARK @ Basic Multilingual Plane
+            replace('"', '＂').      # U+FF02 FULLWIDTH QUOTATION MARK @ Basic Multilingual Plane
+            replace('<', 'ᐸ').       # U+1438 CANADIAN SYLLABICS PA @ Basic Multilingual Plane
+            replace('>', 'ᐳ').       # U+1433 CANADIAN SYLLABICS PO @ Basic Multilingual Plane
+            replace('|', 'ǀ').       # U+01C0 LATIN LETTER DENTAL CLICK @ Basic Multilingual Plane
+            replace('&lsquo;', '‘').  # U+02018 LEFT SINGLE QUOTATION MARK
+            replace('&rsquo;', '’').  # U+02019 RIGHT SINGLE QUOTATION MARK
+            replace('&hellip;', '…').
+            replace('&amp;', '＆')
             )
 
-def delete_all_elements_in_list(string,lists):
+
+def delete_all_elements_in_list(string, lists):
     new_lists = []
     for i in lists:
         if i != string:
