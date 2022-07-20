@@ -234,15 +234,14 @@ def create_nfo_file(path, prefilename, json_data, numinfo: FileNumInfo):
             print("  <release>" + release + "</release>", file=code)
             try:
                 source = json_data.get('source')
-                if source == 'javdb':
-                    rating = json_data['userrating']
-                    votes = json_data['uservotes']
-                    toprating = 5
-                elif source == 'javlibrary':
-                    rating = json_data['userrating']
-                    votes = json_data['uservotes']
-                    toprating = 10
-                print(f"""  <rating>{round(rating * 10.0 / toprating, 1)}</rating>
+                if source == 'javdb' or source == 'javlibrary':
+                    rating = json_data.get('userrating')
+                    votes = json_data.get('uservotes')
+                    if source == 'javdb':
+                        toprating = 5
+                    elif source == 'javlibrary':
+                        toprating = 10
+                    print(f"""  <rating>{round(rating * 10.0 / toprating, 1)}</rating>
   <criticrating>{round(rating * 100.0 / toprating, 1)}</criticrating>
   <ratings>
     <rating name="{source}" max="{toprating}" default="true">
