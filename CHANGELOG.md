@@ -1,3 +1,10 @@
+## [1.32.8](https://github.com/Suwmlee/ikaros/compare/v1.32.7...v1.32.8) (2022-07-27)
+
+
+### Bug Fixes
+
+* clean before re-scrape ([eceda89](https://github.com/Suwmlee/ikaros/commit/eceda89c55d0cc055b572e42fab7eca2c382f9e6))
+
 ## [1.32.7](https://github.com/Suwmlee/ikaros/compare/v1.32.6...v1.32.7) (2022-07-11)
 
 
