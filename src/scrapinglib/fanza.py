@@ -20,6 +20,12 @@ class Fanza(Parser):
 
     def search(self, number):
         self.number = number
+        if self.specifiedUrl:
+            self.detailurl = self.specifiedUrl
+            durl = "https://www.dmm.co.jp/age_check/=/declared=yes/?"+ urlencode({"rurl": self.detailurl})
+            self.htmltree = self.getHtmlTree(durl)
+            result = self.dictformat(self.htmltree)
+            return result
         # fanza allow letter + number + underscore, normalize the input here
         # @note: I only find the usage of underscore as h_test123456789
         fanza_search_number = number

@@ -11,7 +11,7 @@ class Parser:
     """ 基础刮削类
     """
     source = 'base'
-    # 获取poster封面: 
+    # 推荐剪切poster封面:
     # `0` 复制cover
     # `1` 裁剪cover 
     # `3` 下载小封面
@@ -24,6 +24,7 @@ class Parser:
     extraheader = None
     cookies = None
     morestoryline = False
+    specifiedUrl = None
 
     number = ''
     detailurl = ''
@@ -64,8 +65,19 @@ class Parser:
         return result
 
     def search(self, number):
+        """ 查询番号
+
+        查询主要流程:
+        1. 获取 url
+        2. 获取详情页面
+        3. 解析
+        4. 返回 result
+        """
         self.number = number
-        self.detailurl = self.queryNumberUrl(number)
+        if self.specifiedUrl:
+            self.detailurl = self.specifiedUrl
+        else:
+            self.detailurl = self.queryNumberUrl(number)
         htmltree = self.getHtmlTree(self.detailurl)
         result = self.dictformat(htmltree)
         return result
@@ -76,19 +88,24 @@ class Parser:
         针对需要传递的参数: cookies, proxy等
         子类继承后修改
         """
+        if not core:
+            return
         if core.proxies:
             self.proxies = core.proxies
         if core.verify:
             self.verify = core.verify
         if core.morestoryline:
             self.morestoryline = True
+        if core.specifiedSource == self.source:
+            self.specifiedUrl = core.specifiedUrl
 
     def queryNumberUrl(self, number):
         """ 根据番号查询详细信息url
         
+        需要针对不同站点修改,或者在上层直接获取
         备份查询页面,预览图可能需要
         """
-        url = httprequest.get(number)
+        url = "http://detailurl.ai/" + number
         return url
 
     def getHtml(self, url, type = None):
