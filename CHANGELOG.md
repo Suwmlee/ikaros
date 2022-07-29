@@ -1,3 +1,10 @@
+# [1.33.0](https://github.com/Suwmlee/ikaros/compare/v1.32.8...v1.33.0) (2022-07-29)
+
+
+### Features
+
+* specified url when scraping ([66f0744](https://github.com/Suwmlee/ikaros/commit/66f0744d00c6c5e96956a3c0dcb7b751f2999be4))
+
 ## [1.32.8](https://github.com/Suwmlee/ikaros/compare/v1.32.7...v1.32.8) (2022-07-27)
 
 
