@@ -27,7 +27,11 @@ class _ScrapingRecords(db.Model):
     leaktag = Column(Boolean, default=False, comment='leak tag')
     uncensoredtag = Column(Boolean, default=False, comment='uncensored tag')
     hacktag = Column(Boolean, default=False, comment='hack tag')
-    scrapingurl = Column(String, default='', comment='scraping site url')
+
+    # 指定刮削的网站与地址
+    # 手动设置
+    specifiedsource = Column(String, default='', comment='specified scraping site')
+    specifiedurl = Column(String, default='', comment='specified scraping site url')
 
     linktype = Column(Integer, comment='ln type')
     destname = Column(String, default='', comment='final name')
@@ -52,7 +56,8 @@ class _ScrapingRecords(db.Model):
             'leaktag': self.leaktag,
             'uncensoredtag': self.uncensoredtag,
             'hacktag': self.hacktag,
-            'scrapingurl': self.scrapingurl,
+            'specifiedsource': self.specifiedsource,
+            'specifiedurl': self.specifiedurl,
             'linktype': self.linktype,
             'destname': self.destname,
             'destpath': self.destpath,

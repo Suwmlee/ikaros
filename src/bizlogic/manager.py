@@ -80,7 +80,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs, forced=False):
                     ignore = True
                     current_app.logger.info('[!] ' + str(file_path) +' below size limit, will pass')
             if not ignore:
-                (flag, new_path) = core_main(file_path, num_info, conf)
+                (flag, new_path) = core_main(file_path, num_info, conf, movie_info.specifiedsource, movie_info.specifiedurl)
                 if flag:
                     movie_info.status = 1
                     (filefolder, newname) = os.path.split(new_path)

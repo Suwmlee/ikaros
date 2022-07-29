@@ -116,11 +116,15 @@ class ScrapingRecordService():
         db.session.commit()
         return delrecords
 
-    def editRecord(self, sid, status, scrapingname, cnsubtag, leaktag, uncensoredtag, hacktag, cdnum, deadtime):
+    def editRecord(self, sid, status, scrapingname,
+                   specifiedsource, specifiedurl,
+                   cnsubtag, leaktag, uncensoredtag, hacktag, cdnum, deadtime):
         record = _ScrapingRecords.query.filter_by(id=sid).first()
         if record:
             record.status = status
             record.scrapingname = scrapingname
+            record.specifiedsource = specifiedsource
+            record.specifiedurl = specifiedurl
             record.cnsubtag = cnsubtag
             record.leaktag = leaktag
             record.uncensoredtag = uncensoredtag

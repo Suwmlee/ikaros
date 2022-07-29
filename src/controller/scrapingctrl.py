@@ -124,6 +124,8 @@ def editScrapingData():
     scrapingrecordService.editRecord(content['id'],
                                      content['status'],
                                      content['scrapingname'],
+                                     content['specifiedsource'],
+                                     content['specifiedurl'],
                                      content['cnsubtag'],
                                      content['leaktag'],
                                      content['uncensoredtag'],

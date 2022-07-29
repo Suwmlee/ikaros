@@ -271,7 +271,6 @@ def crop_poster(imagecut, path, prefilename):
     if imagecut == 1:
         try:
             img = Image.open(fanartpath)
-            imgSize = img.size
             w = img.width
             h = img.height
             img2 = img.crop((w / 1.9, 0, w, h))
@@ -385,7 +384,7 @@ def paste_file_to_folder(filepath, path, prefilename, link_type, extra=False):
         return False, ''
 
 
-def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
+def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs, specifiedsource=None, specifiedurl=None):
     """ 开始刮削
     :param filepath     文件路径
     :param numinfo      番号信息
@@ -409,7 +408,9 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs):
     task = taskService.getTask('scrape')
     configProxy = scrapingConfService.getProxyConfig(task.cid)
     proxies = configProxy.proxies() if configProxy.enable else None
-    json_data = search(number, c_sources, proxies=proxies, morestoryline=conf.morestoryline)
+    json_data = search(number, c_sources,
+                       specifiedSource=specifiedsource, specifiedUrl=specifiedurl,
+                       proxies=proxies, morestoryline=conf.morestoryline)
     # Return if blank dict returned (data not found)
     if not json_data or json_data.get('number') == '' or json_data.get('title') == '':
         current_app.logger.error('[-]Movie Data not found!')
