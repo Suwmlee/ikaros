@@ -1,3 +1,10 @@
+## [1.33.1](https://github.com/Suwmlee/ikaros/compare/v1.33.0...v1.33.1) (2022-08-15)
+
+
+### Bug Fixes
+
+* storyline ([8179290](https://github.com/Suwmlee/ikaros/commit/817929045325fd3f533382a2feabdb0e30964806))
+
 # [1.33.0](https://github.com/Suwmlee/ikaros/compare/v1.32.8...v1.33.0) (2022-07-29)
 
 
