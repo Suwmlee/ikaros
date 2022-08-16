@@ -1,3 +1,10 @@
+## [1.33.2](https://github.com/Suwmlee/ikaros/compare/v1.33.1...v1.33.2) (2022-08-16)
+
+
+### Bug Fixes
+
+* minor fixes ([5c8f562](https://github.com/Suwmlee/ikaros/commit/5c8f56292889d4b3a33ee6e7bb5633c0320f24d3))
+
 ## [1.33.1](https://github.com/Suwmlee/ikaros/compare/v1.33.0...v1.33.1) (2022-08-15)
 
 
