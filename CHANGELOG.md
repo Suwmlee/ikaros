@@ -1,3 +1,10 @@
+## [1.33.3](https://github.com/Suwmlee/ikaros/compare/v1.33.2...v1.33.3) (2022-08-22)
+
+
+### Bug Fixes
+
+* init ([5b3114c](https://github.com/Suwmlee/ikaros/commit/5b3114c81ebe51fde1f44002bcf3e0ca4d825a47))
+
 ## [1.33.2](https://github.com/Suwmlee/ikaros/compare/v1.33.1...v1.33.2) (2022-08-16)
 
 
