@@ -99,7 +99,7 @@ class ScrapingRecordService():
                     # 转移必须是文件实体
                     if not os.path.exists(i.destpath):
                         if not i.deadtime or i.deadtime == '':
-                            i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
+                            i.deadtime = datetime.datetime.now() + datetime.timedelta(days=7)
                     else:
                         # 曾经标记过，但现在已经恢复，则取消删除计划
                         if i.deadtime:
@@ -111,7 +111,7 @@ class ScrapingRecordService():
                             i.deadtime = None
                     else:
                         if not i.deadtime or i.deadtime == '':
-                            i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
+                            i.deadtime = datetime.datetime.now() + datetime.timedelta(days=7)
 
         db.session.commit()
         return delrecords
@@ -382,7 +382,7 @@ class TransRecordService():
                         i.deadtime = None
                 else:
                     if not i.deadtime or i.deadtime == '':
-                        i.deadtime = datetime.datetime.now() + datetime.timedelta(days=3)
+                        i.deadtime = datetime.datetime.now() + datetime.timedelta(days=7)
         db.session.commit()
         return delrecords
 
