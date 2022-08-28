@@ -1,3 +1,10 @@
+## [1.33.5](https://github.com/Suwmlee/ikaros/compare/v1.33.4...v1.33.5) (2022-08-28)
+
+
+### Bug Fixes
+
+* mapping actor ([d22620d](https://github.com/Suwmlee/ikaros/commit/d22620dea499138f1426771658824668e31a0c97))
+
 ## [1.33.4](https://github.com/Suwmlee/ikaros/compare/v1.33.3...v1.33.4) (2022-08-26)
 
 
