@@ -2,6 +2,7 @@
 '''
 '''
 import os
+import re
 import shutil
 from PIL import Image
 from lxml import etree
@@ -534,13 +535,11 @@ def fixJson(json_data, c_naming_rule):
         tag.remove('XXXX')
     while 'xxx' in tag:
         tag.remove('xxx')
-    actor = str(actor_list).strip("[ ]").replace("'", '').replace(" ", '')
 
     # if imagecut == '3':
     #     DownloadFileWithFilename()
 
     # ====================处理异常字符====================== #\/:*?"<>|
-    actor = special_characters_replacement(actor)
     actor_list = [special_characters_replacement(a) for a in actor_list]
     title = special_characters_replacement(title)
     label = special_characters_replacement(label)
@@ -558,7 +557,7 @@ def fixJson(json_data, c_naming_rule):
     # 返回处理后的json_data
     json_data['title'] = title
     json_data['original_title'] = title
-    json_data['actor'] = actor
+    json_data['actor'] = ','.join(actor_list)
     json_data['release'] = release
     json_data['cover_small'] = cover_small
     json_data['tag'] = tag
@@ -579,21 +578,40 @@ def fixJson(json_data, c_naming_rule):
     actor_mapping_data = etree.parse(actorPath)
     info_mapping_data = etree.parse(infoPath)
     try:
+        def mappingkey(data, key):
+            # 忽略大小写
+            return data.xpath('a[contains(translate(@keyword,"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz"), $name)]/@jp', name=key.lower())
+
         def mappingActor(src):
             if not src:
                 return src
-            # 忽略大小写
-            tmp = actor_mapping_data.xpath('a[contains(translate(@keyword,"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz"), $name)]/@jp', name=src.lower())
-            return tmp[0] if tmp else src
-
+            tmp = mappingkey(actor_mapping_data, src)
+            if tmp and len(tmp) == 1:
+                return tmp[0]
+            if '(' in src or '（' in src:
+                csrc = cleanBrackets(src)
+                tmp2 = mappingkey(actor_mapping_data, csrc)
+                if tmp2 and len(tmp2) == 1:
+                    return tmp2[0]
+                allbrackets = getBrackets(src)
+                for b in allbrackets:
+                    tmp3 = mappingkey(actor_mapping_data, b)
+                    if tmp3 and len(tmp3) == 1:
+                        return tmp3[0]
+            forcesrc = ',' + src + ','
+            tmp4 = mappingkey(actor_mapping_data, forcesrc)
+            if tmp4 and len(tmp4) == 1:
+                return tmp4[0]
+            return src
+            
         def mappingInfo(src):
             if not src:
                 return src
-            tmp = info_mapping_data.xpath('a[contains(translate(@keyword,"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz"), $name)]/@jp', name=src.lower())
+            tmp = mappingkey(info_mapping_data, src)
             return tmp[0] if tmp else src
 
         json_data['actor_list'] = [mappingActor(aa) for aa in json_data['actor_list']]
-        json_data['actor'] = mappingActor(json_data['actor'])
+        json_data['actor'] = ','.join(json_data['actor_list'])
         json_data['tag'] = [mappingInfo(aa) for aa in json_data['tag']]
 
         json_data['tag'] = delete_all_elements_in_list("删除", json_data['tag'])
@@ -609,6 +627,17 @@ def fixJson(json_data, c_naming_rule):
     json_data['naming_rule'] = naming_rule
 
     return json_data
+
+
+def cleanBrackets(s):
+    ext = re.sub('\(.*?\)', '', s)
+    ext = re.sub('（.*?）', '', ext)
+    return ext.strip()
+
+
+def getBrackets(s):
+    bra = re.compile(r'[(（](.*?)[)）]', re.S)
+    return re.findall(bra, s)
 
 
 def special_characters_replacement(text) -> str:
