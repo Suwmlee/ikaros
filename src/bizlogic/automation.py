@@ -6,8 +6,8 @@ import time
 from lxml import etree
 from flask import current_app
 
-from ..scrapinglib import search
-from ..scrapinglib.utils import getTreeElement
+from scrapinglib import search
+from scrapinglib.utils import getTreeElement
 from ..service.recordservice import scrapingrecordService, transrecordService
 from ..service.configservice import autoConfigService, transConfigService, scrapingConfService
 from ..service.taskservice import autoTaskService, taskService

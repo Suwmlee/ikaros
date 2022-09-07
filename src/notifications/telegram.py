@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from ..scrapinglib import httprequest
+from scrapinglib import httprequest
 from ..service.configservice import localConfService
 
 

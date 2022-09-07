@@ -12,7 +12,7 @@ from ..service.taskservice import taskService
 from ..service.configservice import scrapingConfService, _ScrapingConfigs
 from ..utils.filehelper import linkFile, moveSubsbyFilepath
 from ..utils.number_parser import FileNumInfo
-from ..scrapinglib import search, httprequest
+from scrapinglib import search, httprequest
 
 
 def escapePath(path, escape_literals: str):
