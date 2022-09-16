@@ -106,12 +106,13 @@ def download_file_with_filename(url, filename, path):
     try:
         r = httprequest.get(url, proxies=proxies, return_type='object')
         if r == '':
-            current_app.logger.info('[-] source not found!')
+            current_app.logger.error(f"[-] download source not found! {url}")
             return False
         with open(os.path.join(path, filename), "wb") as code:
             code.write(r.content)
         return True
     except:
+        current_app.logger.error(f"[-] download failed! {url}")
         return False
 
 
