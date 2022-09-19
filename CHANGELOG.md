@@ -1,3 +1,10 @@
+## [1.33.6](https://github.com/Suwmlee/ikaros/compare/v1.33.5...v1.33.6) (2022-09-19)
+
+
+### Bug Fixes
+
+* update tvnfo poster ([d800494](https://github.com/Suwmlee/ikaros/commit/d800494b0d077d16a278ccb914c824da2d7f6769))
+
 ## [1.33.5](https://github.com/Suwmlee/ikaros/compare/v1.33.4...v1.33.5) (2022-08-28)
 
 
