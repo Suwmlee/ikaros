@@ -173,6 +173,7 @@ def sendTransferMessage(srcpath, dstpath, scheduler=None):
     headname, ext = os.path.splitext(dstpath)
     nfofile = headname + '.nfo'
     if os.path.exists(nfofile):
+        infopath = dstpath
         xmltree = etree.parse(nfofile)
         title = getTreeElement(xmltree, '//title/text()')
         showtitle = getTreeElement(xmltree, '//showtitle/text()')
@@ -187,6 +188,7 @@ def sendTransferMessage(srcpath, dstpath, scheduler=None):
             if not os.path.exists(tvnfopath):
                 tvnfopath = os.path.join(os.path.dirname(cufolder), 'tvshow.nfo')
             if os.path.exists(tvnfopath):
+                infopath = tvnfopath
                 tvtree = etree.parse(tvnfopath)
                 if imdbid == '':
                     imdbid = getTreeElement(tvtree, '//tvshow/imdb_id/text()')
@@ -197,8 +199,6 @@ def sendTransferMessage(srcpath, dstpath, scheduler=None):
 
             if showtitle != '':
                 text = '_更新_ \n*' + showtitle + '* ('+ year +') \n'
-                if season != '':
-                    text += '第 ' + season + ' 季 ' + episode + ' 集 '+ title +' \n'
             else:
                 text = '_更新_ \n*' + title + '* ('+ year +') \n'
             if imdbid != '' or tmdbid != '':
@@ -210,7 +210,7 @@ def sendTransferMessage(srcpath, dstpath, scheduler=None):
                 text += ' 】\n' 
             text += '_来源:_ `' + srcpath + '`'
 
-            photopath = getPhotoPath(dstpath)
+            photopath = getPhotoPath(infopath)
             if photopath:
                 notificationService.sendTgphoto(text, photopath)
             else:
