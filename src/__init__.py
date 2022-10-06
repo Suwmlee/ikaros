@@ -24,7 +24,7 @@ def create_app():
     # Configure logging
     formatter = logging.Formatter(app.config['LOGGING_FORMAT'])
     handler = TimedRotatingFileHandler(app.config['LOGGING_LOCATION'], encoding="utf-8", when="midnight", interval=1)
-    handler.suffix = "%Y%m%d"
+    handler.suffix = "%Y%m%d.log"
     handler.setFormatter(formatter)
     app.logger.addHandler(handler)
     app.logger.setLevel(app.config['LOGGING_LEVEL'])
