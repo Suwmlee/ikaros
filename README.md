@@ -8,7 +8,8 @@
 - 批量软/硬链接
 - 批量修改文件名，优化剧集名及自定义
 - JAV刮削及自定义
-- 自动托管
+- 自动清理关联的软/硬链接及种子文件
+- 托管（忘记这款软件，安心看片）
 
 ### 安装
 
@@ -16,24 +17,25 @@
 可自行编译或使用编译好的文件
 
 - 使用编译好的[web release](https://github.com/Suwmlee/ikaros-web/tree/release)
+  (机器已安装`python`与`pip`)
   1. 将`index.html`放到`web/templates`
   2. 将其他文件放到`web/static`
   3. `pip install -r requirements.txt`
   4. `python app.py`
 
 - 使用[docker](https://registry.hub.docker.com/r/suwmlee/ikaros)(推荐)
-    ```sh
-    docker run -d \
-      --name=ikaros \
-      -e PUID=0 \
-      -e PGID=0 \
-      -e TZ=Asia/Shanghai \
-      -p 12346:12346 \
-      -v /path/to/media:/media \
-      -v /path/to/data:/ikaros/database \
-      --restart unless-stopped \
-      suwmlee/ikaros:latest
-    ```
+  ```sh
+  docker run -d \
+    --name=ikaros \
+    -e PUID=0 \
+    -e PGID=0 \
+    -e TZ=Asia/Shanghai \
+    -p 12346:12346 \
+    -v /path/to/media:/media \
+    -v /path/to/data:/ikaros/database \
+    --restart unless-stopped \
+    suwmlee/ikaros:latest
+  ```
   默认 `PUID=1000 PGID=1000`,此处PUID,PGID为0，即使用root用户权限，也可以用 __id__ 命令查找具体用户值:
   ```
   $ id username
