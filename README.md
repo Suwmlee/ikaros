@@ -3,13 +3,18 @@
 
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/suwmlee/ikaros/Release)](https://github.com/suwmlee/ikaros/actions) [![GitHub release (latest)](https://img.shields.io/github/v/release/suwmlee/ikaros.svg)](https://github.com/suwmlee/ikaros/releases) [![Docker Pulls](https://img.shields.io/docker/pulls/suwmlee/ikaros)](https://hub.docker.com/r/suwmlee/ikaros)
 
-关联`transmission`/`qBittorrent`与`emby`，下载完成后，自动筛选文件创建软/硬链接，刮削JAV目录，推送emby库刷新
+解决下载软件与媒体服务内诸多问题，安心享受影片
 
+特性:
 - 批量软/硬链接
 - 批量修改文件名，优化剧集名及自定义
 - JAV刮削及自定义
 - 自动清理关联的软/硬链接及种子文件
 - 托管（忘记这款软件，安心看片）
+
+关联`transmission`/`qBittorrent`与`emby`。
+下载完成后，自动筛选文件创建软/硬链接，刮削JAV目录，推送emby库刷新，清理失效文件/种子。<br>
+只需要在网页内操作，不需要打开文件夹，不需要使用命令行
 
 ### 安装
 
