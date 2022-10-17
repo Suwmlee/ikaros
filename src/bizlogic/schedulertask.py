@@ -20,18 +20,27 @@ def cleanRecordsTask(delete=True, scheduler=None):
     放开emby内删除文件权限,用户在emby内删除文件,ikaros检测到文件不存在
     增加 等待删除 标记，三天后，真正删除文件，种子文件
     """
+    if scheduler:
+        with scheduler.app.app_context():
+            cleanRecords(delete)
+    else:
+        cleanRecords(delete)
+
+
+def cleanRecords(delete=True):
     if delete:
         scrapingrecordService.cleanUnavailable()
         transrecordService.cleanUnavailable()
     else:
         localconfig = localConfService.getConfig()
         if localconfig.task_clean:
-            logger(scheduler).debug('[-] cleanRecords: start!')
+            logger().debug('[-] cleanRecords: start!')
             srecords = scrapingrecordService.deadtimetoMissingrecord()
             trecords = transrecordService.deadtimetoMissingrecord()
             records = list(set(srecords + trecords))
             cleanTorrents(records, localconfig)
-            logger(scheduler).debug('[-] cleanRecords: done!')
+            logger().debug('[-] cleanRecords: done!')
+
 
 def cleanTorrents(records, conf):
     """ 删除关联的torrent

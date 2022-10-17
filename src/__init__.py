@@ -37,8 +37,8 @@ def create_app():
     from . import model
     controller.register(app)
     model.load_models()
-    db.create_all()
     with app.app_context():
+        db.create_all()
         try:
             app.logger.info("Initialization: upgrade db")
             flask_migrate.upgrade()
@@ -62,12 +62,12 @@ def resetDefaults(scheduler):
     from .bizlogic.automation import checkTaskQueue
     from .bizlogic.schedulertask import initScheduler
     scheduler.app.logger.info("Initialization: start")
-    conf = localConfService.getConfig()
-    if conf.loglevel:
-        scheduler.app.logger.setLevel(conf.loglevel)
-        scheduler.app.logger.info(f"Initialization: set loglevel {conf.loglevel}")
-    autoTaskService.reset()
     with scheduler.app.app_context():
+        conf = localConfService.getConfig()
+        if conf.loglevel:
+            scheduler.app.logger.setLevel(conf.loglevel)
+            scheduler.app.logger.info(f"Initialization: set loglevel {conf.loglevel}")
+        autoTaskService.reset()
         checkTaskQueue()
     initScheduler()
     scheduler.app.logger.info("Initialization: finished")
