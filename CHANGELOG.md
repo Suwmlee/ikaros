@@ -1,3 +1,11 @@
+## [1.33.7](https://github.com/Suwmlee/ikaros/compare/v1.33.6...v1.33.7) (2022-10-17)
+
+
+### Bug Fixes
+
+* sqlalchemy app context ([982aa27](https://github.com/Suwmlee/ikaros/commit/982aa271e3f35a5a1e36c5f93f9c9add353dd59a))
+* uniform proxy settings ([21624b0](https://github.com/Suwmlee/ikaros/commit/21624b0fca66145b144e5b183e7d565000d8ba6e))
+
 ## [1.33.6](https://github.com/Suwmlee/ikaros/compare/v1.33.5...v1.33.6) (2022-09-19)
 
 
