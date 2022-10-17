@@ -9,7 +9,7 @@ from lxml import etree
 from flask import current_app
 
 from ..service.taskservice import taskService
-from ..service.configservice import scrapingConfService, _ScrapingConfigs
+from ..service.configservice import scrapingConfService, localConfService, _ScrapingConfigs
 from ..utils.filehelper import linkFile, moveSubsbyFilepath
 from ..utils.number_parser import FileNumInfo
 from scrapinglib import search, httprequest
@@ -98,8 +98,7 @@ def parseJsonInfo(json_data):
 def download_file_with_filename(url, filename, path):
     """ 下载文件
     """
-    task = taskService.getTask('scrape')
-    configProxy = scrapingConfService.getProxyConfig(task.cid)
+    configProxy = localConfService.getProxyConfig()
     proxies = configProxy.proxies() if configProxy.enable else None
     if not os.path.exists(path):
         os.makedirs(path)
@@ -407,8 +406,7 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs, specifieds
     c_sources = conf.site_sources
     if not c_sources:
         c_sources = "javlibrary,javdb,javbus,airav,fanza,xcity,jav321,mgstage,fc2,avsox,dlsite,carib,madou,mv91,getchu,gcolle"
-    task = taskService.getTask('scrape')
-    configProxy = scrapingConfService.getProxyConfig(task.cid)
+    configProxy = localConfService.getProxyConfig()
     proxies = configProxy.proxies() if configProxy.enable else None
     json_data = search(number, c_sources,
                        specifiedSource=specifiedsource, specifiedUrl=specifiedurl,

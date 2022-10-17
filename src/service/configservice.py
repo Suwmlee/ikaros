@@ -51,12 +51,6 @@ class ScrapingConfService():
             db.session.delete(config)
             db.session.commit()
 
-    def getProxyConfig(self, cid):
-        config = _ScrapingConfigs.query.filter_by(id=cid).first()
-        proxyConfig = ProxyConfig(config.proxy_enable, config.proxy_address,
-                                  config.proxy_timeout, config.proxy_retry, config.proxy_type)
-        return proxyConfig
-
 
 class TransConfService():
     """ 转移模块服务

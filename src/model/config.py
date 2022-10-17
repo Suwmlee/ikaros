@@ -29,12 +29,6 @@ class _ScrapingConfigs(db.Model):
     soft_prefix = Column(String, default='/media')
     failed_move = Column(Boolean, default=False)
 
-    proxy_enable = Column(Boolean, default=False)
-    proxy_type = Column(String, default='socks5h')
-    proxy_address = Column(String, default='127.0.0.1:1080')
-    proxy_timeout = Column(Integer, default=10)
-    proxy_retry = Column(Integer, default=3)
-
     site_sources = Column(String, default="")
     location_rule = Column(String, default="actor+'/'+number+' '+title")
     naming_rule = Column(String, default="number+' '+title")
@@ -83,11 +77,6 @@ class _ScrapingConfigs(db.Model):
             'watermark_size': self.watermark_size,
             'escape_folders': self.escape_folders,
             'escape_size': self.escape_size,
-            'proxy_enable': self.proxy_enable,
-            'proxy_type': self.proxy_type,
-            'proxy_address': self.proxy_address,
-            'proxy_timeout': self.proxy_timeout,
-            'proxy_retry': self.proxy_retry,
             'cookies_javdb': self.cookies_javdb,
             'cookies_javlib': self.cookies_javlib,
             'refresh_url': self.refresh_url,
