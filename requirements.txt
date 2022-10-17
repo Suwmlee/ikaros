@@ -1,4 +1,5 @@
 Flask
+flask-sqlalchemy==2.5.1
 Flask-Migrate
 Flask-APScheduler
 Pillow
