@@ -1,3 +1,10 @@
+## [1.33.8](https://github.com/Suwmlee/ikaros/compare/v1.33.7...v1.33.8) (2022-10-23)
+
+
+### Bug Fixes
+
+* move files in different file system ([3678a70](https://github.com/Suwmlee/ikaros/commit/3678a70078f29d98097266711d65be1624830784)), closes [#26](https://github.com/Suwmlee/ikaros/issues/26)
+
 ## [1.33.7](https://github.com/Suwmlee/ikaros/compare/v1.33.6...v1.33.7) (2022-10-17)
 
 
