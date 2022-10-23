@@ -371,7 +371,7 @@ def paste_file_to_folder(filepath, path, prefilename, link_type, extra=False):
             linkFile(filepath, newpath, 2)
         else:
             copyTag = False
-            os.rename(filepath, newpath)
+            shutil.move(filepath, newpath)
         moveSubsbyFilepath(filepath, newpath, copyTag)
         return True, newpath
     except FileExistsError:

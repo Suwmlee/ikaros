@@ -5,6 +5,7 @@ import os
 import pathlib
 import re
 import datetime
+import shutil
 
 from ..service.configservice import scrapingConfService, _ScrapingConfigs
 from ..service.recordservice import scrapingrecordService
@@ -113,7 +114,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs, forced=False):
                         else:
                             current_app.logger.error(f"[!]Checking file status: file missing")
                             if os.path.exists(movie_info.srcpath):
-                                os.rename(movie_info.srcpath, movie_info.destpath)
+                                shutil.move(movie_info.srcpath, movie_info.destpath)
                                 current_app.logger.info(f"[!]Checking file status: fixed")
                     elif conf.link_type == 1:
                         if os.path.exists(movie_info.srcpath) and pathlib.Path(movie_info.destpath).is_symlink():
@@ -221,7 +222,7 @@ def startScrapingSingle(cid, movie_path: str, forced=False):
             # 源文件不存在，目的文件存在。(非链接模式,刮削后进行了移动)
             if os.path.exists(movie_info.destpath) and os.path.isfile(movie_info.destpath) \
                 and not pathlib.Path(movie_info.destpath).is_symlink():
-                os.rename(movie_info.destpath, movie_path)
+                shutil.move(movie_info.destpath, movie_path)
     if os.path.exists(movie_path) and os.path.isfile(movie_path):
         conf = scrapingConfService.getConfig(cid)
         create_data_and_move(movie_path, conf, forced)

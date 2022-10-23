@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import shutil
 from flask import current_app
 from ..utils.filehelper import video_type, ext_type
 from ..utils.regex import extractEpNum, matchEpPart, regexMatch
@@ -26,7 +27,7 @@ def rename(root, base, newfix):
         if base in basename:
             newname = basename.replace(base, newfix)
             newfull = os.path.join(dirname, newname)
-            os.rename(name, newfull)
+            shutil.move(name, newfull)
             current_app.logger.info("rename [{}] to [{}]".format(name, newfull))
 
 
@@ -62,7 +63,7 @@ def renamebyreg(root, reg, prefix, preview: bool = True):
 
                 if not preview:
                     newfull = os.path.join(dirname, newname)
-                    os.rename(name, newfull)
+                    shutil.move(name, newfull)
                 single = {'original': basename, 'rename': newname}
                 table.append(single)
 
