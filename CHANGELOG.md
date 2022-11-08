@@ -1,3 +1,10 @@
+## [1.33.9](https://github.com/Suwmlee/ikaros/compare/v1.33.8...v1.33.9) (2022-11-08)
+
+
+### Bug Fixes
+
+* parse md number ([4ab1ff8](https://github.com/Suwmlee/ikaros/commit/4ab1ff8a7c7a86e155a61948353d8f20ce98c814))
+
 ## [1.33.8](https://github.com/Suwmlee/ikaros/compare/v1.33.7...v1.33.8) (2022-10-23)
 
 
