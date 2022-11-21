@@ -1,3 +1,10 @@
+## [1.33.10](https://github.com/Suwmlee/ikaros/compare/v1.33.9...v1.33.10) (2022-11-21)
+
+
+### Bug Fixes
+
+* update mapping ([9324eef](https://github.com/Suwmlee/ikaros/commit/9324eef46bb54db7f0639c01c3ec29e35b28c00a))
+
 ## [1.33.9](https://github.com/Suwmlee/ikaros/compare/v1.33.8...v1.33.9) (2022-11-08)
 
 
