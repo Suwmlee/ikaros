@@ -1,3 +1,10 @@
+# [1.35.0](https://github.com/Suwmlee/ikaros/compare/v1.34.0...v1.35.0) (2022-12-07)
+
+
+### Features
+
+* update lib api ([f77535e](https://github.com/Suwmlee/ikaros/commit/f77535e1290f4c6553ccf8e316e8974f199152fc))
+
 # [1.34.0](https://github.com/Suwmlee/ikaros/compare/v1.33.10...v1.34.0) (2022-11-30)
 
 
