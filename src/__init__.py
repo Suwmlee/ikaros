@@ -3,6 +3,7 @@
     init app
 """
 import logging
+import os
 import flask_migrate
 from flask import Flask
 from logging.handlers import TimedRotatingFileHandler
@@ -22,6 +23,9 @@ def create_app():
     app = Flask(__name__, static_url_path='', static_folder='../web/static/', template_folder='../web/templates/')
     app.config.from_object(Config)
     # Configure logging
+    conf_folder = os.path.dirname(app.config['LOGGING_LOCATION'])
+    if not os.path.exists(conf_folder):
+        os.mkdir(conf_folder)
     formatter = logging.Formatter(app.config['LOGGING_FORMAT'])
     handler = TimedRotatingFileHandler(app.config['LOGGING_LOCATION'], encoding="utf-8", when="midnight", interval=1)
     handler.suffix = "%Y%m%d.log"
