@@ -1,3 +1,10 @@
+## [1.35.1](https://github.com/Suwmlee/ikaros/compare/v1.35.0...v1.35.1) (2022-12-08)
+
+
+### Bug Fixes
+
+* no database folder ([fa15548](https://github.com/Suwmlee/ikaros/commit/fa155482ab964f4e1001a6228a5b911a70ffc760))
+
 # [1.35.0](https://github.com/Suwmlee/ikaros/compare/v1.34.0...v1.35.0) (2022-12-07)
 
 
