@@ -23,19 +23,19 @@ ARG S6_OVERLAY_ARCH="x86_64"
 
 # add s6 overlay
 RUN wget https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz -P /tmp && \
-    tar -C / -xvf /tmp/s6-overlay-noarch.tar.xz
+    tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz
 RUN wget https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6_OVERLAY_ARCH}.tar.xz -P /tmp && \
-    tar -C / -xvf /tmp/s6-overlay-${S6_OVERLAY_ARCH}.tar.xz
+    tar -C / -Jxpf /tmp/s6-overlay-${S6_OVERLAY_ARCH}.tar.xz
 
 # add s6 optional symlinks
 RUN wget  https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-noarch.tar.xz -P /tmp && \
-    tar -C / -xvf /tmp/s6-overlay-symlinks-noarch.tar.xz
+    tar -C / -Jxpf /tmp/s6-overlay-symlinks-noarch.tar.xz
 RUN wget  https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-arch.tar.xz -P /tmp && \
-    tar -C / -xvf /tmp/s6-overlay-symlinks-arch.tar.xz
+    tar -C / -Jxpf /tmp/s6-overlay-symlinks-arch.tar.xz
 
 # fetch ikaros web
 RUN wget https://github.com/Suwmlee/ikaros-web/archive/release.tar.gz -P /tmp && \
-    tar -C /tmp -xvzf /tmp/release.tar.gz
+    tar -C /tmp -xzf /tmp/release.tar.gz
 
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
