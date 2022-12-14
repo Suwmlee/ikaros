@@ -55,7 +55,7 @@ def flask_logger():
     """creates logging information"""
     localPath = os.path.dirname(os.path.abspath(__file__))
     # TODO get web.log
-    logfile = os.path.join(localPath, "..", "..", "database", "web.log")
+    logfile = os.path.join(localPath, "..", "..", "data", "web.log")
     with open(logfile, encoding='UTF-8') as log_info:
         for i in range(25):
             data = log_info.read()

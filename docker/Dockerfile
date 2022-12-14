@@ -57,7 +57,7 @@ RUN echo "**** create abc user and make our folders ****" && \
     mkdir /config
 
 VOLUME /media
-VOLUME /ikaros/database
+VOLUME /ikaros/data
 
 #Copy s6-overlay 3.x services
 #Uses a system-d like definition that can't be use in 2.x

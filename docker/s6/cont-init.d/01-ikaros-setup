@@ -19,5 +19,5 @@ User gid:    $(id -g abc)
 chown abc:abc /config
 chown abc:abc /ikaros
 
-chown -R abc /ikaros/database
-chmod -R u+rwx /ikaros/database
+chown -R abc /ikaros/data
+chmod -R u+rwx /ikaros/data
