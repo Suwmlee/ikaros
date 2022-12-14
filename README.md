@@ -41,10 +41,10 @@
     --restart unless-stopped \
     suwmlee/ikaros:latest
   ```
-  默认 `PUID=0 PGID=0`,即使用root用户权限，也可以用 __id__ 命令查找具体用户值:
+  默认 `PUID=0 PGID=0`,即使用root权限。可以用 __id__ 命令查找具体用户值:
   ```
-  $ id username
-    uid=1000(ikaros) gid=1000(ikarosgroup) groups=1000(ikarosgroup)
+  $ id abc
+    uid=1000(abc) gid=1000(users) groups=1000(users)
   ```
 
 - 群晖docker
