@@ -1,0 +1,13 @@
+#!/bin/sh
+
+USER_ID=${PUID:-1000}
+GROUP_ID=${PGID:-1000}
+
+echo "Starting with UID/GID : $USER_ID/$GROUP_ID"
+
+usermod -o -u $USER_ID abc
+groupmod -o -g $GROUP_ID abc
+
+#Ensure folder is writable
+chown -R abc:abc /ikaros
+chmod u+rwx /ikaros

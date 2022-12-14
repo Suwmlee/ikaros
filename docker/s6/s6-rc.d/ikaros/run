@@ -1,0 +1,4 @@
+#!/bin/sh
+cd /ikaros
+export HOME=/ikaros
+exec s6-setuidgid abc flask run --port=12346
