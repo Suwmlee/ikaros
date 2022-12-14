@@ -1,13 +1,23 @@
-#!/bin/sh
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
 
-USER_ID=${PUID:-1000}
-GROUP_ID=${PGID:-1000}
+PUID=${PUID:-911}
+PGID=${PGID:-911}
 
-echo "Starting with UID/GID : $USER_ID/$GROUP_ID"
+groupmod -o -g "$PGID" abc
+usermod -o -u "$PUID" abc
 
-usermod -o -u $USER_ID abc
-groupmod -o -g $GROUP_ID abc
+echo "
+-------------------------------------
+GID/UID
+-------------------------------------
+User uid:    $(id -u abc)
+User gid:    $(id -g abc)
+-------------------------------------
+"
 
-#Ensure folder is writable
-chown -R abc:abc /ikaros
-chmod u+rwx /ikaros
+chown abc:abc /config
+chown abc:abc /ikaros
+
+chown -R abc /ikaros/database
+chmod -R u+rwx /ikaros/database
