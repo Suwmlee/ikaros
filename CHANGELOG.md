@@ -1,3 +1,10 @@
+## [1.35.3](https://github.com/Suwmlee/ikaros/compare/v1.35.2...v1.35.3) (2022-12-14)
+
+
+### Bug Fixes
+
+* **docker:** run custom scripts permission ([b96e716](https://github.com/Suwmlee/ikaros/commit/b96e716becfc9eef134b6cfd4468e61e2add614d))
+
 ## [1.35.2](https://github.com/Suwmlee/ikaros/compare/v1.35.1...v1.35.2) (2022-12-14)
 
 
