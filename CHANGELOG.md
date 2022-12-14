@@ -1,3 +1,10 @@
+## [1.35.2](https://github.com/Suwmlee/ikaros/compare/v1.35.1...v1.35.2) (2022-12-14)
+
+
+### Bug Fixes
+
+* **docker:** run process as a specific user ([1095906](https://github.com/Suwmlee/ikaros/commit/10959065cde174c7b6b9ad7e273b617c397cc8d3))
+
 ## [1.35.1](https://github.com/Suwmlee/ikaros/compare/v1.35.0...v1.35.1) (2022-12-08)
 
 
