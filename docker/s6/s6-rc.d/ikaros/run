@@ -1,4 +1,4 @@
 #!/bin/sh
-cd /ikaros
-export HOME=/ikaros
-exec s6-setuidgid abc flask run --port=12346
+cd /app
+export HOME=/app
+exec s6-setuidgid tomoki flask run --port=12346

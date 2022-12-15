@@ -28,9 +28,9 @@ RUN wget https://github.com/just-containers/s6-overlay/releases/download/v${S6_O
     tar -C / -Jxpf /tmp/s6-overlay-${S6_OVERLAY_ARCH}.tar.xz
 
 # add s6 optional symlinks
-RUN wget  https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-noarch.tar.xz -P /tmp && \
+RUN wget https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-noarch.tar.xz -P /tmp && \
     tar -C / -Jxpf /tmp/s6-overlay-symlinks-noarch.tar.xz
-RUN wget  https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-arch.tar.xz -P /tmp && \
+RUN wget https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-arch.tar.xz -P /tmp && \
     tar -C / -Jxpf /tmp/s6-overlay-symlinks-arch.tar.xz
 
 # fetch ikaros web
@@ -40,24 +40,24 @@ RUN wget https://github.com/Suwmlee/ikaros-web/archive/release.tar.gz -P /tmp &&
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
-WORKDIR /ikaros
+WORKDIR /app
 COPY . .
 
 # setup ikaros web
-RUN mv /tmp/ikaros-web-release/index.html /ikaros/web/templates/ && \ 
-    mv /tmp/ikaros-web-release/* /ikaros/web/static/
+RUN mv /tmp/ikaros-web-release/index.html /app/web/templates/ && \ 
+    mv /tmp/ikaros-web-release/* /app/web/static/
 
 # clean
 RUN rm -rf /tmp/*
 
-RUN echo "**** create abc user and make our folders ****" && \
+RUN echo "**** create tomoki user and make folders ****" && \
     groupmod -g 1000 users && \
-    useradd -u 911 -U -d /config -s /bin/false abc && \
-    usermod -G users abc && \
+    useradd -u 911 -U -d /config -s /bin/false tomoki && \
+    usermod -G users tomoki && \
     mkdir /config
 
 VOLUME /media
-VOLUME /ikaros/data
+VOLUME /app/data
 
 #Copy s6-overlay 3.x services
 #Uses a system-d like definition that can't be use in 2.x
