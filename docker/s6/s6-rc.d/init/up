@@ -1,1 +1,0 @@
-sh /etc/s6-overlay/s6-rc.d/init/01-ikaros-setup
