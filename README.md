@@ -48,11 +48,8 @@
   ```
 
 - 群晖docker
-  1. 设置卷
+  1. 设置存储空间映射
     <img src="docs/imgs/path.png" alt="set-vol" width="600"/>
-
-  2. 设置端口
-    <img src="docs/imgs/port.png" alt="set-port" width="600"/>
 
 
 __注:__ 
