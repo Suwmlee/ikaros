@@ -37,7 +37,7 @@
     -e TZ=Asia/Shanghai \
     -p 12346:12346 \
     -v /path/to/media:/media \
-    -v /path/to/data:/ikaros/data \
+    -v /path/to/data:/app/data \
     --restart unless-stopped \
     suwmlee/ikaros:latest
   ```
