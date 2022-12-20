@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/Suwmlee/ikaros/compare/v1.35.3...v2.0.0) (2022-12-20)
+
+
+### Features
+
+* **docker:** update python to latest version ([274d019](https://github.com/Suwmlee/ikaros/commit/274d019003b1777aab9a2d9e1cec5b0885fb58b2))
+
+
+### BREAKING CHANGES
+
+* **docker:** Change db location. rename folder `database`  to `data`
+
 ## [1.35.3](https://github.com/Suwmlee/ikaros/compare/v1.35.2...v1.35.3) (2022-12-14)
 
 
