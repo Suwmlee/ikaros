@@ -1,7 +1,6 @@
-FROM python:3.9-slim
+FROM python:slim
 LABEL git="https://github.com/Suwmlee/ikaros"
 
-ENV S6_KEEP_ENV 1
 ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV TZ=Asia/Shanghai
@@ -18,6 +17,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone
 
 # set version for s6 overlay
+ENV S6_KEEP_ENV=1
 ARG S6_OVERLAY_VERSION="3.1.2.1"
 ARG S6_OVERLAY_ARCH="x86_64"
 
