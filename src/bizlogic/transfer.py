@@ -295,6 +295,10 @@ def transfer(src_folder, dest_folder,
             oldname = os.path.splitext(currentfile.realname)[0]
             moveSubs(currentfile.realfolder, currentfile.finalfolder, oldname, currentfile.name)
 
+            if os.path.exists(currentrecord.destpath) and newpath != currentrecord.destpath:
+                # 清理之前转移的文件
+                transrecordService.deleteRecord(currentrecord, False)
+
             if newpath in dest_list:
                 dest_list.remove(newpath)
 
