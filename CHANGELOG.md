@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/Suwmlee/ikaros/compare/v2.0.0...v2.0.1) (2023-01-03)
+
+
+### Bug Fixes
+
+* **transfer:** clean old records ([79345b6](https://github.com/Suwmlee/ikaros/commit/79345b6842a87e28cec67a2d9d6529a671a01ecb))
+
 # [2.0.0](https://github.com/Suwmlee/ikaros/compare/v1.35.3...v2.0.0) (2022-12-20)
 
 
