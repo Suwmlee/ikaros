@@ -1,7 +1,7 @@
 
 # ikaros
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/suwmlee/ikaros/Release)](https://github.com/suwmlee/ikaros/actions) [![GitHub release (latest)](https://img.shields.io/github/v/release/suwmlee/ikaros.svg)](https://github.com/suwmlee/ikaros/releases) [![Docker Pulls](https://img.shields.io/docker/pulls/suwmlee/ikaros)](https://hub.docker.com/r/suwmlee/ikaros)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/suwmlee/ikaros/release.yml?branch=master)](https://github.com/suwmlee/ikaros/actions) [![GitHub release (latest)](https://img.shields.io/github/v/release/suwmlee/ikaros.svg)](https://github.com/suwmlee/ikaros/releases) [![Docker Pulls](https://img.shields.io/docker/pulls/suwmlee/ikaros)](https://hub.docker.com/r/suwmlee/ikaros)
 
 解决下载软件与媒体服务内诸多问题，安心享受影片
 
