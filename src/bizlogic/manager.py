@@ -216,11 +216,11 @@ def startScrapingSingle(cid, movie_path: str, forced=False):
     if movie_info and (forced or movie_info.status == 0 or movie_info.status == 2):
         if os.path.exists(movie_path):
             # 源文件存在，目的文件存在。(链接模式)
-            if os.path.exists(movie_info.destpath):
+            if movie_info.destpath and os.path.exists(movie_info.destpath):
                 scrapingrecordService.deleteRecord(movie_info, False)
         else:
             # 源文件不存在，目的文件存在。(非链接模式,刮削后进行了移动)
-            if os.path.exists(movie_info.destpath) and os.path.isfile(movie_info.destpath) \
+            if movie_info.destpath and os.path.exists(movie_info.destpath) and os.path.isfile(movie_info.destpath) \
                 and not pathlib.Path(movie_info.destpath).is_symlink():
                 shutil.move(movie_info.destpath, movie_path)
     if os.path.exists(movie_path) and os.path.isfile(movie_path):
