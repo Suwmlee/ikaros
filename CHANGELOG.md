@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/Suwmlee/ikaros/compare/v2.0.1...v2.0.2) (2023-04-11)
+
+
+### Bug Fixes
+
+* check destpath ([9a2ad06](https://github.com/Suwmlee/ikaros/commit/9a2ad064e5c80121af2e6fc51b1acd2a1797ea84)), closes [#29](https://github.com/Suwmlee/ikaros/issues/29)
+
 ## [2.0.1](https://github.com/Suwmlee/ikaros/compare/v2.0.0...v2.0.1) (2023-01-03)
 
 

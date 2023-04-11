@@ -9,6 +9,6 @@ class Config:
     LOGGING_FORMAT = '[%(asctime)s] %(module)-15s %(levelname)s : %(message)s'
     LOGGING_LOCATION = 'data/web.log'
     LOGGING_LEVEL = logging.INFO
-    VERSION = '2.0.1'
+    VERSION = '2.0.2'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///../data/data.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
