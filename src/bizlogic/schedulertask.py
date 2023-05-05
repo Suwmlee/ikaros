@@ -64,7 +64,7 @@ def cleanTorrents(records, conf):
             torrents = trs.searchByPath(path)
             for torrent in torrents:
                 logger().debug(f'[-] cleanRecords: find torrent {torrent.name}')
-                downfolder = os.path.join(torrent.downloadDir, torrent.name)
+                downfolder = os.path.join(torrent.fields['downloadDir'], torrent.name)
                 fixedfolder = downfolder.replace(trfolder, prefixed, 1)
                 if checkFolderhasMedia(fixedfolder):
                     continue
