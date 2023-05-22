@@ -1,3 +1,10 @@
+## [2.0.4](https://github.com/Suwmlee/ikaros/compare/v2.0.3...v2.0.4) (2023-05-22)
+
+
+### Bug Fixes
+
+* clean parse madou ([69bedb0](https://github.com/Suwmlee/ikaros/commit/69bedb0cb306dc608f946d6f674df23d36d5a9d0))
+
 ## [2.0.3](https://github.com/Suwmlee/ikaros/compare/v2.0.2...v2.0.3) (2023-05-05)
 
 
