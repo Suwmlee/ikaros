@@ -10,6 +10,7 @@ from logging.handlers import TimedRotatingFileHandler
 from flask_sqlalchemy import SQLAlchemy
 
 from .config import Config
+from .utils.wslog import start_wslogserver
 
 db = SQLAlchemy()
 migrate = flask_migrate.Migrate()
@@ -32,6 +33,7 @@ def create_app():
     handler.setFormatter(formatter)
     app.logger.addHandler(handler)
     app.logger.setLevel(app.config['LOGGING_LEVEL'])
+    start_wslogserver(host='127.0.0.1', port=12348)
 
     db.app = app
     db.init_app(app)
