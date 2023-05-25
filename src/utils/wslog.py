@@ -18,21 +18,20 @@ async def view_log(websocket, path):
         except Exception:
             raise ValueError('Fail to parse URL')
 
-        localPath = os.path.dirname(os.path.abspath(__file__))
-        log_path = os.path.join(localPath, "..", "..", "data", "web.log")
-
-        if not os.path.isfile(log_path):
-            raise ValueError('Not found')
-
         query = parse_qs(parse_result.query)
         tail = query and query['tail'] and query['tail'][0] == '1'
 
-        with open(log_path, encoding='utf8') as f:
+        if tail:
 
-            content = ''.join(deque(f, NUM_LINES))
-            await websocket.send(content)
+            localPath = os.path.dirname(os.path.abspath(__file__))
+            log_path = os.path.join(localPath, "..", "..", "data", "web.log")
 
-            if tail:
+            if not os.path.isfile(log_path):
+                raise ValueError('Not found log')
+
+            with open(log_path, encoding='utf8') as f:
+                content = ''.join(deque(f, NUM_LINES))
+                await websocket.send(content)
                 last_heartbeat = time.time()
                 while True:
                     content = f.read()
@@ -42,27 +41,20 @@ async def view_log(websocket, path):
                         await asyncio.sleep(1)
 
                     if time.time() - last_heartbeat > HEARTBEAT_INTERVAL:
-                        try:
-                            await websocket.send('ping')
-                            pong = await asyncio.wait_for(websocket.recv(), 5)
-                            if pong != 'pong':
-                                raise Exception()
-                        except Exception:
-                            raise Exception('Ping error')
-                        else:
-                            last_heartbeat = time.time()
+                        pong = ''
+                        await websocket.send('ping')
+                        pong = await asyncio.wait_for(websocket.recv(), 5)
 
-            else:
-                await websocket.close()
-
-    except ValueError as e:
+                        if pong != 'pong':
+                            raise Exception('ping error')
+                        last_heartbeat = time.time()
+        else:
+            await websocket.close()
+    except Exception as e:
         try:
-            await websocket.send('<font color="red"><strong>{}</strong></font>'.format(e))
             await websocket.close()
         except:
             pass
-    else:
-        pass
 
 
 async def serve(host: str, port: int):
