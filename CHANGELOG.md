@@ -1,3 +1,10 @@
+## [2.0.6](https://github.com/Suwmlee/ikaros/compare/v2.0.5...v2.0.6) (2023-05-29)
+
+
+### Bug Fixes
+
+* missing ws ([e4ff202](https://github.com/Suwmlee/ikaros/commit/e4ff2021b45bef34e0c242fa2c916dcf206a5ba1))
+
 ## [2.0.5](https://github.com/Suwmlee/ikaros/compare/v2.0.4...v2.0.5) (2023-05-29)
 
 
