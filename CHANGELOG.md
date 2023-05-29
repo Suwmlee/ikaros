@@ -1,3 +1,10 @@
+## [2.0.5](https://github.com/Suwmlee/ikaros/compare/v2.0.4...v2.0.5) (2023-05-29)
+
+
+### Bug Fixes
+
+* scheduler app context ([7e37c45](https://github.com/Suwmlee/ikaros/commit/7e37c457c907194de6b31cc5c7f5268af633eb3a))
+
 ## [2.0.4](https://github.com/Suwmlee/ikaros/compare/v2.0.3...v2.0.4) (2023-05-22)
 
 
