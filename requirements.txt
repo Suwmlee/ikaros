@@ -8,3 +8,4 @@ MechanicalSoup
 cloudscraper
 transmission_rpc
 scrapinglib
+websockets
