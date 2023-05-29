@@ -126,8 +126,8 @@ def runTask(client_path: str):
             records = transrecordService.queryLatest(realPath)
             for record in records:
                 if record:
-                    schedulerService.addJob('autoMessageJob', sendTransferMessage, 
-                                    args=[record.srcpath, record.destpath, schedulerService.scheduler], seconds=15)
+                    schedulerService.addJob('autoMessageJob', wrapSendTransferMessage,
+                                            args=[record.srcpath, record.destpath, schedulerService.scheduler], seconds=15)
                     return
         notificationService.sendtext("托管任务:[{}], 转移异常,详情请查看日志".format(realPath))
     else:
@@ -164,6 +164,11 @@ def sendScrapingMessage(srcpath, dstpath):
         notificationService.sendtext("托管任务:[{}], 刮削完成,已推送媒体库".format(srcpath))
 
 
+def wrapSendTransferMessage(srcpath, dstpath, scheduler=None):
+    with scheduler.app.app_context():
+        sendTransferMessage(srcpath, dstpath, scheduler)
+
+
 def sendTransferMessage(srcpath, dstpath, scheduler=None):
     """
     组织发送转移消息
@@ -194,20 +199,19 @@ def sendTransferMessage(srcpath, dstpath, scheduler=None):
                     imdbid = getTreeElement(tvtree, '//tvshow/imdb_id/text()')
                 if tmdbid == '':
                     tmdbid = getTreeElement(tvtree, '//tvshow/tmdbid/text()')
-
         if notificationService.isTgEnabled():
 
             if showtitle != '':
-                text = '_更新_ \n*' + showtitle + '* ('+ year +') \n'
+                text = '_更新_ \n*' + showtitle + '* (' + year + ') \n'
             else:
-                text = '_更新_ \n*' + title + '* ('+ year +') \n'
+                text = '_更新_ \n*' + title + '* (' + year + ') \n'
             if imdbid != '' or tmdbid != '':
                 text += '【 '
-                if imdbid: 
-                    text += '[IMDB](https://www.imdb.com/title/'+ imdbid +')  '
+                if imdbid:
+                    text += '[IMDB](https://www.imdb.com/title/' + imdbid + ')  '
                 if tmdbid:
-                    text += '[TMDB](https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN) ' 
-                text += ' 】\n' 
+                    text += '[TMDB](https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN) '
+                text += ' 】\n'
             text += '_来源:_ `' + srcpath + '`'
 
             photopath = getPhotoPath(infopath)
@@ -220,7 +224,7 @@ def sendTransferMessage(srcpath, dstpath, scheduler=None):
             if tmdbid != '':
                 jsondata = search(tmdbid, type='general')
                 imageurl = jsondata.get('cover')
-                text_title = '更新  ' + title + ' ('+ year +')'
+                text_title = '更新  ' + title + ' (' + year + ')'
                 text_description = '来源: ' + srcpath
                 text_url = 'https://www.themoviedb.org/movie/' + tmdbid + '?language=zh-CN'
                 notificationService.sendWeNews(text_title, text_description, imageurl, text_url)
@@ -229,6 +233,7 @@ def sendTransferMessage(srcpath, dstpath, scheduler=None):
     else:
         # TODO 不存在文件,自己解析？
         notificationService.sendtext("托管:[{}], 转移完成,媒体库未自动识别,请手动识别".format(srcpath))
+
 
 def getPhotoPath(filepath):
     headname, ext = os.path.splitext(filepath)
