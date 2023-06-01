@@ -9,7 +9,7 @@ NUM_LINES = 1000
 HEARTBEAT_INTERVAL = 15
 
 
-@wsocket.route('/logstream')
+@wsocket.route('/ws/logstream')
 def logstream(websocket):
 
     try:
@@ -26,7 +26,5 @@ def logstream(websocket):
                 content = f.read()
                 if content:
                     websocket.send(content)
-                else:
-                    time.sleep(1)
     except Exception as e:
-        print(e)
+        websocket.close()
