@@ -6,7 +6,7 @@ from flask import Blueprint, json, jsonify
 web = Blueprint('web', __name__)
 
 
-def register(app):
+def init(app):
     from . import main_ctrl
     from . import viewsctrl
     from . import optionctrl

@@ -12,3 +12,4 @@ class Config:
     VERSION = '2.0.6'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///../data/data.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SOCK_SERVER_OPTIONS = {'ping_interval': 10}
