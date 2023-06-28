@@ -1,3 +1,10 @@
+## [2.0.8](https://github.com/Suwmlee/ikaros/compare/v2.0.7...v2.0.8) (2023-06-28)
+
+
+### Bug Fixes
+
+* log ([78065b1](https://github.com/Suwmlee/ikaros/commit/78065b1f6625d4278a6dcff16bb58793126a4192))
+
 ## [2.0.7](https://github.com/Suwmlee/ikaros/compare/v2.0.6...v2.0.7) (2023-06-28)
 
 
