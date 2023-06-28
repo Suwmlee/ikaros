@@ -26,5 +26,7 @@ def logstream(websocket):
                 content = f.read()
                 if content:
                     websocket.send(content)
+                else:
+                    time.sleep(10)
     except Exception as e:
         websocket.close()
