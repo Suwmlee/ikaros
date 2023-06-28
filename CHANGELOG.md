@@ -1,3 +1,10 @@
+## [2.0.7](https://github.com/Suwmlee/ikaros/compare/v2.0.6...v2.0.7) (2023-06-28)
+
+
+### Bug Fixes
+
+* scheduler interval ([4dddd08](https://github.com/Suwmlee/ikaros/commit/4dddd087b65564ee136dce38cbf92205b09d5f8e))
+
 ## [2.0.6](https://github.com/Suwmlee/ikaros/compare/v2.0.5...v2.0.6) (2023-05-29)
 
 
