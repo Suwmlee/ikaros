@@ -48,26 +48,6 @@ def cleanErrData():
     cleanRecordsTask(True)
     return Response(status=200)
 
-# TODO refactor log
-
-
-def flask_logger():
-    """creates logging information"""
-    localPath = os.path.dirname(os.path.abspath(__file__))
-    # TODO get web.log
-    logfile = os.path.join(localPath, "..", "..", "data", "web.log")
-    with open(logfile, encoding='UTF-8') as log_info:
-        for i in range(25):
-            data = log_info.read()
-            yield data.encode()
-            time.sleep(1)
-
-
-@web.route("/api/options/logstream", methods=["GET"])
-def stream():
-    """returns logging information"""
-    return Response(flask_logger(), mimetype="text/plain", content_type="text/event-stream; charset=utf-8")
-
 
 @web.route("/api/options/config", methods=["GET"])
 def getLocalConfig():
@@ -85,7 +65,7 @@ def updateLocalConf():
 
 @web.route("/api/options/check/lib", methods=['GET'])
 def checklibversion():
-    """ 检测scrapinglib版本
+    """ Beta 检测scrapinglib版本
     """
     info = subprocess.run("python -m pip index -vv versions scrapinglib", shell=True, stdout=subprocess.PIPE, encoding="utf8")
     out = info.stdout
@@ -104,7 +84,7 @@ def checklibversion():
 
 @web.route("/api/options/check/lib", methods=['PUT'])
 def updatelibversion():
-    """ 更新scrapinglib
+    """ Beta 更新scrapinglib
     """
     info = subprocess.run("python -m pip install scrapinglib -U", shell=True, stdout=subprocess.PIPE, encoding="utf8")
     current_app.logger.debug(info.stdout)
