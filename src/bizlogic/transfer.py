@@ -303,7 +303,7 @@ def transfer(src_folder, dest_folder,
                 dest_list.remove(newpath)
 
             current_app.logger.info("[-] transfered [{}]".format(newpath))
-            transrecordService.update(currentrecord, link_path, newpath, currentrecord.status,
+            transrecordService.editRecord(currentrecord, link_path, newpath, currentrecord.status,
                                       currentfile.topfolder, currentfile.secondfolder,
                                       currentfile.isepisode, currentfile.season, currentfile.epnum)
             # need rest 100ms

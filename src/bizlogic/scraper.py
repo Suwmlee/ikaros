@@ -402,7 +402,6 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs, specifieds
     """
 
     number = numinfo.num
-    # json_data = get_data_from_json(number, conf.site_sources, conf.naming_rule, conf.async_request)
     c_sources = conf.site_sources
     if not c_sources:
         c_sources = "javlibrary,javdb,javbus,airav,fanza,xcity,jav321,mgstage,fc2,avsox,dlsite,carib,madou,mv91,getchu,gcolle"

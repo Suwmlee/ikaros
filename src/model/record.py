@@ -12,6 +12,7 @@ class _ScrapingRecords(db.Model):
             2   失败
             3   忽略
             4   进行中
+            5   已删除
     """
     __tablename__ = 'scrapingrecords'
 
@@ -71,6 +72,7 @@ class _TransRecords(db.Model):
     status  0
             1   锁定    -> 针对顶层目录
             2   忽略
+            5   已删除
     """
     __tablename__ = 'transrecords'
 

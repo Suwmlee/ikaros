@@ -19,8 +19,6 @@ class _ScrapingConfigs(db.Model):
 
     id = Column(Integer, primary_key=True)
     main_mode = Column(Integer, default=1)
-    multi_scraping = Column(Boolean, default=False, comment="Multiple file scraping at the same time")
-    async_request = Column(Boolean, default=False, comment="Scrape a movie asynchronously")
 
     scraping_folder = Column(String, default='/media')
     failed_folder = Column(String, default='/media/failed')
@@ -59,8 +57,6 @@ class _ScrapingConfigs(db.Model):
         return {
             'id': self.id,
             'main_mode': self.main_mode,
-            'multi_scraping': self.multi_scraping,
-            'async_request': self.async_request,
             'link_type': self.link_type,
             'soft_prefix': self.soft_prefix,
             'scraping_folder': self.scraping_folder,

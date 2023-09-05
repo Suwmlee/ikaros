@@ -25,7 +25,7 @@ class ScrapingRecordService():
             info = _ScrapingRecords(name, path)
             info.srcsize = size
             db.session.add(info)
-            db.session.commit()
+            self.commit()
         return info
 
     def queryByPath(self, value) -> _ScrapingRecords:
@@ -40,6 +40,8 @@ class ScrapingRecordService():
 
     @staticmethod
     def deleteRecord(record: _ScrapingRecords, delsrc=False):
+        """ 删除关联的实际文件
+        """
         basefolder = os.path.dirname(record.srcpath)
         if delsrc and os.path.exists(basefolder):
             srcname = os.path.basename(record.srcpath)
@@ -60,9 +62,9 @@ class ScrapingRecordService():
         records = _ScrapingRecords.query.filter(_ScrapingRecords.id.in_(ids)).all()
         for record in records:
             self.deleteRecord(record, delsrc)
+            self.delete(record)
             delrecords.append(record.srcpath)
-            db.session.delete(record)
-        db.session.commit()
+        self.commit()
         return delrecords
 
     def cleanUnavailable(self):
@@ -71,12 +73,12 @@ class ScrapingRecordService():
             if i.linktype == 0:
                 if not os.path.exists(i.destpath):
                     self.deleteRecord(i, False)
-                    db.session.delete(i)
+                    self.delete(i)
             else:
                 if not os.path.exists(i.srcpath) or not os.path.exists(i.destpath):
                     self.deleteRecord(i, False)
-                    db.session.delete(i)
-        db.session.commit()
+                    self.delete(i)
+        self.commit()
 
     def deadtimetoMissingrecord(self) -> list:
         """ 源文件或目标文件不存在，全部删除
@@ -91,8 +93,8 @@ class ScrapingRecordService():
                     nowtime = datetime.datetime.now()
                     if nowtime > i.deadtime:
                         self.deleteRecord(i, True)
+                        self.delete(i)
                         delrecords.append(i.srcpath)
-                        db.session.delete(i)
                         continue
                 # 0 转移 1 软链接 2 硬链接
                 if i.linktype == 0:
@@ -113,7 +115,7 @@ class ScrapingRecordService():
                         if not i.deadtime or i.deadtime == '':
                             i.deadtime = datetime.datetime.now() + datetime.timedelta(days=7)
 
-        db.session.commit()
+        self.commit()
         return delrecords
 
     def editRecord(self, sid, status, scrapingname,
@@ -135,7 +137,12 @@ class ScrapingRecordService():
             record.updatetime = datetime.datetime.now()
             if deadtime == '' and record.deadtime:
                 record.deadtime = None
-            db.session.commit()
+            self.commit()
+
+    def delete(self, record):
+        """ 标记为 已删除
+        """
+        record.status = 5
 
     def commit(self):
         db.session.commit()
@@ -219,7 +226,7 @@ class TransRecordService():
             info = _TransRecords(name, path)
             info.srcsize = size
             db.session.add(info)
-            db.session.commit()
+            self.commit()
             return info
         return info
 
@@ -239,7 +246,7 @@ class TransRecordService():
         infos = _TransRecords.query.filter(_TransRecords.srcpath.like("%" + value + "%")).all()
         return infos
 
-    def update(self, info: _TransRecords, softpath, destpath, status,
+    def editRecord(self, info: _TransRecords, softpath, destpath, status,
                topfolder, secondfolder,
                isepisode, season, epnum,
                renameTop_tag=False, renameSub_tag=False, deadtime=None):
@@ -269,7 +276,15 @@ class TransRecordService():
             info.updatetime = datetime.datetime.now()
             if deadtime == '' and info.deadtime:
                 info.deadtime = None
-            db.session.commit()
+            self.commit()
+
+    def delete(self, record):
+        """ 标记为 已删除
+        """
+        record.status = 5
+
+    def commit(self):
+        db.session.commit()
 
     def queryByPage(self, pagenum, pagesize, sortprop, sortorder, blur):
         blurparam = or_(_TransRecords.srcname.like("%" + blur + "%"),
@@ -324,6 +339,8 @@ class TransRecordService():
 
     @staticmethod
     def deleteRecord(record: _TransRecords, delsrc):
+        """ 删除关联的实际文件
+        """
         basefolder = os.path.dirname(record.srcpath)
         if delsrc and os.path.exists(basefolder):
             srcname = os.path.basename(record.srcpath)
@@ -348,9 +365,9 @@ class TransRecordService():
         records = _TransRecords.query.filter(_TransRecords.id.in_(ids)).all()
         for record in records:
             self.deleteRecord(record, delsrc)
+            self.delete(record)
             delrecords.append(record.srcpath)
-            db.session.delete(record)
-        db.session.commit()
+        self.commit()
         return delrecords
 
     def cleanUnavailable(self):
@@ -358,8 +375,8 @@ class TransRecordService():
         for i in records:
             if not os.path.exists(i.srcpath) or not os.path.exists(i.destpath):
                 self.deleteRecord(i, False)
-                db.session.delete(i)
-        db.session.commit()
+                self.delete(i)
+        self.commit()
 
     def deadtimetoMissingrecord(self) -> list:
         delrecords = []
@@ -372,8 +389,8 @@ class TransRecordService():
                     nowtime = datetime.datetime.now()
                     if nowtime > i.deadtime:
                         self.deleteRecord(i, True)
+                        self.delete(i)
                         delrecords.append(i.srcpath)
-                        db.session.delete(i)
                         continue
                 # 0 软链接 1 硬链接
                 if os.path.exists(i.srcpath) and checkFileExists(i.destpath):
@@ -383,7 +400,7 @@ class TransRecordService():
                 else:
                     if not i.deadtime or i.deadtime == '':
                         i.deadtime = datetime.datetime.now() + datetime.timedelta(days=7)
-        db.session.commit()
+        self.commit()
         return delrecords
 
     def renameAllTop(self, srcfolder, top, new):
