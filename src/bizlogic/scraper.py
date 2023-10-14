@@ -269,21 +269,20 @@ def crop_poster(imagecut, path, prefilename):
     """
     fanartpath = os.path.join(path, prefilename + '-fanart.jpg')
     posterpath = os.path.join(path, prefilename + '-poster.jpg')
-    if imagecut == 1:
-        try:
+    try:
+        if imagecut == 1:
             img = Image.open(fanartpath)
             w = img.width
             h = img.height
             img2 = img.crop((w / 1.9, 0, w, h))
             img2.save(posterpath)
             current_app.logger.debug('[+]Image Cutted!     ' + posterpath)
-        except:
-            current_app.logger.info('[-]Cover cut failed!')
-    elif imagecut == 0:
-        # 复制封面
-        shutil.copyfile(fanartpath, posterpath)
-        current_app.logger.debug('[+]Image Copyed!     ' + posterpath)
-
+        elif imagecut != 3:
+            # 复制封面
+            shutil.copyfile(fanartpath, posterpath)
+            current_app.logger.debug('[+]Image Copyed!     ' + posterpath)
+    except:
+        current_app.logger.info('[-]Cover cut failed!')
 
 def add_mark(pics, numinfo: FileNumInfo, count, size):
     """ 
