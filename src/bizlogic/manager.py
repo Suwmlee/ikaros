@@ -39,7 +39,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs, forced=False):
     try:
         movie_info = scrapingrecordService.queryByPath(file_path)
         # 查看单个文件刮削状态
-        if not movie_info or forced or movie_info.status == 0 or movie_info.status == 2:
+        if not movie_info or forced or movie_info.status == 0 or movie_info.status == 2 or movie_info.status == 5:
             movie_info = scrapingrecordService.add(file_path)
             # 查询是否已经存在刮削目录 & 不能在同一目录下
             if movie_info.destpath != '':
@@ -213,7 +213,7 @@ def startScrapingSingle(cid, movie_path: str, forced=False):
 
     movie_info = scrapingrecordService.queryByPath(movie_path)
     # 强制 未刮削 刮削失败才进行清理
-    if movie_info and (forced or movie_info.status == 0 or movie_info.status == 2):
+    if movie_info and (forced or movie_info.status == 0 or movie_info.status == 2 or movie_info.status == 5):
         if os.path.exists(movie_path):
             # 源文件存在，目的文件存在。(链接模式)
             if movie_info.destpath and os.path.exists(movie_info.destpath):

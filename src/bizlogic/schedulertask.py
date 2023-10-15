@@ -26,7 +26,6 @@ def cleanRecordsTask(delete=True, scheduler=None):
     else:
         cleanRecords(delete)
 
-
 def cleanRecords(delete=True):
     if delete:
         scrapingrecordService.cleanUnavailable()
@@ -71,7 +70,7 @@ def cleanTorrents(records, conf):
                 trs.removeTorrent(torrent.id, True)
                 logger().info(f'[-] cleanRecords: remove torrent {torrent.id} : {torrent.name}')
     except Exception as e:
-        logger().error("[-] cleanRecords: cleanTorrents error")
+        logger().error("[-] cleanRecords: You may not have set the transmission or an exception may have occurred.")
         logger().error(e)
 
 
