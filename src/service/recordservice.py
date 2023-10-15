@@ -3,7 +3,7 @@
 '''
 import os
 import datetime
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 from ..model.record import _ScrapingRecords, _TransRecords
 from ..utils.filehelper import checkFileExists, cleanFolderbyFilter, cleanFilebyFilter, cleanExtraMedia, cleanFolderWithoutSuffix, video_type
 from .. import db
@@ -47,7 +47,7 @@ class ScrapingRecordService():
             srcname = os.path.basename(record.srcpath)
             srcfilter = os.path.splitext(srcname)[0]
             cleanFilebyFilter(basefolder, srcfilter)
-        if record.destpath != '':
+        if record.destpath and record.destpath != '':
             folder = os.path.dirname(record.destpath)
             if os.path.exists(folder) and basefolder != folder:
                 name = os.path.basename(record.destpath)
@@ -147,72 +147,59 @@ class ScrapingRecordService():
     def commit(self):
         db.session.commit()
 
-    def queryByPage(self, pagenum, pagesize, sortprop, sortorder, blur):
+    def queryByPage(self, pagenum, pagesize, status, sortprop, sortorder, blur):
         """ 查询
         """
-        blurparam = or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
-                        _ScrapingRecords.scrapingname.like("%" + blur + "%"),
-                        _ScrapingRecords.destname.like("%" + blur + "%"))
+        if status:
+            status_num = int(status)
+            if blur:
+                filterparam = and_(
+                    _ScrapingRecords.status == status_num,
+                    or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
+                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
+                            _ScrapingRecords.destname.like("%" + blur + "%"))
+                )
+            else:
+                filterparam = _ScrapingRecords.status == status_num
+        else:
+            if blur:
+                filterparam = and_(
+                    _ScrapingRecords.status != 5,
+                    or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
+                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
+                            _ScrapingRecords.destname.like("%" + blur + "%"))
+                )
+            else:
+                filterparam = _ScrapingRecords.status != 5
+
         if sortprop == 'status':
             if sortorder == 'ascending':
-                if blur:
-                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
-                        _ScrapingRecords.status.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-                else:
-                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.status.asc()).paginate(
-                        page=pagenum, per_page=pagesize, error_out=False)
+                infos = _ScrapingRecords.query.filter(filterparam).order_by(
+                    _ScrapingRecords.status.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
             else:
-                if blur:
-                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
-                        _ScrapingRecords.status.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-                else:
-                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.status.desc()).paginate(
-                        page=pagenum, per_page=pagesize, error_out=False)
+                infos = _ScrapingRecords.query.filter(filterparam).order_by(
+                    _ScrapingRecords.status.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
         elif sortprop == 'cnsubtag':
             if sortorder == 'ascending':
-                if blur:
-                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
-                        _ScrapingRecords.cnsubtag.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-                else:
-                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.cnsubtag.asc()).paginate(
-                        page=pagenum, per_page=pagesize, error_out=False)
+                infos = _ScrapingRecords.query.filter(filterparam).order_by(
+                    _ScrapingRecords.cnsubtag.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
             else:
-                if blur:
-                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
-                        _ScrapingRecords.cnsubtag.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-                else:
-                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.cnsubtag.desc()).paginate(
-                        page=pagenum, per_page=pagesize, error_out=False)
+                infos = _ScrapingRecords.query.filter(filterparam).order_by(
+                    _ScrapingRecords.cnsubtag.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
         elif sortprop == 'deadtime':
             if sortorder == 'ascending':
-                if blur:
-                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
-                        _ScrapingRecords.deadtime.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-                else:
-                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.deadtime.asc()).paginate(
-                        page=pagenum, per_page=pagesize, error_out=False)
+                infos = _ScrapingRecords.query.filter(filterparam).order_by(
+                    _ScrapingRecords.deadtime.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
             else:
-                if blur:
-                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
-                        _ScrapingRecords.deadtime.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-                else:
-                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.deadtime.desc()).paginate(
-                        page=pagenum, per_page=pagesize, error_out=False)
+                infos = _ScrapingRecords.query.filter(filterparam).order_by(
+                    _ScrapingRecords.deadtime.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
         else:
             if sortorder == 'ascending':
-                if blur:
-                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
-                        _ScrapingRecords.updatetime.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-                else:
-                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.updatetime.asc(
-                    )).paginate(page=pagenum, per_page=pagesize, error_out=False)
+                infos = _ScrapingRecords.query.filter(filterparam).order_by(
+                    _ScrapingRecords.updatetime.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
             else:
-                if blur:
-                    infos = _ScrapingRecords.query.filter(blurparam).order_by(
-                        _ScrapingRecords.updatetime.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-                else:
-                    infos = _ScrapingRecords.query.order_by(_ScrapingRecords.updatetime.desc(
-                    )).paginate(page=pagenum, per_page=pagesize, error_out=False)
+                infos = _ScrapingRecords.query.filter(filterparam).order_by(
+                    _ScrapingRecords.updatetime.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
         return infos
 
 
@@ -286,55 +273,50 @@ class TransRecordService():
     def commit(self):
         db.session.commit()
 
-    def queryByPage(self, pagenum, pagesize, sortprop, sortorder, blur):
-        blurparam = or_(_TransRecords.srcname.like("%" + blur + "%"),
+    def queryByPage(self, pagenum, pagesize, status, sortprop, sortorder, blur):
+        if status:
+            status_num = int(status)
+            if blur:
+                filterparam = and_(
+                    _TransRecords.status == status_num,
+                    or_(_TransRecords.srcname.like("%" + blur + "%"),
                         _TransRecords.destpath.like("%" + blur + "%"),
                         _TransRecords.topfolder.like("%" + blur + "%"))
+                )
+            else:
+                filterparam = _TransRecords.status == status_num
+        else:
+            if blur:
+                filterparam = and_(
+                    _TransRecords.status != 5,
+                    or_(_TransRecords.srcname.like("%" + blur + "%"),
+                        _TransRecords.destpath.like("%" + blur + "%"),
+                        _TransRecords.topfolder.like("%" + blur + "%"))
+                )
+            else:
+                filterparam = _TransRecords.status != 5
+
         if sortprop == 'status':
             if sortorder == 'ascending':
-                if blur:
-                    infos = _TransRecords.query.filter(blurparam).order_by(
-                        _TransRecords.status.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-                else:
-                    infos = _TransRecords.query.order_by(_TransRecords.status.asc()).paginate(
-                        page=pagenum, per_page=pagesize, error_out=False)
+                infos = _TransRecords.query.filter(filterparam).order_by(
+                    _TransRecords.status.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
             else:
-                if blur:
-                    infos = _TransRecords.query.filter(blurparam).order_by(
-                        _TransRecords.status.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-                else:
-                    infos = _TransRecords.query.order_by(_TransRecords.status.desc()).paginate(
-                        page=pagenum, per_page=pagesize, error_out=False)
+                infos = _TransRecords.query.filter(filterparam).order_by(
+                    _TransRecords.status.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
         elif sortprop == 'deadtime':
             if sortorder == 'ascending':
-                if blur:
-                    infos = _TransRecords.query.filter(blurparam).order_by(
-                        _TransRecords.deadtime.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-                else:
-                    infos = _TransRecords.query.order_by(_TransRecords.deadtime.asc()).paginate(
-                        page=pagenum, per_page=pagesize, error_out=False)
+                infos = _TransRecords.query.filter(filterparam).order_by(
+                    _TransRecords.deadtime.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
             else:
-                if blur:
-                    infos = _TransRecords.query.filter(blurparam).order_by(
-                        _TransRecords.deadtime.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-                else:
-                    infos = _TransRecords.query.order_by(_TransRecords.deadtime.desc()).paginate(
-                        page=pagenum, per_page=pagesize, error_out=False)
+                infos = _TransRecords.query.filter(filterparam).order_by(
+                    _TransRecords.deadtime.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
         else:
             if sortorder == 'ascending':
-                if blur:
-                    infos = _TransRecords.query.filter(blurparam).order_by(
-                        _TransRecords.updatetime.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-                else:
-                    infos = _TransRecords.query.order_by(_TransRecords.updatetime.asc()).paginate(
-                        page=pagenum, per_page=pagesize, error_out=False)
+                infos = _TransRecords.query.filter(filterparam).order_by(
+                    _TransRecords.updatetime.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
             else:
-                if blur:
-                    infos = _TransRecords.query.filter(blurparam).order_by(
-                        _TransRecords.updatetime.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-                else:
-                    infos = _TransRecords.query.order_by(_TransRecords.updatetime.desc()).paginate(
-                        page=pagenum, per_page=pagesize, error_out=False)
+                infos = _TransRecords.query.filter(filterparam).order_by(
+                    _TransRecords.updatetime.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
         return infos
 
     @staticmethod

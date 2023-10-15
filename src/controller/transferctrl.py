@@ -71,6 +71,7 @@ def getTransRecord():
     """
     pagenum = int(request.args.get('page'))
     size = int(request.args.get('size'))
+    status = request.args.get('status')
     # 排序  cnsubtag|status|updatetime,descending|ascending
     sortprop = request.args.get('sortprop')
     sortorder = request.args.get('sortorder')
@@ -82,7 +83,7 @@ def getTransRecord():
         sortprop = ''
         sortorder = 'desc'
 
-    infos = transrecordService.queryByPage(pagenum, size, sortprop, sortorder, blur)
+    infos = transrecordService.queryByPage(pagenum, size, status, sortprop, sortorder, blur)
     data = []
     for i in infos.items:
         data.append(i.serialize())

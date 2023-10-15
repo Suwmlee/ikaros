@@ -88,6 +88,7 @@ def getScrapingRecord():
     """
     page = int(request.args.get('page'))
     size = int(request.args.get('size'))
+    status = request.args.get('status')
     # 排序  cnsubtag|status|updatetime,descending|ascending
     sortprop = request.args.get('sortprop')
     sortorder = request.args.get('sortorder')
@@ -99,7 +100,7 @@ def getScrapingRecord():
         sortprop = ''
         sortorder = 'desc'
 
-    infos = scrapingrecordService.queryByPage(page, size, sortprop, sortorder, blur)
+    infos = scrapingrecordService.queryByPage(page, size, status, sortprop, sortorder, blur)
     data = []
     for i in infos.items:
         data.append(i.serialize())
