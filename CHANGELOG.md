@@ -1,3 +1,12 @@
+## [2.0.9](https://github.com/Suwmlee/ikaros/compare/v2.0.8...v2.0.9) (2023-10-15)
+
+
+### Bug Fixes
+
+* crop poster ([aa77d22](https://github.com/Suwmlee/ikaros/commit/aa77d22495657ae9a1919fc151b24e473ac79af9)), closes [#32](https://github.com/Suwmlee/ikaros/issues/32)
+* query page ([85032eb](https://github.com/Suwmlee/ikaros/commit/85032eb5777e0c97f30b8aad990fba13da4a1d8c)), closes [#32](https://github.com/Suwmlee/ikaros/issues/32)
+* scan deleted movie ([078ae70](https://github.com/Suwmlee/ikaros/commit/078ae70c63607a50ac3fb675211171b3e84ea555))
+
 ## [2.0.8](https://github.com/Suwmlee/ikaros/compare/v2.0.7...v2.0.8) (2023-06-28)
 
 
