@@ -1,3 +1,10 @@
+## [2.0.10](https://github.com/Suwmlee/ikaros/compare/v2.0.9...v2.0.10) (2023-10-18)
+
+
+### Bug Fixes
+
+* update image constants ([6112b68](https://github.com/Suwmlee/ikaros/commit/6112b68f605f99f72a3fdf6eb26e81cbad0422f5))
+
 ## [2.0.9](https://github.com/Suwmlee/ikaros/compare/v2.0.8...v2.0.9) (2023-10-15)
 
 
