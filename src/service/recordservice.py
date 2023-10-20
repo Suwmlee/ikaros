@@ -3,7 +3,7 @@
 '''
 import os
 import datetime
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, asc, desc
 from ..model.record import _ScrapingRecords, _TransRecords
 from ..utils.filehelper import checkFileExists, cleanFolderbyFilter, cleanFilebyFilter, cleanExtraMedia, cleanFolderWithoutSuffix, video_type
 from .. import db
@@ -156,8 +156,8 @@ class ScrapingRecordService():
                 filterparam = and_(
                     _ScrapingRecords.status == status_num,
                     or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
-                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
-                            _ScrapingRecords.destname.like("%" + blur + "%"))
+                        _ScrapingRecords.scrapingname.like("%" + blur + "%"),
+                        _ScrapingRecords.destname.like("%" + blur + "%"))
                 )
             else:
                 filterparam = _ScrapingRecords.status == status_num
@@ -166,40 +166,16 @@ class ScrapingRecordService():
                 filterparam = and_(
                     _ScrapingRecords.status != 5,
                     or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
-                            _ScrapingRecords.scrapingname.like("%" + blur + "%"),
-                            _ScrapingRecords.destname.like("%" + blur + "%"))
+                        _ScrapingRecords.scrapingname.like("%" + blur + "%"),
+                        _ScrapingRecords.destname.like("%" + blur + "%"))
                 )
             else:
                 filterparam = _ScrapingRecords.status != 5
+        direction = asc if sortorder == 'ascending' else desc
+        sortname = sortprop if sortprop else 'updatetime'
+        sortattr = getattr(_ScrapingRecords, sortname)
+        infos = _ScrapingRecords.query.filter(filterparam).order_by(direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
 
-        if sortprop == 'status':
-            if sortorder == 'ascending':
-                infos = _ScrapingRecords.query.filter(filterparam).order_by(
-                    _ScrapingRecords.status.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-            else:
-                infos = _ScrapingRecords.query.filter(filterparam).order_by(
-                    _ScrapingRecords.status.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-        elif sortprop == 'cnsubtag':
-            if sortorder == 'ascending':
-                infos = _ScrapingRecords.query.filter(filterparam).order_by(
-                    _ScrapingRecords.cnsubtag.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-            else:
-                infos = _ScrapingRecords.query.filter(filterparam).order_by(
-                    _ScrapingRecords.cnsubtag.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-        elif sortprop == 'deadtime':
-            if sortorder == 'ascending':
-                infos = _ScrapingRecords.query.filter(filterparam).order_by(
-                    _ScrapingRecords.deadtime.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-            else:
-                infos = _ScrapingRecords.query.filter(filterparam).order_by(
-                    _ScrapingRecords.deadtime.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-        else:
-            if sortorder == 'ascending':
-                infos = _ScrapingRecords.query.filter(filterparam).order_by(
-                    _ScrapingRecords.updatetime.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-            else:
-                infos = _ScrapingRecords.query.filter(filterparam).order_by(
-                    _ScrapingRecords.updatetime.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
         return infos
 
 
@@ -234,9 +210,9 @@ class TransRecordService():
         return infos
 
     def editRecord(self, info: _TransRecords, softpath, destpath, status,
-               topfolder, secondfolder,
-               isepisode, season, epnum,
-               renameTop_tag=False, renameSub_tag=False, deadtime=None):
+                   topfolder, secondfolder,
+                   isepisode, season, epnum,
+                   renameTop_tag=False, renameSub_tag=False, deadtime=None):
         if info:
             info.linkpath = softpath
             info.destpath = destpath
@@ -295,28 +271,11 @@ class TransRecordService():
                 )
             else:
                 filterparam = _TransRecords.status != 5
+        direction = asc if sortorder == 'ascending' else desc
+        sortname = sortprop if sortprop else 'updatetime'
+        sortattr = getattr(_TransRecords, sortname)
+        infos = _TransRecords.query.filter(filterparam).order_by(direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
 
-        if sortprop == 'status':
-            if sortorder == 'ascending':
-                infos = _TransRecords.query.filter(filterparam).order_by(
-                    _TransRecords.status.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-            else:
-                infos = _TransRecords.query.filter(filterparam).order_by(
-                    _TransRecords.status.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-        elif sortprop == 'deadtime':
-            if sortorder == 'ascending':
-                infos = _TransRecords.query.filter(filterparam).order_by(
-                    _TransRecords.deadtime.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-            else:
-                infos = _TransRecords.query.filter(filterparam).order_by(
-                    _TransRecords.deadtime.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-        else:
-            if sortorder == 'ascending':
-                infos = _TransRecords.query.filter(filterparam).order_by(
-                    _TransRecords.updatetime.asc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
-            else:
-                infos = _TransRecords.query.filter(filterparam).order_by(
-                    _TransRecords.updatetime.desc()).paginate(page=pagenum, per_page=pagesize, error_out=False)
         return infos
 
     @staticmethod
