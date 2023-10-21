@@ -209,6 +209,7 @@ def startScrapingSingle(cid, movie_path: str, forced=False):
     task.cid = cid
     taskService.commit()
 
+    conf = scrapingConfService.getConfig(cid)
     current_app.logger.info("[+]Single start!!!")
 
     movie_info = scrapingrecordService.queryByPath(movie_path)
@@ -224,7 +225,6 @@ def startScrapingSingle(cid, movie_path: str, forced=False):
                 and not pathlib.Path(movie_info.destpath).is_symlink():
                 shutil.move(movie_info.destpath, movie_path)
     if os.path.exists(movie_path) and os.path.isfile(movie_path):
-        conf = scrapingConfService.getConfig(cid)
         create_data_and_move(movie_path, conf, forced)
 
     taskService.updateTaskStatus(task, 1)
