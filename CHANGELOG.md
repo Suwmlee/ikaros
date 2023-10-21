@@ -1,3 +1,10 @@
+## [2.0.11](https://github.com/Suwmlee/ikaros/compare/v2.0.10...v2.0.11) (2023-10-21)
+
+
+### Bug Fixes
+
+* [#35](https://github.com/Suwmlee/ikaros/issues/35) ([9824471](https://github.com/Suwmlee/ikaros/commit/982447154d36bf906596b3104a6a86bda9104ffe))
+
 ## [2.0.10](https://github.com/Suwmlee/ikaros/compare/v2.0.9...v2.0.10) (2023-10-18)
 
 
