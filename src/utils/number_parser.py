@@ -30,10 +30,10 @@ class FileNumInfo():
         if '流出' in filepath or '-leak' in filepath or '_leak' in filepath \
                 or '-uncensored' in filepath or '_uncensored' in filepath:
             self.leak_tag = True
-        if '破解' in filepath or '-hack' in filepath or '_hack' in filepath:
+        if '破解' in filepath or '-hack' in filepath or '_hack' in filepath or '-quitu' in filepath or '-u' in filepath or '_u' in filepath:
             self.hack_tag = True
 
-        cnlist = ['中文', '字幕', '-c.', '_c.', '_c_', '-c-']
+        cnlist = ['中文', '字幕', '-c.', '_c.', '_c_', '-c-', '-uc', '_uc']
         for single in cnlist:
             if single in filepath:
                 self.chs_tag = True
@@ -167,6 +167,7 @@ G_TAKE_NUM_RULES = {
     'heyzo': lambda x: 'HEYZO-' + re.findall(r'heyzo[^\d]*(\d{4})', x, re.I)[0],
     'mdbk': lambda x: str(re.search(r'mdbk(-|_)(\d{4})', x, re.I).group()),
     'mdtm': lambda x: str(re.search(r'mdtm(-|_)(\d{4})', x, re.I).group()),
+    r'([A-Za-z]{2,4}\-?\d{3})': lambda x: str(re.search(r'([A-Za-z]{2,4}\-?\d{3})', x, re.I).group()), # 保底用
 }
 
 
