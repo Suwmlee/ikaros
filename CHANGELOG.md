@@ -1,3 +1,10 @@
+## [2.0.12](https://github.com/Suwmlee/ikaros/compare/v2.0.11...v2.0.12) (2023-11-08)
+
+
+### Bug Fixes
+
+* number_parser.py ([6061772](https://github.com/Suwmlee/ikaros/commit/60617724a7b403891d07af5d21acc7cf76dda120)), closes [#36](https://github.com/Suwmlee/ikaros/issues/36)
+
 ## [2.0.11](https://github.com/Suwmlee/ikaros/compare/v2.0.10...v2.0.11) (2023-10-21)
 
 
