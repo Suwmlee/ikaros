@@ -5,7 +5,7 @@
 
 ##### JAV刮削
 
-配置可参考 [Movie_Data_Capture wiki](https://github.com/yoshiko2/Movie_Data_Capture/wiki)<br>
+配置可参考 [Movie_Data_Capture wiki](https://githubfast.com/yoshiko2/Movie_Data_Capture/wiki)<br>
 ~~使用mdc的刮削库，参数略有修改~~
 
 刮削默认跳过带有忽略或已完成标记的影片。
@@ -78,7 +78,8 @@ http://192.168.1.233:8096/emby/Items/3227ce1e069754c594af25ea66d69fc7/Refresh?Re
 - ~~后续可能修改策略,直接扫描下载目录,不需要配置这些~~
 __注:__ 
 - 默认请求 __127.0.0.1__ ,需根据实际情况更改
-- tr可参考[配置完成脚本](https://github.com/ronggang/transmission-web-control/wiki/About-script-torrent-done-filename)
+- tr可参考[配置完成脚本](https://githubfast.com/ronggang/transmission-web-control/wiki/About-script-torrent-done-filename)
+- 如果docker的挂载路径与qbit挂载路径不同名的话，需要用以下命令a="%F"&& sh qbcomplete.sh ${a/bit挂载路径/ikros挂载路径}，tr同理
 
 ### 其他
 
