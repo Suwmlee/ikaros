@@ -5,7 +5,7 @@
 
 ##### JAV刮削
 
-配置可参考 [Movie_Data_Capture wiki](https://githubfast.com/yoshiko2/Movie_Data_Capture/wiki)<br>
+配置可参考 [Movie_Data_Capture wiki](https://github.com/yoshiko2/Movie_Data_Capture/wiki)<br>
 ~~使用mdc的刮削库，参数略有修改~~
 
 刮削默认跳过带有忽略或已完成标记的影片。
