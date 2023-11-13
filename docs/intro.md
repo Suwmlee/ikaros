@@ -79,6 +79,7 @@ http://192.168.1.233:8096/emby/Items/3227ce1e069754c594af25ea66d69fc7/Refresh?Re
 __注:__ 
 - 默认请求 __127.0.0.1__ ,需根据实际情况更改
 - tr可参考[配置完成脚本](https://github.com/ronggang/transmission-web-control/wiki/About-script-torrent-done-filename)
+- 如果docker的挂载路径与qbit挂载路径不同名的话，需要用以下命令`a="%F"&& sh qbcomplete.sh ${a/bit挂载路径/ikros挂载路径}`，tr同理
 
 ### 其他
 
