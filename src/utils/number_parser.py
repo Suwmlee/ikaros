@@ -217,3 +217,17 @@ def is_uncensored(number):
         G_cache_uncensored_conf.set(uncensored_prefix.split(','))
     return G_cache_uncensored_conf.check(number)
 
+
+if __name__ == "__main__":
+    # 测试
+    test_path = [
+        "/media/sdmua-001-c",
+        "/media/kmhrs-023-C",
+        "/media/sekao-023-C"
+    ]
+    for t in test_path:
+        fin = FileNumInfo(t)
+        print(f"===============================")
+        print(f"解析 {t} :")
+        print(f"    番号: {fin.num} 中文: {fin.chs_tag} 无码: {fin.uncensored_tag} 流出: {fin.leak_tag} 破解: {fin.hack_tag}")
+        print(f"    多集: {fin.multipart_tag} 特典: {fin.special}")
