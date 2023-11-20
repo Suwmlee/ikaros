@@ -1,3 +1,10 @@
+## [2.0.14](https://github.com/Suwmlee/ikaros/compare/v2.0.13...v2.0.14) (2023-11-20)
+
+
+### Bug Fixes
+
+* temporary fix fc2 ([62f14a6](https://github.com/Suwmlee/ikaros/commit/62f14a6b24fe6c57854b2cb45081bc8e98ee7155))
+
 ## [2.0.13](https://github.com/Suwmlee/ikaros/compare/v2.0.12...v2.0.13) (2023-11-20)
 
 
