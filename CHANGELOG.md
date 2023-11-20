@@ -1,3 +1,10 @@
+## [2.0.13](https://github.com/Suwmlee/ikaros/compare/v2.0.12...v2.0.13) (2023-11-20)
+
+
+### Bug Fixes
+
+* [#39](https://github.com/Suwmlee/ikaros/issues/39)  parser test ([9030b51](https://github.com/Suwmlee/ikaros/commit/9030b51d568b47fa42da7499900485aa12efc3fe))
+
 ## [2.0.12](https://github.com/Suwmlee/ikaros/compare/v2.0.11...v2.0.12) (2023-11-08)
 
 
