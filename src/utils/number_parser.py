@@ -108,8 +108,12 @@ def get_number(file_path: str) -> str:
     """ 获取番号
     """
     try:
+        # TODO: need refactor
         basename = os.path.basename(file_path)
         (filename, ext) = os.path.splitext(basename)
+        lower_check = filename.lower()
+        if 'fc2' in lower_check:
+                filename = lower_check.replace('ppv', '').replace('--', '-').replace('_', '-').upper()
         file_number = get_number_by_dict(filename)
         if file_number:
             return file_number
@@ -122,9 +126,6 @@ def get_number(file_path: str) -> str:
         elif '-' in filename or '_' in filename:  # 普通提取番号 主要处理包含减号-和_的番号
             filename = G_spat.sub("", filename)
             filename = str(re.sub("\[\d{4}-\d{1,2}-\d{1,2}\] - ", "", filename))  # 去除文件名中时间
-            lower_check = filename.lower()
-            if 'fc2' in lower_check:
-                filename = lower_check.replace('ppv', '').replace('--', '-').replace('_', '-').upper()
             filename = re.sub("[-_]cd\d{1,2}", "", filename, flags=re.IGNORECASE)
             if not re.search("-|_", filename): # 去掉-CD1之后再无-的情况，例如n1012-CD1.wmv
                 return str(re.search(r'\w+', filename[:filename.find('.')], re.A).group())
@@ -221,13 +222,22 @@ def is_uncensored(number):
 if __name__ == "__main__":
     # 测试
     test_path = [
-        "/media/sdmua-001-c",
-        "/media/kmhrs-023-C",
-        "/media/sekao-023-C"
+        "/media/sdmua-001-c.mkv",
+        "/media/kmhrs-023-C.mkv",
+        "/media/sekao-023-C.mkv",
+        "/media/sekao-023-leak.mkv",
+        "/media/FC2-PPV-1234567.mkv",
+        "/media/FC2PPV-1234567.mkv",
     ]
+    def convert_emoji(bool_tag):
+        if bool_tag:
+            return "✅"
+        return "-"
+
     for t in test_path:
         fin = FileNumInfo(t)
         print(f"===============================")
         print(f"解析 {t} :")
-        print(f"    番号: {fin.num} 中文: {fin.chs_tag} 无码: {fin.uncensored_tag} 流出: {fin.leak_tag} 破解: {fin.hack_tag}")
-        print(f"    多集: {fin.multipart_tag} 特典: {fin.special}")
+        print(f"    番号: {fin.num}")
+        print(f"    中文: {convert_emoji(fin.chs_tag)} 无码: {convert_emoji(fin.uncensored_tag)} 流出: {convert_emoji(fin.leak_tag)} 破解: {convert_emoji(fin.hack_tag)}")
+        print(f"    多集: {convert_emoji(fin.multipart_tag)} 特典: {convert_emoji(fin.special)}")
