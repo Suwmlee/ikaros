@@ -110,7 +110,7 @@ class FileInfo():
             if self.originep[0] == '.':
                 renum = "." + prefix + "."
             elif self.originep[0] == '[':
-                renum = "[" + prefix + "]"
+                renum = " " + prefix + " "
             else:
                 renum = " " + prefix + " "
             current_app.logger.debug("替换内容:" + renum)
@@ -341,7 +341,7 @@ def naming(currentfile: FileInfo, movie_list: list, simplify_tag, fixseries_tag)
             current_app.logger.debug("[-] handling cmct midfolder [{}] ".format(currentfile.midfolder))
     # topfolder
     if simplify_tag and not currentfile.locked:
-        minlen = 27
+        minlen = 20
         tempmid = currentfile.topfolder
         tempmid = replaceCJK(tempmid)
         tempmid = replaceRegex(tempmid, '^s(\d{2})-s(\d{2})')
