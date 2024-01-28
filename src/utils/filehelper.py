@@ -272,11 +272,25 @@ def replaceCJK(base: str):
     tmp = base
     for n in re.findall('[\(\[\（](.*?)[\)\]\）]', base):
         if re.findall('[\u3000-\u33FF\u4e00-\u9fff]+', n):
-            cop = re.compile("[\(\[\（]" + n + "[\)\]\）]")
-            tmp = cop.sub('', tmp)
+            try:
+                cop = re.compile("[\(\[\（]" + n + "[\)\]\）]")
+                tmp = cop.sub('', tmp)
+            except:
+                pass
     tmp = re.sub('[\u3000-\u33FF\u4e00-\u9fff]+', '', tmp)
+    tmp = cleanParentheses(tmp)
     tmp = re.sub(r'(\W)\1+', r'\1', tmp).lstrip(' !?@#$.:：]）)').rstrip(' !?@#$.:：[(（')
     return tmp
+
+
+def cleanParentheses(input: str):
+    tag = True
+    while tag:
+        if "()" in input or "[]" in input:
+            input = input.replace("()", "").replace("[]", "")
+        else:
+            tag = False
+    return input
 
 
 def replaceRegex(base: str, regex: str):
