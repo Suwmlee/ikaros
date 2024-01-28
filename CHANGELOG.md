@@ -1,3 +1,11 @@
+## [2.0.15](https://github.com/Suwmlee/ikaros/compare/v2.0.14...v2.0.15) (2024-01-28)
+
+
+### Bug Fixes
+
+* compatibility [] ([2d1e07b](https://github.com/Suwmlee/ikaros/commit/2d1e07bc548958935ff1cabb8e6f84ccd770d04e))
+* filename parentheses ([1e333ff](https://github.com/Suwmlee/ikaros/commit/1e333ff7a37d14b5017409baa2af6202338209ad))
+
 ## [2.0.14](https://github.com/Suwmlee/ikaros/compare/v2.0.13...v2.0.14) (2023-11-20)
 
 
