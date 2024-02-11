@@ -5,9 +5,6 @@
 
 ##### JAV刮削
 
-配置可参考 [Movie_Data_Capture wiki](https://github.com/yoshiko2/Movie_Data_Capture/wiki)<br>
-~~使用mdc的刮削库，参数略有修改~~
-
 刮削默认跳过带有忽略或已完成标记的影片。
 需自定义刮削番号/中文标签时，需要将状态设置为`未完成`或直接点击刷新按钮
 

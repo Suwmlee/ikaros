@@ -73,7 +73,3 @@ __注:__
 1. 更新 webui
 2. 保留删除记录
 3. 自动检测文件夹，不需要关联下载器
-
-### 感谢
-
-[Movie_Data_Capture](https://github.com/yoshiko2/Movie_Data_Capture)
