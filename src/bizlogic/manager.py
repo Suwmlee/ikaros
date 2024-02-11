@@ -42,7 +42,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs, forced=False):
         if not movie_info or forced or movie_info.status == 0 or movie_info.status == 2 or movie_info.status == 5:
             movie_info = scrapingrecordService.add(file_path)
             # 查询是否已经存在刮削目录 & 不能在同一目录下
-            if movie_info.destpath != '':
+            if movie_info.destpath and movie_info.destpath != '':
                 basefolder = os.path.dirname(movie_info.srcpath)
                 folder = os.path.dirname(movie_info.destpath)
                 if os.path.exists(folder) and basefolder != folder:
