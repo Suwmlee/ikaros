@@ -1,3 +1,10 @@
+## [2.0.16](https://github.com/Suwmlee/ikaros/compare/v2.0.15...v2.0.16) (2024-02-11)
+
+
+### Bug Fixes
+
+* movie info error ([29f783e](https://github.com/Suwmlee/ikaros/commit/29f783e146cb46f26a36f68d053d43521031c43f)), closes [#44](https://github.com/Suwmlee/ikaros/issues/44)
+
 ## [2.0.15](https://github.com/Suwmlee/ikaros/compare/v2.0.14...v2.0.15) (2024-01-28)
 
 
