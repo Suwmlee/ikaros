@@ -3,7 +3,7 @@
 '''
 import os
 import datetime
-from sqlalchemy import or_, and_, asc, desc
+from sqlalchemy import or_, asc, desc
 from ..model.record import _ScrapingRecords, _TransRecords
 from ..utils.filehelper import checkFileExists, cleanFolderbyFilter, cleanFilebyFilter, cleanExtraMedia, cleanFolderWithoutSuffix, video_type
 from .. import db
@@ -187,27 +187,13 @@ class ScrapingRecordService():
     def queryByPage(self, pagenum, pagesize, status, sortprop, sortorder, blur):
         """ 查询
         """
-        filterparam = ""
-        if status:
-            status_num = int(status)
-            if blur:
-                filterparam = and_(
-                    _ScrapingRecords.status == status_num,
-                    or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
-                        _ScrapingRecords.scrapingname.like("%" + blur + "%"),
-                        _ScrapingRecords.destname.like("%" + blur + "%"))
-                )
-            else:
-                filterparam = _ScrapingRecords.status == status_num
-        else:
-            if blur:
-                filterparam = or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
-                                  _ScrapingRecords.scrapingname.like("%" + blur + "%"),
-                                  _ScrapingRecords.destname.like("%" + blur + "%"))
         direction = asc if sortorder == 'ascending' else desc
         sortname = sortprop if sortprop else 'updatetime'
         sortattr = getattr(_ScrapingRecords, sortname)
-        if filterparam:
+        if blur:
+            filterparam = or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
+                              _ScrapingRecords.scrapingname.like("%" + blur + "%"),
+                              _ScrapingRecords.destname.like("%" + blur + "%"))
             infos = _ScrapingRecords.query.filter(filterparam).order_by(
                 direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
         else:
@@ -328,27 +314,13 @@ class TransRecordService():
         db.session.commit()
 
     def queryByPage(self, pagenum, pagesize, status, sortprop, sortorder, blur):
-        filterparam = ""
-        if status:
-            status_num = int(status)
-            if blur:
-                filterparam = and_(
-                    _TransRecords.status == status_num,
-                    or_(_TransRecords.srcname.like("%" + blur + "%"),
-                        _TransRecords.destpath.like("%" + blur + "%"),
-                        _TransRecords.topfolder.like("%" + blur + "%"))
-                )
-            else:
-                filterparam = _TransRecords.status == status_num
-        else:
-            if blur:
-                filterparam = or_(_TransRecords.srcname.like("%" + blur + "%"),
-                                  _TransRecords.destpath.like("%" + blur + "%"),
-                                  _TransRecords.topfolder.like("%" + blur + "%"))
         direction = asc if sortorder == 'ascending' else desc
         sortname = sortprop if sortprop else 'updatetime'
         sortattr = getattr(_TransRecords, sortname)
-        if filterparam:
+        if blur:
+            filterparam = or_(_TransRecords.srcname.like("%" + blur + "%"),
+                              _TransRecords.destpath.like("%" + blur + "%"),
+                              _TransRecords.topfolder.like("%" + blur + "%"))
             infos = _TransRecords.query.filter(filterparam).order_by(
                 direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
         else:
