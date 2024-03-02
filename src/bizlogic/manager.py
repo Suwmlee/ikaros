@@ -53,25 +53,6 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs, forced=False):
                         cleanFilebyFilter(folder, filter)
                     else:
                         cleanFolderbyFilter(folder, filter)
-            num_info = FileNumInfo(file_path)
-            # 查询是否有额外设置
-            if movie_info.scrapingname and movie_info.scrapingname != '':
-                num_info.num = movie_info.scrapingname
-            if movie_info.cnsubtag:
-                num_info.chs_tag = True
-            if movie_info.leaktag:
-                num_info.leak_tag = True
-            if movie_info.uncensoredtag:
-                num_info.uncensored_tag = True
-            if movie_info.hacktag:
-                num_info.hack_tag = True
-            if movie_info.cdnum:
-                num_info.updateCD(movie_info.cdnum)
-            current_app.logger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, num_info.num))
-            movie_info.status = 4
-            movie_info.scrapingname = num_info.num
-            movie_info.updatetime = datetime.datetime.now()
-            scrapingrecordService.commit()
             # 过滤
             ignore = False
             if movie_info.ignored:
@@ -83,6 +64,25 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs, forced=False):
                     ignore = True
                     current_app.logger.info('[!] ' + str(file_path) + ' below size limit, will pass')
             if not ignore:
+                num_info = FileNumInfo(file_path)
+                # 查询是否有额外设置
+                if movie_info.scrapingname and movie_info.scrapingname != '':
+                    num_info.num = movie_info.scrapingname
+                if movie_info.cnsubtag:
+                    num_info.chs_tag = True
+                if movie_info.leaktag:
+                    num_info.leak_tag = True
+                if movie_info.uncensoredtag:
+                    num_info.uncensored_tag = True
+                if movie_info.hacktag:
+                    num_info.hack_tag = True
+                if movie_info.cdnum:
+                    num_info.updateCD(movie_info.cdnum)
+                current_app.logger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, num_info.num))
+                movie_info.status = 4
+                movie_info.scrapingname = num_info.num
+                movie_info.updatetime = datetime.datetime.now()
+                scrapingrecordService.commit()
                 (flag, new_path) = core_main(file_path, num_info, conf, movie_info.specifiedsource, movie_info.specifiedurl)
                 if flag:
                     movie_info.status = 1
@@ -229,6 +229,8 @@ def startScrapingSingle(cid, movie_path: str, forced=False):
                 shutil.move(movie_info.destpath, movie_path)
     if os.path.exists(movie_path) and os.path.isfile(movie_path):
         create_data_and_move(movie_path, conf, forced)
+    else:
+        scrapingrecordService.updateDeleted(movie_info)
 
     taskService.updateTaskStatus(task, 1)
 

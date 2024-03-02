@@ -158,7 +158,7 @@ class ScrapingRecordService():
         record.leaktag = leaktag
         record.uncensoredtag = uncensoredtag
         record.hacktag = hacktag
-        if cdnum == '':
+        if not cdnum or cdnum == '':
             cdnum = 0
         record.cdnum = int(cdnum)
         record.updatetime = datetime.datetime.now()
@@ -174,6 +174,12 @@ class ScrapingRecordService():
             db.session.delete(record)
         else:
             record.deleted = True
+
+    def updateDeleted(self, record: _ScrapingRecords):
+        record.deleted = True
+        record.status = 3
+        record.updatetime = datetime.datetime.now()
+        self.commit()
 
     def commit(self):
         db.session.commit()

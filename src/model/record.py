@@ -27,7 +27,7 @@ class _ScrapingRecords(db.Model):
     srcpath = Column(String, default='')
     srcsize = Column(BigInteger, default=0)
     status = Column(Integer, default=0)
-    ignored = Column(Integer, default=False)
+    ignored = Column(Boolean, default=False)
     locked = Column(Boolean, default=False)
     deleted = Column(Boolean, default=False)
 
@@ -91,7 +91,7 @@ class _TransRecords(db.Model):
     srcfolder = Column(String, default='')
 
     status = Column(Integer, default=0)
-    ignored = Column(Integer, default=False)
+    ignored = Column(Boolean, default=False)
     locked = Column(Boolean, default=False)
     deleted = Column(Boolean, default=False)
 
