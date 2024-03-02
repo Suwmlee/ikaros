@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/Suwmlee/ikaros/compare/v2.1.0...v2.1.1) (2024-03-02)
+
+
+### Bug Fixes
+
+* refine workflow ([5df439d](https://github.com/Suwmlee/ikaros/commit/5df439da8c77968cf690739f9108cd47518a8133))
+
 # [2.1.0](https://github.com/Suwmlee/ikaros/compare/v2.0.16...v2.1.0) (2024-03-02)
 
 
