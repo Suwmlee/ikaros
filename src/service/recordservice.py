@@ -207,36 +207,72 @@ class TransRecordService():
         infos = _TransRecords.query.filter(_TransRecords.srcpath.like("%" + value + "%")).all()
         return infos
 
-    def editRecord(self, info: _TransRecords, softpath, destpath, status,
+    def editRecord(self, info: _TransRecords, softpath, destpath,
+                   status, ignored, locked,
                    topfolder, secondfolder,
                    isepisode, season, epnum,
                    renameTop_tag=False, renameSub_tag=False, deadtime=None):
+        """ 由API调用编辑
+        """
+        if info:
+            if topfolder == '':
+                topfolder = '.'
+            if renameTop_tag and topfolder != '.':
+                self.renameAllTop(info.srcfolder, info.topfolder, topfolder)
+            if isepisode:
+                if renameSub_tag:
+                    self.renameAllSeason(info.srcfolder, info.topfolder, info.secondfolder, info.season, season)
+            else:
+                if renameSub_tag:
+                    self.renameAllSecond(info.srcfolder, info.topfolder, info.secondfolder, secondfolder)
+            if deadtime == '' and info.deadtime:
+                info.deadtime = None
+            if locked:
+                if info.locked:
+                    pass
+                else:
+                    info.locked = True
+                    info.ignored = False
+                    info.deadtime = None
+                    self.updateRecord(info, softpath, destpath, status, topfolder, secondfolder,
+                                isepisode, season, epnum)
+            elif ignored:
+                if info.ignored:
+                    pass
+                else:
+                    info.ignored = True
+                    info.locked = False
+                    info.deadtime = None
+                    self.deleteRecordFiles(info, False)
+                    status = 3
+                    softpath = destpath = ""
+                    topfolder = secondfolder = ""
+                    isepisode = False
+                    self.updateRecord(info, softpath, destpath, status, topfolder, secondfolder,
+                              isepisode, season, epnum)
+
+    def updateRecord(self, info: _TransRecords, softpath, destpath,
+                     status, topfolder, secondfolder,
+                     isepisode, season, epnum):
+        """ 由转移任务更新
+        """
         if info:
             info.linkpath = softpath
             info.destpath = destpath
             info.status = status
             if topfolder == '':
                 topfolder = '.'
-            if renameTop_tag and topfolder != '.':
-                self.renameAllTop(info.srcfolder, info.topfolder, topfolder)
             info.topfolder = topfolder
+            info.secondfolder = secondfolder
             if isepisode:
-                if renameSub_tag:
-                    self.renameAllSeason(info.srcfolder, info.topfolder, info.secondfolder, info.season, season)
-                else:
-                    info.isepisode = True
-                    info.season = season
+                info.isepisode = True
+                info.season = season
                 info.episode = epnum
-                info.secondfolder = secondfolder
             else:
                 info.isepisode = False
-                if renameSub_tag:
-                    self.renameAllSecond(info.srcfolder, info.topfolder, info.secondfolder, secondfolder)
-                else:
-                    info.secondfolder = secondfolder
+                info.season = -1
+                info.episode = -1
             info.updatetime = datetime.datetime.now()
-            if deadtime == '' and info.deadtime:
-                info.deadtime = None
             self.commit()
 
     def delete(self, record):
@@ -275,8 +311,9 @@ class TransRecordService():
         return infos
 
     @staticmethod
-    def deleteRecord(record: _TransRecords, delsrc):
+    def deleteRecordFiles(record: _TransRecords, delsrc):
         """ 删除关联的实际文件
+        :param delsrc   删除原始文件标记
         """
         basefolder = os.path.dirname(record.srcpath)
         if delsrc and os.path.exists(basefolder):
@@ -301,7 +338,7 @@ class TransRecordService():
         delrecords = []
         records = _TransRecords.query.filter(_TransRecords.id.in_(ids)).all()
         for record in records:
-            self.deleteRecord(record, delsrc)
+            self.deleteRecordFiles(record, delsrc)
             self.delete(record)
             delrecords.append(record.srcpath)
         self.commit()
@@ -311,7 +348,7 @@ class TransRecordService():
         records = _TransRecords.query.all()
         for i in records:
             if not os.path.exists(i.srcpath) or not os.path.exists(i.destpath):
-                self.deleteRecord(i, False)
+                self.deleteRecordFiles(i, False)
                 self.delete(i)
         self.commit()
 
@@ -325,8 +362,7 @@ class TransRecordService():
                 if i.deadtime:
                     nowtime = datetime.datetime.now()
                     if nowtime > i.deadtime:
-                        self.deleteRecord(i, True)
-                        self.delete(i)
+                        self.deleteRecordFiles(i, True)
                         delrecords.append(i.srcpath)
                         continue
                 # 0 软链接 1 硬链接

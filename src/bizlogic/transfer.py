@@ -10,8 +10,8 @@ from ..service.configservice import transConfigService
 from ..service.recordservice import transrecordService
 from ..service.taskservice import taskService
 from ..utils.regex import extractEpNum, matchSeason, matchEpPart, matchSeries, simpleMatchEp
-from ..utils.filehelper import linkFile, video_type, ext_type, replaceRegex, cleanFolderWithoutSuffix,\
-     replaceCJK, cleanbyNameSuffix, cleanExtraMedia, moveSubs
+from ..utils.filehelper import linkFile, video_type, ext_type, replaceRegex, cleanFolderWithoutSuffix, \
+    replaceCJK, cleanbyNameSuffix, cleanExtraMedia, moveSubs
 from flask import current_app
 
 
@@ -49,7 +49,7 @@ class FileInfo():
 
     def updateMidFolder(self, mid):
         self.midfolder = mid
-        folders =  os.path.normpath(mid).split(os.path.sep)
+        folders = os.path.normpath(mid).split(os.path.sep)
         self.folders = folders
         self.topfolder = folders[0]
         if len(folders) > 1:
@@ -157,9 +157,9 @@ def autoTransfer(cid, real_path: str):
     try:
         current_app.logger.debug("任务详情: 自动转移")
         if not transfer(conf.source_folder, conf.output_folder,
-                    conf.linktype, conf.soft_prefix,
-                    conf.escape_folder, real_path,
-                    False, conf.replace_CJK, conf.fix_series):
+                        conf.linktype, conf.soft_prefix,
+                        conf.escape_folder, real_path,
+                        False, conf.replace_CJK, conf.fix_series):
             return 0
         if conf.refresh_url:
             if not refreshMediaServer(conf.refresh_url):
@@ -169,16 +169,16 @@ def autoTransfer(cid, real_path: str):
         return 0
 
 
-def ctrlTransfer(src_folder, dest_folder, 
-                linktype, prefix, escape_folders,
-                specified_files, fix_series,
-                clean_others,
-                replace_CJK,
-                refresh_url):
+def ctrlTransfer(src_folder, dest_folder,
+                 linktype, prefix, escape_folders,
+                 specified_files, fix_series,
+                 clean_others,
+                 replace_CJK,
+                 refresh_url):
     transfer(src_folder, dest_folder, linktype, prefix,
-            escape_folders, specified_files,
-            clean_others, replace_CJK,
-            fix_series)
+             escape_folders, specified_files,
+             clean_others, replace_CJK,
+             fix_series)
     if refresh_url:
         refreshMediaServer(refresh_url)
 
@@ -186,9 +186,9 @@ def ctrlTransfer(src_folder, dest_folder,
 def transfer(src_folder, dest_folder,
              linktype, prefix,
              escape_folders, specified_files='',
-             clean_others_tag = True,
-             simplify_tag= False,
-             fixseries_tag= False
+             clean_others_tag=True,
+             simplify_tag=False,
+             fixseries_tag=False
              ):
     """
     如果 specified_files 有值，则使用 specified_files 过滤文件且不清理其他文件
@@ -300,15 +300,15 @@ def transfer(src_folder, dest_folder,
 
             if os.path.exists(currentrecord.destpath) and newpath != currentrecord.destpath:
                 # 清理之前转移的文件
-                transrecordService.deleteRecord(currentrecord, False)
+                transrecordService.deleteRecordFiles(currentrecord, False)
 
             if newpath in dest_list:
                 dest_list.remove(newpath)
 
             current_app.logger.info("[-] transfered [{}]".format(newpath))
-            transrecordService.editRecord(currentrecord, link_path, newpath, currentrecord.status,
-                                      currentfile.topfolder, currentfile.secondfolder,
-                                      currentfile.isepisode, currentfile.season, currentfile.epnum)
+            transrecordService.updateRecord(currentrecord, link_path, newpath, currentrecord.status,
+                                            currentfile.topfolder, currentfile.secondfolder,
+                                            currentfile.isepisode, currentfile.season, currentfile.epnum)
             # need rest 100ms
             time.sleep(0.1)
 
@@ -362,7 +362,7 @@ def naming(currentfile: FileInfo, movie_list: list, simplify_tag, fixseries_tag)
             current_app.logger.debug("[-] fix series name")
             # 检测是否有修正记录
             if isinstance(currentfile.season, int) and isinstance(currentfile.epnum, int) \
-                and currentfile.season > -1 and currentfile.epnum > -1:
+                    and currentfile.season > -1 and currentfile.epnum > -1:
                 current_app.logger.debug("[-] directly use record")
                 if currentfile.season == 0:
                     currentfile.secondfolder = "Specials"
