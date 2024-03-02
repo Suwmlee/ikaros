@@ -108,7 +108,7 @@ def editTransferRecord():
     info = transrecordService.queryByPath(content.get('srcpath'))
     transrecordService.editRecord(info, content.get('linkpath'), content.get('destpath'),
                               content.get('status'), content.get('ignored'), content.get('locked'), 
-                              content.get('topfolder'), content.get('secondfolder'),
+                              content.get('topfolder'), content.get('secondfolder'), content.get('forcedname'),
                               content.get('isepisode'), content.get('season'), content.get('episode'),
                               content.get('renameAllTop'), content.get('renameAllSub'), content.get('deadtime'))
     return Response(status=200)

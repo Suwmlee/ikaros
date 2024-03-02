@@ -234,7 +234,7 @@ class TransRecordService():
 
     def editRecord(self, info: _TransRecords, softpath, destpath,
                    status, ignored, locked,
-                   topfolder, secondfolder,
+                   topfolder, secondfolder, forcedname,
                    isepisode, season, epnum,
                    renameTop_tag=False, renameSub_tag=False, deadtime=None):
         """ 由API调用编辑
@@ -250,6 +250,9 @@ class TransRecordService():
             else:
                 if renameSub_tag:
                     self.renameAllSecond(info.srcfolder, info.topfolder, info.secondfolder, secondfolder)
+            if not forcedname:
+                forcedname = ""
+            info.forcedname = forcedname
             if deadtime == '' and info.deadtime:
                 info.deadtime = None
             if locked:

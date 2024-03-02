@@ -95,6 +95,7 @@ class _TransRecords(db.Model):
     locked = Column(Boolean, default=False)
     deleted = Column(Boolean, default=False)
 
+    forcedname = Column(String, default='', comment='forced name')
     topfolder = Column(String, default='')
     # 电影类，次级目录;如果是剧集则以season为准
     secondfolder = Column(String, default='')
@@ -127,6 +128,7 @@ class _TransRecords(db.Model):
             'isepisode': self.isepisode,
             'season': self.season,
             'episode': self.episode,
+            'forcedname': self.forcedname,
             'linkpath': self.linkpath,
             'destpath': self.destpath,
             'updatetime': self.updatetime.strftime("%Y/%m/%d %H:%M:%S") if self.updatetime else '',

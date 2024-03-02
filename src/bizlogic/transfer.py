@@ -34,6 +34,7 @@ class FileInfo():
     originep = ''
     season = None
     epnum = None
+    forcedname = ''
 
     finalpath = ''
     finalfolder = ''
@@ -64,6 +65,15 @@ class FileInfo():
             else:
                 temp.append(self.secondfolder)
         return os.path.join(*temp)
+
+    def updateForcedname(self, name):
+        self.forcedname = name
+
+    def fixFinalName(self):
+        if self.forcedname != "":
+            return self.forcedname + self.ext
+        else:
+            return self.name + self.ext
 
     def updateFinalPath(self, path):
         self.finalpath = path
@@ -279,14 +289,16 @@ def transfer(src_folder, dest_folder,
                     currentfile.epnum = currentrecord.episode
             elif not fixseries_tag:
                 currentfile.isepisode = False
+            if currentrecord.forcedname:
+                currentfile.updateForcedname(currentrecord.forcedname)
 
             # 优化命名
             naming(currentfile, movie_list, simplify_tag, fixseries_tag)
 
             if currentfile.topfolder == '.':
-                newpath = os.path.join(dest_folder, currentfile.name + currentfile.ext)
+                newpath = os.path.join(dest_folder, currentfile.fixFinalName())
             else:
-                newpath = os.path.join(dest_folder, currentfile.fixMidFolder(), currentfile.name + currentfile.ext)
+                newpath = os.path.join(dest_folder, currentfile.fixMidFolder(), currentfile.fixFinalName())
             currentfile.updateFinalPath(newpath)
             if linktype == 0:
                 linkFile(link_path, newpath, 1)
@@ -400,9 +412,3 @@ def naming(currentfile: FileInfo, movie_list: list, simplify_tag, fixseries_tag)
                                 currentfile.fixEpName(0)
                         except Exception as ex:
                             current_app.logger.error(ex)
-
-    # 检测是否是特殊的导评/花絮内容
-    # TODO 更多关于花絮的规则
-    if currentfile.name == "导演访谈" and not currentfile.locked:
-        if currentfile.secondfolder == '' and currentfile.topfolder != '.':
-            currentfile.secondfolder = "extras"
