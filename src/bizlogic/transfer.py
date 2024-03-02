@@ -254,17 +254,20 @@ def transfer(src_folder, dest_folder,
 
             currentrecord = transrecordService.add(currentfile.realpath)
             currentrecord.srcfolder = src_folder
-            if currentrecord.status == 2:
-                # 忽略标记，直接下一个
+            # 忽略标记，直接下一个
+            if currentrecord.ignored:
                 continue
+            # 锁定
+            if currentrecord.locked:
+                # TODO
+                currentfile.locked = True
             # 记录优先
             # 如果是剧集，season优先
             if currentrecord.topfolder and currentrecord.topfolder != '.':
                 currentfile.topfolder = currentrecord.topfolder
             if currentrecord.secondfolder:
                 currentfile.secondfolder = currentrecord.secondfolder
-            if currentrecord.status and currentrecord.status == 1:
-                currentfile.locked = True
+
             if currentrecord.isepisode:
                 currentfile.isepisode = True
                 if isinstance(currentrecord.season, int) and currentrecord.season > -1:

@@ -87,7 +87,7 @@ class ScrapingRecordService():
         records = _ScrapingRecords.query.all()
         for i in records:
             # 排除忽略标记
-            if i.status != 3:
+            if not i.ignored:
                 # 已标记deadtime，检查是否到期，进行删除
                 if i.deadtime:
                     nowtime = datetime.datetime.now()
@@ -142,7 +142,7 @@ class ScrapingRecordService():
     def delete(self, record):
         """ 标记为 已删除
         """
-        record.status = 5
+        record.deleted = True
 
     def commit(self):
         db.session.commit()
@@ -150,6 +150,7 @@ class ScrapingRecordService():
     def queryByPage(self, pagenum, pagesize, status, sortprop, sortorder, blur):
         """ 查询
         """
+        filterparam = ""
         if status:
             status_num = int(status)
             if blur:
@@ -163,19 +164,16 @@ class ScrapingRecordService():
                 filterparam = _ScrapingRecords.status == status_num
         else:
             if blur:
-                filterparam = and_(
-                    _ScrapingRecords.status != 5,
-                    or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
-                        _ScrapingRecords.scrapingname.like("%" + blur + "%"),
-                        _ScrapingRecords.destname.like("%" + blur + "%"))
-                )
-            else:
-                filterparam = _ScrapingRecords.status != 5
+                filterparam = or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
+                    _ScrapingRecords.scrapingname.like("%" + blur + "%"),
+                    _ScrapingRecords.destname.like("%" + blur + "%"))
         direction = asc if sortorder == 'ascending' else desc
         sortname = sortprop if sortprop else 'updatetime'
         sortattr = getattr(_ScrapingRecords, sortname)
-        infos = _ScrapingRecords.query.filter(filterparam).order_by(direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
-
+        if filterparam:
+            infos = _ScrapingRecords.query.filter(filterparam).order_by(direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
+        else:
+            infos = _ScrapingRecords.query.order_by(direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
         return infos
 
 
@@ -244,12 +242,13 @@ class TransRecordService():
     def delete(self, record):
         """ 标记为 已删除
         """
-        record.status = 5
+        record.deleted = True
 
     def commit(self):
         db.session.commit()
 
     def queryByPage(self, pagenum, pagesize, status, sortprop, sortorder, blur):
+        filterparam = ""
         if status:
             status_num = int(status)
             if blur:
@@ -263,19 +262,16 @@ class TransRecordService():
                 filterparam = _TransRecords.status == status_num
         else:
             if blur:
-                filterparam = and_(
-                    _TransRecords.status != 5,
-                    or_(_TransRecords.srcname.like("%" + blur + "%"),
-                        _TransRecords.destpath.like("%" + blur + "%"),
-                        _TransRecords.topfolder.like("%" + blur + "%"))
-                )
-            else:
-                filterparam = _TransRecords.status != 5
+                filterparam = or_(_TransRecords.srcname.like("%" + blur + "%"),
+                    _TransRecords.destpath.like("%" + blur + "%"),
+                    _TransRecords.topfolder.like("%" + blur + "%"))
         direction = asc if sortorder == 'ascending' else desc
         sortname = sortprop if sortprop else 'updatetime'
         sortattr = getattr(_TransRecords, sortname)
-        infos = _TransRecords.query.filter(filterparam).order_by(direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
-
+        if filterparam:
+            infos = _TransRecords.query.filter(filterparam).order_by(direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
+        else:
+            infos = _TransRecords.query.order_by(direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
         return infos
 
     @staticmethod
@@ -324,7 +320,7 @@ class TransRecordService():
         records = _TransRecords.query.all()
         for i in records:
             # 忽略标记
-            if i.status != 2:
+            if not i.ignored:
                 # 已标记deadtime，检查是否到期，进行删除
                 if i.deadtime:
                     nowtime = datetime.datetime.now()
@@ -347,14 +343,14 @@ class TransRecordService():
     def renameAllTop(self, srcfolder, top, new):
         records = _TransRecords.query.filter_by(srcfolder=srcfolder, topfolder=top).all()
         for single in records:
-            if single.status != 1 and single.status != 2:
+            if not single.ignored and not single.locked:
                 single.topfolder = new
                 single.updatetime = datetime.datetime.now()
 
     def renameAllSecond(self, srcfolder, top, second, new):
         records = _TransRecords.query.filter_by(srcfolder=srcfolder, topfolder=top, secondfolder=second).all()
         for single in records:
-            if single.status != 1 and single.status != 2:
+            if not single.ignored and not single.locked:
                 single.secondfolder = new
                 single.updatetime = datetime.datetime.now()
 
@@ -362,7 +358,7 @@ class TransRecordService():
         records = _TransRecords.query.filter_by(srcfolder=srcfolder, topfolder=top,
                                                 secondfolder=second, season=season).all()
         for single in records:
-            if single.status != 1 and single.status != 2:
+            if not single.ignored and not single.locked:
                 single.isepisode = True
                 single.season = new
                 single.updatetime = datetime.datetime.now()
