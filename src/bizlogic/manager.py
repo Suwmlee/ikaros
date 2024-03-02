@@ -74,7 +74,9 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs, forced=False):
             scrapingrecordService.commit()
             # 过滤
             ignore = False
-            if conf.escape_size and conf.escape_size > 0:
+            if movie_info.ignored:
+                ignore = True
+            elif conf.escape_size and conf.escape_size > 0:
                 minsize = conf.escape_size * 1024 * 1024
                 filesize = os.path.getsize(file_path)
                 if filesize < minsize:
