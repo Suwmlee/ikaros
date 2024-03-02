@@ -1,3 +1,15 @@
+# [2.2.0](https://github.com/Suwmlee/ikaros/compare/v2.1.1...v2.2.0) (2024-03-02)
+
+
+### Bug Fixes
+
+* query filterparam ([aaa468e](https://github.com/Suwmlee/ikaros/commit/aaa468e95c04c81c585250a3aa96d28202dc6005))
+
+
+### Features
+
+* **transfer:** forced name ([61d0496](https://github.com/Suwmlee/ikaros/commit/61d049622d8ac85fc9ffa78df1a82e526f9647ce))
+
 ## [2.1.1](https://github.com/Suwmlee/ikaros/compare/v2.1.0...v2.1.1) (2024-03-02)
 
 
