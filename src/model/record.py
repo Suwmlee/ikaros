@@ -1,5 +1,17 @@
 # -*- coding: utf-8 -*-
-
+"""
+    刮削/转移记录
+    关键参数:
+    status:
+        0   等待
+        1   成功
+        2   失败
+        3   跳过
+        4   进行中
+    ignored: 忽略
+    locked: 锁定, 不再进行重命名等
+    deleted: 实际内容已经删除
+"""
 import datetime
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, BigInteger
 from .. import db
@@ -7,12 +19,6 @@ from .. import db
 
 class _ScrapingRecords(db.Model):
     """ 刮削记录
-    status  0   未刮削
-            1   已刮削
-            2   失败
-            3   忽略
-            4   进行中
-            5   已删除
     """
     __tablename__ = 'scrapingrecords'
 
@@ -21,6 +27,9 @@ class _ScrapingRecords(db.Model):
     srcpath = Column(String, default='')
     srcsize = Column(BigInteger, default=0)
     status = Column(Integer, default=0)
+    ignored = Column(Integer, default=False)
+    locked = Column(Boolean, default=False)
+    deleted = Column(Boolean, default=False)
 
     scrapingname = Column(String, default='', comment='used name for scraping')
     cdnum = Column(Integer, default=0, comment='cd num')
@@ -51,6 +60,9 @@ class _ScrapingRecords(db.Model):
             'srcpath': self.srcpath,
             'srcsize': self.srcsize,
             'status': self.status,
+            'ignored': self.ignored,
+            'locked': self.locked,
+            'deleted': self.deleted,
             'scrapingname': self.scrapingname,
             'cdnum': self.cdnum,
             'cnsubtag': self.cnsubtag,
@@ -62,17 +74,13 @@ class _ScrapingRecords(db.Model):
             'linktype': self.linktype,
             'destname': self.destname,
             'destpath': self.destpath,
-            'updatetime': self.updatetime.strftime("%Y/%m/%d %H:%M:%S")  if self.updatetime else '',
+            'updatetime': self.updatetime.strftime("%Y/%m/%d %H:%M:%S") if self.updatetime else '',
             'deadtime': self.deadtime.strftime("%Y/%m/%d %H:%M:%S") if self.deadtime else '',
         }
 
 
 class _TransRecords(db.Model):
     """ 转移记录
-    status  0
-            1   锁定    -> 针对顶层目录
-            2   忽略
-            5   已删除
     """
     __tablename__ = 'transrecords'
 
@@ -83,6 +91,9 @@ class _TransRecords(db.Model):
     srcfolder = Column(String, default='')
 
     status = Column(Integer, default=0)
+    ignored = Column(Integer, default=False)
+    locked = Column(Boolean, default=False)
+    deleted = Column(Boolean, default=False)
 
     topfolder = Column(String, default='')
     # 电影类，次级目录;如果是剧集则以season为准
@@ -108,6 +119,9 @@ class _TransRecords(db.Model):
             'srcsize': self.srcsize,
             'srcfolder': self.srcfolder,
             'status': self.status,
+            'ignored': self.ignored,
+            'locked': self.locked,
+            'deleted': self.deleted,
             'topfolder': self.topfolder,
             'secondfolder': self.secondfolder,
             'isepisode': self.isepisode,
@@ -115,6 +129,6 @@ class _TransRecords(db.Model):
             'episode': self.episode,
             'linkpath': self.linkpath,
             'destpath': self.destpath,
-            'updatetime': self.updatetime.strftime("%Y/%m/%d %H:%M:%S")  if self.updatetime else '',
+            'updatetime': self.updatetime.strftime("%Y/%m/%d %H:%M:%S") if self.updatetime else '',
             'deadtime': self.deadtime.strftime("%Y/%m/%d %H:%M:%S") if self.deadtime else '',
         }
