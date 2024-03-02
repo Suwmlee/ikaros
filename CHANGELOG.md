@@ -1,3 +1,17 @@
+# [2.1.0](https://github.com/Suwmlee/ikaros/compare/v2.0.16...v2.1.0) (2024-03-02)
+
+
+### Bug Fixes
+
+* record deleted status ([6cb408f](https://github.com/Suwmlee/ikaros/commit/6cb408fd53874ce95f1d55625ec456ccf31f5280))
+* record status ([9dca6aa](https://github.com/Suwmlee/ikaros/commit/9dca6aac79c95fc046580ea5dfbcd33bc6fc6bab))
+* scraping deleted status ([90bd207](https://github.com/Suwmlee/ikaros/commit/90bd207da1dbdaf91f3c8b28336ddd98cd48c8da))
+
+
+### Features
+
+* transfer workflow ([a0eca27](https://github.com/Suwmlee/ikaros/commit/a0eca276e5e44833ebae9d9d5da441d26c874db9))
+
 ## [2.0.16](https://github.com/Suwmlee/ikaros/compare/v2.0.15...v2.0.16) (2024-02-11)
 
 
