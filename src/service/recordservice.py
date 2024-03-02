@@ -119,25 +119,52 @@ class ScrapingRecordService():
         return delrecords
 
     def editRecord(self, sid, status, scrapingname,
+                   ignored, locked,
                    specifiedsource, specifiedurl,
                    cnsubtag, leaktag, uncensoredtag, hacktag, cdnum, deadtime):
-        record = _ScrapingRecords.query.filter_by(id=sid).first()
-        if record:
-            record.status = status
-            record.scrapingname = scrapingname
-            record.specifiedsource = specifiedsource
-            record.specifiedurl = specifiedurl
-            record.cnsubtag = cnsubtag
-            record.leaktag = leaktag
-            record.uncensoredtag = uncensoredtag
-            record.hacktag = hacktag
-            if cdnum == '':
-                cdnum = 0
-            record.cdnum = int(cdnum)
-            record.updatetime = datetime.datetime.now()
-            if deadtime == '' and record.deadtime:
-                record.deadtime = None
-            self.commit()
+        info = _ScrapingRecords.query.filter_by(id=sid).first()
+        if info:
+            if locked:
+                if not info.locked:
+                    info.ignored = False
+                    info.locked = True
+                    info.deadtime = None
+                    self.updateRecord(info, status, scrapingname, specifiedsource, specifiedurl,
+                                      cnsubtag, leaktag, uncensoredtag, hacktag, cdnum, deadtime)
+            elif ignored:
+                if not info.ignored:
+                    info.ignored = True
+                    info.locked = False
+                    info.deadtime = None
+                    self.deleteRecordFiles(info, False)
+                    status = 3
+                    info.destpath = info.destname = ""
+                    self.updateRecord(info, status, scrapingname, specifiedsource, specifiedurl,
+                                      cnsubtag, leaktag, uncensoredtag, hacktag, cdnum, deadtime)
+            else:
+                info.ignored = False
+                info.locked = False
+                self.updateRecord(info, status, scrapingname, specifiedsource, specifiedurl,
+                                  cnsubtag, leaktag, uncensoredtag, hacktag, cdnum, deadtime)
+
+    def updateRecord(self, record: _ScrapingRecords, status, scrapingname,
+                     specifiedsource, specifiedurl,
+                     cnsubtag, leaktag, uncensoredtag, hacktag, cdnum, deadtime):
+        record.status = status
+        record.scrapingname = scrapingname
+        record.specifiedsource = specifiedsource
+        record.specifiedurl = specifiedurl
+        record.cnsubtag = cnsubtag
+        record.leaktag = leaktag
+        record.uncensoredtag = uncensoredtag
+        record.hacktag = hacktag
+        if cdnum == '':
+            cdnum = 0
+        record.cdnum = int(cdnum)
+        record.updatetime = datetime.datetime.now()
+        if deadtime == '' and record.deadtime:
+            record.deadtime = None
+        self.commit()
 
     def deleteRecord(self, record, forced=False):
         """ 删除记录
@@ -169,15 +196,17 @@ class ScrapingRecordService():
         else:
             if blur:
                 filterparam = or_(_ScrapingRecords.srcname.like("%" + blur + "%"),
-                    _ScrapingRecords.scrapingname.like("%" + blur + "%"),
-                    _ScrapingRecords.destname.like("%" + blur + "%"))
+                                  _ScrapingRecords.scrapingname.like("%" + blur + "%"),
+                                  _ScrapingRecords.destname.like("%" + blur + "%"))
         direction = asc if sortorder == 'ascending' else desc
         sortname = sortprop if sortprop else 'updatetime'
         sortattr = getattr(_ScrapingRecords, sortname)
         if filterparam:
-            infos = _ScrapingRecords.query.filter(filterparam).order_by(direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
+            infos = _ScrapingRecords.query.filter(filterparam).order_by(
+                direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
         else:
-            infos = _ScrapingRecords.query.order_by(direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
+            infos = _ScrapingRecords.query.order_by(direction(sortattr)).paginate(
+                page=pagenum, per_page=pagesize, error_out=False)
         return infos
 
 
@@ -232,18 +261,14 @@ class TransRecordService():
             if deadtime == '' and info.deadtime:
                 info.deadtime = None
             if locked:
-                if info.locked:
-                    pass
-                else:
-                    info.locked = True
+                if not info.locked:
                     info.ignored = False
+                    info.locked = True
                     info.deadtime = None
                     self.updateRecord(info, softpath, destpath, status, topfolder, secondfolder,
-                                isepisode, season, epnum)
+                                      isepisode, season, epnum)
             elif ignored:
-                if info.ignored:
-                    pass
-                else:
+                if not info.ignored:
                     info.ignored = True
                     info.locked = False
                     info.deadtime = None
@@ -253,7 +278,12 @@ class TransRecordService():
                     topfolder = secondfolder = ""
                     isepisode = False
                     self.updateRecord(info, softpath, destpath, status, topfolder, secondfolder,
-                              isepisode, season, epnum)
+                                      isepisode, season, epnum)
+            else:
+                info.ignored = False
+                info.locked = False
+                self.updateRecord(info, softpath, destpath, status, topfolder, secondfolder,
+                                  isepisode, season, epnum)
 
     def updateRecord(self, info: _TransRecords, softpath, destpath,
                      status, topfolder, secondfolder,
@@ -307,15 +337,17 @@ class TransRecordService():
         else:
             if blur:
                 filterparam = or_(_TransRecords.srcname.like("%" + blur + "%"),
-                    _TransRecords.destpath.like("%" + blur + "%"),
-                    _TransRecords.topfolder.like("%" + blur + "%"))
+                                  _TransRecords.destpath.like("%" + blur + "%"),
+                                  _TransRecords.topfolder.like("%" + blur + "%"))
         direction = asc if sortorder == 'ascending' else desc
         sortname = sortprop if sortprop else 'updatetime'
         sortattr = getattr(_TransRecords, sortname)
         if filterparam:
-            infos = _TransRecords.query.filter(filterparam).order_by(direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
+            infos = _TransRecords.query.filter(filterparam).order_by(
+                direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
         else:
-            infos = _TransRecords.query.order_by(direction(sortattr)).paginate(page=pagenum, per_page=pagesize, error_out=False)
+            infos = _TransRecords.query.order_by(direction(sortattr)).paginate(
+                page=pagenum, per_page=pagesize, error_out=False)
         return infos
 
     @staticmethod

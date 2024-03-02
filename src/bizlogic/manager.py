@@ -39,7 +39,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs, forced=False):
     try:
         movie_info = scrapingrecordService.queryByPath(file_path)
         # 查看单个文件刮削状态
-        if not movie_info or forced or movie_info.status == 0 or movie_info.status == 2 or movie_info.status == 5:
+        if not movie_info or forced or movie_info.status == 0 or movie_info.status == 2:
             movie_info = scrapingrecordService.add(file_path)
             # 查询是否已经存在刮削目录 & 不能在同一目录下
             if movie_info.destpath and movie_info.destpath != '':
@@ -79,7 +79,7 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs, forced=False):
                 filesize = os.path.getsize(file_path)
                 if filesize < minsize:
                     ignore = True
-                    current_app.logger.info('[!] ' + str(file_path) +' below size limit, will pass')
+                    current_app.logger.info('[!] ' + str(file_path) + ' below size limit, will pass')
             if not ignore:
                 (flag, new_path) = core_main(file_path, num_info, conf, movie_info.specifiedsource, movie_info.specifiedurl)
                 if flag:
@@ -106,7 +106,8 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs, forced=False):
         else:
             current_app.logger.info("[!]Already done: [{}]".format(file_path))
             try:
-                current_app.logger.info(f"[!]Checking dest file status: type {conf.link_type} and destpath [{movie_info.destpath}]")
+                current_app.logger.info(
+                    f"[!]Checking dest file status: type {conf.link_type} and destpath [{movie_info.destpath}]")
                 if movie_info and movie_info.status == 1:
                     if conf.link_type == 0:
                         if os.path.exists(movie_info.destpath) and not pathlib.Path(movie_info.destpath).is_symlink():
@@ -123,8 +124,8 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs, forced=False):
                             current_app.logger.error(f"[!]Checking file status: wrong symlink")
                     elif conf.link_type == 2:
                         if os.path.exists(movie_info.srcpath) and \
-                            os.path.exists(movie_info.destpath) and \
-                            os.path.samefile(movie_info.srcpath, movie_info.destpath):
+                                os.path.exists(movie_info.destpath) and \
+                                os.path.samefile(movie_info.srcpath, movie_info.destpath):
                             current_app.logger.info(f"[!]Checking file status: OK")
                         else:
                             current_app.logger.error(f"[!]Checking file status: file missing")
@@ -168,7 +169,7 @@ def startScrapingAll(cid, folder=''):
     total = len(movie_list)
     taskService.updateTaskNum(task, total)
     current_app.logger.info("[*]======================================================")
-    current_app.logger.info('[+]Find  ' + str(total) +'  movies')
+    current_app.logger.info('[+]Find  ' + str(total) + '  movies')
 
     for movie_path in movie_list:
         # refresh data
@@ -214,7 +215,7 @@ def startScrapingSingle(cid, movie_path: str, forced=False):
 
     movie_info = scrapingrecordService.queryByPath(movie_path)
     # 强制 未刮削 刮削失败才进行清理
-    if movie_info and (forced or movie_info.status == 0 or movie_info.status == 2 or movie_info.status == 5):
+    if movie_info and (forced or movie_info.status == 0 or movie_info.status == 2):
         if os.path.exists(movie_path):
             # 源文件存在，目的文件存在。(链接模式)
             if movie_info.destpath and os.path.exists(movie_info.destpath):
@@ -222,7 +223,7 @@ def startScrapingSingle(cid, movie_path: str, forced=False):
         else:
             # 源文件不存在，目的文件存在。(非链接模式,刮削后进行了移动)
             if movie_info.destpath and os.path.exists(movie_info.destpath) and os.path.isfile(movie_info.destpath) \
-                and not pathlib.Path(movie_info.destpath).is_symlink():
+                    and not pathlib.Path(movie_info.destpath).is_symlink():
                 shutil.move(movie_info.destpath, movie_path)
     if os.path.exists(movie_path) and os.path.isfile(movie_path):
         create_data_and_move(movie_path, conf, forced)
