@@ -218,7 +218,7 @@ def startScrapingSingle(cid, movie_path: str, forced=False):
         if os.path.exists(movie_path):
             # 源文件存在，目的文件存在。(链接模式)
             if movie_info.destpath and os.path.exists(movie_info.destpath):
-                scrapingrecordService.deleteRecord(movie_info, False)
+                scrapingrecordService.deleteRecordFiles(movie_info, False)
         else:
             # 源文件不存在，目的文件存在。(非链接模式,刮削后进行了移动)
             if movie_info.destpath and os.path.exists(movie_info.destpath) and os.path.isfile(movie_info.destpath) \

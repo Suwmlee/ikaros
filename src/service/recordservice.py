@@ -39,7 +39,7 @@ class ScrapingRecordService():
         return _ScrapingRecords.query.filter_by(id=value).first()
 
     @staticmethod
-    def deleteRecord(record: _ScrapingRecords, delsrc=False):
+    def deleteRecordFiles(record: _ScrapingRecords, delsrc=False):
         """ 删除关联的实际文件
         """
         basefolder = os.path.dirname(record.srcpath)
@@ -61,8 +61,8 @@ class ScrapingRecordService():
         delrecords = []
         records = _ScrapingRecords.query.filter(_ScrapingRecords.id.in_(ids)).all()
         for record in records:
+            self.deleteRecordFiles(record, delsrc)
             self.deleteRecord(record, delsrc)
-            self.delete(record)
             delrecords.append(record.srcpath)
         self.commit()
         return delrecords
@@ -72,12 +72,12 @@ class ScrapingRecordService():
         for i in records:
             if i.linktype == 0:
                 if not os.path.exists(i.destpath):
-                    self.deleteRecord(i, False)
-                    self.delete(i)
+                    self.deleteRecordFiles(i, False)
+                    self.deleteRecord(i)
             else:
                 if not os.path.exists(i.srcpath) or not os.path.exists(i.destpath):
-                    self.deleteRecord(i, False)
-                    self.delete(i)
+                    self.deleteRecordFiles(i, False)
+                    self.deleteRecord(i)
         self.commit()
 
     def deadtimetoMissingrecord(self) -> list:
@@ -92,8 +92,8 @@ class ScrapingRecordService():
                 if i.deadtime:
                     nowtime = datetime.datetime.now()
                     if nowtime > i.deadtime:
-                        self.deleteRecord(i, True)
-                        self.delete(i)
+                        self.deleteRecordFiles(i, True)
+                        self.deleteRecord(i)
                         delrecords.append(i.srcpath)
                         continue
                 # 0 转移 1 软链接 2 硬链接
@@ -139,10 +139,14 @@ class ScrapingRecordService():
                 record.deadtime = None
             self.commit()
 
-    def delete(self, record):
-        """ 标记为 已删除
+    def deleteRecord(self, record, forced=False):
+        """ 删除记录
+        :param forced   True: 删除记录 False: 仅做标记
         """
-        record.deleted = True
+        if forced:
+            db.session.delete(record)
+        else:
+            record.deleted = True
 
     def commit(self):
         db.session.commit()
