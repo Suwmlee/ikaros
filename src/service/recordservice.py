@@ -275,10 +275,14 @@ class TransRecordService():
             info.updatetime = datetime.datetime.now()
             self.commit()
 
-    def delete(self, record):
-        """ 标记为 已删除
+    def deleteRecord(self, record, forced=False):
+        """ 删除记录
+        :param forced   True: 删除记录 False: 仅做标记
         """
-        record.deleted = True
+        if forced:
+            db.session.delete(record)
+        else:
+            record.deleted = True
 
     def commit(self):
         db.session.commit()
@@ -313,7 +317,7 @@ class TransRecordService():
     @staticmethod
     def deleteRecordFiles(record: _TransRecords, delsrc):
         """ 删除关联的实际文件
-        :param delsrc   删除原始文件标记
+        :param delsrc   是否删除原始文件
         """
         basefolder = os.path.dirname(record.srcpath)
         if delsrc and os.path.exists(basefolder):
@@ -339,7 +343,7 @@ class TransRecordService():
         records = _TransRecords.query.filter(_TransRecords.id.in_(ids)).all()
         for record in records:
             self.deleteRecordFiles(record, delsrc)
-            self.delete(record)
+            self.deleteRecord(record, delsrc)
             delrecords.append(record.srcpath)
         self.commit()
         return delrecords
@@ -349,7 +353,7 @@ class TransRecordService():
         for i in records:
             if not os.path.exists(i.srcpath) or not os.path.exists(i.destpath):
                 self.deleteRecordFiles(i, False)
-                self.delete(i)
+                self.deleteRecord(i)
         self.commit()
 
     def deadtimetoMissingrecord(self) -> list:
@@ -363,6 +367,7 @@ class TransRecordService():
                     nowtime = datetime.datetime.now()
                     if nowtime > i.deadtime:
                         self.deleteRecordFiles(i, True)
+                        self.deleteRecord(i)
                         delrecords.append(i.srcpath)
                         continue
                 # 0 软链接 1 硬链接
