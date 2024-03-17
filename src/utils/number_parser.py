@@ -104,16 +104,30 @@ class FileNumInfo():
         except:
             return False
 
+def fc2_name_process(fc2_name: str) -> str:
+    parts = fc2_name.split('-')
+    if len(parts) > 2:
+        out_name = '-'.join(parts[:2])
+        return out_name
+    return fc2_name
+
 def get_number(file_path: str) -> str:
     """ 获取番号
     """
     try:
         # TODO: need refactor
         basename = os.path.basename(file_path)
+        file_subpath = os.path.dirname(file_path)
+        file_subpath = os.path.basename(file_subpath)
+        file_subpath_lower_check = file_subpath.lower()
         (filename, ext) = os.path.splitext(basename)
         lower_check = filename.lower()
         if 'fc2' in lower_check:
-                filename = lower_check.replace('ppv', '').replace('--', '-').replace('_', '-').upper()
+            filename = lower_check.replace('ppv', '').replace('--', '-').replace('_', '-').upper().replace(' ', '')
+            filename = fc2_name_process(filename)
+        if 'fc2' in file_subpath_lower_check:
+            filename = file_subpath_lower_check.replace('ppv', '').replace('--', '-').replace('_', '-').upper().replace(' ', '')
+            filename = fc2_name_process(filename)
         file_number = get_number_by_dict(filename)
         if file_number:
             return file_number
@@ -168,6 +182,8 @@ G_TAKE_NUM_RULES = {
     'heyzo': lambda x: 'HEYZO-' + re.findall(r'heyzo[^\d]*(\d{4})', x, re.I)[0],
     'mdbk': lambda x: str(re.search(r'mdbk(-|_)(\d{4})', x, re.I).group()),
     'mdtm': lambda x: str(re.search(r'mdtm(-|_)(\d{4})', x, re.I).group()),
+    's2mbd': lambda x: str(re.search(r's2mbd(-|_)(\d{3})', x, re.I).group()),
+    's2m': lambda x: str(re.search(r's2m(-|_)(\d{3})', x, re.I).group()),
     r'([A-Za-z]{2,6}\-?\d{3})': lambda x: str(re.search(r'([A-Za-z]{2,6}\-?\d{3})', x, re.I).group()), # 保底用
 }
 
@@ -228,6 +244,14 @@ if __name__ == "__main__":
         "/media/sekao-023-leak.mkv",
         "/media/FC2-PPV-1234567.mkv",
         "/media/FC2PPV-1234567.mkv",
+        "/meida/fc2-ppv-1234567-xxx.com.mp4",
+        "/media/FC2-PPV-1111223/1111223.mp4",
+        "/media/FC2-1123456-1.mp4",
+        "/media/FC2PPV-1123457/FC2PPV-1123457-2.mp4",
+        "/media/111234_123 女人/trailers/trailer.mp4",
+        "/media/Miku Ohashi/調子に乗ったS嬢Ｘ苛められたM嬢 大橋未久(011015_780).mp4",
+        "/meida/S2M-001-FHD/S2MBD-001.mp4",
+        "/media/FC2-PPV-1112345/④えりか旅行本編.mp4",
     ]
     def convert_emoji(bool_tag):
         if bool_tag:
