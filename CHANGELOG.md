@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/Suwmlee/ikaros/compare/v2.2.0...v2.2.1) (2024-03-18)
+
+
+### Bug Fixes
+
+* update number_parser.py fc2 ([78d2e5f](https://github.com/Suwmlee/ikaros/commit/78d2e5f6fe641de9612b550cc1de9f8436932319))
+
 # [2.2.0](https://github.com/Suwmlee/ikaros/compare/v2.1.1...v2.2.0) (2024-03-02)
 
 
