@@ -161,7 +161,6 @@ def startScrapingAll(cid, folder=''):
     taskService.commit()
 
     conf = scrapingConfService.getConfig(cid)
-    cleanFolder(conf.failed_folder)
 
     if folder == '':
         folder = conf.scraping_folder
