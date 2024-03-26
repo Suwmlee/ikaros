@@ -1,3 +1,10 @@
+## [2.2.2](https://github.com/Suwmlee/ikaros/compare/v2.2.1...v2.2.2) (2024-03-26)
+
+
+### Bug Fixes
+
+* cancel clean failed folder ([94166e2](https://github.com/Suwmlee/ikaros/commit/94166e2785e447e7b16c4e70839d49a20bde71d5)), closes [#49](https://github.com/Suwmlee/ikaros/issues/49)
+
 ## [2.2.1](https://github.com/Suwmlee/ikaros/compare/v2.2.0...v2.2.1) (2024-03-18)
 
 
