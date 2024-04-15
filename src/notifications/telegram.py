@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from scrapinglib import httprequest
+from flask import current_app
 from ..service.configservice import localConfService
 
 
@@ -26,7 +27,8 @@ class Telegram():
             proxies = configProxy.proxies() if configProxy.enable else None
             try:
                 httprequest.get(url, proxies=proxies)
-            except:
+            except Exception as ex:
+                current_app.logger.debug(ex)
                 pass
 
     def sendmarkdown(self, text: str):
@@ -39,7 +41,8 @@ class Telegram():
             proxies = configProxy.proxies() if configProxy.enable else None
             try:
                 httprequest.post(url, params, proxies=proxies)
-            except:
+            except Exception as ex:
+                current_app.logger.debug(ex)
                 pass
 
     def sendphoto(self, caption: str, photopath):
@@ -54,5 +57,6 @@ class Telegram():
                 proxies = configProxy.proxies() if configProxy.enable else None
                 try:
                     httprequest.post(url, params, files=files, proxies=proxies)
-                except:
-                    pass
+                except Exception as ex:
+                    current_app.logger.debug(ex)
+                    pass         

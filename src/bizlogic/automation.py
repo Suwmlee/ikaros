@@ -146,6 +146,7 @@ def sendScrapingMessage(srcpath, dstpath):
     """
     组织发送刮削消息
     """
+    current_app.logger.debug("推送通知")
     headname, ext = os.path.splitext(dstpath)
     nfofile = headname + '.nfo'
     picfile = headname + '-fanart.jpg'
@@ -161,7 +162,7 @@ def sendScrapingMessage(srcpath, dstpath):
         if notificationService.isWeEnabled():
             notificationService.sendWeMarkdown(caption)
     else:
-        notificationService.sendtext("托管任务:[{}], 刮削完成,已推送媒体库".format(srcpath))
+        notificationService.sendtext("推送通知:[{}], 刮削完成,已推送媒体库".format(srcpath))
 
 
 def wrapSendTransferMessage(srcpath, dstpath, scheduler=None):
