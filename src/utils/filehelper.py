@@ -8,12 +8,12 @@ import stat
 import logging
 from flask import current_app
 
-video_type = ['.mp4', '.avi', '.rmvb', '.wmv',
+video_type = ['.mp4', '.avi', '.rmvb', '.wmv', '.strm',
               '.mov', '.mkv', '.flv', '.ts', '.m2ts','.webm', '.iso']
 ext_type = ['.ass', '.srt', '.sub', '.ssa', '.smi', '.idx', '.sup',
             '.psb', '.usf', '.xss', '.ssf', '.rt', '.lrc', '.sbv', '.vtt', '.ttml']
 
-video_filter = ['*.mp4', '*.avi', '*.rmvb', '*.wmv',
+video_filter = ['*.mp4', '*.avi', '*.rmvb', '*.wmv', '*.strm',
                 '*.mov', '*.mkv', '*.flv', '*.ts', '*.m2ts', '*.webm', '*.iso']
 ext_filter = ['*.ass', '*.srt', '*.sub', '*.ssa', '*.smi', '*.idx', '*.sup',
               '*.psb', '*.usf', '*.xss', '*.ssf', '*.rt', '*.lrc', '*.sbv', '*.vtt', '*.ttml']
