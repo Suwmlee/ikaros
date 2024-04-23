@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/Suwmlee/ikaros/compare/v2.2.2...v2.3.0) (2024-04-23)
+
+
+### Features
+
+* support strm ([218f27e](https://github.com/Suwmlee/ikaros/commit/218f27e5b943ae9dbafde4ffb43481dac2eb2b2c)), closes [#57](https://github.com/Suwmlee/ikaros/issues/57)
+
 ## [2.2.2](https://github.com/Suwmlee/ikaros/compare/v2.2.1...v2.2.2) (2024-03-26)
 
 
