@@ -184,7 +184,7 @@ G_TAKE_NUM_RULES = {
     'mdtm': lambda x: str(re.search(r'mdtm(-|_)(\d{4})', x, re.I).group()),
     's2mbd': lambda x: str(re.search(r's2mbd(-|_)(\d{3})', x, re.I).group()),
     's2m': lambda x: str(re.search(r's2m(-|_)(\d{3})', x, re.I).group()),
-    r'([A-Za-z]{2,6}\-?\d{3})': lambda x: str(re.search(r'([A-Za-z]{2,6}\-?\d{3})', x, re.I).group()), # 保底用
+    r'([A-Za-z]{2,6}\-?\d{3,4})': lambda x: str(re.search(r'([A-Za-z]{2,6}\-?\d{3,4})', x, re.I).group()), # 保底用
 }
 
 
@@ -252,6 +252,9 @@ if __name__ == "__main__":
         "/media/Miku Ohashi/調子に乗ったS嬢Ｘ苛められたM嬢 大橋未久(011015_780).mp4",
         "/meida/S2M-001-FHD/S2MBD-001.mp4",
         "/media/FC2-PPV-1112345/④えりか旅行本編.mp4",
+        "/media/SIRO-1234-C.mkv",
+        "/media/MXGS-1234-C.mkv",
+        "/media/dv-1234-C.mkv",
     ]
     def convert_emoji(bool_tag):
         if bool_tag:
