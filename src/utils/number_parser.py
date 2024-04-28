@@ -1,6 +1,6 @@
 import os
 import re
-from flask import current_app
+import logging
 
 G_spat = re.compile(
     "^\w+\.(cc|com|net|me|club|jp|tv|xyz|biz|wiki|info|tw|us|de)@|^22-sht\.me|"
@@ -104,34 +104,24 @@ class FileNumInfo():
         except:
             return False
 
-def fc2_name_process(fc2_name: str) -> str:
-    parts = fc2_name.split('-')
-    if len(parts) > 2:
-        out_name = '-'.join(parts[:2])
-        return out_name
-    return fc2_name
 
 def get_number(file_path: str) -> str:
     """ 获取番号
     """
     try:
-        # TODO: need refactor
         basename = os.path.basename(file_path)
         file_subpath = os.path.dirname(file_path)
         file_subpath = os.path.basename(file_subpath)
-        file_subpath_lower_check = file_subpath.lower()
         (filename, ext) = os.path.splitext(basename)
-        lower_check = filename.lower()
-        if 'fc2' in lower_check:
-            filename = lower_check.replace('ppv', '').replace('--', '-').replace('_', '-').upper().replace(' ', '')
-            filename = fc2_name_process(filename)
-        if 'fc2' in file_subpath_lower_check:
-            filename = file_subpath_lower_check.replace('ppv', '').replace('--', '-').replace('_', '-').upper().replace(' ', '')
-            filename = fc2_name_process(filename)
-        file_number = get_number_by_dict(filename)
+        file_number = rules_parser(filename.lower())
+        if file_number is None:
+            # 文件名不包含，查看文件夹
+            file_number = rules_parser(file_subpath.lower())
         if file_number:
             return file_number
-        elif '字幕组' in filename or 'SUB' in filename.upper() or re.match(r'[\u30a0-\u30ff]+', filename):
+
+        logging.getLogger().debug(f"[!] 特殊番号: {file_path}")
+        if '字幕组' in filename or 'SUB' in filename.upper() or re.match(r'[\u30a0-\u30ff]+', filename):
             filename = G_spat.sub("", filename)
             filename = re.sub("\[.*?\]","",filename)
             filename = filename.replace(".chs", "").replace(".cht", "")
@@ -166,36 +156,41 @@ def get_number(file_path: str) -> str:
             except:
                 return str(re.search(r'(.+?)\.', basename)[0])
     except Exception as e:
-        current_app.logger.error(e)
+        logging.getLogger().error(e)
         return
 
 
-# 按javdb数据源的命名规范提取number
-G_TAKE_NUM_RULES = {
-    'tokyo.*hot': lambda x: str(re.search(r'(cz|gedo|k|n|red-|se)\d{2,4}', x, re.I).group()),
-    'carib': lambda x: str(re.search(r'\d{6}(-|_)\d{3}', x, re.I).group()).replace('_', '-'),
-    '1pon|mura|paco': lambda x: str(re.search(r'\d{6}(-|_)\d{3}', x, re.I).group()).replace('-', '_'),
-    '10mu': lambda x: str(re.search(r'\d{6}(-|_)\d{2}', x, re.I).group()).replace('-', '_'),
-    'x-art': lambda x: str(re.search(r'x-art\.\d{2}\.\d{2}\.\d{2}', x, re.I).group()),
-    'xxx-av': lambda x: ''.join(['xxx-av-', re.findall(r'xxx-av[^\d]*(\d{3,5})[^\d]*', x, re.I)[0]]),
-    'heydouga': lambda x: 'heydouga-' + '-'.join(re.findall(r'(\d{4})[\-_](\d{3,4})[^\d]*', x, re.I)[0]),
-    'heyzo': lambda x: 'HEYZO-' + re.findall(r'heyzo[^\d]*(\d{4})', x, re.I)[0],
-    'mdbk': lambda x: str(re.search(r'mdbk(-|_)(\d{4})', x, re.I).group()),
-    'mdtm': lambda x: str(re.search(r'mdtm(-|_)(\d{4})', x, re.I).group()),
-    's2mbd': lambda x: str(re.search(r's2mbd(-|_)(\d{3})', x, re.I).group()),
-    's2m': lambda x: str(re.search(r's2m(-|_)(\d{3})', x, re.I).group()),
-    r'([A-Za-z]{2,6}\-?\d{3,4})': lambda x: str(re.search(r'([A-Za-z]{2,6}\-?\d{3,4})', x, re.I).group()), # 保底用
-}
+# 定义多个匹配规则
+rules = [
+    lambda x: re.search(r'(cz|gedo|k|n|red-|se)\d{2,4}', x, re.I).group(),
+    lambda x: re.search(r'\d{6}(-|_)\d{3}', x, re.I).group(),
+    lambda x: re.search(r'\d{6}(-|_)\d{2}', x, re.I).group(),
+    lambda x: re.search(r'x-art\.\d{2}\.\d{2}\.\d{2}', x, re.I).group(),
+    lambda x: ''.join(['xxx-av-', re.findall(r'xxx-av[^\d]*(\d{3,5})[^\d]*', x, re.I)[0]]),
+    lambda x: 'heydouga-' + '-'.join(re.findall(r'(\d{4})[\-_](\d{3,4})[^\d]*', x, re.I)[0]),
+    lambda x: 'HEYZO-' + re.findall(r'heyzo[^\d]*(\d{4})', x, re.I)[0],
+    lambda x: re.search(r'mdbk(-|_)(\d{4})', x, re.I).group(),
+    lambda x: re.search(r'mdtm(-|_)(\d{4})', x, re.I).group(),
+    lambda x: re.search(r's2mbd(-|_)(\d{3})', x, re.I).group(),
+    lambda x: re.search(r's2m(-|_)(\d{3})', x, re.I).group(),
+    lambda x: re.search(r'fc2(-|_)(\d{5,7})', x, re.I).group(),
+    lambda x: re.search(r'([A-Za-z]{2,6}\-?\d{3,4})', x, re.I).group(),
+]
 
 
-def get_number_by_dict(filename: str) -> str:
-    try:
-        for k, v in G_TAKE_NUM_RULES.items():
-            if re.search(k, filename, re.I):
-                return v(filename)
-    except:
-        pass
-    return None
+def rules_parser(filename):
+    """ lower filename
+    """
+    for rule in rules:
+        try:
+            if 'fc2' in filename:
+                filename = filename.replace('ppv', '').replace('--', '-').replace('_', '-').replace(' ', '')
+            file_number = rule(filename)
+            if file_number:
+                return file_number
+        except:
+            pass
+    return
 
 
 class Cache_uncensored_conf:
