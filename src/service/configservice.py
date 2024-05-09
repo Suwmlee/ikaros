@@ -7,7 +7,7 @@ from .. import db
 
 class ScrapingConfService():
 
-    def getConfiglist(self):
+    def getConfiglist(self) -> list[_ScrapingConfigs]:
         configs = _ScrapingConfigs.query.all()
         if not configs:
             config = _ScrapingConfigs()
@@ -60,7 +60,7 @@ class TransConfService():
         config = _TransferConfigs.query.filter_by(id=cid).first()
         return config
 
-    def getConfiglist(self):
+    def getConfiglist(self) -> list[_TransferConfigs]:
         configs = _TransferConfigs.query.all()
         if not configs:
             config = _TransferConfigs()

@@ -5,13 +5,16 @@ import os
 from logging import Logger
 from flask import current_app
 
+from .mediaserver import refreshMediaServer
 from ..utils.filehelper import checkFolderhasMedia
 from ..downloader.transmission import Transmission
+from ..bizlogic.manager import startScrapingAll
+from ..bizlogic.transfer import ctrlTransfer
+from ..service.configservice import scrapingConfService, transConfigService
 from ..service.taskservice import taskService
 from ..service.schedulerservice import schedulerService
 from ..service.recordservice import scrapingrecordService, transrecordService
 from ..service.configservice import localConfService
-
 
 def cleanRecordsTask(delete=True, scheduler=None):
     """
@@ -76,21 +79,46 @@ def cleanTorrents(records, conf):
 
 def checkDirectoriesTask(scheduler=None):
     """
-    TODO
     无其他任务时,才执行
     增加检测 转移/刮削 文件夹顶层目录内容 计划任务
-    间隔3分钟检测是否有新增内容,不需要下载器脚本
-    """
+    间隔10分钟检测是否有新增内容,不需要下载器脚本
+    """    
+    if scheduler:
+        with scheduler.app.app_context():
+            autoWatchDirectories()
+    else:
+        autoWatchDirectories()
+
+def autoWatchDirectories():
     if taskService.haveRunningTask():
         return
-    logger(scheduler).debug('checkDirectories')
-
+    logger().debug('[!] watch Directories')
+    logger().debug('watch scraping folder')
+    scraping_configs = scrapingConfService.getConfiglist()
+    for conf in scraping_configs:
+        if conf.auto_watch:
+            try:
+                logger().debug(f"watch {conf.scraping_folder}")
+                startScrapingAll(conf.id)
+            except Exception as ex:
+                logger().error(ex)
+    logger().debug('watch transfer folder')
+    transfer_configs = transConfigService.getConfiglist()
+    for conf in transfer_configs:
+        if conf.auto_watch:
+            try:
+                logger().debug(f"watch {conf.source_folder}")
+                ctrlTransfer(conf.source_folder, conf.output_folder, conf.linktype,
+                         conf.soft_prefix, conf.escape_folder, "", conf.fix_series,
+                         conf.clean_others, conf.replace_CJK, conf.refresh_url)
+            except Exception as ex:
+                logger().error(ex)
 
 def initScheduler():
     """ 初始化
     """
     schedulerService.addJob('cleanRecords', cleanRecordsTask, args=[False, schedulerService.scheduler], seconds=3600)
-    # schedulerService.addJob('checkDirectories', checkDirectoriesTask, args=[schedulerService.scheduler], seconds=180)
+    schedulerService.addJob('checkDirectories', checkDirectoriesTask, args=[schedulerService.scheduler], seconds=900)
 
 
 def logger(scheduler=None) -> Logger: 

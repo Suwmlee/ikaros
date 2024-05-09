@@ -19,6 +19,7 @@ class _ScrapingConfigs(db.Model):
 
     id = Column(Integer, primary_key=True)
     main_mode = Column(Integer, default=1)
+    auto_watch = Column(Boolean, default=False)
 
     scraping_folder = Column(String, default='/media')
     failed_folder = Column(String, default='/media/failed')
@@ -57,6 +58,7 @@ class _ScrapingConfigs(db.Model):
         return {
             'id': self.id,
             'main_mode': self.main_mode,
+            'auto_watch': self.auto_watch,
             'link_type': self.link_type,
             'soft_prefix': self.soft_prefix,
             'scraping_folder': self.scraping_folder,
@@ -84,6 +86,7 @@ class _TransferConfigs(db.Model):
     __tablename__ = 'transferconfigs'
 
     id = Column(Integer, primary_key=True)
+    auto_watch = Column(Boolean, default=False)
     source_folder = Column(String, default='/media')
     soft_prefix = Column(String, default='/volume1/Media')
     linktype = Column(Integer, default=0)
@@ -99,6 +102,7 @@ class _TransferConfigs(db.Model):
     def serialize(self):
         return {
             'id': self.id,
+            'auto_watch': self.auto_watch,
             'source_folder': self.source_folder,
             'linktype': self.linktype,
             'soft_prefix': self.soft_prefix,
