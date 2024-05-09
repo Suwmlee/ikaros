@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/Suwmlee/ikaros/compare/v2.3.1...v2.4.0) (2024-05-09)
+
+
+### Features
+
+* auto watch folder ([4941a4e](https://github.com/Suwmlee/ikaros/commit/4941a4e209d7928fae4bbe6a4833655d3ac4cad2)), closes [#33](https://github.com/Suwmlee/ikaros/issues/33)
+
 ## [2.3.1](https://github.com/Suwmlee/ikaros/compare/v2.3.0...v2.3.1) (2024-04-25)
 
 
