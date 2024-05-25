@@ -400,29 +400,23 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs, specifieds
 
     """
 
-    number = numinfo.num
     c_sources = conf.site_sources
     if not c_sources:
         c_sources = "javlibrary,javdb,javbus,airav,fanza,xcity,jav321,mgstage,fc2,avsox,dlsite,carib,madou,mv91,getchu,gcolle"
     configProxy = localConfService.getProxyConfig()
     proxies = configProxy.proxies() if configProxy.enable else None
-    json_data = search(number, c_sources,
+    json_data = search(numinfo.num, c_sources,
                        specifiedSource=specifiedsource, specifiedUrl=specifiedurl,
                        proxies=proxies, morestoryline=conf.morestoryline)
+    if json_data.get('number') == '' and numinfo.num:
+        json_data['number'] = numinfo.num
     # Return if blank dict returned (data not found)
-    if not json_data or json_data.get('number') == '' or json_data.get('title') == '':
+    if not json_data or json_data.get('title') == '':
         current_app.logger.error('[-]Movie Data not found!')
         return False, moveFailedFolder(filepath)
 
     json_data = fixJson(json_data, conf.naming_rule)
 
-    if json_data.get("number") != number:
-        # fix issue #119
-        # the root cause is we normalize the search id
-        # print_files() will use the normalized id from website,
-        # but paste_file_to_folder() still use the input raw search id
-        # so the solution is: use the normalized search id
-        number = json_data.get("number")
     imagecut = json_data.get('imagecut')
 
     # main_mode
