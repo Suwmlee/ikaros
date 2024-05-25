@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/Suwmlee/ikaros/compare/v2.4.0...v2.4.1) (2024-05-25)
+
+
+### Bug Fixes
+
+* number could be empty ([cefef1b](https://github.com/Suwmlee/ikaros/commit/cefef1b8bd664e5b192d722852fdd66b5c7da558))
+
 # [2.4.0](https://github.com/Suwmlee/ikaros/compare/v2.3.1...v2.4.0) (2024-05-09)
 
 
