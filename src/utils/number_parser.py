@@ -113,10 +113,10 @@ def get_number(file_path: str) -> str:
         file_subpath = os.path.dirname(file_path)
         file_subpath = os.path.basename(file_subpath)
         (filename, ext) = os.path.splitext(basename)
-        file_number = rules_parser(filename.lower())
+        file_number = rules_parser(filename)
         if file_number is None:
             # 文件名不包含，查看文件夹
-            file_number = rules_parser(file_subpath.lower())
+            file_number = rules_parser(file_subpath)
         if file_number:
             return file_number
 
@@ -162,9 +162,7 @@ def get_number(file_path: str) -> str:
 
 # 定义多个匹配规则
 rules = [
-    lambda x: re.search(r'(cz|gedo|k|n|red-|se)\d{2,4}', x, re.I).group(),
-    lambda x: re.search(r'\d{6}(-|_)\d{3}', x, re.I).group(),
-    lambda x: re.search(r'\d{6}(-|_)\d{2}', x, re.I).group(),
+    lambda x: re.search(r'\d{6}(-|_)\d{2,3}', x, re.I).group(),
     lambda x: re.search(r'x-art\.\d{2}\.\d{2}\.\d{2}', x, re.I).group(),
     lambda x: ''.join(['xxx-av-', re.findall(r'xxx-av[^\d]*(\d{3,5})[^\d]*', x, re.I)[0]]),
     lambda x: 'heydouga-' + '-'.join(re.findall(r'(\d{4})[\-_](\d{3,4})[^\d]*', x, re.I)[0]),
@@ -178,13 +176,14 @@ rules = [
 ]
 
 
-def rules_parser(filename):
+def rules_parser(filename: str):
     """ lower filename
     """
+    filename = filename.upper()
     for rule in rules:
         try:
-            if 'fc2' in filename:
-                filename = filename.replace('ppv', '').replace('--', '-').replace('_', '-').replace(' ', '')
+            if 'FC2' in filename:
+                filename = filename.replace('PPV', '').replace('--', '-').replace('_', '-').replace(' ', '')
             file_number = rule(filename)
             if file_number:
                 return file_number
@@ -250,6 +249,7 @@ if __name__ == "__main__":
         "/media/SIRO-1234-C.mkv",
         "/media/MXGS-1234-C.mkv",
         "/media/dv-1234-C.mkv",
+        "/media/pred-1234-C.mkv",
     ]
     def convert_emoji(bool_tag):
         if bool_tag:

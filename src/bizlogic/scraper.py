@@ -284,6 +284,7 @@ def crop_poster(imagecut, path, prefilename):
     except:
         current_app.logger.info('[-]Cover cut failed!')
 
+
 def add_mark(pics, numinfo: FileNumInfo, count, size):
     """ 
     Add water mark 
@@ -561,6 +562,7 @@ def fixJson(json_data, c_naming_rule):
     json_data['series'] = series
     json_data['studio'] = studio
     json_data['director'] = director
+    json_data['number'] = number.upper()
 
     # 统一演员名/tag等
     localPath = os.path.dirname(os.path.abspath(__file__))
@@ -594,7 +596,7 @@ def fixJson(json_data, c_naming_rule):
             if tmp4 and len(tmp4) == 1:
                 return tmp4[0]
             return src
-            
+
         def mappingInfo(src):
             if not src:
                 return src
