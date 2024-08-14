@@ -36,112 +36,118 @@ def findAllMovies(root, escape_folder):
 def create_data_and_move(file_path: str, conf: _ScrapingConfigs, app: any, forced=False):
     """ scrape single file
     """
+
+    movie_info = scrapingrecordService.queryByPath(file_path)
     with app.app_context():
         try:
-            movie_info = scrapingrecordService.queryByPath(file_path)
-            # 查看单个文件刮削状态
-            if not movie_info or forced or movie_info.status == 0 or movie_info.status == 2:
-                movie_info = scrapingrecordService.add(file_path)
-                # 查询是否已经存在刮削目录 & 不能在同一目录下
-                if movie_info.destpath and movie_info.destpath != '':
-                    basefolder = os.path.dirname(movie_info.srcpath)
-                    folder = os.path.dirname(movie_info.destpath)
-                    if os.path.exists(folder) and basefolder != folder:
-                        name = os.path.basename(movie_info.destpath)
-                        filter = os.path.splitext(name)[0]
-                        if movie_info.cdnum and movie_info.cdnum > 0:
-                            # 如果是多集，则只清理当前文件
-                            cleanFilebyFilter(folder, filter)
-                        else:
-                            cleanFolderbyFilter(folder, filter)
-                # 过滤
-                ignore = False
-                if movie_info.ignored:
-                    ignore = True
-                elif conf.escape_size and conf.escape_size > 0:
-                    minsize = conf.escape_size * 1024 * 1024
-                    filesize = os.path.getsize(file_path)
-                    if filesize < minsize:
-                        ignore = True
-                        app.logger.info('[!] ' + str(file_path) + ' below size limit, will pass')
-                if not ignore:
-                    num_info = FileNumInfo(file_path)
-                    # 查询是否有额外设置
-                    if movie_info.scrapingname and movie_info.scrapingname != '':
-                        num_info.num = movie_info.scrapingname
-                    if movie_info.cnsubtag:
-                        num_info.chs_tag = True
-                    if movie_info.leaktag:
-                        num_info.leak_tag = True
-                    if movie_info.uncensoredtag:
-                        num_info.uncensored_tag = True
-                    if movie_info.hacktag:
-                        num_info.hack_tag = True
-                    if movie_info.cdnum:
-                        num_info.updateCD(movie_info.cdnum)
-                    app.logger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, num_info.num))
-                    movie_info.status = 4
-                    movie_info.scrapingname = num_info.num
-                    movie_info.updatetime = datetime.datetime.now()
-                    scrapingrecordService.commit()
-                    (flag, new_path) = core_main(file_path, num_info, conf, movie_info.specifiedsource, movie_info.specifiedurl)
-                    if flag:
-                        movie_info.status = 1
-                        (filefolder, newname) = os.path.split(new_path)
-                        movie_info.destname = newname
-                        movie_info.destpath = new_path
-                        movie_info.linktype = conf.link_type
-                        movie_info.cnsubtag = num_info.chs_tag
-                        movie_info.leaktag = num_info.leak_tag
-                        movie_info.uncensoredtag = num_info.uncensored_tag
-                        movie_info.hacktag = num_info.hack_tag
-                        if num_info.multipart_tag:
-                            movie_info.cdnum = num_info.part[3:]
-                    else:
-                        # 失败
-                        movie_info.status = 2
-                        movie_info.destpath = new_path
-                else:
-                    # 忽略
-                    movie_info.status = 3
-                movie_info.updatetime = datetime.datetime.now()
-                scrapingrecordService.commit()
-            else:
-                app.logger.info("[!]Already done: [{}]".format(file_path))
-                try:
-                    app.logger.info(
-                        f"[!]Checking dest file status: type {conf.link_type} and destpath [{movie_info.destpath}]")
-                    if movie_info and movie_info.status == 1:
-                        if conf.link_type == 0:
-                            if os.path.exists(movie_info.destpath) and not pathlib.Path(movie_info.destpath).is_symlink():
-                                app.logger.info(f"[!]Checking file status: OK")
-                            else:
-                                app.logger.error(f"[!]Checking file status: file missing")
-                                if os.path.exists(movie_info.srcpath):
-                                    shutil.move(movie_info.srcpath, movie_info.destpath)
-                                    app.logger.info(f"[!]Checking file status: fixed")
-                        elif conf.link_type == 1:
-                            if os.path.exists(movie_info.srcpath) and pathlib.Path(movie_info.destpath).is_symlink():
-                                app.logger.info(f"[!]Checking file status: OK")
-                            else:
-                                app.logger.error(f"[!]Checking file status: wrong symlink")
-                        elif conf.link_type == 2:
-                            if os.path.exists(movie_info.srcpath) and \
-                                    os.path.exists(movie_info.destpath) and \
-                                    os.path.samefile(movie_info.srcpath, movie_info.destpath):
-                                app.logger.info(f"[!]Checking file status: OK")
-                            else:
-                                app.logger.error(f"[!]Checking file status: file missing")
-                                linkFile(movie_info.srcpath, movie_info.destpath, 2)
-                                app.logger.info(f"[!]Checking file status: fixed")
-                except Exception as e:
-                    app.logger.error(f"[!]Checking file status: ERROR")
-                    app.logger.error(e)
-        except Exception as err:
-            app.logger.error("[!] ERROR: [{}] ".format(file_path))
-            app.logger.error(err)
-            moveFailedFolder(file_path)
-        app.logger.info("[*]======================================================")
+          # 查看单个文件刮削状态
+          if not movie_info or forced or movie_info.status == 0 or movie_info.status == 2:
+              movie_info = scrapingrecordService.add(file_path)
+              # 查询是否已经存在刮削目录 & 不能在同一目录下
+              if movie_info.destpath and movie_info.destpath != '':
+                  basefolder = os.path.dirname(movie_info.srcpath)
+                  folder = os.path.dirname(movie_info.destpath)
+                  if os.path.exists(folder) and basefolder != folder:
+                      name = os.path.basename(movie_info.destpath)
+                      filter = os.path.splitext(name)[0]
+                      if movie_info.cdnum and movie_info.cdnum > 0:
+                          # 如果是多集，则只清理当前文件
+                          cleanFilebyFilter(folder, filter)
+                      else:
+                          cleanFolderbyFilter(folder, filter)
+              # 过滤
+              ignore = False
+              if movie_info.ignored:
+                  ignore = True
+              elif conf.escape_size and conf.escape_size > 0:
+                  minsize = conf.escape_size * 1024 * 1024
+                  filesize = os.path.getsize(file_path)
+                  if filesize < minsize:
+                      ignore = True
+                      current_app.logger.info('[!] ' + str(file_path) + ' below size limit, will pass')
+              if not ignore:
+                  num_info = FileNumInfo(file_path)
+                  # 查询是否有额外设置
+                  if movie_info.scrapingname and movie_info.scrapingname != '':
+                      num_info.num = movie_info.scrapingname
+                  if movie_info.cnsubtag:
+                      num_info.chs_tag = True
+                  if movie_info.leaktag:
+                      num_info.leak_tag = True
+                  if movie_info.uncensoredtag:
+                      num_info.uncensored_tag = True
+                  if movie_info.hacktag:
+                      num_info.hack_tag = True
+                  if movie_info.cdnum:
+                      num_info.updateCD(movie_info.cdnum)
+                  current_app.logger.info("[!]Making Data for [{}], the number is [{}]".format(file_path, num_info.num))
+                  movie_info.status = 4
+                  movie_info.scrapingname = num_info.num
+                  movie_info.updatetime = datetime.datetime.now()
+                  scrapingrecordService.commit()
+                  # main proccess
+                  (flag, new_path) = core_main(file_path, num_info, conf, movie_info.specifiedsource, movie_info.specifiedurl)
+                  if flag:
+                      movie_info.status = 1
+                      (filefolder, newname) = os.path.split(new_path)
+                      movie_info.destname = newname
+                      movie_info.destpath = new_path
+                      movie_info.linktype = conf.link_type
+                      movie_info.cnsubtag = num_info.chs_tag
+                      movie_info.leaktag = num_info.leak_tag
+                      movie_info.uncensoredtag = num_info.uncensored_tag
+                      movie_info.hacktag = num_info.hack_tag
+                      if num_info.multipart_tag:
+                          movie_info.cdnum = num_info.part[3:]
+                  else:
+                      # 失败
+                      movie_info.status = 2
+                      movie_info.destpath = new_path
+              else:
+                  # 忽略
+                  movie_info.status = 3
+              movie_info.updatetime = datetime.datetime.now()
+              scrapingrecordService.commit()
+          else:
+              current_app.logger.info("[!]Already done: [{}]".format(file_path))
+              try:
+                  current_app.logger.info(
+                      f"[!]Checking dest file status: type {conf.link_type} and destpath [{movie_info.destpath}]")
+                  if movie_info and movie_info.status == 1:
+                      if conf.link_type == 0:
+                          if os.path.exists(movie_info.destpath) and not pathlib.Path(movie_info.destpath).is_symlink():
+                              current_app.logger.info(f"[!]Checking file status: OK")
+                          else:
+                              current_app.logger.error(f"[!]Checking file status: file missing")
+                              if os.path.exists(movie_info.srcpath):
+                                  shutil.move(movie_info.srcpath, movie_info.destpath)
+                                  current_app.logger.info(f"[!]Checking file status: fixed")
+                      elif conf.link_type == 1:
+                          if os.path.exists(movie_info.srcpath) and pathlib.Path(movie_info.destpath).is_symlink():
+                              current_app.logger.info(f"[!]Checking file status: OK")
+                          else:
+                              current_app.logger.error(f"[!]Checking file status: wrong symlink")
+                      elif conf.link_type == 2:
+                          if os.path.exists(movie_info.srcpath) and \
+                                  os.path.exists(movie_info.destpath) and \
+                                  os.path.samefile(movie_info.srcpath, movie_info.destpath):
+                              current_app.logger.info(f"[!]Checking file status: OK")
+                          else:
+                              current_app.logger.error(f"[!]Checking file status: file missing")
+                              linkFile(movie_info.srcpath, movie_info.destpath, 2)
+                              current_app.logger.info(f"[!]Checking file status: fixed")
+              except Exception as e:
+                  current_app.logger.error(f"[!]Checking file status: ERROR")
+                  current_app.logger.error(e)
+      except Exception as err:
+          # Sometimes core_main may cause exception, and the status will stuck on 4(scraping)
+          # So we have to set a defer func to handle this situation
+          movie_info.status = 2 # set task as failed
+          scrapingrecordService.commit()
+          current_app.logger.error("[!] ERROR: [{}] ".format(file_path))
+          current_app.logger.error(err)
+          moveFailedFolder(file_path)
+      current_app.logger.info("[*]======================================================")
 
 
 def startScrapingAll(cid, folder=''):

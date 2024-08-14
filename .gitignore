@@ -130,3 +130,8 @@ dmypy.json
 # Custom
 web/
 web.log.*
+
+# MacOS venv
+bin/
+include/
+pyvenv.cfg
