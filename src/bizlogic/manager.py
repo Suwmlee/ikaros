@@ -37,8 +37,9 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs, app: any, force
     """ scrape single file
     """
 
-    movie_info = scrapingrecordService.queryByPath(file_path)
+    
     with app.app_context():
+        movie_info = scrapingrecordService.queryByPath(file_path)
         try:
           # 查看单个文件刮削状态
           if not movie_info or forced or movie_info.status == 0 or movie_info.status == 2:
@@ -139,15 +140,15 @@ def create_data_and_move(file_path: str, conf: _ScrapingConfigs, app: any, force
               except Exception as e:
                   current_app.logger.error(f"[!]Checking file status: ERROR")
                   current_app.logger.error(e)
-      except Exception as err:
-          # Sometimes core_main may cause exception, and the status will stuck on 4(scraping)
-          # So we have to set a defer func to handle this situation
-          movie_info.status = 2 # set task as failed
-          scrapingrecordService.commit()
-          current_app.logger.error("[!] ERROR: [{}] ".format(file_path))
-          current_app.logger.error(err)
-          moveFailedFolder(file_path)
-      current_app.logger.info("[*]======================================================")
+        except Exception as err:
+            # Sometimes core_main may cause exception, and the status will stuck on 4(scraping)
+            # So we have to set a defer func to handle this situation
+            movie_info.status = 2 # set task as failed
+            scrapingrecordService.commit()
+            current_app.logger.error("[!] ERROR: [{}] ".format(file_path))
+            current_app.logger.error(err)
+            moveFailedFolder(file_path)
+        current_app.logger.info("[*]======================================================")
 
 
 def startScrapingAll(cid, folder=''):
@@ -180,7 +181,7 @@ def startScrapingAll(cid, folder=''):
     current_app.logger.info("[*]======================================================")
     current_app.logger.info('[+]Find  ' + str(total) + '  movies')
 
-    threadPoolSize = 5
+    threadPoolSize = conf.threads_num
     currentThreads = []
     for movie_path in movie_list:
         # refresh data
