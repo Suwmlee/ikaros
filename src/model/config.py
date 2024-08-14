@@ -27,6 +27,7 @@ class _ScrapingConfigs(db.Model):
     link_type = Column(Integer, default=1)
     soft_prefix = Column(String, default='/media')
     failed_move = Column(Boolean, default=False)
+    threads_num = Column(Integer, default=5)
 
     site_sources = Column(String, default="")
     location_rule = Column(String, default="actor+'/'+number+' '+title")
@@ -64,6 +65,7 @@ class _ScrapingConfigs(db.Model):
             'scraping_folder': self.scraping_folder,
             'success_folder': self.success_folder,
             'failed_folder': self.failed_folder,
+            'threads_num': self.threads_num,
             'location_rule': self.location_rule,
             'naming_rule': self.naming_rule,
             'site_sources': self.site_sources,

@@ -409,6 +409,9 @@ def core_main(filepath, numinfo: FileNumInfo, conf: _ScrapingConfigs, specifieds
     json_data = search(numinfo.num, c_sources,
                        specifiedSource=specifiedsource, specifiedUrl=specifiedurl,
                        proxies=proxies, morestoryline=conf.morestoryline)
+    if json_data == None:
+        current_app.logger.error('[!]Empty Info, Notice: JavDB forbide [JAPANESE] IP, please check your proxy.')
+        return False, ''
     if json_data.get('number') == '' and numinfo.num:
         json_data['number'] = numinfo.num
     # Return if blank dict returned (data not found)
