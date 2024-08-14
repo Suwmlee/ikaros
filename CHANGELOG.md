@@ -1,3 +1,15 @@
+# [2.5.0](https://github.com/Suwmlee/ikaros/compare/v2.4.2...v2.5.0) (2024-08-14)
+
+
+### Bug Fixes
+
+* handled some error in scraping ([dc16881](https://github.com/Suwmlee/ikaros/commit/dc16881f55b4c7023531222bc0222cd3d23a2d1d))
+
+
+### Features
+
+* complete multithreading with config control ([daff077](https://github.com/Suwmlee/ikaros/commit/daff077138a2b3d74e6626efda16d7f7b21e04b4))
+
 ## [2.4.2](https://github.com/Suwmlee/ikaros/compare/v2.4.1...v2.4.2) (2024-05-26)
 
 
