@@ -1,3 +1,10 @@
+## [2.5.1](https://github.com/Suwmlee/ikaros/compare/v2.5.0...v2.5.1) (2024-09-06)
+
+
+### Bug Fixes
+
+* db migrate ([b70b0b4](https://github.com/Suwmlee/ikaros/commit/b70b0b46d167a73a738c5345b03f48860ab249f6))
+
 # [2.5.0](https://github.com/Suwmlee/ikaros/compare/v2.4.2...v2.5.0) (2024-08-14)
 
 
