@@ -81,8 +81,8 @@ class _ScrapingConfigs(db.Model):
             'cookies_javdb': self.cookies_javdb,
             'cookies_javlib': self.cookies_javlib,
             'refresh_url': self.refresh_url,
-            'remark': self.remark
-            "is_sym_relative_path": self.is_sym_relative_path,
+            'remark': self.remark,
+            'is_sym_relative_path': self.is_sym_relative_path
         }
 
 
@@ -118,7 +118,7 @@ class _TransferConfigs(db.Model):
             'replace_CJK': self.replace_CJK,
             'fix_series': self.fix_series,
             'refresh_url': self.refresh_url,
-            'remark': self.remark
+            'remark': self.remark,
             "is_sym_relative_path": self.is_sym_relative_path,
         }
 
