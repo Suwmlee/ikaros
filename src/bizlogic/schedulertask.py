@@ -108,9 +108,19 @@ def autoWatchDirectories():
         if conf.auto_watch:
             try:
                 logger().debug(f"watch {conf.source_folder}")
-                ctrlTransfer(conf.source_folder, conf.output_folder, conf.linktype,
-                         conf.soft_prefix, conf.escape_folder, "", conf.fix_series,
-                         conf.clean_others, conf.replace_CJK, conf.refresh_url)
+                ctrlTransfer(
+                    conf.source_folder,
+                    conf.output_folder,
+                    conf.linktype,
+                    conf.soft_prefix,
+                    conf.escape_folder,
+                    "",
+                    conf.fix_series,
+                    conf.clean_others,
+                    conf.replace_CJK,
+                    conf.refresh_url,
+                    conf.is_sym_relative_path,
+                )
             except Exception as ex:
                 logger().error(ex)
 

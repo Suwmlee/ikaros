@@ -202,11 +202,13 @@ def moveSubsbyFilepath(srcpath, destpath, saved=True):
     moveSubs(srcfolder, destfolder, srcbasename, destbasename, saved)
 
 
-def forceSymlink(srcpath, dstpath):
+def forceSymlink(srcpath, dstpath, is_relative=False):
     """ create symlink
     https://stackoverflow.com/questions/8299386/modifying-a-symlink-in-python
     """
     try:
+        if is_relative:
+            srcpath = os.path.relpath(srcpath, os.path.dirname(dstpath))
         os.symlink(srcpath, dstpath)
     except OSError as e:
         if e.errno == errno.EEXIST:
@@ -239,7 +241,7 @@ def checkFileExists(filepath):
     else:
         return False
 
-def linkFile(srcpath, dstpath, linktype=1):
+def linkFile(srcpath, dstpath, linktype=1, is_relative=False):
     """ 链接文件
 
     params: linktype: `1` 软链接 `2` 硬链接
@@ -256,7 +258,7 @@ def linkFile(srcpath, dstpath, linktype=1):
             os.makedirs(dstfolder)
         logger().debug("[-] create link from [{}] to [{}]".format(srcpath, dstpath))
         if linktype == 1:
-            forceSymlink(srcpath, dstpath)
+            forceSymlink(srcpath, dstpath, is_relative)
         else:
             forceHardlink(srcpath, dstpath)
 

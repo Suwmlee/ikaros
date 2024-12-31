@@ -15,12 +15,19 @@ from ..service.taskservice import taskService
 @web.route("/api/transfer", methods=['POST'])
 def startTransfer():
     content = request.get_json()
-    ctrlTransfer(content['source_folder'], content['output_folder'],
-                 content['linktype'], content['soft_prefix'],
-                 content['escape_folder'], content.get('specified_files'),
-                 content['fix_series'],
-                 content['clean_others'], content['replace_CJK'],
-                 content.get('refresh_url'))
+    ctrlTransfer(
+        content["source_folder"],
+        content["output_folder"],
+        content["linktype"],
+        content["soft_prefix"],
+        content["escape_folder"],
+        content.get("specified_files"),
+        content["fix_series"],
+        content["clean_others"],
+        content["replace_CJK"],
+        content.get("refresh_url"),
+        content["is_sym_relative_path"],
+    )
     return Response(status=200)
 
 
