@@ -166,10 +166,18 @@ def autoTransfer(cid, real_path: str):
     conf = transConfigService.getConfigById(cid)
     try:
         current_app.logger.debug("任务详情: 自动转移")
-        if not transfer(conf.source_folder, conf.output_folder,
-                        conf.linktype, conf.soft_prefix,
-                        conf.escape_folder, real_path,
-                        False, conf.replace_CJK, conf.fix_series):
+        if not transfer(
+            conf.source_folder,
+            conf.output_folder,
+            conf.linktype,
+            conf.soft_prefix,
+            conf.escape_folder,
+            real_path,
+            False,
+            conf.replace_CJK,
+            conf.fix_series,
+            conf.is_sym_relative_path,
+        ):
             return 0
         if conf.refresh_url:
             if not refreshMediaServer(conf.refresh_url):
@@ -179,27 +187,47 @@ def autoTransfer(cid, real_path: str):
         return 0
 
 
-def ctrlTransfer(src_folder, dest_folder,
-                 linktype, prefix, escape_folders,
-                 specified_files, fix_series,
-                 clean_others,
-                 replace_CJK,
-                 refresh_url):
-    transfer(src_folder, dest_folder, linktype, prefix,
-             escape_folders, specified_files,
-             clean_others, replace_CJK,
-             fix_series)
+def ctrlTransfer(
+    src_folder,
+    dest_folder,
+    linktype,
+    prefix,
+    escape_folders,
+    specified_files,
+    fix_series,
+    clean_others,
+    replace_CJK,
+    refresh_url,
+    is_sym_relative_path,
+):
+    transfer(
+        src_folder,
+        dest_folder,
+        linktype,
+        prefix,
+        escape_folders,
+        specified_files,
+        clean_others,
+        replace_CJK,
+        fix_series,
+        is_sym_relative_path,
+    )
     if refresh_url:
         refreshMediaServer(refresh_url)
 
 
-def transfer(src_folder, dest_folder,
-             linktype, prefix,
-             escape_folders, specified_files='',
-             clean_others_tag=True,
-             simplify_tag=False,
-             fixseries_tag=False
-             ):
+def transfer(
+    src_folder,
+    dest_folder,
+    linktype,
+    prefix,
+    escape_folders,
+    specified_files="",
+    clean_others_tag=True,
+    simplify_tag=False,
+    fixseries_tag=False,
+    is_sym_relative_path=False,
+):
     """
     如果 specified_files 有值，则使用 specified_files 过滤文件且不清理其他文件
     """
@@ -301,7 +329,7 @@ def transfer(src_folder, dest_folder,
                 newpath = os.path.join(dest_folder, currentfile.fixMidFolder(), currentfile.fixFinalName())
             currentfile.updateFinalPath(newpath)
             if linktype == 0:
-                linkFile(link_path, newpath, 1)
+                linkFile(link_path, newpath, 1, is_sym_relative_path)
             else:
                 linkFile(link_path, newpath, 2)
 

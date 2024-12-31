@@ -365,8 +365,9 @@ def paste_file_to_folder(filepath, path, prefilename, link_type, extra=False):
             soft_prefix = config.soft_prefix
             src_folder = config.scraping_folder
             midfolder = filefolder.replace(src_folder, '').lstrip("\\").lstrip("/")
+            is_relative = config.is_sym_relative_path
             soft_path = os.path.join(soft_prefix, midfolder, name)
-            linkFile(soft_path, newpath, 1)
+            linkFile(soft_path, newpath, 1, is_relative)
         elif link_type == 2:
             linkFile(filepath, newpath, 2)
         else:

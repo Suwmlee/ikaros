@@ -26,6 +26,7 @@ class _ScrapingConfigs(db.Model):
     success_folder = Column(String, default='/media/output')
     link_type = Column(Integer, default=1)
     soft_prefix = Column(String, default='/media')
+    is_sym_relative_path = Column(Boolean, default=False)
     failed_move = Column(Boolean, default=False)
     threads_num = Column(Integer, default=5)
 
@@ -81,6 +82,7 @@ class _ScrapingConfigs(db.Model):
             'cookies_javlib': self.cookies_javlib,
             'refresh_url': self.refresh_url,
             'remark': self.remark
+            "is_sym_relative_path": self.is_sym_relative_path,
         }
 
 
@@ -94,6 +96,7 @@ class _TransferConfigs(db.Model):
     linktype = Column(Integer, default=0)
     output_folder = Column(String, default='/media/output')
     escape_folder = Column(String, default='Sample,sample')
+    is_sym_relative_path = Column(Boolean, default=False)
     escape_size = Column(Integer, default=0)
     clean_others = Column(Boolean, default=False)
     replace_CJK = Column(Boolean, default=False)
@@ -116,6 +119,7 @@ class _TransferConfigs(db.Model):
             'fix_series': self.fix_series,
             'refresh_url': self.refresh_url,
             'remark': self.remark
+            "is_sym_relative_path": self.is_sym_relative_path,
         }
 
 
