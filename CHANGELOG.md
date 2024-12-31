@@ -1,3 +1,15 @@
+# [2.6.0](https://github.com/Suwmlee/ikaros/compare/v2.5.1...v2.6.0) (2024-12-31)
+
+
+### Bug Fixes
+
+* syntax err ([b8ce711](https://github.com/Suwmlee/ikaros/commit/b8ce711f381efd21f813e1290d9b8dd41a03b8bc))
+
+
+### Features
+
+* add relative path support for symlink ([27eed53](https://github.com/Suwmlee/ikaros/commit/27eed53d232fe4f74a2264d060abaf6b84b925b8))
+
 ## [2.5.1](https://github.com/Suwmlee/ikaros/compare/v2.5.0...v2.5.1) (2024-09-06)
 
 
