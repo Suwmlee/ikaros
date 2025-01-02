@@ -1,3 +1,11 @@
+## [2.6.1](https://github.com/Suwmlee/ikaros/compare/v2.6.0...v2.6.1) (2025-01-02)
+
+
+### Bug Fixes
+
+* **ci:** bump version ([df2793c](https://github.com/Suwmlee/ikaros/commit/df2793c2e5e55657d4a89a5c543280376e3431f4))
+* trigger release manually v2.6.1 ([70bd123](https://github.com/Suwmlee/ikaros/commit/70bd123c9b9f133f7bc09584b88fbf342eaf982f))
+
 # [2.6.0](https://github.com/Suwmlee/ikaros/compare/v2.5.1...v2.6.0) (2024-12-31)
 
 
