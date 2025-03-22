@@ -16,8 +16,11 @@
 下载完成后，自动筛选文件创建软/硬链接，刮削JAV目录，推送emby库刷新，清理失效文件/种子。<br>
 只需要在网页内操作，不需要打开文件夹，不需要使用命令行
 
-__重要!!!: ikaros不再进行大更新，新的特性和功能将在[Bonita](https://github.com/Suwmlee/bonita)中实现__
-__重要!!!: ikaros不再进行大更新，新的特性和功能将在[Bonita](https://github.com/Suwmlee/bonita)中实现__
+<br><br>
+__!!! ikaros不再进行大更新，新的特性和功能将在[Bonita](https://github.com/Suwmlee/bonita)中实现__<br>
+__!!! ikaros不再进行大更新，新的特性和功能将在[Bonita](https://github.com/Suwmlee/bonita)中实现__<br>
+__!!! ikaros不再进行大更新，新的特性和功能将在[Bonita](https://github.com/Suwmlee/bonita)中实现__
+<br><br>
 
 ### 安装
 
